@@ -1,0 +1,39 @@
+<% 
+var warningsStats = this.getWarningsStats(element);
+%>
+<div style="width: 100%">
+<table style="width: 100%">
+<tbody>
+<tr>
+<th colspan="3" class="stats"><div class="cell-th"><p class="cell-th-span">
+<a href="<%= this.params.warningsFile.zus.name %>.html#<%= element.getXmlGuid().substring(5) %>">Problemy</a>
+</p></div></th>
+</tr>
+<tr>
+<td class="stats-name" style="width: 40%;"><div class="cell-th"><p class="cell-th-span">Kategoria</p></div></td>
+<td class="stats-name" style="width: 30%;"><div class="cell-th"><p class="cell-th-span">Sprawdzeñ</p></div></td>
+<td class="stats-name" style="width: 30%;"><div class="cell-th"><p class="cell-th-span">Problemów</p></div></td>
+</tr>
+<%
+for (var category in warningsStats) {
+	var stats = warningsStats[category];
+	%>
+	<tr>
+	<td class="stats-name"><div class="cell-th"><p class="cell-th-span"><b><%= this.category[category].label %></b></p></div></td>
+	<td><div class="cell-td"><p class="cell-td-span"><b><%= stats.checks ? stats.checks : "nie sprawdzano" %></b></p></div></td>
+	<td><div class="cell-td"><p class="cell-td-span"><b><%= stats.checks ? stats.total : "nie sprawdzano" %></b></p></div></td>
+	</tr>
+	<%
+	for (var id in stats.warnings) {
+		%>
+		<tr>
+		<td colspan="2" style="border-right: 0px;"><div class="cell-td"><p class="cell-td-span"><%= this.warnings[id].getDescription() %></p></div></td>
+		<td style="border-left: 0px;"><div class="cell-td"><p class="cell-td-span" style="text-align: right;"><% stats.warnings[id] %></p></div></td>
+		</tr>
+		<%
+	}
+}
+%>
+</tbody>
+</table>
+</div>

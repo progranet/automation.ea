@@ -1,0 +1,246 @@
+* {
+	font-family: Calibri;
+	font-size: 10pt;
+}
+
+p, ul, li {
+	font-family: Calibri;
+	font-size: 10pt;
+}
+
+ul, li {
+	margin-top: 0px;
+	padding-top: 0px;
+}
+
+p.li {
+	margin: 0px;
+	padding: 0px;
+	margin-left: 20px;
+	text-indent: -10px;
+}
+
+table {
+	border: 0px;
+    border-spacing: 0;
+	border-collapse: collapse;
+	margin: 0px;
+}
+
+td, th {
+	border: 1px solid black;
+	padding: 0px;
+	vertical-align: text-top;
+}
+
+th {
+	background-color: #96A9C1;
+	color: white;
+}
+
+h1
+	{mso-style-link:"Nag³ówek 1 Znak";
+	margin-top:24.0pt;
+	margin-right:0cm;
+	margin-bottom:0cm;
+	margin-left:21.6pt;
+	margin-bottom:.0001pt;
+	text-indent:-21.6pt;
+	line-height:115%;
+	page-break-after:avoid;
+	font-size:14.0pt;
+	font-family:"Cambria","serif";
+	color:#365F91;
+}
+h2
+	{mso-style-name:"Nag³ówek 2\,H2\,Subhead A\,2";
+	mso-style-link:"Nag³ówek 2 Znak\,H2 Znak\,Subhead A Znak\,2 Znak";
+	margin-top:10.0pt;
+	margin-right:0cm;
+	margin-bottom:0cm;
+	margin-left:28.8pt;
+	margin-bottom:.0001pt;
+	text-indent:-28.8pt;
+	line-height:115%;
+	page-break-after:avoid;
+	font-size:13.0pt;
+	font-family:"Cambria","serif";
+	color:#4F81BD;
+}
+h3
+	{mso-style-link:"Nag³ówek 3 Znak";
+	margin-top:10.0pt;
+	margin-right:0cm;
+	margin-bottom:0cm;
+	margin-left:36.0pt;
+	margin-bottom:.0001pt;
+	text-indent:-36.0pt;
+	line-height:115%;
+	page-break-after:avoid;
+	font-size:11.0pt;
+	font-family:"Cambria","serif";
+	color:#4F81BD;
+}
+h4
+	{mso-style-link:"Nag³ówek 4 Znak";
+	margin-top:10.0pt;
+	margin-right:0cm;
+	margin-bottom:0cm;
+	margin-left:43.2pt;
+	margin-bottom:.0001pt;
+	text-indent:-43.2pt;
+	line-height:115%;
+	page-break-after:avoid;
+	font-size:11.0pt;
+	font-family:"Cambria","serif";
+	color:#4F81BD;
+	font-weight:bold;
+	font-style:italic;}
+h5
+	{mso-style-link:"Nag³ówek 5 Znak";
+	margin-top:10.0pt;
+	margin-right:0cm;
+	margin-bottom:0cm;
+	margin-left:50.4pt;
+	margin-bottom:.0001pt;
+	text-indent:-50.4pt;
+	line-height:115%;
+	page-break-after:avoid;
+	font-size:11.0pt;
+	font-family:"Cambria","serif";
+	color:#243F60;
+	font-weight:normal;}
+h6
+	{mso-style-link:"Nag³ówek 6 Znak";
+	margin-top:10.0pt;
+	margin-right:0cm;
+	margin-bottom:0cm;
+	margin-left:57.6pt;
+	margin-bottom:.0001pt;
+	text-indent:-57.6pt;
+	line-height:115%;
+	page-break-after:avoid;
+	font-size:11.0pt;
+	font-family:"Cambria","serif";
+	color:#243F60;
+	font-weight:normal;
+	font-style:italic;}
+
+a:link {     
+	/*text-decoration: none;*/
+	color: blue; 
+}
+
+a:visited {
+	color: blue; 
+}
+
+a:hover {
+	/*text-decoration: underline;*/
+	color: red;
+}
+
+.un {
+	color: red;
+	background: #e0e0ff;
+}
+
+.mn {
+	color: blue;
+	background: #e0e0ff;
+}
+
+.uu {
+	text-decoration: line-through; 
+	color: red;
+	background: #ffe0e0;
+}
+
+.mu {
+	text-decoration: line-through; 
+	color: blue;
+	background: #ffe0e0;
+}
+
+th.stats {
+	background-color: #C1A996;
+	color: white;
+}
+
+td.stats-name {
+	background-color: #F1D9C6;
+}
+
+th.warnings {
+	background-color: silver;
+	color: black;
+}
+
+td.name {
+	background-color: #C6D9F1;
+}
+
+.code {
+	font-size: 8pt;
+	font-weight: normal;
+	font-family: monospace;
+	white-space: nowrap;
+}
+
+.reference {
+	color: blue;
+	border-bottom: 1px dashed blue;
+}
+
+.spacer {
+	width: 100%;
+	height: 20px;
+}
+
+.package-plain {
+	font-weight: bold;
+	font-size: 12pt;
+}
+
+div.cell-th, div.cell-td {
+	margin: 2px;
+	margin-left: 5px;
+	margin-right: 5px;
+	text-align: left;
+}
+
+div.warnings {
+	margin: 1px;
+	margin-left: 2px;
+	margin-right: 2px;
+	text-align: left;
+}
+
+p.cell-th-span, p.cell-td-span {
+	margin: 5px;
+}
+
+p.warnings, p.warnings-name {
+	margin: 2px;
+}
+
+p.cell-th-span, p.warnings-name {
+	font-weight: bold;
+}
+
+.diagram-image-block {
+	text-align: center;
+}
+
+.diagram-image-img {
+	text-align: center;
+}
+
+.diagram-name-block {
+	text-align: center;
+}
+
+.diagram-name-span {
+	text-align: center;
+	margin: 0px;
+}

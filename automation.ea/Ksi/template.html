@@ -1,0 +1,319 @@
+<!-- htmlHead -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Windows-1250"/>
+<link rel="stylesheet" href="<% stylesheet %>" type="text/css"/>
+<title><% title %></title>
+</head>
+<body style="width: 21cm;">
+<div style="padding: 2.5cm;"><div style="">
+
+
+<!-- spacer -->
+<br>
+
+<!-- refName -->
+<a name="<% guid %>"></a>
+
+<!-- diagram -->
+<div style="width: 100%">
+<div class="diagram-image-block"><img id="<% diagram.getXmlGuid().substring(5) %>" usemap="#<% diagram.getXmlGuid() %>" class="diagram-image-img"<% dimension %> src="<% filePath %>"></img></div>
+<div class="diagram-name-block"><p class="diagram-name-span"><% diagram._class %>: <% diagram.getName() %></p></div>
+<!-- mapHead -->
+<map name="<% diagram.getXmlGuid() %>">
+<!-- mapArea -->
+<area shape="rect" coords="<% dimension.left %>,<% dimension.top %>,<% dimension.right %>,<% dimension.bottom %>" href="#<% elementView.getElement().getXmlGuid().substring(5) %>" alt="<% elementView.getElement().getName() %>">
+<!-- mapFoot -->
+</map>
+</div>
+
+<!-- statsHead -->
+<div style="width: 100%">
+<table style="width: 100%">
+<tbody>
+<tr>
+<th colspan="3" class="stats"><div class="cell-th"><p class="cell-th-span"><% name %></p></div></th>
+</tr>
+<tr>
+<td class="stats-name" style="width: 40%;"><div class="cell-th"><p class="cell-th-span">Kategoria</p></div></td>
+<td class="stats-name" style="width: 30%;"><div class="cell-th"><p class="cell-th-span">Sprawdzeń</p></div></td>
+<td class="stats-name" style="width: 30%;"><div class="cell-th"><p class="cell-th-span">Problemów</p></div></td>
+</tr>
+<!-- statsRow -->
+<tr>
+<td class="stats-name"><div class="cell-th"><p class="cell-th-span"><b><% category %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><b><% checks ? checks : "nie sprawdzano" %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><b><% checks ? total : "nie sprawdzano" %></b></p></div></td>
+</tr>
+<!-- statsRowId -->
+<tr>
+<td colspan="2" style="border-right: 0px;"><div class="cell-td"><p class="cell-td-span"><% description %></p></div></td>
+<td style="border-left: 0px;"><div class="cell-td"><p class="cell-td-span" style="text-align: right;"><% number %></p></div></td>
+</tr>
+<!-- statsFoot -->
+</tbody>
+</table>
+</div>
+
+<!-- useCaseHead -->
+<div style="width: 100%">
+<table style="width: 100%">
+<tbody>
+<tr>
+<th><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></th>
+<th><div class="cell-th"><p class="cell-th-span"><b><% value %></b></p></div></th>
+</tr>
+<!-- useCaseRowPlain -->
+<tr>
+<td class="name"><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><% value %></p></div></td>
+</tr>
+<!-- useCaseRowList -->
+<tr>
+<td class="name"><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><ul><% value %><% list %></ul></p></div></td>
+</tr>
+<!-- useCaseFoot -->
+</tbody>
+</table>
+</div>
+
+<!-- scenarioHead -->
+<div style="width: 100%">
+<table style="width: 100%">
+<tbody>
+<tr>
+<th colspan="4"><div class="cell-th"><p class="cell-th-span"><b><% name %></b></p></div></th>
+</tr>
+<tr>
+<td class="name"><div class="cell-th"><p class="cell-th-span"><b>Krok</b></p></div></td>
+<td class="name"><div class="cell-th"><p class="cell-th-span"><b>Wykonawca</b></p></div></td>
+<td class="name"><div class="cell-th"><p class="cell-th-span"><b>Opis</b></p></div></td>
+<td class="name" style="width: 40%"><div class="cell-th"><p class="cell-th-span"><b>Kontekst</b></p></div></td>
+</tr>
+<!-- scenarioStep -->
+<tr>
+<td class="name"><div class="cell-th"><p class="cell-th-span"><b><% number %></b></p></div></td>
+<td class="name"><div class="cell-th"><p class="cell-th-span"><b><% type %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><% action %></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span">
+<% rules ? "<b>Reguły:</b><ul><li>" + rules + "</li></ul>" : "" %>
+<% include ? "<span class=\"code\">--</span><b>Włącza:</b><span class=\"code\">--&gt;</span><ul><li>" + include + "</li></ul>" : "" %>
+<% extended ? "<span class=\"code\">&lt;--</span><b>Jest rozszerzony:</b><span class=\"code\">--</span><ul><li>" + extended + "</li></ul>" : "" %>
+<% input ? "<span class=\"code\">--&gt;|</span><b>Klasy wejściowe:</b><ul>" + input + "</ul>" : "" %>
+<% output ? "<b>Klasy wyjściowe:</b><span class=\"code\">|--&gt;</span><ul>" + output + "</ul>" : "" %>
+</p></div></td>
+</tr>
+<!-- scenarioFoot -->
+</tbody>
+</table>
+</div>
+
+<!-- rulesHead -->
+<div style="width: 100%">
+<table style="width: 100%">
+<tbody>
+<tr>
+<th colspan="3"><div class="cell-th"><p class="cell-th-span"><b><% name %></b></p></div></th>
+</tr>
+<tr>
+<td class="name"><div class="cell-th"><p class="cell-th-span"><b>Numer</b></p></div></td>
+<td class="name"><div class="cell-th"><p class="cell-th-span"><b>Opis</b></p></div></td>
+<td class="name"><div class="cell-th"><p class="cell-th-span"><b>Komunikaty</b></p></div></td>
+</tr>
+<!-- rulesRule -->
+<tr>
+<td class="name"><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><% value %></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><% messages %></p></div></td>
+</tr>
+<!-- rulesFoot -->
+</tbody>
+</table>
+</div>
+
+<!-- requirementHead -->
+<div style="width: 100%">
+<table style="width: 100%">
+<tbody>
+<tr>
+<th><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></th>
+<th><div class="cell-th"><p class="cell-th-span"><b><% value %></b></p></div></th>
+</tr>
+<!-- requirementRowPlain -->
+<tr>
+<td class="name" style="width: 30%"><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><% value %></p></div></td>
+</tr>
+<!-- requirementRowList -->
+<tr>
+<td class="name" style="width: 30%"><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><ul><% value %><% list %></ul></p></div></td>
+</tr>
+<!-- requirementFoot -->
+</tbody>
+</table>
+</div>
+
+<!-- actorHead -->
+<div style="width: 100%">
+<table style="width: 100%">
+<tbody>
+<tr>
+<th><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></th>
+<th><div class="cell-th"><p class="cell-th-span"><b><% value %></b></p></div></th>
+</tr>
+<!-- actorRowPlain -->
+<tr>
+<td class="name" style="width: 30%"><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><% value %></p></div></td>
+</tr>
+<!-- actorRowList -->
+<tr>
+<td class="name" style="width: 30%"><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><ul><% value %><% list %></ul></p></div></td>
+</tr>
+<!-- actorFoot -->
+</tbody>
+</table>
+</div>
+
+<!-- messageHead -->
+<div style="width: 100%">
+<table style="width: 100%">
+<tbody>
+<tr>
+<th><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></th>
+<th><div class="cell-th"><p class="cell-th-span"><b><% value %></b></p></div></th>
+</tr>
+<!-- messageRowPlain -->
+<tr>
+<td class="name" style="width: 30%"><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><% value %></p></div></td>
+</tr>
+<!-- messageRowList -->
+<tr>
+<td class="name" style="width: 30%"><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><ul><% value %><% list %></ul></p></div></td>
+</tr>
+<!-- messageFoot -->
+</tbody>
+</table>
+</div>
+
+<!-- typeHead -->
+<div style="width: 100%">
+<table style="width: 100%">
+<tbody>
+<tr>
+<th style="width: 30%"><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></th>
+<th><div class="cell-th"><p class="cell-th-span"><% value %></p></div></th>
+</tr>
+<!-- typeRowPlain -->
+<tr>
+<td class="name" style="width: 30%"><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><% value %></p></div></td>
+</tr>
+<!-- typeRowList -->
+<tr>
+<td class="name" style="width: 30%"><div class="cell-th"><p class="cell-th-span"><b><% key %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><ul><% value %><% list %></ul></p></div></td>
+</tr>
+<!-- typeFoot -->
+</tbody>
+</table>
+</div>
+
+<!-- attributesHead -->
+<div style="width: 100%">
+<table style="width: 100%">
+<tbody>
+<tr>
+<td class="name" colspan="3"><div class="cell-th"><p class="cell-th-span"><b>Atrybuty</b></p></div></td>
+</tr>
+<!-- attribute -->
+<tr>
+<td class="name" style="width: 30%"><div class="cell-th"><p class="cell-th-span"><b><% name %></b></p></div></td>
+<td style="width: 30%"><div class="cell-td"><p class="cell-td-span"><% type %></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><% notes %></p></div></td>
+</tr>
+<!-- attributesFoot -->
+</tbody>
+</table>
+</div>
+
+<!-- literalsHead -->
+<div style="width: 100%">
+<table style="width: 100%">
+<tbody>
+<tr>
+<td class="name" colspan="2"><div class="cell-th"><p class="cell-th-span"><b>Literały</b></p></div></td>
+</tr>
+<!-- literal -->
+<tr>
+<td class="name" style="width: 30%"><div class="cell-th"><p class="cell-th-span"><b><% name %></b></p></div></td>
+<td><div class="cell-td"><p class="cell-td-span"><% notes %></p></div></td>
+</tr>
+<!-- literalsFoot -->
+</tbody>
+</table>
+</div>
+
+<!-- warningHead -->
+<div style="width: 100%;">
+<table style="width: 100%;">
+<tbody>
+<tr>
+<th class="warnings" style="width: 20%"><p class="warnings-name">Opis uwag do dokumentów</p></th>
+<th class="warnings"><p class="warnings-name">&nbsp;</p></th>
+</tr>
+<tr>
+<td><p class="warnings-name">Projekt</p></td>
+<td><p class="warnings"><% projekt %></p></td>
+</tr>
+<tr>
+<td><p class="warnings-name">Nr uwagi</p></td>
+<td><p class="warnings"><% number %></p></td>
+</tr>
+<tr>
+<td><p class="warnings-name">Dokument</p></td>
+<td><p class="warnings"><% sygnatura %></p></td>
+</tr>
+<tr>
+<td><p class="warnings-name">Data zgłoszenia</p></td>
+<td><p class="warnings"><% data %></p></td>
+</tr>
+<tr>
+<td><p class="warnings-name">Źródło uwagi</p></td>
+<td><p class="warnings"><% zrodlo %></p></td>
+</tr>
+<tr>
+<td><p class="warnings-name">Osoba zgłaszająca</p></td>
+<td><p class="warnings"><% zglaszajacy %></p></td>
+</tr>
+<!-- warningMessagesHead -->
+<tr>
+<td><p class="warnings-name">Opis</p></td>
+<td>
+<!-- warningMessage -->
+<p class="warnings"><b><% category %></b>:</p><% messages %>
+<!-- warningMessagesFoot -->
+</td>
+</tr>
+<!-- warningFoot -->
+<tr>
+<td><p class="warnings-name">Dotyczy</p></td>
+<td><p class="warnings"><% package %> / <u><% context %></u></p></td>
+</tr>
+<tr>
+<td><p class="warnings-name">Kategoria</p></td>
+<td><p class="warnings"><% kind %></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- htmlFoot -->
+</div></div>
+</body>
+</html>
