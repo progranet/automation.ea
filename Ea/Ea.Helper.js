@@ -52,7 +52,6 @@ Ea.Helper = {
 					Core.Log.logs.info.call(Inspect, "execute", indent + "$$ [$<$>] = $", [_private ? "–  " : "+ ", name, type, elementType, sufix]);
 				else
 					Core.Log.logs.info.call(Inspect, "execute", indent + "$$ [$] = $", [_private ? "–  " : "+ ", name, type, sufix]);
-				//Core.Log.logs.info.call(Inspect, "execute", indent + "$$ [$] = $", [_private ? "–  " : "+ ", name, type, sufix]);
 			};
 			
 			if (isCollection) {
@@ -147,8 +146,8 @@ Ea.Helper.CustomProperty = extend(Ea.Helper.AbstractProperty, {
 
 	create: function(params) {
 		_super.create(params);
-		this.getter = params.getter;
-		this.setter = params.setter;
+		this.getter = params.get;
+		this.setter = params.set;
 		this.elementType = params.elementType || this._class.elementTypeDefault;
 	},
 	
@@ -162,32 +161,6 @@ Ea.Helper.CustomProperty = extend(Ea.Helper.AbstractProperty, {
 	
 	get: function(object, params) {
 		return object[this.getter].apply(object, params || []);
-	}
-});
-
-Ea.Helper.Source = define({
-	_api: null,
-	_value: null,
-	create: function(api) {
-		this._api = api;
-		this._value = {};
-	},
-	getApi: function() {
-		return this._api;
-	},
-	getApiValue: function(property) {
-		if (property.index == null)
-			return this._api[property.api];
-		return this._api[property.api](property.index);
-	},
-	getValue: function(property) {
-		return this._value[property.property];
-	},
-	setValue: function(property, value) {
-		this._value[property.property] = value;
-	},
-	isInitialized: function(property) {
-		return (property.property in this._value);
 	}
 });
 
@@ -230,8 +203,8 @@ Ea.Helper.ApiProperty = extend(Ea.Helper.AbstractProperty, {
 	},
 	
 	get: function(object, params) {
-		var source = object.instanceOf(Ea.Helper.Source) ? object : object._source;
-		if (!source.isInitialized(this))
+		var source = object.instanceOf(Ea.Source) ? object : object._source;
+		if (Ea.mm || !source.isInitialized(this))
 			this._init(source);
 		return this._get(source, params || []);
 	},
@@ -264,7 +237,7 @@ Ea.Helper.Collection = extend(Ea.Helper.ApiProperty, {
 	},
 	
 	_init: function(source) {
-		source.setValue(this, Ea.getCollection(this, source.getApiValue(this)));
+		source.setValue(this, Ea.getCollection(this.type, source.getApiValue(this), this));
 	}
 },
 {
@@ -297,7 +270,7 @@ Ea.Helper.Property = extend(Ea.Helper.ApiProperty, {
 	
 	_init: function(source) {
 		source.setValue(this, this.getTyped(source, this.type));
-	},
+	}/*,
 	
 	set: function(params) {
 		this.value = params[0];
@@ -311,7 +284,7 @@ Ea.Helper.Property = extend(Ea.Helper.ApiProperty, {
 	
 	_update: function() {
 		this.context.api[this.updateFn]();
-	}
+	}*/
 });
 
 Ea.Helper.List = extend(Ea.Helper.Property, {
@@ -407,9 +380,6 @@ Ea.Helper.Map = extend(Ea.Helper.Property, {
 });
 
 Ea.Helper.Reference = extend(Ea.Helper.ApiProperty, {
-	create: function(params) {
-		_super.create(params);
-	},
 	_init: function(source) {
 		source.setValue(this, Ea.get(this.type, source.getApiValue(this)));
 	}
@@ -425,33 +395,26 @@ Ea.Helper.ReferenceByPointer = extend(Ea.Helper.Property, {
 	referenceType: null,
 
 	_init: function(source) {
-		var reference = this.getTyped(source, this.referenceType);
-		source.setValue(this, (reference ? Ea[this.getBy](this.type, reference) : null));
-	},
+		var reference = this.getTyped(source, this._class.referenceType);
+		source.setValue(this, (reference ? Ea[this._class.getBy](this.type, reference) : null));
+	}/*,
 	
 	_set: function() {
 		this.context.api[this.property] = (this.value ? this.value.api[this.reference] : null);
-	}
+	}*/
 },
 {
 	typeDefault: "Ea.Element._Base"
 });
 
-Ea.Helper.ReferenceById = extend(Ea.Helper.ReferenceByPointer, {
-	create: function(params) {
-		_super.create(params);
-		this.getBy = "getById";
-		this.referenceType = Number;
-	}
+Ea.Helper.ReferenceById = extend(Ea.Helper.ReferenceByPointer, {},
+{
+	getBy: "getById",
+	referenceType: Number
 });
 
-Ea.Helper.ReferenceByGuid = extend(Ea.Helper.ReferenceByPointer, {
-	create: function(params) {
-		_super.create(params);
-		this.getBy = "getByGuid";
-		this.referenceType = String;
-	}
-});
-
-Ea.Helper.Inspect = define({
+Ea.Helper.ReferenceByGuid = extend(Ea.Helper.ReferenceByPointer, {},
+{
+	getBy: "getByGuid",
+	referenceType: String
 });

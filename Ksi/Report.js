@@ -15,7 +15,7 @@ Report = {
 		reuseDiagrams: false,
 		processReferences: true,
 		processReport: true,
-		depth: 0,
+		depth: 1,
 		warningsFile: {
 			zus: {
 				name: "Uwagi - wersja ZUS",
@@ -1082,9 +1082,7 @@ Report = {
 		Actor: "U¿ytkownik"
 	},
 	
-	/*_steps: {
-		
-	},*/
+	//_steps: {},
 	
 	processScenario: function(scenario, context, basic, depth, file) {
 		this.write(file, Html.templates.scenarioHead, {name: this.format(scenario.getName())});
@@ -1116,12 +1114,29 @@ Report = {
 			 * Wyszukiwanie wzorców w³¹czania/rozszerzania
 			 */
 			var link = step.getLink();
+			var fakeLink = null;
+			if (link) {
+				if (!/&lt;(include|extend)&gt;/.test(action)) {
+					fakeLink = link;
+					link = null;
+				};
+			}
+			if (fakeLink) {
+				warn("Wykryto przeterminowany link (w³¹czanie/rozszerzanie) na poziomie kroku scenariusza przypadku u¿ycia: $", [context.useCase.getAlias()]);
+			}
 			var linkString = "";
 			var direction = null;
 			if (link) {
 				this.setStats(this.category.step, context.useCase, 1);
 				linkString = this.getLink(link, link.getAlias());
-				action = action.replace(new RegExp("&lt;(include|extend)&gt;\\s*(" + link.getName() + ")?", "i"), function(whole, _direction, name) {
+				var regExp = null;
+				try {
+					regExp = new RegExp("&lt;(include|extend)&gt;\\s*(" + link.getName() + ")?", "i");
+				}
+				catch (exception) {
+					warn("Nazwa w³¹czanego/rozszerzaj¹cego (przez link) przypadku zawiera niedozwolone znaki: $", [link.getName()]);
+				}
+				action = action.replace(regExp, function(whole, _direction, name) {
 					direction = _direction;
 					return "&lt;" + _direction + "&gt; (" + linkString + ")" + (name ? " " + name : "");
 				});
@@ -1136,7 +1151,7 @@ Report = {
 						regExp = new RegExp("<(include|extend)>.*(" + linkName + ")", "i");
 					}
 					catch (exception) {
-						warn("Nazwa w³¹czanego przypadku zawiera niedozwolone znaki: $", [linkName]);
+						warn("Nazwa potencjalnie w³¹czanego/rozszerzaj¹cego przypadku zawiera niedozwolone znaki: $", [linkName]);
 					}
 					finally {
 						actionRaw.replace(regExp, function(whole, dir, name) {

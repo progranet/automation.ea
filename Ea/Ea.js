@@ -41,10 +41,8 @@ Ea = {
 		return Ea.Application.getRepository().getByGuid(type, guid);
 	},
 	
-	getCollection: function(property, source) {
-		var api = property.type.getCollection(property.elementType, source);
-		var proxy = Ea.Application.getRepository().get(property.type, api, property);
-		return proxy;
+	getCollection: function(type, api, params) {
+		return Ea.Application.getRepository().getCollection(type, api, params);
 	},
 
 	initialize: function() {
@@ -137,6 +135,32 @@ Ea.Log = define({
 	_currentPath: null
 });
 
+Ea.Source = define({
+	_api: null,
+	_value: null,
+	create: function(api) {
+		this._api = api;
+		this._value = {};
+	},
+	getApi: function() {
+		return this._api;
+	},
+	getApiValue: function(property) {
+		if (property.index == null)
+			return this._api[property.api];
+		return this._api[property.api](property.index);
+	},
+	getValue: function(property) {
+		return this._value[property.property];
+	},
+	setValue: function(property, value) {
+		this._value[property.property] = value;
+	},
+	isInitialized: function(property) {
+		return (property.property in this._value);
+	}
+});
+
 Ea.Any = define({
 	
 	// usun¹æ logowanie z tego poziomu
@@ -172,17 +196,20 @@ Ea.Any = define({
 	}
 }, 
 {
-	
-	__parent: new Ea.Helper.CustomProperty({type: "Ea.Namespace", getter: "getParent"}),
+	__parent: new Ea.Helper.CustomProperty({type: "Ea.Namespace", get: "getParent"}),
 	
 	getType: function() {
 		return this.namespace._Base;
 	},
 	
-	_get: function(api) {
-		var source = new Ea.Helper.Source(api);
+	_get: function(api, params) {
+		return this._createProxy(api, params);
+	},
+	
+	_createProxy: function(api, params) {
+		var source = new Ea.Source(api);
 		var type = this.getType(source);
-		var proxy = new type();
+		var proxy = new type(params);
 		proxy._source = source;
 		return proxy;
 	},
@@ -207,10 +234,6 @@ Ea.Any = define({
 		return properties;
 	}
 });
-
-include("Ea.Application@Ea.Types");
-Ea.register("Ea.Project@Ea.Types", 1);
-Ea.register("Ea.Repository@Ea.Types", 2);
 
 Ea.Named = extend(Ea.Any, {
 
@@ -268,16 +291,15 @@ Ea.Named = extend(Ea.Any, {
 	_notes: new Ea.Helper.Property({api: "Notes"}),
 	_stereotype: new Ea.Helper.Property({api: "Stereotype"}),
 	
-	_qualifiedName: new Ea.Helper.CustomProperty({getter: "getQualifiedName"})
+	_qualifiedName: new Ea.Helper.CustomProperty({get: "getQualifiedName"})
 });
 
 Ea.Namespace = extend(Ea.Named);
 
-Ea.Stereotype = extend(Ea.Named);
+include("Ea.Application@Ea.Types");
 
 Ea.register("Ea.Collection@Ea.Types", 3);
 Ea.register("Ea.Package@Ea.Types", 5);
 Ea.register("Ea.Connector@Ea.Types.Connector", 7);
 Ea.register("Ea.Diagram@Ea.Types.Diagram", 8);
-
 Ea.register("Ea.Element@Ea.Types.Element", 4);

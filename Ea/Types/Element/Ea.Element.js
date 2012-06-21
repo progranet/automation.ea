@@ -165,10 +165,10 @@ Ea.Element._Base = extend(Ea.Namespace, {
 	_miscData2: new Ea.Helper.Property({api: "MiscData", private: true, index: 2}),
 	_miscData3: new Ea.Helper.Property({api: "MiscData", private: true, index: 3}),
 	
-	_abstract: new Ea.Helper.CustomProperty({getter: "isAbstract", type: Boolean}),
-	_inDiagrams: new Ea.Helper.CustomProperty({getter: "findDiagrams", type: "Core.Types.Collection", elementType: "Ea.Diagram._Base"}),
-	_linkedDiagram: new Ea.Helper.CustomProperty({getter: "getLinkedDiagram", type: "Ea.Diagram._Base"}),
-	_customReferences: new Ea.Helper.CustomProperty({getter: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"})
+	_abstract: new Ea.Helper.CustomProperty({get: "isAbstract", type: Boolean}),
+	_inDiagrams: new Ea.Helper.CustomProperty({get: "findDiagrams", type: "Core.Types.Collection", elementType: "Ea.Diagram._Base"}),
+	_linkedDiagram: new Ea.Helper.CustomProperty({get: "getLinkedDiagram", type: "Ea.Diagram._Base"}),
+	_customReferences: new Ea.Helper.CustomProperty({get: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"})
 });
 
 Ea.Element.CustomReference = define({
@@ -372,7 +372,7 @@ Ea.Element.Object = extend(Ea.Element._Base, {
 	_metaClass: new Ea.Helper.ReferenceById({api: "ClassifierID", type: "Ea.Element.Classifier"}),
 	_runState: new Ea.Helper.Property({api: "RunState", private: true}),
 	
-	runState: new Ea.Helper.CustomProperty({getter: "getRunState", type: Object})
+	runState: new Ea.Helper.CustomProperty({get: "getRunState", type: Object})
 });
 
 Ea.Element.Package = extend(Ea.Element._Base, {
@@ -381,7 +381,7 @@ Ea.Element.Package = extend(Ea.Element._Base, {
 	}
 },
 {
-	_package: new Ea.Helper.CustomProperty({getter: "getPackage", type: "Ea.Package._Base"})
+	_package: new Ea.Helper.CustomProperty({get: "getPackage", type: "Ea.Package._Base"})
 });
 
 Ea.Element.Screen = extend(Ea.Element._Base);
@@ -408,7 +408,7 @@ Ea.Element.AssociationClass = extend(Ea.Element.Class, {
 	}
 },
 {
-	association: new Ea.Helper.CustomProperty({getter: "getAssociation", type: "Ea.Connector._Base"})
+	association: new Ea.Helper.CustomProperty({get: "getAssociation", type: "Ea.Connector._Base"})
 });
 
 Ea.Element.Interface = extend(Ea.Element.Classifier);

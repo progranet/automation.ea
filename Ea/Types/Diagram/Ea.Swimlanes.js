@@ -17,14 +17,6 @@
 Ea.Swimlanes = {};
 
 Ea.Swimlanes._Base = extend(Ea.Collection._Base, {
-	_addAll: function(collection) {
-		array = [];
-		for (var i = 0; i < collection.Count; i++) {
-			var ea = collection.Items(i);
-			var element = Ea.get(this.elementType, ea);
-			array.push(element);
-		}
-		return array;
-	}
+
 });
 

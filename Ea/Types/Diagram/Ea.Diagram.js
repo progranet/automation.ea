@@ -122,7 +122,7 @@ Ea.Diagram._Base = extend(Ea.Namespace, {
 	}
 },
 {
-	_dimension: new Ea.Helper.CustomProperty({type: Object, getter: "getDimension"}),
+	_dimension: new Ea.Helper.CustomProperty({type: Object, get: "getDimension"}),
 	
 	api: "Diagram",
 

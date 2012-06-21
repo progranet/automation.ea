@@ -16,58 +16,44 @@
 
 Ea.Collection = {};
 
-Ea.Collection._Base = extend(Core.Types.Collection, {},
+Ea.Collection._Base = extend(Core.Types.Collection, {
+	create: function(params) {
+		_super.create(null, params);
+	}
+},
 {
 	getType: function() {
 		return Ea.Collection._Base;
 	},
 
-	getCollection: function(elementType, value) {
-		var collection = new Array();
-		for (var e = 0; e < value.Count; e++) {
-			var api = value.GetAt(e);
-			var proxy = Ea.get(elementType, api);
-			collection.push(proxy);
-		}
-		return collection;
-	},
-	
 	_get: function(api, params) {
-		var source = new Ea.Helper.Source(api);
-		var type = this.getType(source);
-		var proxy = new type(null, params);
-		proxy._source = source;
-		for (var e = 0; e < api.length; e++) {
-			var element = api[e];
+		
+		var proxy = Ea.Any._createProxy.call(this, api, params);
+		
+		for (var e = 0; e < api.Count; e++) {
+			var element = Ea.get(params.elementType, api.GetAt(e));
 			proxy.add(element);
 		}
 		return proxy;
 	}
 });
 
-Ea.Collection.Map = extend(Core.Types.Map, {},
+Ea.Collection.Map = extend(Core.Types.Map, {
+	create: function(params) {
+		_super.create(null, params);
+	}
+},
 {
 	getType: function() {
 		return Ea.Collection.Map;
 	},
 
-	getCollection: function(elementType, value) {
-		var collection = new Array();
-		for (var e = 0; e < value.Count; e++) {
-			var api = value.GetAt(e);
-			var proxy = Ea.get(elementType, api);
-			collection.push(proxy);
-		}
-		return collection;
-	},
-	
 	_get: function(api, params) {
-		var source = new Ea.Helper.Source(api);
-		var type = this.getType(source);
-		var proxy = new type(null, params);
-		proxy._source = source;
-		for (var e = 0; e < api.length; e++) {
-			var element = api[e];
+		
+		var proxy = Ea.Any._createProxy.call(this, api, params);
+		
+		for (var e = 0; e < api.Count; e++) {
+			var element = Ea.get(params.elementType, api.GetAt(e));
 			proxy.add(element);
 		}
 		return proxy;

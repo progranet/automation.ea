@@ -37,6 +37,11 @@ Ea.Repository._Base = extend(Ea.Any, {
 		info("stats: {total read: $, cache read by id: $, cache read by guid: $, cache white by id: $, cache write by guid: $}", [this.stats.tr, this.stats.cri, this.stats.crg, this.stats.cwi, this.stats.cwg]);
 	},
 	
+	getCollection: function(type, api, params) {
+		var proxy = type._get(api, params);
+		return proxy;
+	},
+	
 	get: function(type, api, params) {
 		this.stats.tr++;
 		if (this.cache[type.namespace.name]) {
@@ -120,7 +125,6 @@ Ea.Repository._Base = extend(Ea.Any, {
 				this.stats.cwg++;
 			}
 		}
-		//this.cacheInfo();
 		return proxy;
 	},
 	
