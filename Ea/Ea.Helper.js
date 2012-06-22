@@ -381,7 +381,9 @@ Ea.Helper.Map = extend(Ea.Helper.Property, {
 
 Ea.Helper.Reference = extend(Ea.Helper.ApiProperty, {
 	_init: function(source) {
-		source.setValue(this, Ea.get(this.type, source.getApiValue(this)));
+		var api = source.getApiValue(this);
+		var proxy = api ? Ea.get(this.type, api) : null;
+		source.setValue(this, proxy);
 	}
 },
 {

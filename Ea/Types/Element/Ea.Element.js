@@ -139,7 +139,6 @@ Ea.Element._Base = extend(Ea.Namespace, {
 	_customProperties: new Ea.Helper.CollectionMap({api: "CustomProperties", elementType: "Ea.CustomProperty._Base", key: "this.getName()", value: "this.getValue()"}),
 	_specializedProperties: new Ea.Helper.Collection({type: "Ea.Properties._Base", api: "Properties", elementType: "Ea.Property._Base"}),
 	_constraints: new Ea.Helper.Collection({api: "Constraints", elementType: "Ea.Constraint._Base"}),
-	_scenarios: new Ea.Helper.Collection({api: "Scenarios", elementType: "Ea.Scenario._Base"}),
 	
 	_type: new Ea.Helper.Property({api: "Type", private: true}),
 	_subtype: new Ea.Helper.Property({api: "Subtype", type: Number}),
@@ -578,9 +577,30 @@ Ea.Element.UseCase = extend(Ea.Element._Base, {
 		var string = this._getMiscData0();
 		if (string == null) return null;
 		// TODO: parse '#EXP#=Po zakoñczeniu opracowywania publikacji;#EXP#=Przy wyborze publikacji do opracowywania;'
+	},
+	
+	getBasicScenario: function() {
+		var basic = this.getScenarios(Ea.Scenario.BasicPath);
+		if (!basic)
+			return null;
+		if (basic.size == 1)
+			return basic.first();
+		throw new Error("More than 1 basic scenarios");
+	},
+	
+	getScenarioExtensions: function() {
+		var basic = this.getBasicScenario();
+		var extensions = new Core.Types.Collection();
+		basic.getSteps().forEach(function(step) {
+			extensions.addAll(step.getExtensions());
+		});
+		return extensions;
 	}
 },
 {
+	_scenarios: new Ea.Helper.Collection({api: "Scenarios", elementType: "Ea.Scenario._Base"}),
+	_basicScenario: new Ea.Helper.CustomProperty({type: "Ea.Scenario.BasicPath", get: "getBasicScenario"}),
+	_scenarioExtensions: new Ea.Helper.CustomProperty({type: "Ea.ScenarioExtension._Base", elementType: "Ea.Scenario._Base", get: "getScenarioExtensions"}),
 	_complexity: new Ea.Helper.Property({api: "Complexity", type: Number})
 });
 

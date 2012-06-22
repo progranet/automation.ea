@@ -20,9 +20,6 @@ Ea.Scenario._Base = extend(Ea.Named, {},
 {
 	api: "Scenario",
 
-	_steps: new Ea.Helper.Collection({api: "Steps", elementType: "Ea.ScenarioStep._Base", key: "this.getPos()"}),
-	_type: new Ea.Helper.Property({api: "Type"}),
-	
 	getType: function(source) {
 		var typeName = this._type.get(source).replace(/\s/g,"");
 		var type = this.namespace[typeName];
@@ -30,7 +27,13 @@ Ea.Scenario._Base = extend(Ea.Named, {},
 			type = this.namespace._Base;
 		}
 		return type;
-	}
+	},
+
+	_type: new Ea.Helper.Property({api: "Type"}),
+
+	_guid: new Ea.Helper.Property({api: "ScenarioGUID"}),
+	_steps: new Ea.Helper.Collection({api: "Steps", elementType: "Ea.ScenarioStep._Base", key: "this.getPos()"})
+	
 });
 
 //TODO remove following backward compatibility

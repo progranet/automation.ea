@@ -16,26 +16,18 @@
 
 Ea.ScenarioExtension = {};
 
-Ea.ScenarioExtension._Base = extend(Ea.Named, {
+Ea.ScenarioExtension._Base = extend(Ea.Any, {
 	
-	_joiningStep: undefined,
-	getJoiningStep: function() {
-		if (this._joiningStep === undefined || Ea.mm) {
-			try {
-				this._joiningStep = this._getJoiningStep();
-			}
-			catch (exception) {
-				this._joiningStep = null;
-			}
-		}
-		return this._joiningStep;
+	_toString: function() {
+		return this.getLevel() + " [" + this._class + "]";
 	}
 },
 {
 	api: "ScenarioExtension",
 	
+	_guid: new Ea.Helper.Property({api: "ExtensionGUID"}),
 	_pos: new Ea.Helper.Property({api: "Pos"}),
 	_level: new Ea.Helper.Property({api: "Level"}),
-	_joiningStep: new Ea.Helper.Reference({api: "JoiningStep", private: true, type: "Ea.ScenarioStep._Base"}),
+	_joiningStep: new Ea.Helper.Reference({api: "JoiningStep", type: "Ea.ScenarioStep._Base"}),
 	_scenario: new Ea.Helper.Reference({api: "Scenario", type: "Ea.Scenario._Base"})
 });
