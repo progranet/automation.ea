@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.WebProject">
+		<attributes>
+			<attribute name="hide" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.baseBrowserLibrary"/>
+	<classpathentry excluding="Ksi/|Locale/Pl/|Ea/Types/Element/Feature/|Html/|Common/|Ea/Types/Element/|Ea/Types/Diagram/|Ea/Types/Element/Property/|Diff/|Ea/|Ea/Types/|Ea/Types/Connector/|Trz/|Core/|Ms/|Ea/Types/Element/Scenario/" kind="src" path=""/>
+	<classpathentry kind="src" path="Common"/>
+	<classpathentry kind="src" path="Core"/>
+	<classpathentry kind="src" path="Diff"/>
+	<classpathentry excluding="Types/Element/Feature/|Types/Element/|Types/Diagram/|Types/Element/Property/|Types/|Types/Connector/|Types/Element/Scenario/" kind="src" path="Ea"/>
+	<classpathentry excluding="Element/Feature/|Element/|Diagram/|Element/Property/|Connector/|Element/Scenario/" kind="src" path="Ea/Types"/>
+	<classpathentry kind="src" path="Ea/Types/Connector"/>
+	<classpathentry kind="src" path="Ea/Types/Diagram"/>
+	<classpathentry excluding="Feature/|Property/|Scenario/" kind="src" path="Ea/Types/Element"/>
+	<classpathentry kind="src" path="Ea/Types/Element/Feature"/>
+	<classpathentry kind="src" path="Ea/Types/Element/Property"/>
+	<classpathentry kind="src" path="Ea/Types/Element/Scenario"/>
+	<classpathentry kind="src" path="Html"/>
+	<classpathentry kind="src" path="Ksi"/>
+	<classpathentry kind="src" path="Locale/Pl"/>
+	<classpathentry kind="src" path="Ms"/>
+	<classpathentry kind="src" path="Trz"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path=""/>
+</classpath>

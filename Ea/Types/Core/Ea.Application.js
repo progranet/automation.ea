@@ -64,5 +64,5 @@ Ea.Application._Base = extend(Ea.Any, {}, {
 	_visible: new Ea.Helper.Property({api: "Visible", type: Boolean})
 });
 
-Ea.register("Ea.Project@Ea.Types", 1);
-Ea.register("Ea.Repository@Ea.Types", 2);
+Ea.register("Ea.Project@Ea.Types.Core", 1);
+Ea.register("Ea.Repository@Ea.Types.Core", 2);

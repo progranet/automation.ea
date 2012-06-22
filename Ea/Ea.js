@@ -296,7 +296,7 @@ Ea.Named = extend(Ea.Any, {
 
 Ea.Namespace = extend(Ea.Named);
 
-include("Ea.Application@Ea.Types");
+include("Ea.Application@Ea.Types.Core");
 
 Ea.register("Ea.Collection@Ea.Types", 3);
 Ea.register("Ea.Package@Ea.Types", 5);
