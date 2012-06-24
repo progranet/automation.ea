@@ -14,24 +14,24 @@
    limitations under the License.
 */
 
-include("Core.IO@Core");
-include("Ea@Ea");
+Core.Target = {
+		
+};
 
-Inspect = {
-	params: {
+Core.Target.AbstractTarget = define({
+	
+	_debug: null,
+	
+	create: function(debug) {
+		_super.create();
+		this._debug = debug;
+	},
+	
+	write: function(message) {
 		
 	},
 	
-	execute: function() {
-		var object = Ea.Application.getRepository().getSelectedObject();
-		var target = null;
-		if (this.params.output) {
-			target = new Core.IO.FileTarget(this.params.output);
-			Core.Log.registerTarget(Core.Log.logs.info, target);
-		}
-		Ea.Helper.inspect(object);
-		if (target) {
-			target.close();
-		}
+	isDebug: function() {
+		return this._debug;
 	}
-};
+});

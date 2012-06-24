@@ -20,12 +20,7 @@ Core.Log = {
 		error: ["*"],
 		debug: ["*"],
 		info: ["*"],
-		warn: ["*"],
-		
-		target: "System",
-
-		infoTarget: "Script",
-		errorTarget: "System"
+		warn: ["*"]
 	},
 
 	logs: {
@@ -42,32 +37,17 @@ Core.Log = {
 			Core.Log._log(Core.Log.logs.warn, this, propertyName, message, params);
 		}
 	},
-	targets: {
-		System: {
-			debug: true
-		},
-		Script: {
-			debug: false
-		}
-	},
 	
 	pattern: null,
 	
 	initialize: function() {
 
-		var targets = Core.Log.targets;
-		for (var tn in targets) {
-			targets[tn].name = tn;
-			Repository.EnsureOutputVisible(tn);
-			Repository.ClearOutput(tn);
-		}
-		
 		var pattern = "", i = 0;
 		var logs = Core.Log.logs;
 		for (var ln in logs) {
 			logs[ln].name = ln;
 			logs[ln].mask = Core.Log.params[ln] || [];
-			logs[ln].target = targets[Core.Log.params[ln + "Target"] || Core.Log.params.target];
+			logs[ln].targets = [];
 			pattern = pattern + (i++ > 0 ? "|" : "") + ln;
 		}
 
@@ -127,7 +107,6 @@ Core.Log = {
 	},
 	
 	isLogged: function(level, namespace) {
-		if (typeof(level) == "string") level = Core.Log.logs[level];
 		var lt = level.mask;
 		for (var pi = 0; pi < lt.length; pi++) {
 			var p = lt[pi];
@@ -147,6 +126,8 @@ Core.Log = {
 	},
 	
 	_log: function(level, context, propertyName, message, params) {
+		if (typeof(level) == "string")
+			level = Core.Log.logs[level];
 		var fn = context[propertyName];
 		var qualifiedName = fn ? fn.qualifiedName : "<<anonymous>>";
 		if (!Core.Log.isLogged(level, qualifiedName)) return;
@@ -155,13 +136,24 @@ Core.Log = {
 		var c0 = message ? message.charAt(0) : "";
 		var s = (c0 == "^" ? 1 : (c0 == "!" ? 2 : false));
 		if (s) message = message.substring(1);
+
 		var contextName = fn.static === false ? context._class.qualifiedName : context.qualifiedName;
 		var sourceFn = contextName + "." + propertyName;
 		var sourceAt = qualifiedName;
 		var source = sourceFn + (sourceFn == sourceAt ? "" : " (@" + sourceAt + ")");
-		var debug = (level.target.debug ? level.name + ": {" + (fn.static === false ? "" : "static ") + "" + source + "}" : "");
-		message = (s == 1 ? message + " " : "") + (s == 2 ? "" : debug) + (s == 1 ? "" : message);
-		Repository.WriteOutput(level.target.name, message, undefined);
+		
+		for (var ti = 0; ti < level.targets.length; ti++) {
+			var target = level.targets[ti];
+			var debugInfo = target.isDebug() ? ((fn.static === false ? "" : "static ") + source + " ") : "";
+			message = (s == 1 ? message + " " : "") + (s == 2 ? "" : debugInfo) + (s == 1 ? "" : message);
+			target.write(message);
+		}
+	},
+	
+	registerTarget: function(level, target) {
+		if (typeof(level) == "string")
+			level = Core.Log.logs[level];
+		level.targets.push(target);
 	}
 };
 

@@ -41,7 +41,7 @@ Ea.Collection._Base = extend(Core.Types.Collection, {
 
 Ea.Collection.Map = extend(Core.Types.Map, {
 	create: function(params) {
-		_super.create(null, params);
+		_super.create(params);
 	}
 },
 {

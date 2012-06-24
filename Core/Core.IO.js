@@ -103,3 +103,24 @@ Core.IO.File = define({
 		this.closed = true;
 	}
 });
+
+Core.IO.FileTarget = extend(Core.Target.AbstractTarget, {
+	
+	_path: null,
+	_file: null,
+	
+	create: function(path, debug) {
+		_super.create(debug);
+		this._path = path;
+		this._file = new Core.IO.File(this._path, Core.IO.mode.write);
+	},
+	
+	write: function(message) {
+		this._file.writeLine(message);
+	},
+	
+	close: function() {
+		this._file.close();
+	}
+});
+

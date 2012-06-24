@@ -48,6 +48,13 @@ Ea = {
 	initialize: function() {
 		this._prepare(Ea.Any);
 		Ea.Application.initializeDefault();
+		
+		var systemTarget = new Ea.Helper.Target("System", true);
+		var scriptTarget = new Ea.Helper.Target("Script", false);
+		Core.Log.registerTarget(Core.Log.logs.error, systemTarget);
+		Core.Log.registerTarget(Core.Log.logs.warn, systemTarget);
+		Core.Log.registerTarget(Core.Log.logs.debug, systemTarget);
+		Core.Log.registerTarget(Core.Log.logs.info, scriptTarget);
 	},
 	
 	_prepare: function(_class) {

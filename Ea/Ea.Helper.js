@@ -29,7 +29,7 @@ Ea.Helper = {
 		return (typeof type == "string") ? eval(type) : type;
 	},
 	
-	inspect: function(object, indent) {
+	inspect: function(object) {
 		this._inspect(object, 0, "$ = {", []);
 	},
 	
@@ -85,7 +85,7 @@ Ea.Helper = {
 				};
 				params.elementType = params.isCollection ? property.elementType : null;
 				params.typeName = params.isCollection ? Core.Output.getString(params.type) + "<" + Core.Output.getString(params.elementType) + ">" : Core.Output.getString(params.type);
-				params.template = (params._private ? "–  " : "+ ") + params.name + " [" + params.typeName + "]";
+				params.template = (params._private ? "– " : "+ ") + params.name + " [" + params.typeName + "]";
 				
 				if (params.isCollection) {
 					if (value.instanceOf(Core.Types.Map)) {
@@ -122,6 +122,22 @@ Ea.Helper = {
 		info(this._indent(indent) + "}");
 	}
 };
+
+Ea.Helper.Target = extend(Core.Target.AbstractTarget, {
+	
+	_name: null,
+	
+	create: function(name, debug) {
+		_super.create(debug);
+		this._name = name;
+		Ea.Application.getRepository().showOutput(this._name);
+		Ea.Application.getRepository().clearOutput(this._name);
+	},
+	
+	write: function(message) {
+		Ea.Application.getRepository().writeOutput(this._name, message);
+	}
+});
 
 Ea.Helper.AbstractProperty = define({
 

@@ -200,6 +200,18 @@ Ea.Repository._Base = extend(Ea.Any, {
 	
 	search: function(name, term, options, data) {
 		this._source.getApi().RunModelSearch(name, term, options, data);
+	},
+	
+	showOutput: function(name) {
+		Repository.EnsureOutputVisible(name);
+	},
+	
+	clearOutput: function(name) {
+		Repository.ClearOutput(name);
+	},
+	
+	writeOutput: function(name, message) {
+		Repository.WriteOutput(name, message, undefined);
 	}
 
 }, {

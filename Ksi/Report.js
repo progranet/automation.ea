@@ -141,7 +141,7 @@ Report = {
 		reuseDiagrams: false,
 		processReferences: true,
 		processReport: true,
-		depth: 1,
+		depth: 0,
 		warningsFile: {
 			zus: {
 				name: "Uwagi - wersja ZUS",
@@ -1050,30 +1050,12 @@ Report = {
 				this.addWarning(8, useCase);
 			}
 			
-			/*var basic = scenarios.filter("this.getType() == 'Basic Path'");
-			this.setStats(this.category.scenario, useCase, 1);
-			if (basic.size == 1) {
-				this.processScenario(basic.first(), context, null, depth, file);
-			}
-			else {
-				if (basic.isEmpty())
-					this.addWarning(7, useCase);
-				else
-					this.addWarning(8, useCase);
-			}*/
-
 			// Rozszerzenia
 			var extensions = useCase.getScenarioExtensions();
 			this.setStats(this.category.scenario, useCase, extensions.size);
 			extensions.forEach(function(extension) {
 				this.processScenario(extension.getScenario(), context, extension, depth, file);
 			});
-			
-			/*var extensions = scenarios.filter("this.getType() != 'Basic Path'");
-			this.setStats(this.category.scenario, useCase, extensions.size);
-			extensions.forEach(function(scenario) {
-				this.processScenario(scenario, context, false, depth, file);
-			});*/
 			
 			// regu³y scenariuszy
 			for (var guid in context.include) {

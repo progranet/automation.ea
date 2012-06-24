@@ -70,3 +70,4 @@ info = debug = error = warn = aop = function(message) {
 include("Core@Core");
 include("Core.Log@Core");
 include("Core.Lang@Core");
+include("Core.Target@Core");
