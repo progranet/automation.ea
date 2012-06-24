@@ -17,7 +17,8 @@
 Ea.Helper = {
 		
 	params: {
-		updateFn: "Update"
+		updateFn: "Update",
+		indent: "      "
 	},
 	
 	isCollectionType: function(type) {
@@ -27,71 +28,98 @@ Ea.Helper = {
 	typeEval: function(type) {
 		return (typeof type == "string") ? eval(type) : type;
 	},
-
+	
 	inspect: function(object, indent) {
-		
-		indent = indent || "      ";
+		this._inspect(object, 0, "$ = {", []);
+	},
+	
+	_ids: {},
+	
+	_indent: function(number) {
+		var indent = "";
+		for (var i = 0; i < number; i++) {
+			indent = indent + this.params.indent;
+		}
+		return indent;
+	},
+
+	_expand: function(template, params, value, indent, _private) {
+		if (Core.Types.Object.isInstance(value)) {
+			if (value.instanceOf(Ea.Any) && !value.instanceOf(Ea.Namespace)) {
+				if (!_private) {
+					this._inspect(value, indent + 1, template + " = {", params);
+					return;
+				}
+				template = template + " = {#PRIVATE#}";
+			}
+			params.push(value._toString());
+		}
+		else
+			params.push(value);
+		info(this._indent(indent + 1) + template, params);
+	},
+	
+	_inspect: function(object, indent, template, params) {
 		
 		var type = object._class;
 		var properties = type.getProperties();
 		
-		info("$ = {", [object._class]);
+		params.push(object._toString());
+		info(this._indent(indent) + template, params);
 
-		for (var name in properties) {
+		if (this._ids[object.__id]) {
+			info(this._indent(indent + 1) + "#LOOP#");
+		}
+		else {
+			this._ids[object.__id] = object;
+			for (var name in properties) {
 
-			var property = properties[name];
-			var name = property.property.replace(/^_+/, "");
-			var _private = property.private;
-			var type = property.type;
-			var value = property.get(object);
-			var isCollection = value && property.type.isClass && value.instanceOf(Core.Types.Collection);
-			var elementType = isCollection ? property.elementType : null;
-			
-			var out = function(sufix) {
-				if (isCollection)
-					Core.Log.logs.info.call(Inspect, "execute", indent + "$$ [$<$>] = $", [_private ? "–  " : "+ ", name, type, elementType, sufix]);
-				else
-					Core.Log.logs.info.call(Inspect, "execute", indent + "$$ [$] = $", [_private ? "–  " : "+ ", name, type, sufix]);
-			};
-			
-			if (isCollection) {
-				if (value.instanceOf(Core.Types.Map)) {
-					if (value.size == 0) {
-						out("{}");
+				var property = properties[name];
+				var value = property.get(object);
+				
+				var params = {
+					name: property.property.replace(/^_+/, ""),
+					_private: property.private,
+					type: property.type,
+					isCollection: value && property.type.isClass && value.instanceOf(Core.Types.Collection)
+				};
+				params.elementType = params.isCollection ? property.elementType : null;
+				params.typeName = params.isCollection ? Core.Output.getString(params.type) + "<" + Core.Output.getString(params.elementType) + ">" : Core.Output.getString(params.type);
+				params.template = (params._private ? "–  " : "+ ") + params.name + " [" + params.typeName + "]";
+				
+				if (params.isCollection) {
+					if (value.instanceOf(Core.Types.Map)) {
+						if (value.size == 0) {
+							info(this._indent(indent + 1) + "$ = {}", [params.template]);
+						}
+						else {
+							info(this._indent(indent + 1) + "$ = {", [params.template]);
+							value.forEach(function(value, key) {
+								this._expand("$ = $", [key], value, indent + 1, params._private);
+							});
+							info(this._indent(indent + 1) + "}");
+						}
 					}
 					else {
-						out("{");
-						value.forEach(function(value, key) {
-							if (value && value._toString)
-								value = value._toString();
-							info(indent + indent + "$ = $", [key, value]);
-						});
-						info(indent + "}");
+						if (value.size == 0) {
+							info(this._indent(indent + 1) + "$ = []", [params.template]);
+						}
+						else {
+							info(this._indent(indent + 1) + "$ = [", [params.template]);
+							value.forEach(function(value, index) {
+								this._expand("$", [], value, indent + 1, params._private);
+							});
+							info(this._indent(indent + 1) + "]");
+						}
 					}
 				}
 				else {
-					if (value.size == 0) {
-						out("[]");
-					}
-					else {
-						out("[");
-						value.forEach(function(value, index) {
-							if (value && value._toString)
-								value = value._toString();
-							info(indent + indent + "$", [value]);
-						});
-						info(indent + "]");
-					}
+					this._expand("$ = $", [params.template], value, indent, params._private);
 				}
+				
 			}
-			else {
-				if (value && value._toString)
-					value = value._toString();
-				out(value);
-			}
-			
 		}
-		info("}");
+		info(this._indent(indent) + "}");
 	}
 };
 

@@ -22,7 +22,7 @@ Core.Output = {
 		if (params instanceof Array) {
 			var p = 0;
 			return scriptlet.replace(/\$/g, function() {
-				return p < params.length ? Core.Output.getString(params[p++]) : "[parameter not found]";
+				return p < params.length ? Core.Output.getString(params[p++]) : "<<undefined parameter>>";
 			});
 		}
 		else if (typeof(params) == "object") {
@@ -88,7 +88,7 @@ Core.Output = {
 		
 		if (type == "function") {
 			if (context.isClass) {
-				return context.qualifiedName;
+				return context;
 			}
 			var parsed = Core.parse(context);
 			if (parsed.name) {

@@ -18,7 +18,7 @@ Ea.Collection = {};
 
 Ea.Collection._Base = extend(Core.Types.Collection, {
 	create: function(params) {
-		_super.create(null, params);
+		_super.create(params);
 	}
 },
 {
@@ -36,6 +36,7 @@ Ea.Collection._Base = extend(Core.Types.Collection, {
 		}
 		return proxy;
 	}
+	
 });
 
 Ea.Collection.Map = extend(Core.Types.Map, {

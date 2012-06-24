@@ -60,9 +60,13 @@ Report = {
 		17: {reported: true, kind: "warning", category: "step", 
 				description: "Kroki przebiegu g³ównego s¹ rozszerzane przez przypadki u¿ycia - powinny w³¹czaæ",
 				message: "Krok [$] przebiegu podstawowego nie powinien byæ rozszerzany przez inny przypadek u¿ycia (powinien w³¹czaæ)"},
-		18: {reported: true, kind: "warning", category: "type", 
+		18: {
+				reported: true, 
+				kind: "warning", 
+				category: "type", 
 				description: "Brak powi¹zañ klas wykazanych w krokach przebiegów z modelem dziedziny systemu",
-				message: "Klasa [$] u¿yta w kroku [$] przebiegu $ nie zosta³a wskazana w modelu dziedziny systemu"},
+				message: "Klasa [$] u¿yta w kroku [$] przebiegu $ nie zosta³a wskazana w modelu dziedziny systemu"
+			},
 		19: {reported: true, kind: "warning", category: "rule", 
 				description: "Niepoprawne regu³y",
 				message: "$ nie jest poprawn¹ regu³¹"},
@@ -114,9 +118,20 @@ Report = {
 		35: {reported: true, kind: "warning", category: "type", 
 				description: "Kierunki przep³ywu danych (wejœciowe/wyjœciowe) s¹ niepoprawne",
 				message: "Niepoprawny rodzaj przesuniêcia ($) dla grupy danych [$] w kroku [$] przebiegu $"},
-		36: {reported: true, kind: "warning", category: "step", 
+		36: {
+				reported: true, 
+				kind: "warning", 
+				category: "step", 
 				description: "Niepoprawne/zbêdne kroki - brak przypisania regu³, brak przep³ywu danych",
-				message: "Krok systemowy [$] przebiegu $ jest niepoprawny lub zbêdny - brak operacji na danych oraz brak powi¹zanych regu³"}
+				message: "Krok systemowy [$] przebiegu $ jest niepoprawny lub zbêdny - brak operacji na danych oraz brak powi¹zanych regu³"
+			},
+		37: {
+				reported: true, 
+				kind: "warning", 
+				category: "type", 
+				description: "Puste nazwy klas wykazanych w krokach przebiegów",
+				message: "Klasa u¿yta w kroku [$] przebiegu $ ma pust¹ nazwê"
+			}
 	},
 	
 	params: {
@@ -272,10 +287,17 @@ Report = {
 		//string = string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 		string = string.replace(/\[un\d\s?/g, "<span class=\"un\">").replace(/\s?\]un\d/g, "</span>");
 		string = string.replace(/\[mn\d\s?/g, "<span class=\"mn\">").replace(/\s?\]mn\d/g, "</span>");
+		//TODO: /[mk\d ]mk\d - co to jest?
+		string = string.replace(/\[mk\d\s?/g, "<span class=\"mk\">").replace(/\s?\]mk\d/g, "</span>");
+		string = string.replace(/\[uk\d\s?/g, "<span class=\"uk\">").replace(/\s?\]uk\d/g, "</span>");
+		
 		string = string.replace(/^NOWY\d\s*-\s*(.*)$/, "<span class=\"mn\">$1</SPAN>");
+		
 		string = string.replace(/\[uu\d\s?/g, "<span class=\"uu\">").replace(/\s?\]uu\d/g, "</span>");
 		string = string.replace(/\[mu\d\s?/g, "<span class=\"mu\">").replace(/\s?\]mu\d/g, "</span>");
+		
 		string = string.replace(/^USUNIÊTO\d\s*-\s*(.*)$/, "<span class=\"uu\">$1</SPAN>");
+		
 		return string;
 	},
 	
@@ -286,6 +308,9 @@ Report = {
 		string = string.replace(/^(NOWY|USUNIÊTO)\d\s*-\s*/, "");
 		string = string.replace(/\[un\d\s?/g, "").replace(/\s?\]un\d/g, "");
 		string = string.replace(/\[mn\d\s?/g, "").replace(/\s?\]mn\d/g, "");
+		string = string.replace(/\[mk\d\s?/g, "").replace(/\s?\]mk\d/g, "");
+		string = string.replace(/\[uk\d\s?/g, "").replace(/\s?\]uk\d/g, "");
+
 		string = string.replace(/\[uu\d/g, "<uu>").replace(/\]uu\d/g, "</uu>");
 		string = string.replace(/\[mu\d/g, "<mu>").replace(/\]mu\d/g, "</mu>");
 		string = string.replace(/\]/g, "&rsb;");
@@ -402,7 +427,7 @@ Report = {
 			for (var id in stats.warnings) {
 				var warning = this.warnings[id];
 				var number = stats.warnings[id];
-				this.write(file, Html.templates.statsRowId, {description: warning.getDescription(), number: number});
+				this.write(file, Html.templates.statsRowId, {warning: warning, number: number});
 			}
 		}
 		this.write(file, Html.templates.statsFoot);
@@ -490,7 +515,7 @@ Report = {
 							paramsNoLinks.push(this.getLabel(params[pi], true));
 							paramsLinks.push(this.getLabel(params[pi]));
 						}
-						var _messageLinks = "{KJ-0000-" + new String(warning.getId()).lpad("0", 4) + "} " + Core.Output.exec(warning.getMessage(), paramsLinks);
+						var _messageLinks = warning.getCriteria() + " " + Core.Output.exec(warning.getMessage(), paramsLinks);
 						messagesLinks = messagesLinks + "<p class=\"li\">•&nbsp;" + _messageLinks + "</p>";
 						var _messageNoLinks = Core.Output.exec(warning.getMessage(), paramsNoLinks);
 						messagesNoLinks = messagesNoLinks + "<p class=\"li\">•&nbsp;" + _messageNoLinks + "</p>";
@@ -601,7 +626,7 @@ Report = {
 			for (var id in stats.warnings) {
 				var warning = this.warnings[id];
 				var number = stats.warnings[id];
-				this.write(file, Html.templates.statsRowId, {description: warning.getDescription(), number: number});
+				this.write(file, Html.templates.statsRowId, {warning: warning, number: number});
 			}
 		}
 		this.write(file, Html.templates.statsFoot);
@@ -1337,8 +1362,12 @@ Report = {
 				string = string.replace(new RegExp(typeName, "gi"), typeLink);
 			}
 			else {
-				if (!/^parametry?(uruchomieniow[ey])?$/i.test(typeName.replace(/\s/g, "")))
-					this.addWarning(18, context.useCase, [typeName, stepContext.step.getLevel(), stepContext.scenario]);
+				if (!/^parametry?(uruchomieniow[ey])?$/i.test(typeName.replace(/\s/g, ""))) {
+					if (!typeName.trim())
+						this.addWarning(37, context.useCase, [stepContext.step.getLevel(), stepContext.scenario]);
+					else	
+						this.addWarning(18, context.useCase, [typeName, stepContext.step.getLevel(), stepContext.scenario]);
+				}
 			}
 			context.scenario.types[typeName] = type;
 			/*if (moves.length == 0)
@@ -1754,20 +1783,6 @@ Report = {
 Report.Warning = define({
 	_id: null,
 	_constraint: null,
-	/*_kind: null,
-	_category: null,
-	_message: null,
-	_reported: false,
-	_description: null,*/
-	/*create: function(id, reported, kind, category, description, message) {
-		this._id = id;
-		this._reported = reported;
-		this._kind = kind;
-		this._category = category;
-		this._message = message;
-		this._description = description;
-		Report.warnings[id] = this;
-	},*/
 	create: function(id, constraint) {
 		this._id = id;
 		this._constraint = constraint;
@@ -1777,6 +1792,9 @@ Report.Warning = define({
 	},
 	getId: function() {
 		return this._id;
+	},
+	getCriteria: function() {
+		return "{KJ-0000-" + new String(this.getId()).lpad("0", 4) + "}";		
 	},
 	getDescription: function() {
 		return this._constraint.description;

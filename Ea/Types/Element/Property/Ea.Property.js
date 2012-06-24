@@ -17,9 +17,9 @@
 Ea.Property = {};
 
 Ea.Property._Base = extend(Ea.Named, {
-	_toString: function() {
+	/*_toString: function() {
 		return this.getName() + " = " + this.getValue();
-	}
+	}*/
 },
 {
 	api: "Property",

@@ -53,6 +53,10 @@ Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, {
 
 	check: function(params) {
 		return this._class.check(this, params);
+	},
+	
+	_toString: function() {
+		return " [" + this._class + "]";
 	}
 },
 {
@@ -76,7 +80,6 @@ Core.Types.Named = define({
 	
 	_toString: function() {
 		return this.getName() + " [" + this._class + "]";
-		//return this.getName();
 	}
 });
 
@@ -87,12 +90,12 @@ Core.Types.Collection = define({
 	_elements: null,
 	_table: null,
 
-	create: function(collection, params) {
+	create: function(params) {
 		params = params || {};
 		this._elements = {};
 		this._table = [];
 		this._filter = Core.Types.Filter.ensure(params.filter);
-		this.addAll(collection);
+		this.addAll(params.collection);
 	},
 	
 	add: function(element) {
@@ -172,7 +175,7 @@ Core.Types.Collection = define({
 	
 	filter: function(filters) {
 		if (!filters) return this;
-		var filtered = new Core.Types.Collection(null, {filter: this._filter});
+		var filtered = new Core.Types.Collection({filter: this._filter});
 		this.forEach(function(element) {
 			if (element.match(filters)) {
 				filtered.add(element);
@@ -199,14 +202,14 @@ Core.Types.Map = extend(Core.Types.Collection, {
 	_valueFn: null,
 	_map: null,
 	
-	create: function(collection, params) {
+	create: function(params) {
 		params = params || {};
 		this._keyDef = params.key;
 		this._keyFn = new Function("return " + this._keyDef + ";");
 		this._valueDef = params.value;
 		this._valueFn = this._valueDef ? new Function("return " + this._valueDef + ";") : null;
 		this._map = {};
-		_super.create(collection, params);
+		_super.create(params);
 	},
 	
 	_added: function(element) {

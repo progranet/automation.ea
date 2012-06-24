@@ -150,6 +150,14 @@ a:hover {
 	background: #e0e0ff;
 }
 
+.mk {
+	border: 1px solid red;
+}
+
+.uk {
+	border: 1px solid red;
+}
+
 .uu {
 	text-decoration: line-through; 
 	color: red;

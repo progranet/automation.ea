@@ -47,8 +47,17 @@
 </tr>
 <!-- statsRowId -->
 <tr>
-<td colspan="2" style="border-right: 0px;"><div class="cell-td"><p class="cell-td-span"><% description %></p></div></td>
-<td style="border-left: 0px;"><div class="cell-td"><p class="cell-td-span" style="text-align: right;"><% number %></p></div></td>
+<td colspan="3">
+
+<table style="width: 100%;">
+<tr>
+<td style="border: 0px; width: 100px; padding-left: 10px;"><p class="code"><% warning.getCriteria() %></p></td>
+<td style="border: 0px;"><p class="cell-td-span"><% warning.getDescription() %></p></td>
+<td style="border: 0px; width: 50px;"><p class="cell-td-span" style="text-align: right;"><% number %></p></td>
+</tr>
+</table>
+
+</td>
 </tr>
 <!-- statsFoot -->
 </tbody>

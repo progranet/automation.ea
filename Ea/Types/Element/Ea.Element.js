@@ -592,7 +592,7 @@ Ea.Element.UseCase = extend(Ea.Element._Base, {
 		var basic = this.getBasicScenario();
 		var extensions = new Core.Types.Collection();
 		basic.getSteps().forEach(function(step) {
-			extensions.addAll(step.getExtensions());
+			extensions.addAll(step._getExtensions());
 		});
 		return extensions;
 	}
@@ -600,7 +600,7 @@ Ea.Element.UseCase = extend(Ea.Element._Base, {
 {
 	_scenarios: new Ea.Helper.Collection({api: "Scenarios", elementType: "Ea.Scenario._Base"}),
 	_basicScenario: new Ea.Helper.CustomProperty({type: "Ea.Scenario.BasicPath", get: "getBasicScenario"}),
-	_scenarioExtensions: new Ea.Helper.CustomProperty({type: "Ea.ScenarioExtension._Base", elementType: "Ea.Scenario._Base", get: "getScenarioExtensions"}),
+	_scenarioExtensions: new Ea.Helper.CustomProperty({type: "Core.Types.Collection", elementType: "Ea.ScenarioExtension._Base", get: "getScenarioExtensions"}),
 	_complexity: new Ea.Helper.Property({api: "Complexity", type: Number})
 });
 

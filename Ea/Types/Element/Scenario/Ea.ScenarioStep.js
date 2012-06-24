@@ -34,7 +34,7 @@ Ea.ScenarioStep._Base = extend(Ea.Named, {
 	__guid: new Ea.Helper.Property({api: "StepGUID"}),
 	_pos: new Ea.Helper.Property({api: "Pos"}),
 	_level: new Ea.Helper.Property({api: "Level"}),
-	_extensions: new Ea.Helper.Collection({api: "Extensions", elementType: "Ea.ScenarioExtension._Base", key: "this.getLevel()"}),
+	_extensions: new Ea.Helper.Collection({api: "Extensions", elementType: "Ea.ScenarioExtension._Base", key: "this.getLevel()", private: true}),
 	_stepType: new Ea.Helper.Property({api: "StepType", private: true}),
 	_link: new Ea.Helper.ReferenceByGuid({api: "Link", type: "Ea.Element.UseCase"}),
 	_uses: new Ea.Helper.Property({api: "Uses"}),
