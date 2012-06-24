@@ -129,7 +129,9 @@ Core.Log = {
 		if (typeof(level) == "string")
 			level = Core.Log.logs[level];
 		var fn = context[propertyName];
-		var qualifiedName = fn ? fn.qualifiedName : "<<anonymous>>";
+		if (!fn)
+			return;
+		var qualifiedName = fn.qualifiedName;
 		if (!Core.Log.isLogged(level, qualifiedName)) return;
 
 		message = Core.Output.exec(message, params);
@@ -140,12 +142,12 @@ Core.Log = {
 		var contextName = fn.static === false ? context._class.qualifiedName : context.qualifiedName;
 		var sourceFn = contextName + "." + propertyName;
 		var sourceAt = qualifiedName;
-		var source = sourceFn + (sourceFn == sourceAt ? "" : " (@" + sourceAt + ")");
+		var source = sourceFn + (sourceFn == sourceAt ? "" : " @ " + sourceAt.replace(/\.[^\.]+$/, ""));
+		var debugInfo = level.name + ": {" + (fn.static === false ? "" : "static ") + source + "} ";
 		
 		for (var ti = 0; ti < level.targets.length; ti++) {
 			var target = level.targets[ti];
-			var debugInfo = target.isDebug() ? ((fn.static === false ? "" : "static ") + source + " ") : "";
-			message = (s == 1 ? message + " " : "") + (s == 2 ? "" : debugInfo) + (s == 1 ? "" : message);
+			message = (s == 1 ? message + " " : "") + (s == 2 ? "" : (target.isDebug() ? debugInfo : "")) + (s == 1 ? "" : message);
 			target.write(message);
 		}
 	},

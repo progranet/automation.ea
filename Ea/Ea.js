@@ -51,6 +51,7 @@ Ea = {
 		
 		var systemTarget = new Ea.Helper.Target("System", true);
 		var scriptTarget = new Ea.Helper.Target("Script", false);
+		
 		Core.Log.registerTarget(Core.Log.logs.error, systemTarget);
 		Core.Log.registerTarget(Core.Log.logs.warn, systemTarget);
 		Core.Log.registerTarget(Core.Log.logs.debug, systemTarget);
@@ -86,7 +87,7 @@ Ea = {
 	register: function(type, objectType) {
 		var namespace = include(type);
 		this._objectTypes[objectType] = namespace;
-	}
+	}	
 };
 
 include("Ea.Helper@Ea");
@@ -94,24 +95,25 @@ include("Ea.Helper@Ea");
 Ea.Log = define({
 	
 	_path: null,
-	_parented: null,
+	_element: null,
 	
-	create: function(parented) {
+	create: function(element) {
 		_super.create();
-		this._parented = parented;
+		this._element = element;
+		element._log = this;
 	},
 	
 	getPath: function() {
 		if (!this._path || Ea.mm) {
 			this._path = [];
-			var parent = this._parented.getParent();
+			var parent = this._element.getParent();
 			if (parent) {
-				var parentPath = parent.getLog().getPath();
+				var parentPath = Ea.Log.getPath(parent); //parent._log.getPath();
 				for (var p = 0; p < parentPath.length; p++) {
 					this._path.push(parentPath[p]);
 				}
 			}
-			this._path.push(this._parented);
+			this._path.push(this._element);
 		}
 		return this._path;
 	},
@@ -139,7 +141,21 @@ Ea.Log = define({
 	}
 },
 {
-	_currentPath: null
+	_currentPath: null,
+
+	log: function(element) {
+		if (!element._log) {
+			new Ea.Log(element);
+		}
+		element._log.log();
+	},
+
+	getPath: function(element) {
+		if (!element._log) {
+			new Ea.Log(element);
+		}
+		return element._log.getPath();
+	}
 });
 
 Ea.Source = define({
@@ -168,22 +184,11 @@ Ea.Source = define({
 	}
 });
 
+
 Ea.Any = define({
-	
-	// usun¹æ logowanie z tego poziomu
-	_log: null,
 	
 	create: function() {
 		_super.create();
-		this._log = new Ea.Log(this);
-	},
-	
-	getLog: function() {
-		return this._log;
-	},
-	
-	log: function() {
-		this._log.log();
 	},
 	
 	getParent: function() {

@@ -6,134 +6,6 @@ include("Ea@Ea");
 
 Report = {
 	
-	warnings: {},
-		
-	constraints: {
-		1: {reported: true, kind: "error", category: "alias", 
-				description: "Brak identyfikatora",
-				message: "$ nie ma identyfikatora"},
-		2: {reported: true, kind: "error", category: "alias", 
-				description: "Identyfikator nie jest unikalny",
-				message: "$: identyfikator jest taki sam jak dla $ / <u>$</u>"},
-		3: {reported: true, kind: "warning", category: "relation", 
-				description: "Niepoprawna relacja pomiêdzy aktorem i przypadkiem u¿ycia",
-				message: "Aktor powinien byæ powi¹zany z przypadkiem $ u¿ycia relacj¹ asocjacji (aktor --&gt; przypadek u¿ycia)"},
-		4: {reported: true, kind: "warning", category: "relation", 
-				description: "Niepoprawna relacja pomiêdzy przypadkiem u¿ycia i wymaganiem",
-				message: "Przypadek u¿ycia powinien byæ powi¹zany z wymaganiem $ relacj¹ realizacji"},
-		5: {reported: false, kind: "warning", category: "relation", 
-				description: "Niepoprawna relacja pomiêdzy przypadkiem u¿ycia i zadaniem procesu biznesowego",
-				message: "Przypadek u¿ycia powinien byæ powi¹zany z zadaniem procesu biznesowego $ relacj¹ realizacji"},
-		6: {reported: true, kind: "warning", category: "diagram", 
-				description: "Zdefiniowano przebiegi, ale brak diagramu aktywnoœci",
-				message: "Brak diagramu aktywnoœci"},
-		7: {reported: true, kind: "warning", category: "scenario", 
-				description: "Zdefiniowano przebiegi, ale nie zdefiniowano przebiegu podstawowego",
-				message: "Brak przebiegu podstawowego"},
-		8: {reported: true, kind: "warning", category: "scenario", 
-				description: "Wiêcej ni¿ jeden przebieg podstawowy",
-				message: "Wiêcej ni¿ jeden przebieg podstawowy"},
-		9: {reported: true, kind: "warning", category: "relation", 
-				description: "Przypadki u¿ycia w³¹czane na poziomie modelu przypadków u¿ycia, nie s¹ w³¹czane w ¿adnym kroku przebiegu",
-				message: "Przypadek u¿ycia w³¹cza przypadek $, który nie jest w³¹czany przez ¿aden krok przebiegów"},
-		10: {reported: true, kind: "warning", category: "relation", 
-				description: "Przypadki u¿ycia rozszerzaj¹ce na poziomie modelu przypadków u¿ycia, nie rozszerzaj¹ ¿adnego kroku przebiegu",
-				message: "Przypadek u¿ycia jest rozszerzeany przez przypadek $, który nie rozszerza ¿adnego kroku przebiegów"},
-		11: {reported: true, kind: "warning", category: "scenario", 
-				description: "Brak przebiegów dla przypadku u¿ycia, który nie jest abstrakcyjny i nie jest generalizacj¹",
-				message: "Brak przebiegów"},
-		12: {reported: true, kind: "error", category: "scenario", 
-				description: "Przebiegi odnosz¹ siê do regu³, które nie zosta³y odnalezione",
-				message: "Przebiegi odnosz¹ siê do nieistniej¹cej regu³y [$]"},
-		13: {reported: true, kind: "warning", category: "step", 
-				description: "Kroki wskazuj¹ na w³¹czanie/rozszerzanie, natomiast nie odnaleziono w opisie kroków wzorca wskazanych przypadków",
-				message: "W kroku [$] przebiegu $ nie odnaleziono wzorca w³¹czanego/rozszerzaj¹cego przypadku u¿ycia"},
-		14: {reported: true, kind: "warning", category: "step", 
-				description: "Kroki w³¹czaj¹ przypadki u¿ycia, które nie s¹ w³¹czane na poziomie modelu przypadków u¿ycia",
-				message: "Krok [$] przebiegu $ w³¹cza przypadek u¿ycia, który nie jest w³¹czany na poziomie modelu"},
-		15: {reported: true, kind: "error", category: "step", 
-				description: "Kroki przebiegów alternatywnych (rozszerzeñ) w³¹czaj¹ przypadki u¿ycia - powinny byæ rozszerzane",
-				message: "Krok [$] przebiegu alternatywnego (rozszerzenia) $ nie mo¿e w³¹czaæ przypadku u¿ycia (powinien byæ rozszerzany)"},
-		16: {reported: true, kind: "warning", category: "step", 
-				description: "Kroki s¹ rozszerzane przez przypadki u¿ycia, które nie rozszerzaj¹ przypadku na poziomie modelu przypadków u¿ycia",
-				message: "Krok [$] przebiegu $ jest rozszerzany przez przypadek u¿ycia, który nie jest rozszerzeniem na poziomie modelu"},
-		17: {reported: true, kind: "warning", category: "step", 
-				description: "Kroki przebiegu g³ównego s¹ rozszerzane przez przypadki u¿ycia - powinny w³¹czaæ",
-				message: "Krok [$] przebiegu podstawowego nie powinien byæ rozszerzany przez inny przypadek u¿ycia (powinien w³¹czaæ)"},
-		18: {
-				reported: true, 
-				kind: "warning", 
-				category: "type", 
-				description: "Brak powi¹zañ klas wykazanych w krokach przebiegów z modelem dziedziny systemu",
-				message: "Klasa [$] u¿yta w kroku [$] przebiegu $ nie zosta³a wskazana w modelu dziedziny systemu"
-			},
-		19: {reported: true, kind: "warning", category: "rule", 
-				description: "Niepoprawne regu³y",
-				message: "$ nie jest poprawn¹ regu³¹"},
-		20: {reported: true, kind: "error", category: "rule", 
-				description: "Numery regu³ s¹ nieunikalne w kontekœcie przypadku u¿ycia",
-				message: "Regu³a $ ma taki sam numer jak regu³a $"},
-		21: {reported: true, kind: "warning", category: "rule", 
-				description: "Brak powi¹zania regu³ z krokami przebiegów",
-				message: "Brak odniesienia w przebiegach do regu³y $"},
-		22: {reported: true, kind: "warning", category: "message", 
-				description: "Komunikaty wskazane w regu³ach, nie zosta³y odnalezione w modelu",
-				message: "Komunikat '$' nie zosta³ odnaleziony w modelu"},
-		23: {reported: true, kind: "warning", category: "relation", 
-				description: "Klasy abstrakcyjne nie posiadaj¹ specjalizacji",
-				message: "Klasa jest abstrakcyjna i nie posiada specjalizacji"},
-		24: {reported: true, kind: "warning", category: "scenario", 
-				description: "Przypadek, który nie jest abstrakcyjny i nie jest generalizacj¹, nie operuje na danych",
-				message: "Brak zdefiniowanych klas wejœciowych/wyjœciowych dla przypadku u¿ycia, który nie jest abstrakcyjny i nie jest generalizacj¹"},
-		25: {reported: true, kind: "warning", category: "relation", 
-				description: "Wymaganie nie jest realizowane przez ¿aden przypadek u¿ycia",
-				message: "Wymaganie nie jest realizowane przez ¿aden przypadek u¿ycia"},
-		26: {reported: true, kind: "warning", category: "step", 
-				description: "Kroki wskazuj¹ w modelu innych wykonawców ni¿ w opisach",
-				message: "Krok [$] przebiegu $ wskazuje w modelu innego wykonawcê ni¿ w opisie kroku"},
-		27: {reported: true, kind: "warning", category: "step", 
-				description: "Kroki wykonywane przez u¿ytkownika operuj¹ na danych",
-				message: "Krok u¿ytkownika [$] przebiegu $ nie mo¿e operowaæ na danych [$ ($)]"},
-		28: {reported: true, kind: "warning", category: "type", 
-				description: "Te same kroki przebiegów wielokrotnie operuj¹ na tych samych grupach danych",
-				message: "Krok [$] przebiegu $ wielokrotnie operuje na takiej samej grupie danych [$ ($)]"},
-		29: {reported: true, kind: "warning", category: "rule", 
-				description: "Niepoprawne warunki pocz¹tkowe",
-				message: "$ nie jest poprawnym warunkem pocz¹tkowym"},
-		30: {reported: true, kind: "warning", category: "rule", 
-				description: "Niepoprawne warunki koñcowe",
-				message: "$ nie jest poprawnym warunkem koñcowym"},
-		31: {reported: true, kind: "warning", category: "step", 
-				description: "Kroki odwo³uj¹ siê do przypadków u¿ycia, które na poziomie modelu nie s¹ generalizacj¹, nie rozszerzaj¹, ani nie s¹ w³¹czane",
-				message: "W kroku [$] przebiegu $ wystêpuje identyfikator przypadku u¿ycia ($), który nie jest powi¹zany poprawn¹ relacj¹ (nie jest rozszerzeniem, nie jest w³¹czany, nie jest generalizacj¹)"},
-		32: {reported: true, kind: "error", category: "name", 
-				description: "Brak nazwy",
-				message: "$ nie ma nazwy"},
-		33: {reported: true, kind: "error", category: "notes", 
-				description: "Brak opisu",
-				message: "$ nie ma opisu"},
-		34: {reported: true, kind: "warning", category: "notes", 
-				description: "Opis jest to¿samy z nazw¹",
-				message: "$: opis jest taki sam jak nazwa"},
-		35: {reported: true, kind: "warning", category: "type", 
-				description: "Kierunki przep³ywu danych (wejœciowe/wyjœciowe) s¹ niepoprawne",
-				message: "Niepoprawny rodzaj przesuniêcia ($) dla grupy danych [$] w kroku [$] przebiegu $"},
-		36: {
-				reported: true, 
-				kind: "warning", 
-				category: "step", 
-				description: "Niepoprawne/zbêdne kroki - brak przypisania regu³, brak przep³ywu danych",
-				message: "Krok systemowy [$] przebiegu $ jest niepoprawny lub zbêdny - brak operacji na danych oraz brak powi¹zanych regu³"
-			},
-		37: {
-				reported: true, 
-				kind: "warning", 
-				category: "type", 
-				description: "Puste nazwy klas wykazanych w krokach przebiegów",
-				message: "Klasa u¿yta w kroku [$] przebiegu $ ma pust¹ nazwê"
-			}
-	},
-	
 	params: {
 		styleSheet: "style.css",
 		diagramMaxWidth: 600,
@@ -169,6 +41,269 @@ Report = {
 		}
 	},
 	
+	constraints: {
+		1: {
+				reported: true, 
+				kind: "error", 
+				category: "alias", 
+				description: "Brak identyfikatora",
+				message: "$ nie ma identyfikatora"
+			},
+		2: {
+				reported: true, 
+				kind: "error", 
+				category: "alias", 
+				description: "Identyfikator nie jest unikalny",
+				message: "$: identyfikator jest taki sam jak dla $ / <u>$</u>"
+			},
+		3: {
+				reported: true, 
+				kind: "warning", 
+				category: "relation", 
+				description: "Niepoprawna relacja pomiêdzy aktorem i przypadkiem u¿ycia",
+				message: "Aktor powinien byæ powi¹zany z przypadkiem $ u¿ycia relacj¹ asocjacji (aktor --&gt; przypadek u¿ycia)"
+			},
+		4: {
+				reported: true, 
+				kind: "warning", 
+				category: "relation", 
+				description: "Niepoprawna relacja pomiêdzy przypadkiem u¿ycia i wymaganiem",
+				message: "Przypadek u¿ycia powinien byæ powi¹zany z wymaganiem $ relacj¹ realizacji"
+			},
+		5: {
+				reported: false, 
+				kind: "warning", 
+				category: "relation", 
+				description: "Niepoprawna relacja pomiêdzy przypadkiem u¿ycia i zadaniem procesu biznesowego",
+				message: "Przypadek u¿ycia powinien byæ powi¹zany z zadaniem procesu biznesowego $ relacj¹ realizacji"
+			},
+		6: {
+				reported: true, 
+				kind: "warning", 
+				category: "diagram", 
+				description: "Zdefiniowano przebiegi, ale brak diagramu aktywnoœci",
+				message: "Brak diagramu aktywnoœci"
+			},
+		7: {
+				reported: true, 
+				kind: "warning", 
+				category: "scenario", 
+				description: "Zdefiniowano przebiegi, ale nie zdefiniowano przebiegu podstawowego",
+				message: "Brak przebiegu podstawowego"
+			},
+		8: {
+				reported: true, 
+				kind: "warning", 
+				category: "scenario", 
+				description: "Wiêcej ni¿ jeden przebieg podstawowy",
+				message: "Wiêcej ni¿ jeden przebieg podstawowy"
+			},
+		9: {
+				reported: true, 
+				kind: "warning", 
+				category: "relation", 
+				description: "Przypadki u¿ycia w³¹czane na poziomie modelu przypadków u¿ycia, nie s¹ w³¹czane w ¿adnym kroku przebiegu",
+				message: "Przypadek u¿ycia w³¹cza przypadek $, który nie jest w³¹czany przez ¿aden krok przebiegów"
+			},
+		10: {
+				reported: true, 
+				kind: "warning", 
+				category: "relation", 
+				description: "Przypadki u¿ycia rozszerzaj¹ce na poziomie modelu przypadków u¿ycia, nie rozszerzaj¹ ¿adnego kroku przebiegu",
+				message: "Przypadek u¿ycia jest rozszerzeany przez przypadek $, który nie rozszerza ¿adnego kroku przebiegów"
+			},
+		11: {
+				reported: true, 
+				kind: "warning", 
+				category: "scenario", 
+				description: "Brak przebiegów dla przypadku u¿ycia, który nie jest abstrakcyjny i nie jest generalizacj¹",
+				message: "Brak przebiegów"
+			},
+		12: {
+				reported: true, 
+				kind: "error", 
+				category: "scenario", 
+				description: "Przebiegi odnosz¹ siê do regu³, które nie zosta³y odnalezione",
+				message: "Przebiegi odnosz¹ siê do nieistniej¹cej regu³y [$]"
+			},
+		13: {
+				reported: true, 
+				kind: "warning", 
+				category: "step", 
+				description: "Kroki wskazuj¹ na w³¹czanie/rozszerzanie, natomiast nie odnaleziono w opisie kroków wzorca wskazanych przypadków",
+				message: "W kroku [$] przebiegu $ nie odnaleziono wzorca w³¹czanego/rozszerzaj¹cego przypadku u¿ycia"
+			},
+		14: {
+				reported: true, 
+				kind: "warning", 
+				category: "step", 
+				description: "Kroki w³¹czaj¹ przypadki u¿ycia, które nie s¹ w³¹czane na poziomie modelu przypadków u¿ycia",
+				message: "Krok [$] przebiegu $ w³¹cza przypadek u¿ycia, który nie jest w³¹czany na poziomie modelu"
+			},
+		15: {
+				reported: true, 
+				kind: "error", 
+				category: "step", 
+				description: "Kroki przebiegów alternatywnych (rozszerzeñ) w³¹czaj¹ przypadki u¿ycia - powinny byæ rozszerzane",
+				message: "Krok [$] przebiegu alternatywnego (rozszerzenia) $ nie mo¿e w³¹czaæ przypadku u¿ycia (powinien byæ rozszerzany)"
+			},
+		16: {
+				reported: true, 
+				kind: "warning", 
+				category: "step", 
+				description: "Kroki s¹ rozszerzane przez przypadki u¿ycia, które nie rozszerzaj¹ przypadku na poziomie modelu przypadków u¿ycia",
+				message: "Krok [$] przebiegu $ jest rozszerzany przez przypadek u¿ycia, który nie jest rozszerzeniem na poziomie modelu"
+			},
+		17: {
+				reported: true, 
+				kind: "warning", 
+				category: "step", 
+				description: "Kroki przebiegu g³ównego s¹ rozszerzane przez przypadki u¿ycia - powinny w³¹czaæ",
+				message: "Krok [$] przebiegu podstawowego nie powinien byæ rozszerzany przez inny przypadek u¿ycia (powinien w³¹czaæ)"
+			},
+		18: {
+				reported: true, 
+				kind: "warning", 
+				category: "type", 
+				description: "Brak powi¹zañ klas wykazanych w krokach przebiegów z modelem dziedziny systemu",
+				message: "Klasa [$] u¿yta w kroku [$] przebiegu $ nie zosta³a wskazana w modelu dziedziny systemu"
+			},
+		19: {
+				reported: true, 
+				kind: "warning", 
+				category: "rule", 
+				description: "Niepoprawne regu³y",
+				message: "$ nie jest poprawn¹ regu³¹"
+			},
+		20: {
+				reported: true, 
+				kind: "error", 
+				category: "rule", 
+				description: "Numery regu³ s¹ nieunikalne w kontekœcie przypadku u¿ycia",
+				message: "Regu³a $ ma taki sam numer jak regu³a $"
+			},
+		21: {
+				reported: true, 
+				kind: "warning", 
+				category: "rule", 
+				description: "Brak powi¹zania regu³ z krokami przebiegów",
+				message: "Brak odniesienia w przebiegach do regu³y $"
+			},
+		22: {
+				reported: true, 
+				kind: "warning", 
+				category: "message", 
+				description: "Komunikaty wskazane w regu³ach, nie zosta³y odnalezione w modelu",
+				message: "Komunikat '$' nie zosta³ odnaleziony w modelu"
+			},
+		23: {
+				reported: true, 
+				kind: "warning", 
+				category: "relation", 
+				description: "Klasy abstrakcyjne nie posiadaj¹ specjalizacji",
+				message: "Klasa jest abstrakcyjna i nie posiada specjalizacji"
+			},
+		24: {
+				reported: true, 
+				kind: "warning", 
+				category: "scenario", 
+				description: "Przypadek, który nie jest abstrakcyjny i nie jest generalizacj¹, nie operuje na danych",
+				message: "Brak zdefiniowanych klas wejœciowych/wyjœciowych dla przypadku u¿ycia, który nie jest abstrakcyjny i nie jest generalizacj¹"
+			},
+		25: {
+				reported: true, 
+				kind: "warning", 
+				category: "relation", 
+				description: "Wymaganie nie jest realizowane przez ¿aden przypadek u¿ycia",
+				message: "Wymaganie nie jest realizowane przez ¿aden przypadek u¿ycia"
+			},
+		26: {
+				reported: true, 
+				kind: "warning", 
+				category: "step", 
+				description: "Kroki wskazuj¹ w modelu innych wykonawców ni¿ w opisach",
+				message: "Krok [$] przebiegu $ wskazuje w modelu innego wykonawcê ni¿ w opisie kroku"
+			},
+		27: {
+				reported: true, 
+				kind: "warning", 
+				category: "step", 
+				description: "Kroki wykonywane przez u¿ytkownika operuj¹ na danych",
+				message: "Krok u¿ytkownika [$] przebiegu $ nie mo¿e operowaæ na danych [$ ($)]"
+			},
+		28: {
+				reported: true, 
+				kind: "warning", 
+				category: "type", 
+				description: "Te same kroki przebiegów wielokrotnie operuj¹ na tych samych grupach danych",
+				message: "Krok [$] przebiegu $ wielokrotnie operuje na takiej samej grupie danych [$ ($)]"
+			},
+		29: {
+				reported: true, 
+				kind: "warning", 
+				category: "rule", 
+				description: "Niepoprawne warunki pocz¹tkowe",
+				message: "$ nie jest poprawnym warunkem pocz¹tkowym"
+			},
+		30: {
+				reported: true, 
+				kind: "warning", 
+				category: "rule", 
+				description: "Niepoprawne warunki koñcowe",
+				message: "$ nie jest poprawnym warunkem koñcowym"
+			},
+		31: {
+				reported: true, 
+				kind: "warning", 
+				category: "step", 
+				description: "Kroki odwo³uj¹ siê do przypadków u¿ycia, które na poziomie modelu nie s¹ generalizacj¹, nie rozszerzaj¹, ani nie s¹ w³¹czane",
+				message: "W kroku [$] przebiegu $ wystêpuje identyfikator przypadku u¿ycia ($), który nie jest powi¹zany poprawn¹ relacj¹ (nie jest rozszerzeniem, nie jest w³¹czany, nie jest generalizacj¹)"
+			},
+		32: {
+				reported: true, 
+				kind: "error", 
+				category: "name", 
+				description: "Brak nazwy",
+				message: "$ nie ma nazwy"
+			},
+		33: {
+				reported: true, 
+				kind: "error", 
+				category: "notes", 
+				description: "Brak opisu",
+				message: "$ nie ma opisu"
+			},
+		34: {
+				reported: true, 
+				kind: "warning", 
+				category: "notes", 
+				description: "Opis jest to¿samy z nazw¹",
+				message: "$: opis jest taki sam jak nazwa"
+			},
+		35: {
+				reported: true, 
+				kind: "warning", 
+				category: "type", 
+				description: "Kierunki przep³ywu danych (wejœciowe/wyjœciowe) s¹ niepoprawne",
+				message: "Niepoprawny rodzaj przesuniêcia ($) dla grupy danych [$] w kroku [$] przebiegu $"},
+		36: {
+				reported: true, 
+				kind: "warning", 
+				category: "step", 
+				description: "Niepoprawne/zbêdne kroki - brak przypisania regu³, brak przep³ywu danych",
+				message: "Krok systemowy [$] przebiegu $ jest niepoprawny lub zbêdny - brak operacji na danych oraz brak powi¹zanych regu³"
+			},
+		37: {
+				reported: true, 
+				kind: "warning", 
+				category: "type", 
+				description: "Puste nazwy klas wykazanych w krokach przebiegów",
+				message: "Klasa u¿yta w kroku [$] przebiegu $ ma pust¹ nazwê"
+			}
+	},
+	
+	warnings: {},
+	
 	_depthMax: 0,
 	
 	elements: {},
@@ -185,6 +320,7 @@ Report = {
 		Message: {
 			label: "Komunikat",
 			title: "Komunikaty",
+			pattern: "[\\d\\.]+-KOM-[\\d]+",
 			filter: Ea.Element.PrimitiveType,
 			process: true
 		},
@@ -726,7 +862,7 @@ Report = {
 	},
 	
 	processUseCase: function(useCase, depth, file) {
-		useCase.log();
+		Ea.Log.log(useCase);
 		
 		// ## pocz¹tek tabeli ##
 		this.write(file, Html.templates.useCaseHead, {key: this.format(useCase.getAlias()), value: this.format(useCase.getName())});
@@ -760,7 +896,7 @@ Report = {
 	},
 	
 	_processUseCaseDetails: function(useCase, depth) {
-		useCase.log();
+		Ea.Log.log(useCase);
 		
 		var file = this.open(this.params.outputRoot + useCase.getXmlGuid() + ".html");
 		this.write(file, Html.templates.htmlHead, {title: useCase.getAlias() + " " + useCase.getName(), stylesheet: this.params.styleSheet});
@@ -1011,7 +1147,6 @@ Report = {
 		 * Diagramy aktywnoœci
 		 */
 		var diagrams = this.processActivityDiagram(useCase);
-		this.setStats(this.category.diagram, useCase, 1);
 		diagrams.forEach(function(diagram) {
 			this.processDiagram(diagram, file);
 		});
@@ -1081,6 +1216,7 @@ Report = {
 			if (typeUsage.total == 0 && !canEmpty()) {
 				this.addWarning(24, useCase);
 			}
+			this.setStats(this.category.diagram, useCase, 1);
 			if (diagrams.isEmpty())
 				this.addWarning(6, useCase);
 		}
@@ -1419,11 +1555,10 @@ Report = {
 				}
 
 				var messages = "";
-				this.clear(notes).replace(/[\(\s]([\d\.]+-KOM-\d+)/g, function(whole, messageRef) {
-					
+				this.clear(notes).replace(new RegExp(this.types.Message.pattern, "g"), function(messageRef) {
 					Report.setStats(Report.category.message, context.useCase, 1);
 					if (!Report.types.Message.aliases[messageRef]) {
-						var matching = Report._findMessage(messageRef).filter("this.instanceOf(Ea.Element.PrimitiveType) && (this.getStereotype() == 'E' || this.getStereotype() == 'L')");
+						var matching = Report._findMessage(messageRef);
 						matching.forEach(function(message) {
 							Report.processElement(Report.types.Message, message, depth);
 						});
@@ -1456,7 +1591,7 @@ Report = {
 	},
 	
 	processType: function(type, depth, file) {
-		type.log();
+		Ea.Log.log(type);
 
 		this.setStats(this.category.relation, type, 1);
 		if (this._isAbstract(type) && type.getRelated("supertypeOf").isEmpty()) {
@@ -1571,7 +1706,7 @@ Report = {
 	},
 	
 	processRequirement: function(requirement, depth, file) {
-		requirement.log();
+		Ea.Log.log(requirement);
 		
 		// ## pocz¹tek tabeli ##
 		this.write(file, Html.templates.requirementHead, {key: this.format(requirement.getAlias()), value: this.format(requirement.getName())});
@@ -1621,7 +1756,7 @@ Report = {
 	},
 	
 	processMessage: function(message, depth, file) {
-		message.log();
+		Ea.Log.log(message);
 		
 		// ## pocz¹tek tabeli ##
 		this.write(file, Html.templates.messageHead, {key: this.format(message.getAlias()), value: this.format(message.getName())});
@@ -1647,7 +1782,7 @@ Report = {
 	},
 	
 	processActor: function(actor, depth, file) {
-		actor.log();
+		Ea.Log.log(actor);
 		
 		// ## pocz¹tek tabeli ##
 		this.write(file, Html.templates.actorHead, {key: this.format(actor.getAlias()), value: this.format(actor.getName())});

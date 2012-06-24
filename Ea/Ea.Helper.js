@@ -44,18 +44,14 @@ Ea.Helper = {
 	},
 
 	_expand: function(template, params, value, indent, _private) {
-		if (Core.Types.Object.isInstance(value)) {
-			if (value.instanceOf(Ea.Any) && !value.instanceOf(Ea.Namespace)) {
-				if (!_private) {
-					this._inspect(value, indent + 1, template + " = {", params);
-					return;
-				}
-				template = template + " = {#PRIVATE#}";
+		if (Ea.Any.isInstance(value) && !value.instanceOf(Ea.Namespace)) {
+			if (!_private) {
+				this._inspect(value, indent + 1, template + " = {", params);
+				return;
 			}
-			params.push(value._toString());
+			template = template + " = {#PRIVATE#}";
 		}
-		else
-			params.push(value);
+		params.push(value);
 		info(this._indent(indent + 1) + template, params);
 	},
 	

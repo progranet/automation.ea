@@ -70,6 +70,9 @@ Core.Output = {
 				}
 				return result + "]";
 			}
+			if (Core.Types.Object.isInstance(context)) {
+				return context;
+			}
 			var result = "{";
 			var pi = 0;
 			for (var p in context) {

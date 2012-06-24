@@ -581,7 +581,7 @@ Ea.Element.UseCase = extend(Ea.Element._Base, {
 	
 	getBasicScenario: function() {
 		var basic = this.getScenarios(Ea.Scenario.BasicPath);
-		if (!basic)
+		if (basic.isEmpty())
 			return null;
 		if (basic.size == 1)
 			return basic.first();
@@ -591,9 +591,10 @@ Ea.Element.UseCase = extend(Ea.Element._Base, {
 	getScenarioExtensions: function() {
 		var basic = this.getBasicScenario();
 		var extensions = new Core.Types.Collection();
-		basic.getSteps().forEach(function(step) {
-			extensions.addAll(step._getExtensions());
-		});
+		if (basic)
+			basic.getSteps().forEach(function(step) {
+				extensions.addAll(step._getExtensions());
+			});
 		return extensions;
 	}
 },
