@@ -94,6 +94,23 @@ Ea.Element._Base = extend(Ea.Namespace, {
 		return this._customReferences;
 	},
 	
+	_contextReferences: null,
+	getContextReferences: function() {
+		if (!this._contextReferences || Ea.mm) {
+			this._contextReferences = new Core.Types.Collection();
+			this.getCustomReferences().forEach(function(reference) {
+				this._contextReferences.add(new Ea.Element.ContextReference(reference.getNotes() || "", reference.getSupplier(), ""));
+			});
+			this.getProperties().forEach(function(property) {
+				var connection = property.getConnector()._class.getName();
+				var supplier = property.getType();
+				var notes = property.getConnector().getName();
+				this._contextReferences.add(new Ea.Element.ContextReference(notes, supplier, connection));
+			});
+		}
+		return this._contextReferences;
+	},
+
 	findDiagrams: function() {
 		return Ea.Application.getRepository().getByQuery(Ea.Diagram._Base, "t_diagramobjects", "Object_ID", this.getId(), "Diagram_ID");
 	}
@@ -167,7 +184,8 @@ Ea.Element._Base = extend(Ea.Namespace, {
 	_abstract: new Ea.Helper.CustomProperty({get: "isAbstract", type: Boolean}),
 	_inDiagrams: new Ea.Helper.CustomProperty({get: "findDiagrams", type: "Core.Types.Collection", elementType: "Ea.Diagram._Base"}),
 	_linkedDiagram: new Ea.Helper.CustomProperty({get: "getLinkedDiagram", type: "Ea.Diagram._Base"}),
-	_customReferences: new Ea.Helper.CustomProperty({get: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"})
+	_customReferences: new Ea.Helper.CustomProperty({get: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"}),
+	_complexity: new Ea.Helper.Property({api: "Complexity", type: Number})
 });
 
 Ea.Element.CustomReference = define({
@@ -186,6 +204,31 @@ Ea.Element.CustomReference = define({
 	
 	getSupplier: function() {
 		return this._supplier;
+	}
+});
+
+Ea.Element.ContextReference = define({
+	_notes: null,
+	_supplier: null,
+	_connection: null,
+
+	create: function(notes, supplier, connection) {
+		_super.create(params);
+		this._notes = notes;
+		this._supplier = supplier;
+		this._connection = connection;
+	},
+	
+	getNotes: function() {
+		return this._notes;
+	},
+	
+	getSupplier: function() {
+		return this._supplier;
+	},
+	
+	getConnection: function() {
+		return this._connection;
 	}
 });
 
@@ -423,9 +466,35 @@ Ea.Element.PrimitiveType = extend(Ea.Element.DataType);
 
 Ea.Element.Requirement = extend(Ea.Element._Base);
 
-Ea.Element.Pseudostate = extend(Ea.Element._Base);
+Ea.Element._BehavioralElement = extend(Ea.Element._Base, {
+	getBasicScenario: function() {
+		var basic = this.getScenarios(Ea.Scenario.BasicPath);
+		if (basic.isEmpty())
+			return null;
+		if (basic.size == 1)
+			return basic.first();
+		throw new Error("More than 1 basic scenarios");
+	},
+	
+	getScenarioExtensions: function() {
+		var basic = this.getBasicScenario();
+		var extensions = new Core.Types.Collection();
+		if (basic)
+			basic.getSteps().forEach(function(step) {
+				extensions.addAll(step._getExtensions());
+			});
+		return extensions;
+	}
+},
+{
+	_scenarios: new Ea.Helper.Collection({api: "Scenarios", elementType: "Ea.Scenario._Base"}),
+	_basicScenario: new Ea.Helper.CustomProperty({type: "Ea.Scenario.BasicPath", get: "getBasicScenario"}),
+	_scenarioExtensions: new Ea.Helper.CustomProperty({type: "Core.Types.Collection", elementType: "Ea.ScenarioExtension._Base", get: "getScenarioExtensions"})
+});
 
-Ea.Element.Activity = extend(Ea.Element._Base);
+Ea.Element.Pseudostate = extend(Ea.Element._BehavioralElement);
+
+Ea.Element.Activity = extend(Ea.Element._BehavioralElement);
 
 Ea.Element.ActivityInitial = extend(Ea.Element.Pseudostate);
 
@@ -433,9 +502,9 @@ Ea.Element.ActivityFinal = extend(Ea.Element.Pseudostate);
 
 Ea.Element.ActivityPartition = extend(Ea.Element._Base);
 
-Ea.Element.Action = extend(Ea.Element._Base);
+Ea.Element.Action = extend(Ea.Element._BehavioralElement);
 
-Ea.Element.StateMachine = extend(Ea.Element._Base);
+Ea.Element.StateMachine = extend(Ea.Element._BehavioralElement);
 
 Ea.Element.Actor = extend(Ea.Element._Base);
 
@@ -495,13 +564,13 @@ Ea.Element.Constraint = extend(Ea.Element._Base, {
 	}
 });
 
-Ea.Element.State = extend(Ea.Element._Base);
+Ea.Element.State = extend(Ea.Element._BehavioralElement);
 
 Ea.Element.InitialState = extend(Ea.Element.State);
 
 Ea.Element.FinalState = extend(Ea.Element.State);
 
-Ea.Element.Process = extend(Ea.Element._Base);
+Ea.Element.Process = extend(Ea.Element._BehavioralElement);
 
 Ea.Element.Goal = extend(Ea.Element.Object);
 
@@ -535,16 +604,7 @@ Ea.Element.Sequence = extend(Ea.Element._Base);
 
 Ea.Element.ProvidedInterface = extend(Ea.Element._Base);
 
-Ea.Element.CallBehaviorAction = extend(Ea.Element.Action, {
-	_toString: function() {
-		var classifier = this.getClassifier();
-		return this.getName() + " :" + (classifier ? classifier.getName() : "<<undefined reference>>") + " [" + this._class  + "]";
-	}
-}, {
-	_classifier: new Ea.Helper.ReferenceById({api: "ClassifierID", type: "Ea.Element.Classifier"})
-});
-
-Ea.Element.CallOperationAction = extend(Ea.Element.Action, {
+Ea.Element._CallAction = extend(Ea.Element.Action, {
 	_toString: function() {
 		var classifier = this.getClassifier();
 		return this.getName() + " :" + (classifier ? classifier.getName() : "<<undefined reference>>") + " [" + this._class  + "]";
@@ -554,80 +614,16 @@ Ea.Element.CallOperationAction = extend(Ea.Element.Action, {
 	_classifier: new Ea.Helper.ReferenceById({api: "ClassifierID", type: "Ea.Element.Classifier"})
 });
 
-Ea.Element.UseCase = extend(Ea.Element._Base, {
-	
-	_contextReferences: null,
-	getContextReferences: function() {
-		if (!this._contextReferences || Ea.mm) {
-			this._contextReferences = new Core.Types.Collection();
-			this.getCustomReferences().forEach(function(reference) {
-				this._contextReferences.add(new Ea.Element.ContextReference(reference.getNotes() || "", reference.getSupplier(), ""));
-			});
-			this.getProperties().forEach(function(property) {
-				var connection = property.getConnector()._class.getName();
-				var supplier = property.getType();
-				var notes = property.getConnector().getName();
-				this._contextReferences.add(new Ea.Element.ContextReference(notes, supplier, connection));
-			});
-		}
-		return this._contextReferences;
-	},
+Ea.Element.CallBehaviorAction = extend(Ea.Element._CallAction);
 
+Ea.Element.CallOperationAction = extend(Ea.Element._CallAction);
+
+Ea.Element.UseCase = extend(Ea.Element._BehavioralElement, {
 	getExtensionPoints: function() {
 		var string = this._getMiscData0();
 		if (string == null) return null;
 		// TODO: parse '#EXP#=Po zakoñczeniu opracowywania publikacji;#EXP#=Przy wyborze publikacji do opracowywania;'
-	},
-	
-	getBasicScenario: function() {
-		var basic = this.getScenarios(Ea.Scenario.BasicPath);
-		if (basic.isEmpty())
-			return null;
-		if (basic.size == 1)
-			return basic.first();
-		throw new Error("More than 1 basic scenarios");
-	},
-	
-	getScenarioExtensions: function() {
-		var basic = this.getBasicScenario();
-		var extensions = new Core.Types.Collection();
-		if (basic)
-			basic.getSteps().forEach(function(step) {
-				extensions.addAll(step._getExtensions());
-			});
-		return extensions;
-	}
-},
-{
-	_scenarios: new Ea.Helper.Collection({api: "Scenarios", elementType: "Ea.Scenario._Base"}),
-	_basicScenario: new Ea.Helper.CustomProperty({type: "Ea.Scenario.BasicPath", get: "getBasicScenario"}),
-	_scenarioExtensions: new Ea.Helper.CustomProperty({type: "Core.Types.Collection", elementType: "Ea.ScenarioExtension._Base", get: "getScenarioExtensions"}),
-	_complexity: new Ea.Helper.Property({api: "Complexity", type: Number})
-});
-
-Ea.Element.ContextReference = define({
-	_notes: null,
-	_supplier: null,
-	_connection: null,
-
-	create: function(notes, supplier, connection) {
-		_super.create(params);
-		this._notes = notes;
-		this._supplier = supplier;
-		this._connection = connection;
-	},
-	
-	getNotes: function() {
-		return this._notes;
-	},
-	
-	getSupplier: function() {
-		return this._supplier;
-	},
-	
-	getConnection: function() {
-		return this._connection;
-	}
+	}	
 });
 
 Ea.Element.TestSet = extend(Ea.Element.UseCase); 
@@ -652,7 +648,7 @@ Ea.Element.DataObject = extend(Ea.Element._Base);
 
 Ea.Element.CentralBufferNode = extend(Ea.Element._Base);	
 
-Ea.Element.BusinessProcess = extend(Ea.Element._Base); 
+Ea.Element.BusinessProcess = extend(Ea.Element._BehavioralElement); 
 Ea.Element.Gateway = extend(Ea.Element._Base); 
 Ea.Element.EndEvent = extend(Ea.Element._Base); 
 Ea.Element.StartEvent = extend(Ea.Element._Base); 
