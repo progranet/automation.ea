@@ -115,6 +115,11 @@ Ea.Connector._Base = extend(Ea.Named, {
 	_client: new Ea.Helper.ReferenceById({api: "ClientID", type: "Ea.Element._Base"}),
 	_supplier: new Ea.Helper.ReferenceById({api: "SupplierID", type: "Ea.Element._Base"}),
 	
+	_clientAttribute: new Ea.Helper.CustomProperty({get: "getClientAttribute", type: "Ea.Attribute._Base"}),
+	_clientMethod: new Ea.Helper.CustomProperty({get: "getClientMethod", type: "Ea.Method._Base"}),
+	_supplierAttribute: new Ea.Helper.CustomProperty({get: "getSupplierAttribute", type: "Ea.Attribute._Base"}),
+	_supplierMethod: new Ea.Helper.CustomProperty({get: "getSupplierMethod", type: "Ea.Method._Base"}),
+	
 	_clientEnd: new Ea.Helper.Reference({api: "ClientEnd", type: "Ea.ConnectorEnd._Base"}),
 	_supplierEnd: new Ea.Helper.Reference({api: "SupplierEnd", type: "Ea.ConnectorEnd._Base"}),
 	
@@ -133,7 +138,7 @@ Ea.Connector._Base = extend(Ea.Named, {
 
 Ea.Connector.Aggregation = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "composedOf" : "partOf";
+		return client ? "composed of" : "part of";
 	},
 	composedOf: function() {
 		return this.getSupplier();
@@ -145,7 +150,7 @@ Ea.Connector.Aggregation = extend(Ea.Connector._Base, {
 
 Ea.Connector.Assembly = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "linksFrom" : "linksTo";
+		return client ? "links from" : "links to";
 	},
 	linksFrom: function() {
 		return this.getSupplier();
@@ -157,7 +162,7 @@ Ea.Connector.Assembly = extend(Ea.Connector._Base, {
 
 Ea.Connector.Association = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "linksFrom" : "linksTo";
+		return client ? "links from" : "links to";
 	},
 	linksFrom: function() {
 		return this.getSupplier();
@@ -173,7 +178,7 @@ Ea.Connector.CommunicationPath = extend(Ea.Connector._Base, {});
 
 Ea.Connector.Connector = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "linksFrom" : "linksTo";
+		return client ? "links from" : "links to";
 	},
 	linksFrom: function() {
 		return this.getSupplier();
@@ -185,7 +190,7 @@ Ea.Connector.Connector = extend(Ea.Connector._Base, {
 
 Ea.Connector.ControlFlow = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "transitionFrom" : "transitionTo";
+		return client ? "transition from" : "transition to";
 	},
 	transitionFrom: function() {
 		return this.getSupplier();
@@ -197,7 +202,7 @@ Ea.Connector.ControlFlow = extend(Ea.Connector._Base, {
 
 Ea.Connector.Delegate = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "linksFrom" : "linksTo";
+		return client ? "links from" : "links to";
 	},
 	linksFrom: function() {
 		return this.getSupplier();
@@ -209,7 +214,7 @@ Ea.Connector.Delegate = extend(Ea.Connector._Base, {
 
 Ea.Connector.Dependency = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "neededBy" : "dependsOn";
+		return client ? "needed by" : "depends on";
 	},
 	neededBy: function() {
 		return this.getSupplier();
@@ -221,7 +226,7 @@ Ea.Connector.Dependency = extend(Ea.Connector._Base, {
 
 Ea.Connector.Deployment = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "linksFrom" : "linksTo";
+		return client ? "links from" : "links to";
 	},
 	linksFrom: function() {
 		return this.getSupplier();
@@ -235,7 +240,7 @@ Ea.Connector.ERLink = extend(Ea.Connector._Base, {});
 
 Ea.Connector.Generalization = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "supertypeOf" : "subtypeOf";
+		return client ? "supertype of" : "subtype of";
 	},
 	supertypeOf: function() {
 		return this.getSupplier();
@@ -247,7 +252,7 @@ Ea.Connector.Generalization = extend(Ea.Connector._Base, {
 
 Ea.Connector.InformationFlow = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "linksFrom" : "linksTo";
+		return client ? "links from" : "links to";
 	},
 	linksFrom: function() {
 		return this.getSupplier();
@@ -263,7 +268,7 @@ Ea.Connector.InterruptFlow = extend(Ea.Connector._Base, {});
 
 Ea.Connector.Manifest = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "linksFrom" : "linksTo";
+		return client ? "links from" : "links to";
 	},
 	linksFrom: function() {
 		return this.getSupplier();
@@ -275,7 +280,7 @@ Ea.Connector.Manifest = extend(Ea.Connector._Base, {
 
 Ea.Connector.Nesting = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "owns" : "ownedBy";
+		return client ? "owns" : "owned by";
 	},
 	owns: function() {
 		return this.getSupplier();
@@ -289,7 +294,7 @@ Ea.Connector.NoteLink = extend(Ea.Connector._Base, {});
 
 Ea.Connector.ObjectFlow = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "transitionFrom" : "transitionTo";
+		return client ? "transition from" : "transition to";
 	},
 	transitionFrom: function() {
 		return this.getSupplier();
@@ -307,7 +312,7 @@ Ea.Connector.ProtocolTransition = extend(Ea.Connector._Base, {});
 
 Ea.Connector.Realisation = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "realizedBy" : "implements";
+		return client ? "realized by" : "implements";
 	},
 	realizedBy: function() {
 		return this.getSupplier();
@@ -321,7 +326,7 @@ Ea.Connector.Sequence = extend(Ea.Connector._Base, {});
 
 Ea.Connector.StateFlow = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "transitionFrom" : "transitionTo";
+		return client ? "transition from" : "transition to";
 	},
 	transitionFrom: function() {
 		return this.getSupplier();
@@ -333,7 +338,7 @@ Ea.Connector.StateFlow = extend(Ea.Connector._Base, {
 
 Ea.Connector.UseCase = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
-		return client ? "linksFrom" : "linksTo";
+		return client ? "links from" : "links to";
 	},
 	linksFrom: function() {
 		return this.getSupplier();

@@ -923,11 +923,11 @@ Report = {
 		 * Aktorzy dla przypadku u¿ycia
 		 */
 		list = "";
-		var actors = useCase.getRelatedProperties(null, Ea.Element.Actor);
+		var actors = useCase.getRelationships(null, Ea.Element.Actor);
 		actors.forEach(function(property) {
 			var ro = "";
-			var actor = property.getType();
-			if (property.getRelation() != "linksFrom") {
+			var actor = property.getTo();
+			if (property.getRelation() != "links from") {
 				// TODO byæ mo¿e w ogóle trzeba odfiltrowaæ inne typy powi¹zañ(?)
 			}
 			this.processElement(this.types.Actor, actor, depth);
@@ -943,11 +943,11 @@ Report = {
 		 * Wymagania realizowane przez przypadek u¿ycia
 		 */
 		list = "";
-		var requirements = useCase.getRelatedProperties(null, Ea.Element.Requirement);
+		var requirements = useCase.getRelationships(null, Ea.Element.Requirement);
 		this.setStats(this.category.relation, useCase, requirements.size);
 		requirements.forEach(function(property) {
 			var ro = "";
-			var requirement = property.getType();
+			var requirement = property.getTo();
 			if (property.getRelation() != "implements") {
 				this.addWarning(4, useCase, [requirement]);
 			}
@@ -961,7 +961,7 @@ Report = {
 		/*
 		 * Zale¿noœci przypadków u¿ycia pomiêdzy sob¹
 		 */
-		var useCases = useCase.getRelatedProperties(null, Ea.Element.UseCase);
+		var useCases = useCase.getRelationships(null, Ea.Element.UseCase);
 		var context = {
 				useCase: useCase,
 				include: {},
@@ -981,9 +981,9 @@ Report = {
 		
 		// przypadek u¿ycia jest specjalizacj¹
 		list="";
-		useCases.filter("this.getRelation() == 'subtypeOf'").forEach(function(property) {
+		useCases.filter("this.getRelation() == 'subtype of'").forEach(function(property) {
 			var ro = "";
-			var useCase = property.getType();
+			var useCase = property.getTo();
 			context.specializes[useCase.getGuid()] = useCase;
 			context.validAliases[useCase.getAlias()] = useCase;
 			this.processElement(this.types.UseCase, useCase, depth);
@@ -996,9 +996,9 @@ Report = {
 		
 		// przypadek u¿ycia jest generalizacj¹
 		list="";
-		useCases.filter("this.getRelation() == 'supertypeOf'").forEach(function(property) {
+		useCases.filter("this.getRelation() == 'supertype of'").forEach(function(property) {
 			var ro = "";
-			var useCase = property.getType();
+			var useCase = property.getTo();
 			this.processElement(this.types.UseCase, useCase, depth);
 			var link = useCase.getAlias();
 			link = this.getLink(useCase, link);
@@ -1009,11 +1009,11 @@ Report = {
 
 		// przypadek u¿ycia w³¹cza
 		list="";
-		var includes = useCases.filter("this.getRelation() == 'linksTo' && this.getType().instanceOf(Ea.Element.UseCase) && this.getConnector().getStereotype() == 'include'");
+		var includes = useCases.filter("this.getRelation() == 'links to' && this.getTo().instanceOf(Ea.Element.UseCase) && this.getConnector().getStereotype() == 'include'");
 		this.setStats(this.category.relation, useCase, includes.size);
 		includes.forEach(function(property) {
 			var ro = "";
-			var useCase = property.getType();
+			var useCase = property.getTo();
 			context.include[useCase.getGuid()] = useCase;
 			context.validAliases[useCase.getAlias()] = useCase;
 			this.processElement(this.types.UseCase, useCase, depth);
@@ -1026,9 +1026,9 @@ Report = {
 		
 		// przypadek u¿ycia jest w³¹czany
 		list="";
-		useCases.filter("this.getRelation() == 'linksFrom' && this.getType().instanceOf(Ea.Element.UseCase) && this.getConnector().getStereotype() == 'include'").forEach(function(property) {
+		useCases.filter("this.getRelation() == 'links from' && this.getTo().instanceOf(Ea.Element.UseCase) && this.getConnector().getStereotype() == 'include'").forEach(function(property) {
 			var ro = "";
-			var useCase = property.getType();
+			var useCase = property.getTo();
 			this.processElement(this.types.UseCase, useCase, depth);
 			var link = useCase.getAlias();
 			link = this.getLink(useCase, link);
@@ -1039,9 +1039,9 @@ Report = {
 
 		// przypadek u¿ycia rozszerza
 		list="";
-		useCases.filter("this.getRelation() == 'linksTo' && this.getType().instanceOf(Ea.Element.UseCase) && this.getConnector().getStereotype() == 'extend'").forEach(function(property) {
+		useCases.filter("this.getRelation() == 'links to' && this.getTo().instanceOf(Ea.Element.UseCase) && this.getConnector().getStereotype() == 'extend'").forEach(function(property) {
 			var ro = "";
-			var useCase = property.getType();
+			var useCase = property.getTo();
 			this.processElement(this.types.UseCase, useCase, depth);
 			var link = useCase.getAlias();
 			link = this.getLink(useCase, link);
@@ -1052,11 +1052,11 @@ Report = {
 
 		// przypadek u¿ycia jest rozszerzany
 		list="";
-		var extendeds = useCases.filter("this.getRelation() == 'linksFrom' && this.getType().instanceOf(Ea.Element.UseCase) && this.getConnector().getStereotype() == 'extend'");
+		var extendeds = useCases.filter("this.getRelation() == 'links from' && this.getTo().instanceOf(Ea.Element.UseCase) && this.getConnector().getStereotype() == 'extend'");
 		this.setStats(this.category.relation, useCase, extendeds.size);
 		extendeds.forEach(function(property) {
 			var ro = "";
-			var useCase = property.getType();
+			var useCase = property.getTo();
 			context.extended[useCase.getGuid()] = useCase;
 			context.validAliases[useCase.getAlias()] = useCase;
 			this.processElement(this.types.UseCase, useCase, depth);
@@ -1071,11 +1071,11 @@ Report = {
 		 * Aktywnoœci procesów biznesowych wspierane przez przypadek u¿ycia
 		 */
 		list = "";
-		var processActivities = useCase.getRelatedProperties(null, "this.instanceOf(Ea.Element.Activity) && this.getTaggedValues().get('BPMNVersion')");
+		var processActivities = useCase.getRelationships(null, "this.instanceOf(Ea.Element.Activity) && this.getTaggedValues().get('BPMNVersion')");
 		this.setStats(this.category.relation, useCase, processActivities.size);
 		var processes = {};
 		processActivities.forEach(function(property) {
-			var activity = property.getType();
+			var activity = property.getTo();
 			this.processElement(this.types.BusinessTask, activity, depth);
 			var process = activity.getParent();
 			if (!processes[process.getGuid()]) {
@@ -1091,7 +1091,7 @@ Report = {
 			list = list + "<b>" + process.process.getAlias() + "</b> " + process.process.getName() + ":<ul>";
 			process.activities.forEach(function(property) {
 				var ro = "";
-				var activity = property.getType();
+				var activity = property.getTo();
 				if (property.getRelation() != "implements") {
 					this.addWarning(5, useCase, [activity]);
 				}
@@ -1153,7 +1153,7 @@ Report = {
 		this.write(file, Html.templates.spacer);
 		
 		var canEmpty = function() {
-			return useCase.getStereotype() == "abstract" || useCase.isAbstract() || useCase.getRelated("supertypeOf").notEmpty();
+			return useCase.getStereotype() == "abstract" || useCase.isAbstract() || useCase.getRelated("supertype of").notEmpty();
 		};
 		
 		/*
@@ -1594,7 +1594,7 @@ Report = {
 		Ea.Log.log(type);
 
 		this.setStats(this.category.relation, type, 1);
-		if (this._isAbstract(type) && type.getRelated("supertypeOf").isEmpty()) {
+		if (this._isAbstract(type) && type.getRelated("supertype of").isEmpty()) {
 			this.addWarning(23, type);
 		}
 		
@@ -1622,13 +1622,13 @@ Report = {
 		/*
 		 * Hierarchia typów
 		 */
-		var types = type.getRelatedProperties(null, Ea.Element.Type);
+		var types = type.getRelationships(null, Ea.Element.Type);
 
 		// generalizacje typu
 		list="";
-		types.filter("this.getRelation() == 'subtypeOf'").forEach(function(property) {
+		types.filter("this.getRelation() == 'subtype of'").forEach(function(property) {
 			var ro = "";
-			var type = property.getType();
+			var type = property.getTo();
 			this.processElement(this.types.Type, type, depth);
 			var link = type.getAlias();
 			link = this.getLink(type, link);
@@ -1639,9 +1639,9 @@ Report = {
 		
 		// spacjalizacje typu
 		list="";
-		types.filter("this.getRelation() == 'supertypeOf'").forEach(function(property) {
+		types.filter("this.getRelation() == 'supertype of'").forEach(function(property) {
 			var ro = "";
-			var type = property.getType();
+			var type = property.getTo();
 			this.processElement(this.types.Type, type, depth);
 			var link = type.getAlias();
 			link = this.getLink(type, link);
@@ -1730,15 +1730,15 @@ Report = {
 		 * Przypadki u¿ycia realizuj¹ce wymaganie
 		 */
 		list = "";
-		var useCases = requirement.getRelatedProperties(null, Ea.Element.UseCase);
+		var useCases = requirement.getRelationships(null, Ea.Element.UseCase);
 		this.setStats(this.category.relation, requirement, 1);
 		if (useCases.notEmpty()) {
 			useCases.forEach(function(property) {
 				var ro = "";
-				if (property.getRelation() != "realizedBy") {
+				if (property.getRelation() != "realized by") {
 					// TODO b³êdy typ powi¹zania
 				}
-				var useCase = property.getType();
+				var useCase = property.getTo();
 				this.processElement(this.types.UseCase, useCase, depth);
 				var link = this.getLink(useCase, useCase.getAlias());
 				ro = ro + "<b>" + link + "</b> " + useCase.getName();
@@ -1806,14 +1806,14 @@ Report = {
 		 * Przypadki u¿ycia
 		 */
 		list = "";
-		var useCases = actor.getRelatedProperties(null, Ea.Element.UseCase);
+		var useCases = actor.getRelationships(null, Ea.Element.UseCase);
 		this.setStats(this.category.relation, actor, useCases.size);
 		useCases.forEach(function(property) {
 			var ro = "";
-			if (property.getRelation() != "linksTo") {
+			if (property.getRelation() != "links to") {
 				this.addWarning(3, actor, [useCase]);
 			}
-			var useCase = property.getType();
+			var useCase = property.getTo();
 			this.processElement(this.types.UseCase, useCase, depth);
 			var link = this.getLink(useCase, useCase.getAlias());
 			ro = ro + "<b>" + link + "</b> " + useCase.getName();
@@ -1824,13 +1824,13 @@ Report = {
 		/*
 		 * Hierarchia aktorów
 		 */
-		var actors = actor.getRelatedProperties(null, Ea.Element.Actor);
+		var actors = actor.getRelationships(null, Ea.Element.Actor);
 
 		// generalizacje aktora
 		list="";
-		actors.filter("this.getRelation() == 'subtypeOf'").forEach(function(property) {
+		actors.filter("this.getRelation() == 'subtype of'").forEach(function(property) {
 			var ro = "";
-			var actor = property.getType();
+			var actor = property.getTo();
 			this.processElement(this.types.Actor, actor, depth);
 			var link = actor.getAlias();
 			link = this.getLink(actor, link);
@@ -1841,9 +1841,9 @@ Report = {
 		
 		// spacjalizacje aktora
 		list="";
-		actors.filter("this.getRelation() == 'supertypeOf'").forEach(function(property) {
+		actors.filter("this.getRelation() == 'supertype of'").forEach(function(property) {
 			var ro = "";
-			var actor = property.getType();
+			var actor = property.getTo();
 			this.processElement(this.types.Actor, actor, depth);
 			var link = actor.getAlias();
 			link = this.getLink(actor, link);

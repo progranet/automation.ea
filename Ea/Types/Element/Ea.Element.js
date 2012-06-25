@@ -18,16 +18,12 @@ Ea.Element = {};
 
 Ea.Element._Base = extend(Ea.Namespace, {
 	
-	_properties: null,
-	getProperties: function() {
-		if (!this._properties || Ea.mm) {
-			this._connectorsParse();
-		}
-		return this._properties;
-	},
-	
 	isAbstract: function() {
 		return this._getAbstract() == 1;
+	},
+	
+	getParent: function() {
+		return this._getParent() || this._getPackage();
 	},
 	
 	getLinkedDiagram: function() {
@@ -36,13 +32,39 @@ Ea.Element._Base = extend(Ea.Namespace, {
 		return Ea.getById(Ea.Diagram._Base, id);
 	},
 	
-	getRelatedProperties: function(relation, filter) {
+
+	_relationships: null,
+	_getRelationships: function() {
+		if (!this._relationships || Ea.mm) {
+			this._relationships = new Core.Types.Collection();
+			this.getConnectors().forEach(function(connector) {
+				var client = (connector.getClient() == this);
+				var thisConnectorEnd = !client ? connector.getSupplierEnd() : connector.getClientEnd();
+				var secondEnd = client ? connector.getSupplier() : connector.getClient();
+				var secondConnectorEnd = client ? connector.getSupplierEnd() : connector.getClientEnd();
+				if (secondEnd) {
+					// EA integrity problem (Connector.Supplier == null) workaround
+					this._relationships.add(new Ea.Helper.Relationship({
+						from: this,
+						fromEnd: thisConnectorEnd,
+						connector: connector,
+						isClient: client,
+						to: secondEnd,
+						toEnd: secondConnectorEnd
+					}));		
+				}
+			});
+		}
+		return this._relationships;
+	},
+	
+	getRelationships: function(relation, filter) {
 		var relations = new Core.Types.Collection();
-		this.getProperties().forEach(function(property) {
-			if (!relation || (typeof relation == "string" && relation == property.getRelation()) || (relation.isClass && relation.isSubclassOf(Ea.Connector._Base) && property.getConnector().instanceOf(relation))) {
-				var related = property.getType();
+		this._getRelationships().forEach(function(relationship) {
+			if (!relation || (typeof relation == "string" && relation == relationship.getRelation()) || (relation.isClass && relation.isSubclassOf(Ea.Connector._Base) && relationship.getConnector().instanceOf(relation))) {
+				var related = relationship.getTo();
 				if (related.match(filter))
-					relations.add(property);
+					relations.add(relationship);
 			}
 		});
 		return relations;
@@ -50,40 +72,10 @@ Ea.Element._Base = extend(Ea.Namespace, {
 	
 	getRelated: function(relation, filter) {
 		var relations = new Core.Types.Collection();
-		this.getRelatedProperties(relation, filter).forEach(function(property) {
-			relations.add(property.getType());
+		this.getRelationships(relation, filter).forEach(function(property) {
+			relations.add(property.getTo());
 		});
 		return relations;
-	},
-	
-	_connectorsParsed: false,
-	_connectorsParse: function() {
-		if (!this._connectorsParsed || Ea.mm) {
-			this._properties = new Core.Types.Collection();
-			var thisEnd = this;
-			this.getConnectors().forEach(function(connector) {
-				var client = (connector.getClient() == thisEnd);
-				var thisConnectorEnd = !client ? connector.getSupplierEnd() : connector.getClientEnd();
-				var secondEnd = client ? connector.getSupplier() : connector.getClient();
-				var secondConnectorEnd = client ? connector.getSupplierEnd() : connector.getClientEnd();
-				if (secondEnd) {
-					// EA integrity problem (Connector.Supplier == null) workaround
-					thisEnd._properties.add(new Ea.Element.Property({
-						parent: thisEnd,
-						parentEnd: thisConnectorEnd,
-						connector: connector,
-						client: client,
-						type: secondEnd,
-						typeEnd: secondConnectorEnd
-					}));		
-				}
-			});
-		}
-		this._connectorsParsed = true;
-	},
-	
-	getParent: function() {
-		return this._getParent() || this._getPackage();
 	},
 	
 	_customReferences: null,
@@ -101,9 +93,9 @@ Ea.Element._Base = extend(Ea.Namespace, {
 			this.getCustomReferences().forEach(function(reference) {
 				this._contextReferences.add(new Ea.Element.ContextReference(reference.getNotes() || "", reference.getSupplier(), ""));
 			});
-			this.getProperties().forEach(function(property) {
+			this._getRelationships().forEach(function(property) {
 				var connection = property.getConnector()._class.getName();
-				var supplier = property.getType();
+				var supplier = property.getTo();
 				var notes = property.getConnector().getName();
 				this._contextReferences.add(new Ea.Element.ContextReference(notes, supplier, connection));
 			});
@@ -231,155 +223,6 @@ Ea.Element.ContextReference = define({
 		return this._connection;
 	}
 });
-
-Ea.Element.Property = define({
-	
-	_connector: null,
-	_client: null,
-	_targetEnd: null,
-	_thisEnd: null,
-	_role: null,
-	_type: null,
-	_typeEnd: null,
-	_typeAttribute: null,
-	_typeMethod: null,
-	_relation: null,
-	_parent: null,
-	_parentEnd: null,
-	_parentAttribute: null,
-	_parentMethod: null,
-	_opposite: null,
-	_guard: null,
-	
-	create: function(params) {
-		_super.create(params);
-		this._connector = params.connector;
-		this._guard = params.connector.getGuard();
-		this._client = params.client;
-		var targetEnd = this._targetEnd = params.client ? params.connector.getSupplierEnd() : params.connector.getClientEnd();
-		//var thisEnd = this._thisEnd = !params.client ? params.connector.getSupplierEnd() : params.connector.getClientEnd();
-		//info("$,$", [params.client, params.connector.getClientEnd()]);
-		this._role = targetEnd.Role;
-		this._type = params.type;
-		this._typeAttribute = !params.client ? params.connector.getSupplierAttribute() : params.connector.getClientAttribute();
-		this._typeMethod = !params.client ? params.connector.getSupplierMethod() : params.connector.getClientMethod();
-		this._typeEnd = params.typeEnd;
-		this._relation = params.connector.getRelation(!params.client);
-		this._parent = params.parent;
-		this._parentEnd = params.parentEnd;
-		this._parentAttribute = params.client ? params.connector.getSupplierAttribute() : params.connector.getClientAttribute();
-		this._parentMethod = params.client ? params.connector.getSupplierMethod() : params.connector.getClientMethod();
-		this._opposite = params.opposite || new Ea.Element.Property({
-			parent: params.type, 
-			parentEnd: params.typeEnd,
-			connector: params.connector, 
-			client: !params.client, 
-			type: params.parent, 
-			typeEnd: params.parentEnd,
-			opposite: this
-		});
-	},
-	
-	getParent: function() {
-		return this._parent;
-	},
-	
-	getParentEnd: function() {
-		return this._parentEnd;
-	},
-	
-	getParentAttribute: function() {
-		return this._parentAttribute;
-	},
-	
-	getParentMethod: function() {
-		return this._parentMethod;
-	},
-	
-	getName: function() {
-		return this._role || this._type.getName().toLowerCase();
-	},
-	
-	getType: function() {
-		return this._type;
-	},
-	
-	getTypeEnd: function() {
-		return this._typeEnd;
-	},
-	
-	getTypeAttribute: function() {
-		return this._typeAttribute;
-	},
-	
-	getTypeMethod: function() {
-		return this._typeMethod;
-	},
-	
-	getRelation: function() {
-		return this._relation;
-	},
-	
-	getConnector: function() {
-		return this._connector;
-	},
-	
-	isAggregation: function() {
-		return this._thisEnd.Aggregation != 0;
-	},
-	
-	getAggregation: function() {
-		return this._thisEnd.Aggregation;
-	},
-	
-	getMultiplicity: function() {
-		return this._targetEnd.Cardinality;
-	},
-	
-	setMultiplicity: function(multiplicity) {
-		this._targetEnd.Cardinality = multiplicity;
-		this._targetEnd.Update();
-	},
-	
-	isNavigable: function() {
-		return this._targetEnd.Navigable != "Non-Navigable";
-	},
-	
-	getNavigability: function() {
-		return this._targetEnd.Navigable;
-	},
-	
-	setNavigable: function() {
-		this._targetEnd.Navigable = "Navigable";
-		this._targetEnd.Update();
-	},
-	
-	setNonNavigable: function() {
-		this._targetEnd.Navigable = "Non-Navigable";
-		this._targetEnd.Update();
-	},
-	
-	getOpposite: function() {
-		return this._opposite;
-	},
-	
-	isClient: function() {
-		return this._client;
-	},
-	
-	getGuard: function() {
-		return this._guard;
-	},
-	
-	_toString: function() {
-		return this.getName() + " :" + this.getType() + " [" + this._class + "]";
-	}
-});
-
-Ea.Element.Property.Aggregation = {
-	shared: 1,
-	composite: 2
-};
 
 Ea.Element.Object = extend(Ea.Element._Base, {
 
