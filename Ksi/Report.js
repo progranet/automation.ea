@@ -862,7 +862,7 @@ Report = {
 	},
 	
 	processUseCase: function(useCase, depth, file) {
-		Ea.Log.log(useCase);
+		Ea.log(useCase);
 		
 		// ## pocz¹tek tabeli ##
 		this.write(file, Html.templates.useCaseHead, {key: this.format(useCase.getAlias()), value: this.format(useCase.getName())});
@@ -896,7 +896,7 @@ Report = {
 	},
 	
 	_processUseCaseDetails: function(useCase, depth) {
-		Ea.Log.log(useCase);
+		Ea.log(useCase);
 		
 		var file = this.open(this.params.outputRoot + useCase.getXmlGuid() + ".html");
 		this.write(file, Html.templates.htmlHead, {title: useCase.getAlias() + " " + useCase.getName(), stylesheet: this.params.styleSheet});
@@ -1591,7 +1591,7 @@ Report = {
 	},
 	
 	processType: function(type, depth, file) {
-		Ea.Log.log(type);
+		Ea.log(type);
 
 		this.setStats(this.category.relation, type, 1);
 		if (this._isAbstract(type) && type.getRelated("supertype of").isEmpty()) {
@@ -1706,7 +1706,7 @@ Report = {
 	},
 	
 	processRequirement: function(requirement, depth, file) {
-		Ea.Log.log(requirement);
+		Ea.log(requirement);
 		
 		// ## pocz¹tek tabeli ##
 		this.write(file, Html.templates.requirementHead, {key: this.format(requirement.getAlias()), value: this.format(requirement.getName())});
@@ -1756,7 +1756,7 @@ Report = {
 	},
 	
 	processMessage: function(message, depth, file) {
-		Ea.Log.log(message);
+		Ea.log(message);
 		
 		// ## pocz¹tek tabeli ##
 		this.write(file, Html.templates.messageHead, {key: this.format(message.getAlias()), value: this.format(message.getName())});
@@ -1782,7 +1782,7 @@ Report = {
 	},
 	
 	processActor: function(actor, depth, file) {
-		Ea.Log.log(actor);
+		Ea.log(actor);
 		
 		// ## pocz¹tek tabeli ##
 		this.write(file, Html.templates.actorHead, {key: this.format(actor.getAlias()), value: this.format(actor.getName())});

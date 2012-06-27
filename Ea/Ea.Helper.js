@@ -594,3 +594,65 @@ Ea.Helper.ReferenceByGuid = extend(Ea.Helper.ReferenceByPointer, {},
 	getBy: "getByGuid",
 	referenceType: String
 });
+
+
+Ea.Helper.Log = define({
+	
+	_path: null,
+	_element: null,
+	
+	create: function(element) {
+		_super.create();
+		this._element = element;
+	},
+	
+	getPath: function() {
+		if (!this._path || Ea.mm) {
+			this._path = [];
+			var parent = this._element.getParent();
+			if (parent) {
+				var parentPath = Ea.Helper.Log.getLog(parent).getPath();
+				for (var p = 0; p < parentPath.length; p++) {
+					this._path.push(parentPath[p]);
+				}
+			}
+			this._path.push(this._element);
+		}
+		return this._path;
+	},
+	
+	log: function() {
+		
+		var path = this.getPath();
+		var _tab = function(count, string) {
+			var gen = "";
+			for (var i = 0; i < count; i++)
+				gen = gen + string;
+			return gen;
+		};
+
+		if (path.length > 0) {
+			for (var p = 0; p < path.length; p++) {
+				if (!Ea.Helper.Log._currentPath || p >= Ea.Helper.Log._currentPath.length || Ea.Helper.Log._currentPath[p] != path[p]) {
+					var element = path[p];
+					var string = element.instanceOf(Ea.Package._Base) ? "[•] " + element + "" : " " + element;
+					info(_tab(p, "      |") + "—" + string + "");
+				}
+			}
+			Ea.Helper.Log._currentPath = path;
+		}
+	}
+},
+{
+	_currentPath: null,
+	
+	_logs: {
+		
+	},
+
+	getLog: function(element) {
+		if (!Ea.Helper.Log._logs[element.getGuid()])
+			Ea.Helper.Log._logs[element.getGuid()] = new Ea.Helper.Log(element);
+		return Ea.Helper.Log._logs[element.getGuid()];
+	}
+});

@@ -16,24 +16,7 @@
 
 Ea.Package = {};
 
-Ea.Package._Base = extend(Ea.Namespace, {
-	
-	// TODO usun¹æ
-	_pi: null,
-	count: function(pi) {
-		pi = pi || 1;
-		this._pi = pi;
-		Ea.Package.count = Math.max(Ea.Package.count, pi++);
-		this.getPackages().forEach(function(package) {
-			pi = package.count(pi);
-		});
-		return pi;
-	},
-	
-	getProgressIndicator: function() {
-		return this._pi;
-	}
-},
+Ea.Package._Base = extend(Ea.Namespace, {},
 {
 	api: "Package",
 	

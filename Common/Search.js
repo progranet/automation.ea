@@ -91,7 +91,7 @@ Search = {
 	},
 	
 	processPackage: function(package) {
-		package.log();
+		Ea.log(package);
 		this.found.addAll(package.getElements(this.params.filter));
 		package.getPackages().forEach(function(element) {
 			this.processPackage(element);

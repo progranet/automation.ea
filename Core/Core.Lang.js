@@ -47,6 +47,9 @@ Core.Lang = {
 	
 	extend: function(namespace, name, superClass, properties, staticProperties) {
 		
+		if (typeof(namespace) != "string")
+			namespace = namespace.qualifiedName;
+		
 		if (superClass === undefined) {
 			throw new Error("Undefined super class for " + namespace + "." + name);
 		}
@@ -89,7 +92,8 @@ Core.Lang = {
 			if (Core.isFunction(property, propertyName)) {
 				var fn = property.toString();
 				fn = fn.replace(/_super\.([a-zA-Z0-9_$]+)\((\)?)/g, function($0, $1, $2) {
-					return "this[\"" + superClass.qualifiedName + "." + $1 + "\"].call(this" + ($2 ? ")" : ", ");
+					var string = "this[\"" + superClass.qualifiedName + "." + $1 + "\"].call(this" + ($2 ? ")" : ", ");
+					return string;
 				});
 				fn = eval("properties." + propertyName + " = " + fn);
 				Core.enrichMethod(properties, propertyName, namespace + "." + name + "." + propertyName, false);

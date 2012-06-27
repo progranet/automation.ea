@@ -42,8 +42,7 @@ Ea.Element._Base = extend(Ea.Namespace, {
 				var thisConnectorEnd = !client ? connector.getSupplierEnd() : connector.getClientEnd();
 				var secondEnd = client ? connector.getSupplier() : connector.getClient();
 				var secondConnectorEnd = client ? connector.getSupplierEnd() : connector.getClientEnd();
-				if (secondEnd) {
-					// EA integrity problem (Connector.Supplier == null) workaround
+				if (secondEnd) { // EA integrity problem (Connector.Supplier == null) workaround
 					this._relationships.add(new Ea.Helper.Relationship({
 						from: this,
 						fromEnd: thisConnectorEnd,
@@ -115,8 +114,8 @@ Ea.Element._Base = extend(Ea.Namespace, {
 			17: "AssociationClass"
 		},
 		Event: {
-			0: "Reciever",
-			1: "Sender"
+			1: "Reciever",
+			0: "Sender"
 		},
 		Note: {
 			1: "ConnectorNote",
@@ -129,13 +128,19 @@ Ea.Element._Base = extend(Ea.Namespace, {
 	},
 	
 	getType: function(source) {
-		var typeName = this._metatype.get(source) || this._type.get(source).replace(/\s/g,"");
-		if (this._subTypes[typeName]) {
-			typeName = this._subTypes[typeName][this._subtype.get(source)] || typeName;
+		var typeName = this._type.get(source).replace(/\s/g,"");
+		var metaType = this._metatype.get(source);
+		var subType;
+		if (metaType && metaType != typeName) {
+			typeName = metaType;
+		}
+		else if (subType = (this._subTypes[typeName] || {})[this._subtype.get(source)]) {
+			typeName = subType;
 		}
 		var type = this.namespace[typeName];
 		if (!type) {
-			throw new Error("Not implemented Ea.Element." + typeName + " type");
+			type = Ea.Element[typeName] = Core.Lang.extend(Ea.Element, typeName, Ea.Element._Base);
+			warn("Not implemented Ea.Element.$ type", [typeName]);
 		}
 		return type;
 	},
@@ -143,15 +148,15 @@ Ea.Element._Base = extend(Ea.Namespace, {
 	_id: new Ea.Helper.Property({api: "ElementID", type: Number}),
 	_guid: new Ea.Helper.Property({api: "ElementGUID"}),
 	
+	_type: new Ea.Helper.Property({api: "Type", private: true}),
+	_subtype: new Ea.Helper.Property({api: "Subtype", type: Number, private: true}),
+	_metatype: new Ea.Helper.Property({api: "MetaType", private: true}),
+	
 	__abstract: new Ea.Helper.Property({api: "Abstract", private: true}),
 	_taggedValues: new Ea.Helper.CollectionMap({api: "TaggedValues", elementType: "Ea.TaggedValue._Base", key: "this.getName()", value: "this.getValue()"}),
 	_customProperties: new Ea.Helper.CollectionMap({api: "CustomProperties", elementType: "Ea.CustomProperty._Base", key: "this.getName()", value: "this.getValue()"}),
 	_specializedProperties: new Ea.Helper.Collection({type: "Ea.Properties._Base", api: "Properties", elementType: "Ea.Property._Base"}),
 	_constraints: new Ea.Helper.Collection({api: "Constraints", elementType: "Ea.Constraint._Base"}),
-	
-	_type: new Ea.Helper.Property({api: "Type", private: true}),
-	_subtype: new Ea.Helper.Property({api: "Subtype", type: Number}),
-	_metatype: new Ea.Helper.Property({api: "MetaType"}),
 	
 	_status: new Ea.Helper.Property({api: "Status"}),
 	_keywords: new Ea.Helper.Property({api: "Tag"}),
@@ -268,12 +273,6 @@ Ea.Element.Package = extend(Ea.Element._Base, {
 {
 	_package: new Ea.Helper.CustomProperty({get: "getPackage", type: "Ea.Package._Base"})
 });
-
-Ea.Element.Screen = extend(Ea.Element._Base);
-
-Ea.Element.GUIElement = extend(Ea.Element._Base);
-
-Ea.Element.Component = extend(Ea.Element._Base);
 
 Ea.Element.Type = extend(Ea.Element._Base);
 	
@@ -395,7 +394,7 @@ Ea.Element.Sender = extend(Ea.Element.Event);
 
 Ea.Element.InterruptibleActivityRegion = extend(Ea.Element._Base);
 
-Ea.Element.DataStore = extend(Ea.Element._Base);
+//Ea.Element.DataStore = extend(Ea.Element._Base);
 
 Ea.Element.Message = extend(Ea.Element._Base);
 
@@ -468,37 +467,6 @@ Ea.Element.UseCase = extend(Ea.Element._BehavioralElement, {
 		// TODO: parse '#EXP#=Po zakoñczeniu opracowywania publikacji;#EXP#=Przy wyborze publikacji do opracowywania;'
 	}	
 });
-
-Ea.Element.TestSet = extend(Ea.Element.UseCase); 
-
-Ea.Element.ExecutionEnvironment = extend(Ea.Element._Base); 
-
-Ea.Element.RequiredInterface = extend(Ea.Element._Base); 
-
-Ea.Element.Port = extend(Ea.Element._Base); 
-
-Ea.Element.WebPage = extend(Ea.Element._Base); 
-
-Ea.Element.ESB_Service = extend(Ea.Element._Base); 
-
-Ea.Element.Abstract = extend(Ea.Element._Base); 
-
-Ea.Element.Operation = extend(Ea.Element._Base); 
-
-Ea.Element.Feature = extend(Ea.Element._Base); 
-
-Ea.Element.DataObject = extend(Ea.Element._Base); 
-
-Ea.Element.CentralBufferNode = extend(Ea.Element._Base);	
-
-Ea.Element.BusinessProcess = extend(Ea.Element._BehavioralElement); 
-Ea.Element.Gateway = extend(Ea.Element._Base); 
-Ea.Element.EndEvent = extend(Ea.Element._Base); 
-Ea.Element.StartEvent = extend(Ea.Element._Base); 
-Ea.Element.Group = extend(Ea.Element._Base); 
-Ea.Element.Pool = extend(Ea.Element._Base); 
-Ea.Element.Interaction = extend(Ea.Element._Base);
-Ea.Element.ExpansionNode = extend(Ea.Element._Base);	
 
 Ea.Feature = extend(Ea.Named, {
 	getParent: function() {

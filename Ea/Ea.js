@@ -87,76 +87,14 @@ Ea = {
 	register: function(type, objectType) {
 		var namespace = include(type);
 		this._objectTypes[objectType] = namespace;
-	}	
+	},
+	
+	log: function(element) {
+		Ea.Helper.Log.getLog(element).log();
+	}
 };
 
 include("Ea.Helper@Ea");
-
-Ea.Log = define({
-	
-	_path: null,
-	_element: null,
-	
-	create: function(element) {
-		_super.create();
-		this._element = element;
-		element._log = this;
-	},
-	
-	getPath: function() {
-		if (!this._path || Ea.mm) {
-			this._path = [];
-			var parent = this._element.getParent();
-			if (parent) {
-				var parentPath = Ea.Log.getPath(parent); //parent._log.getPath();
-				for (var p = 0; p < parentPath.length; p++) {
-					this._path.push(parentPath[p]);
-				}
-			}
-			this._path.push(this._element);
-		}
-		return this._path;
-	},
-	
-	log: function() {
-		
-		var path = this.getPath();
-		var _tab = function(count, string) {
-			var gen = "";
-			for (var i = 0; i < count; i++)
-				gen = gen + string;
-			return gen;
-		};
-
-		if (path.length > 0) {
-			for (var p = 0; p < path.length; p++) {
-				if (!Ea.Log._currentPath || p >= Ea.Log._currentPath.length || Ea.Log._currentPath[p] != path[p]) {
-					var parented = path[p];
-					var string = parented.instanceOf(Ea.Package._Base) ? "[•] " + parented + "" : " " + parented;
-					info(_tab(p, "      |") + "—" + string + "");
-				}
-			}
-			Ea.Log._currentPath = path;
-		}
-	}
-},
-{
-	_currentPath: null,
-
-	log: function(element) {
-		if (!element._log) {
-			new Ea.Log(element);
-		}
-		element._log.log();
-	},
-
-	getPath: function(element) {
-		if (!element._log) {
-			new Ea.Log(element);
-		}
-		return element._log.getPath();
-	}
-});
 
 Ea.Source = define({
 	_api: null,
