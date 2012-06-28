@@ -54,11 +54,11 @@ Core.Log = {
 		pattern = (new RegExp("(([^\\.]\\s*)(" + pattern + ")\\s*\\()", "g"));
 		Core.Log.pattern = pattern.compile(pattern);
 		
-		var callbackStacktrace = function(fn, context, propertyName, qualifiedName, _static) {
-			var bio = fn.indexOf("{");
-			fn = fn.substring(0, bio) +
+		var callbackStacktrace = function(source, namespace, propertyName, qualifiedName, _static) {
+			var bio = source.indexOf("{");
+			source = source.substring(0, bio) +
 			"{\n\
-				try {" + fn.substring(bio + 1, fn.length - 2) +	"\n\
+				try {" + source.substring(bio + 1, source.length - 2) +	"\n\
 				}\n\
 				catch(e) {\n\
 					if (e.throwed) {\n\
@@ -76,33 +76,18 @@ Core.Log = {
 					throw e;\n\
 				}\n\
 			}\n";
-			return fn;
+			return source;
 		};
 		Core.enrichMethodRegister(callbackStacktrace);
 
-		var callbackLogs = function(fn, context, propertyName, qualifiedName, _static) {
-			fn = fn.replace(Core.Log.pattern, function($0, $1, $2, $3) {
+		var callbackLogs = function(source, namespace, propertyName, qualifiedName, _static) {
+			source = source.replace(Core.Log.pattern, function($0, $1, $2, $3) {
 				return $2 + "Core.Log.logs." + $3 + ".call(this, \"" + propertyName + "\", ";
 			});
-			return fn;
+			return source;
 		};
 		Core.enrichMethodRegister(callbackLogs);
 		
-		/*var callbackSource = function(qualifiedName, source) {
-			var lines = source.split(/\r\n/);
-			source = "";
-			for (var ln = 0; ln < lines.length; ln++) {
-				var line = lines[ln];
-				if (/;\s*$/.test(line)) {
-					line = line + "___ln=" + (ln + 1) + ";";
-				}
-				source = source + line + "\r\n";
-			}
-			info(source);
-			return source;
-		};
-		Core.enrichSourceRegister(callbackSource);*/
-
 		Core.enrichNamespace(Core);
 	},
 	
@@ -158,5 +143,3 @@ Core.Log = {
 		level.targets.push(target);
 	}
 };
-
-include("Core.Output@Core");

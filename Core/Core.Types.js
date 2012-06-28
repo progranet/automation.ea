@@ -14,8 +14,8 @@
    limitations under the License.
 */
 
-var callback = function(fn, context, propertyName, qualifiedName, _static) {
-	return fn.replace(/\.\s*forEach\s*\(/g, ".forEach(this, ");
+var callback = function(source, namespace, propertyName, qualifiedName, _static) {
+	return source.replace(/\.\s*forEach\s*\(/g, ".forEach(this, ");
 };
 
 Core.enrichMethodRegister(callback);

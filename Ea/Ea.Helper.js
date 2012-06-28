@@ -633,22 +633,20 @@ Ea.Helper.Log = define({
 
 		if (path.length > 0) {
 			for (var p = 0; p < path.length; p++) {
-				if (!Ea.Helper.Log._currentPath || p >= Ea.Helper.Log._currentPath.length || Ea.Helper.Log._currentPath[p] != path[p]) {
+				if (!Ea.Helper.Log._current || p >= Ea.Helper.Log._current.length || Ea.Helper.Log._current[p] != path[p]) {
 					var element = path[p];
 					var string = element.instanceOf(Ea.Package._Base) ? "[•] " + element + "" : " " + element;
 					info(_tab(p, "      |") + "—" + string + "");
 				}
 			}
-			Ea.Helper.Log._currentPath = path;
+			Ea.Helper.Log._current = path;
 		}
 	}
 },
 {
-	_currentPath: null,
+	_current: null,
 	
-	_logs: {
-		
-	},
+	_logs: {},
 
 	getLog: function(element) {
 		if (!Ea.Helper.Log._logs[element.getGuid()])

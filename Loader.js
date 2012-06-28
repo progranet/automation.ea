@@ -35,11 +35,13 @@ include = function(libraryName, params) {
 	var namespace = eval(qualifiedName);
 	if (!namespace.params)
 		namespace.params = {};
-	for (var param in params) {
+	for (var param in params)
 		namespace.params[param] = params[param];
-	}
 	namespace.name = qualifiedName.split(".").pop();
 	namespace.qualifiedName = qualifiedName;
+	namespace.toString = function() {
+		return this.qualifiedName;
+	};
 	namespace._loader = {
 		package: _package
 	};
@@ -69,5 +71,6 @@ info = debug = error = warn = aop = function(message) {
 
 include("Core@Core");
 include("Core.Log@Core");
+include("Core.Output@Core");
 include("Core.Lang@Core");
 include("Core.Target@Core");

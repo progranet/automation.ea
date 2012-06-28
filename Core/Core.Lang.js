@@ -34,8 +34,6 @@ String.prototype.trim = function() {
 
 Core.Lang = {
 
-	_translate: isIncluded("Translator"),
-	
 	isClass: function(type) {
 		// TODO remove public property Core.Types.Object.isClass
 		return type.isClass;
@@ -126,7 +124,6 @@ Core.Lang = {
 		_class.ensure = function(params) {
 			return _class.isInstance(params) ? params : new _class(params);
 		};
-		_class.translated = (this._translate ? Translator.translate(name, namespace) : name);
 		_class.toString = function() {
 			return _class.qualifiedName;
 		};

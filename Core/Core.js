@@ -52,12 +52,12 @@ Core = {
 		var property = namespace[propertyName];
 		if (!this.isFunction(namespace[propertyName], propertyName))
 			return;
-		var fn = property.toString();
+		var source = property.toString();
 		for (var ci = 0; ci < this._callbacksMethod.length; ci++) {
 			var callback = this._callbacksMethod[ci];
-			fn = callback(fn, namespace, propertyName, qualifiedName, _static);
+			source = callback(source, namespace, propertyName, qualifiedName, _static);
 		}
-		eval("namespace[propertyName] = " + fn);
+		eval("namespace[propertyName] = " + source);
 		namespace[propertyName].qualifiedName = qualifiedName;
 		namespace[propertyName].static = _static;
 	},
