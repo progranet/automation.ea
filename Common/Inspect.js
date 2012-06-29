@@ -27,7 +27,7 @@ Inspect = {
 		var target = null;
 		if (this.params.output) {
 			target = new Core.IO.FileTarget(this.params.output);
-			Core.Log.registerTarget(Core.Log.logs.info, target);
+			Core.Log.registerTarget("info", target);
 		}
 		Ea.Helper.inspect(object);
 		if (target) {

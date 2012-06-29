@@ -159,5 +159,3 @@ var callbackSource = function(qualifiedName, source) {
 };
 
 Core.enrichSourceRegister(callbackSource);
-
-include("Core.Types@Core");

@@ -52,10 +52,9 @@ Ea = {
 		var systemTarget = new Ea.Helper.Target("System", true);
 		var scriptTarget = new Ea.Helper.Target("Script", false);
 		
-		Core.Log.registerTarget(Core.Log.logs.error, systemTarget);
-		Core.Log.registerTarget(Core.Log.logs.warn, systemTarget);
-		Core.Log.registerTarget(Core.Log.logs.debug, systemTarget);
-		Core.Log.registerTarget(Core.Log.logs.info, scriptTarget);
+		Core.Log.registerTarget("error", systemTarget);
+		Core.Log.registerTarget("warn", systemTarget);
+		Core.Log.registerTarget("info", scriptTarget);
 	},
 	
 	_prepare: function(_class) {

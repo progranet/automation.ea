@@ -60,7 +60,7 @@ Ea.Helper = {
 		var type = object._class;
 		var properties = type.getProperties();
 		
-		params.push(object._toString());
+		params.push(object);
 		info(this._indent(indent) + template, params);
 
 		if (this._ids[object.__id]) {

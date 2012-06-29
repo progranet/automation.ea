@@ -18,47 +18,22 @@ Core.Log = {
 
 	params: {
 		error: ["*"],
-		debug: ["*"],
 		info: ["*"],
 		warn: ["*"]
 	},
 
-	logs: {
-		error: function(propertyName, message, params) {
-			Core.Log._log(Core.Log.logs.error, this, propertyName, message, params);
-		},
-		debug: function(propertyName, message, params) {
-			Core.Log._log(Core.Log.logs.debug, this, propertyName, message, params);
-		},
-		info: function(propertyName, message, params) {
-			Core.Log._log(Core.Log.logs.info, this, propertyName, message, params);
-		},
-		warn: function(propertyName, message, params) {
-			Core.Log._log(Core.Log.logs.warn, this, propertyName, message, params);
-		}
-	},
+	logs: {},
 	
 	pattern: null,
 	
 	initialize: function() {
 
-		var pattern = "", i = 0;
-		var logs = Core.Log.logs;
-		for (var ln in logs) {
-			logs[ln].name = ln;
-			logs[ln].mask = Core.Log.params[ln] || [];
-			logs[ln].targets = [];
-			pattern = pattern + (i++ > 0 ? "|" : "") + ln;
-		}
-
-		pattern = (new RegExp("(([^\\.]\\s*)(" + pattern + ")\\s*\\()", "g"));
-		Core.Log.pattern = pattern.compile(pattern);
-		
 		var callbackStacktrace = function(source, namespace, propertyName, qualifiedName, _static) {
 			var bio = source.indexOf("{");
 			source = source.substring(0, bio) +
 			"{\n\
-				try {" + source.substring(bio + 1, source.length - 2) +	"\n\
+				try {"
+					+ source.substring(bio + 1, source.length - 2) + "\n\
 				}\n\
 				catch(e) {\n\
 					if (e.throwed) {\n\
@@ -80,32 +55,19 @@ Core.Log = {
 		};
 		Core.enrichMethodRegister(callbackStacktrace);
 
-		var callbackLogs = function(source, namespace, propertyName, qualifiedName, _static) {
-			source = source.replace(Core.Log.pattern, function($0, $1, $2, $3) {
-				return $2 + "Core.Log.logs." + $3 + ".call(this, \"" + propertyName + "\", ";
-			});
-			return source;
-		};
-		Core.enrichMethodRegister(callbackLogs);
+		for (var level in Core.Log.params) {
+			this.registerLog(level, Core.Log.params[level]);
+		}
 		
 		Core.enrichNamespace(Core);
 	},
 	
-	isLogged: function(level, namespace) {
+	_macth: function(level, namespace) {
 		var lt = level.mask;
 		for (var pi = 0; pi < lt.length; pi++) {
 			var p = lt[pi];
-			if (p == "*") {
+			if (p == "*" || p == namespace || (p.charAt(p.length - 1) == "*" && namespace.indexOf(p.substring(0, p.length - 2)) == 0))
 				return true;
-			}
-			else if (p.charAt(p.length - 1) == "*") {
-				if (namespace.indexOf(p.substring(0, p.length - 2)) == 0)
-					return true;
-			}
-			else {
-				if (namespace == p)
-					return true;
-			}
 		}
 		return false;
 	},
@@ -117,7 +79,8 @@ Core.Log = {
 		if (!fn)
 			return;
 		var qualifiedName = fn.qualifiedName;
-		if (!Core.Log.isLogged(level, qualifiedName)) return;
+		if (!Core.Log._macth(level, qualifiedName))
+			return;
 
 		message = Core.Output.exec(message, params);
 		var c0 = message ? message.charAt(0) : "";
@@ -137,9 +100,31 @@ Core.Log = {
 		}
 	},
 	
+	registerLog: function(level, mask) {
+		Core.Log.logs[level] = {
+			name: level,
+			mask: mask,
+			targets: []
+		};
+
+		var callbackLogs = function(source, namespace, propertyName, qualifiedName, _static) {
+			return source.replace(new RegExp("(([^\\.]\\s*)" + level + "\\s*\\()", "g"), function($0, $1, $2) {
+				return $2 + "Core.Log._log(\"" + level + "\", this, \"" + propertyName + "\", ";
+			});
+		};
+		Core.enrichMethodRegister(callbackLogs);
+	},
+	
 	registerTarget: function(level, target) {
 		if (typeof(level) == "string")
 			level = Core.Log.logs[level];
 		level.targets.push(target);
+		if (_logBuffer[level.name]) {
+			for (var mi = 0; mi < _logBuffer[level.name].length; mi++) {
+				var buffered = _logBuffer[level.name][mi];
+				Core.Log._log(level, Core.Log, "registerTarget", buffered.message, buffered.params);
+			}
+			delete _logBuffer[level.name];
+		}
 	}
 };

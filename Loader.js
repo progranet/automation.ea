@@ -61,16 +61,36 @@ isIncluded = function(libraryName) {
 	return (libraryName in _included);
 };
 
-_info = function(message) {
+
+_logBuffer = {
+	info: [],
+	error: [],
+	warn: []
+};
+
+_info = function(message, params, level) {
+	_logBuffer[level].push({
+		message: message,
+		params: params
+	});
 	Repository.WriteOutput("Script", message, undefined);
 };
 
-info = debug = error = warn = aop = function(message) {
-	_info("(" + message + ")");
+info = function(message, params) {
+	_info(message, params, "info");
+};
+
+error = function(message, params) {
+	_info(message, params, "error");
+};
+
+warn = function(message, params) {
+	_info(message, params, "warn");
 };
 
 include("Core@Core");
 include("Core.Log@Core");
 include("Core.Output@Core");
 include("Core.Lang@Core");
+include("Core.Types@Core");
 include("Core.Target@Core");

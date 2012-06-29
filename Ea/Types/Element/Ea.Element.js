@@ -32,7 +32,6 @@ Ea.Element._Base = extend(Ea.Namespace, {
 		return Ea.getById(Ea.Diagram._Base, id);
 	},
 	
-
 	_relationships: null,
 	_getRelationships: function() {
 		if (!this._relationships || Ea.mm) {
@@ -255,7 +254,8 @@ Ea.Element.Object = extend(Ea.Element._Base, {
 	},
 	
 	_toString: function() {
-		return this.getName() + " :" + this.getMetaClass().getName() + " [" + this._class  + "]";
+		var metaClass = this.getMetaClass();
+		return this.getName() + " :" + (metaClass ? metaClass.getName() : "<<unknown class>>") + " [" + this._class  + "]";
 	}
 },
 {
