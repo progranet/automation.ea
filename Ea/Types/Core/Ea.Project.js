@@ -18,7 +18,7 @@ Ea.Project = {
 
 };
 
-Ea.Project._Base = extend(Ea.Any, {
+Ea.Project._Base = extend(Ea.Types.Any, {
 	
 	guidToXml: function(guid) {
 		return guid ? this._source.getApi().GUIDtoXML(guid) : null;

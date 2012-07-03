@@ -21,7 +21,7 @@ Ea.ScenarioStep = {
 	}
 };
 
-Ea.ScenarioStep._Base = extend(Ea.Named, {
+Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 
 	getStepType: function() {
 		return Ea.ScenarioStep.StepType[this._getStepType()];
@@ -31,12 +31,12 @@ Ea.ScenarioStep._Base = extend(Ea.Named, {
 {
 	api: "ScenarioStep",
 	
-	__guid: new Ea.Helper.Property({api: "StepGUID"}),
-	_pos: new Ea.Helper.Property({api: "Pos"}),
-	_level: new Ea.Helper.Property({api: "Level"}),
-	_extensions: new Ea.Helper.Collection({api: "Extensions", elementType: "Ea.ScenarioExtension._Base", key: "this.getLevel()", private: true}),
-	_stepType: new Ea.Helper.Property({api: "StepType", private: true}),
-	_link: new Ea.Helper.ReferenceByGuid({api: "Link", type: "Ea.Element.UseCase"}),
-	_uses: new Ea.Helper.Property({api: "Uses"}),
-	_results: new Ea.Helper.Property({api: "Results"})
+	__guid: attribute({api: "StepGUID"}),
+	_pos: attribute({api: "Pos"}),
+	_level: attribute({api: "Level"}),
+	_extensions: attribute({api: "Extensions", type: "Ea.Collection._Base", elementType: "Ea.ScenarioExtension._Base", key: "this.getLevel()", private: true}),
+	_stepType: attribute({api: "StepType", private: true}),
+	_link: attribute({api: "Link", type: "Ea.Element.UseCase", referenceType: "guid"}),
+	_uses: attribute({api: "Uses"}),
+	_results: attribute({api: "Results"})
 });

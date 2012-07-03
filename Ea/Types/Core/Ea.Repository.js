@@ -16,7 +16,7 @@
 
 Ea.Repository = {};
 
-Ea.Repository._Base = extend(Ea.Any, {
+Ea.Repository._Base = extend(Ea.Types.Any, {
 	
 	cache: null,
 	
@@ -38,7 +38,7 @@ Ea.Repository._Base = extend(Ea.Any, {
 	},
 	
 	getCollection: function(type, api, params) {
-		var proxy = type._get(api, params);
+		var proxy = Ea.Class.createProxy(type, api, params);
 		return proxy;
 	},
 	
@@ -108,7 +108,8 @@ Ea.Repository._Base = extend(Ea.Any, {
 	},
 
 	_get: function(type, api, params) {
-		var proxy = type._get(api, params);
+		//var proxy = type._get(api, params);
+		var proxy = Ea.Class.createProxy(type, api, params);
 		if (type._id || type._guid) {
 			if (!this.cache[type.namespace.name]) {
 				this.cache[type.namespace.name] = {
@@ -217,5 +218,5 @@ Ea.Repository._Base = extend(Ea.Any, {
 }, {
 	api: "Repository",
 	
-	_models: new Ea.Helper.CollectionMap({api: "Models", elementType: "Ea.Package._Base"})
+	_models: attribute({api: "Models", type: "Ea.Collection._Base", elementType: "Ea.Package._Base"})
 });

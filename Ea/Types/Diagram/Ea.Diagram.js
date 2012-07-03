@@ -29,7 +29,7 @@ Ea.Diagram = {
 	}
 };
 
-Ea.Diagram._Base = extend(Ea.Namespace, {
+Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 
 	getParent: function() {
 		return this._getParent() || this._getPackage();
@@ -122,7 +122,7 @@ Ea.Diagram._Base = extend(Ea.Namespace, {
 	}
 },
 {
-	_dimension: new Ea.Helper.CustomProperty({type: Object, get: "getDimension"}),
+	_dimension: attribute({type: Object, get: "getDimension"}),
 	
 	api: "Diagram",
 
@@ -135,22 +135,22 @@ Ea.Diagram._Base = extend(Ea.Namespace, {
 		return type;
 	},
 	
-	_id: new Ea.Helper.Property({api: "DiagramID", type: Number}),
-	_guid: new Ea.Helper.Property({api: "DiagramGUID"}),
-	_type: new Ea.Helper.Property({api: "Type"}),
-	_metaType: new Ea.Helper.Property({api: "MetaType", private: true}),
+	_id: attribute({api: "DiagramID", type: Number}),
+	_guid: attribute({api: "DiagramGUID"}),
+	_type: attribute({api: "Type"}),
+	_metaType: attribute({api: "MetaType", private: true}),
 	
-	_style: new Ea.Helper.Map({api: "ExtendedStyle"}),
-	_styleEx: new Ea.Helper.Map({api: "StyleEx"}),
-	_elementViews: new Ea.Helper.Collection({api: "DiagramObjects", type: "Ea.Collection._Base", elementType: "Ea.DiagramObject._Base"}),
-	_connectorViews: new Ea.Helper.Collection({api: "DiagramLinks", type: "Ea.Collection._Base", elementType: "Ea.DiagramLink._Base"}),
-	_parent: new Ea.Helper.ReferenceById({api: "ParentID", type: "Ea.Element._Base", private: true}),
-	_package: new Ea.Helper.ReferenceById({api: "PackageID", type: "Ea.Package._Base", private: true}),
-	_swimlaneDef: new Ea.Helper.Reference({api: "SwimlaneDef", type: "Ea.SwimlaneDef._Base"}),
+	_style: attribute({api: "ExtendedStyle", subtype: "Map"}),
+	_styleEx: attribute({api: "StyleEx", subtype: "Map"}),
+	_elementViews: attribute({api: "DiagramObjects", type: "Ea.Collection._Base", elementType: "Ea.DiagramObject._Base"}),
+	_connectorViews: attribute({api: "DiagramLinks", type: "Ea.Collection._Base", elementType: "Ea.DiagramLink._Base"}),
+	_parent: attribute({api: "ParentID", type: "Ea.Element._Base", referenceType: "id", private: true}),
+	_package: attribute({api: "PackageID", type: "Ea.Package._Base", referenceType: "id", private: true}),
+	_swimlaneDef: attribute({api: "SwimlaneDef", type: "Ea.SwimlaneDef._Base"}),
 
-	_author: new Ea.Helper.Property({api: "Author"}),
-	_created: new Ea.Helper.Property({api: "CreatedDate", type: Core.Types.Date}),
-	_modified: new Ea.Helper.Property({api: "ModifiedDate", type: Core.Types.Date})
+	_author: attribute({api: "Author"}),
+	_created: attribute({api: "CreatedDate", type: Core.Types.Date}),
+	_modified: attribute({api: "ModifiedDate", type: Core.Types.Date})
 });
 
 Ea.Diagram.Activity = extend(Ea.Diagram._Base);
@@ -173,7 +173,7 @@ Ea.register("Ea.SwimlaneDef@Ea.Types.Diagram", 50);
 Ea.register("Ea.Swimlanes@Ea.Types.Diagram", 51);
 Ea.register("Ea.Swimlane@Ea.Types.Diagram", 52);
 
-Ea.View = extend(Ea.Any, {
+Ea.View = extend(Ea.Types.Any, {
 	
 	_dimension: null,
 
@@ -187,7 +187,7 @@ Ea.View = extend(Ea.Any, {
 	}
 },
 {
-	_diagram: new Ea.Helper.ReferenceById({api: "DiagramID", type: "Ea.Diagram._Base"})
+	_diagram: attribute({api: "DiagramID", type: "Ea.Diagram._Base", referenceType: "id"})
 });
 
 Ea.register("Ea.DiagramLink@Ea.Types.Diagram", 20);

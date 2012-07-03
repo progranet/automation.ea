@@ -69,10 +69,11 @@ _logBuffer = {
 };
 
 _info = function(message, params, level) {
-	_logBuffer[level].push({
-		message: message,
-		params: params
-	});
+	if (level)
+		_logBuffer[level].push({
+			message: message,
+			params: params
+		});
 	Repository.WriteOutput("Script", message, undefined);
 };
 

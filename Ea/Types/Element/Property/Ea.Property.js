@@ -16,16 +16,16 @@
 
 Ea.Property = {};
 
-Ea.Property._Base = extend(Ea.Named, {
+Ea.Property._Base = extend(Ea.Types.Named, {
 	/*_toString: function() {
 		return this.getName() + " = " + this.getValue();
 	}*/
 },
 {
 	api: "Property",
-	_type: new Ea.Helper.Property({api: "Type"}),
-	_validation: new Ea.Helper.Property({api: "Validation"}),
-	_value: new Ea.Helper.Property({api: "Value"})
+	_type: attribute({api: "Type"}),
+	_validation: attribute({api: "Validation"}),
+	_value: attribute({api: "Value"})
 
 });
 

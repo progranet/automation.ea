@@ -16,7 +16,7 @@
 
 Ea.File = {};
 
-Ea.File._Base = extend(Ea.Named, {},
+Ea.File._Base = extend(Ea.Types.Named, {},
 {
 	api: "File",
 	getType: function(source) {
@@ -27,7 +27,7 @@ Ea.File._Base = extend(Ea.Named, {},
 		}
 		return type;
 	},
-	_type: new Ea.Helper.Property({api: "Type"})
+	_type: attribute({api: "Type"})
 });
 
 Ea.File.WebAdress = extend(Ea.File._Base, {

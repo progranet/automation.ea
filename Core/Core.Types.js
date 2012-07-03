@@ -33,26 +33,17 @@ Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, {
 		this._setId();
 	},
 	
-	__id: null,
+	__id__: null,
 	_setId: function() {
-		this.__id = "#" + Core.Types.getId();
+		this.__id__ = "#" + Core.Types.getId();
 	},
 	
 	instanceOf: function(_class) {
 		return this._class === _class || this._class.isSubclassOf(_class);
 	},
 	
-	log: function(message, params) {
-		info(message, params);
-	},
-	
-	match: function(filters) {
-		filters = Core.Types.Filter.ensure(filters);
-		return filters.check(this);
-	},
-
-	check: function(params) {
-		return this._class.check(this, params);
+	match: function(filter) {
+		return (Core.Types.Filter.ensure(filter)).check(this);
 	},
 	
 	_toString: function() {
@@ -99,24 +90,25 @@ Core.Types.Collection = define({
 	},
 	
 	add: function(element) {
-		if (!element) {
+		if (!element || !Core.Types.Object.isInstance(element))
 			return false;
-		}
-		element = this._add(element);
-		if (!element.match(this._filter)) return false;
-		if (this._elements[element.__id]) {
-			debug("Element already exists in collection: " + element.__id + " :" + element._class.qualifiedName);
+		if (!this._add(element))
+			return false;
+		if (!this._filter.check(element))
+			return false;
+		if (element.__id__ in this._elements) {
+			debug("Element already exists in collection: $ (object.__id__ = $)", [element, element.__id__]);
 			return false;
 		}
 		this._table.push(element);
-		this._elements[element.__id] = element;
+		this._elements[element.__id__] = element;
 		this.size++;
 		this._added(element);
 		return true;
 	},
 	
 	_add: function(element) {
-		return element;
+		return true;
 	},
 	
 	_added: function(element) {
@@ -173,11 +165,12 @@ Core.Types.Collection = define({
 		}
 	},
 	
-	filter: function(filters) {
-		if (!filters) return this;
+	filter: function(filter) {
+		if (!filter) return this;
 		var filtered = new Core.Types.Collection({filter: this._filter});
+		filter = Core.Types.Filter.ensure(filter);
 		this.forEach(function(element) {
-			if (element.match(filters)) {
+			if (filter.check(element)) {
 				filtered.add(element);
 			}
 		});

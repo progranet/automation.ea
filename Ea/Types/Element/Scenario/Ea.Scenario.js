@@ -16,7 +16,7 @@
 
 Ea.Scenario = {};
 
-Ea.Scenario._Base = extend(Ea.Named, {},
+Ea.Scenario._Base = extend(Ea.Types.Named, {},
 {
 	api: "Scenario",
 
@@ -29,10 +29,10 @@ Ea.Scenario._Base = extend(Ea.Named, {},
 		return type;
 	},
 
-	_type: new Ea.Helper.Property({api: "Type"}),
+	_type: attribute({api: "Type"}),
 
-	_guid: new Ea.Helper.Property({api: "ScenarioGUID"}),
-	_steps: new Ea.Helper.Collection({api: "Steps", elementType: "Ea.ScenarioStep._Base", key: "this.getPos()"})
+	_guid: attribute({api: "ScenarioGUID"}),
+	_steps: attribute({api: "Steps", type: "Ea.Collection._Base", elementType: "Ea.ScenarioStep._Base", key: "this.getPos()"})
 	
 });
 

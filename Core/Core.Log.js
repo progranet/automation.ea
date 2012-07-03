@@ -19,7 +19,8 @@ Core.Log = {
 	params: {
 		error: ["*"],
 		info: ["*"],
-		warn: ["*"]
+		warn: ["*"],
+		debug: ["*"]
 	},
 
 	logs: {},

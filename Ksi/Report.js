@@ -476,9 +476,9 @@ Report = {
 	},
 	
 	getLabel: function(param, noLinks) {
-		if (Ea.Any.isInstance(param)) {
+		if (Ea.Types.Any.isInstance(param)) {
 			var label;
-			if (Ea.Named.isInstance(param)) {
+			if (Ea.Types.Named.isInstance(param)) {
 				if (Ea.Constraint._Base.isInstance(param)) {
 					label = "<i><b>" + param.getName() + "</b> " + param.getNotes() + "</i>";
 				}
@@ -1653,52 +1653,54 @@ Report = {
 		// ## koniec tabeli ##
 		this.write(file, Html.templates.typeFoot);
 
-		if (type.instanceOf(Ea.Element.Enumeration)) {
-			var literals = type.getLiterals();
-			if (literals.notEmpty()) {
-				this.write(file, Html.templates.literalsHead);
-				literals.forEach(function(literal) {
-					var name = this.format(literal.getName());
-					var notes = this.format(literal.getNotes());
-					this.write(file, Html.templates.literal, {name: name, notes: notes});
-				});
-				this.write(file, Html.templates.literalsFoot);
+		if (type.instanceOf(Ea.Element.Classifier)) {
+			if (type.instanceOf(Ea.Element.Enumeration)) {
+				var literals = type.getLiterals();
+				if (literals.notEmpty()) {
+					this.write(file, Html.templates.literalsHead);
+					literals.forEach(function(literal) {
+						var name = this.format(literal.getName());
+						var notes = this.format(literal.getNotes());
+						this.write(file, Html.templates.literal, {name: name, notes: notes});
+					});
+					this.write(file, Html.templates.literalsFoot);
+				}
+				else {
+					// TODO Enumeracja nie posiada litera³ów
+				}
 			}
 			else {
-				// TODO Enumeracja nie posiada litera³ów
-			}
-		}
-		else if (type.instanceOf(Ea.Element.Classifier)) {
-			var attributes = type.getAttributes();
-			if (attributes.notEmpty()) {
-				this.write(file, Html.templates.attributesHead);
-				attributes.forEach(function(attribute) {
-					var name = this.format(attribute.getName());
-					var type = attribute.getType();
-					var typeName;
-					if (type) {
-						typeName = this.format(type.getName());
-						if (Ea.Element.Class.isInstance(type)) {
-							this.processElement(this.types.Type, type, depth);
-							typeName = this.getLink(type, typeName);
+				var attributes = type.getAttributes();
+				if (attributes.notEmpty()) {
+					this.write(file, Html.templates.attributesHead);
+					attributes.forEach(function(attribute) {
+						var name = this.format(attribute.getName());
+						var type = attribute.getType();
+						var typeName;
+						if (type) {
+							typeName = this.format(type.getName());
+							if (Ea.Element.Class.isInstance(type)) {
+								this.processElement(this.types.Type, type, depth);
+								typeName = this.getLink(type, typeName);
+							}
+							else if (Ea.Element.Enumeration.isInstance(type)) {
+								this.processElement(this.types.Type, type, depth);
+								typeName = this.getLink(type, typeName);
+							}
+							else {
+								// TODO typ jest inny ni¿ jeden ze zdefiniowanych typów prymitywnych
+							}
 						}
-						else if (Ea.Element.Enumeration.isInstance(type)) {
-							this.processElement(this.types.Type, type, depth);
-							typeName = this.getLink(type, typeName);
-						}
-						else {
-							// TODO typ jest inny ni¿ jeden ze zdefiniowanych typów prymitywnych
-						}
-					}
-					else
-						typeName = "";
-					var notes = this.format(attribute.getNotes());
-					this.write(file, Html.templates.attribute, {name: name, type: typeName, notes: notes});
-				});
-				this.write(file, Html.templates.attributesFoot);
-			}
-			else {
-				// TODO Klasa bêd¹ca liœciem nie posiada atrybutów
+						else
+							typeName = "";
+						var notes = this.format(attribute.getNotes());
+						this.write(file, Html.templates.attribute, {name: name, type: typeName, notes: notes});
+					});
+					this.write(file, Html.templates.attributesFoot);
+				}
+				else {
+					// TODO Klasa bêd¹ca liœciem nie posiada atrybutów
+				}
 			}
 		}
 		

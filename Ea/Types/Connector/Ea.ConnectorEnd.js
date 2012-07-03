@@ -16,11 +16,11 @@
 
 Ea.ConnectorEnd = {};
 
-Ea.ConnectorEnd._Base = extend(Ea.Any, {},
+Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {},
 {
 	api: "ConnectorEnd",
-	_aggregation: new Ea.Helper.Property({api: "Aggregation"}),
-	_role: new Ea.Helper.Property({api: "Role"}),
-	_multiplicity: new Ea.Helper.Property({api: "Cardinality"}),
-	_navigability: new Ea.Helper.Property({api: "Navigable"})
+	_aggregation: attribute({api: "Aggregation"}),
+	_role: attribute({api: "Role"}),
+	_multiplicity: attribute({api: "Cardinality"}),
+	_navigability: attribute({api: "Navigable"})
 });

@@ -16,6 +16,6 @@
 
 Ea.Parameter = {};
 
-Ea.Parameter._Base = extend(Ea.Named, {}, {
+Ea.Parameter._Base = extend(Ea.Types.Named, {}, {
 	api: "Parameter"
 });

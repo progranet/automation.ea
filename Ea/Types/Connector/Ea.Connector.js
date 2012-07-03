@@ -18,7 +18,7 @@ Ea.register("Ea.ConnectorEnd@Ea.Types.Connector", 22);
 
 Ea.Connector = {};
 
-Ea.Connector._Base = extend(Ea.Named, {
+Ea.Connector._Base = extend(Ea.Types.Named, {
 	
 	_features: null,
 	
@@ -108,23 +108,23 @@ Ea.Connector._Base = extend(Ea.Named, {
 {
 	api: "Connector",
 	
-	_id: new Ea.Helper.Property({api: "ConnectorID", type: Number}),
-	_guid: new Ea.Helper.Property({api: "ConnectorGUID"}),
-	_type: new Ea.Helper.Property({api: "Type"}),
+	_id: attribute({api: "ConnectorID", type: Number}),
+	_guid: attribute({api: "ConnectorGUID"}),
+	_type: attribute({api: "Type"}),
 	
-	_client: new Ea.Helper.ReferenceById({api: "ClientID", type: "Ea.Element._Base"}),
-	_supplier: new Ea.Helper.ReferenceById({api: "SupplierID", type: "Ea.Element._Base"}),
+	_client: attribute({api: "ClientID", type: "Ea.Element._Base", referenceType: "id"}),
+	_supplier: attribute({api: "SupplierID", type: "Ea.Element._Base", referenceType: "id"}),
 	
-	_clientAttribute: new Ea.Helper.CustomProperty({get: "getClientAttribute", type: "Ea.Attribute._Base"}),
-	_clientMethod: new Ea.Helper.CustomProperty({get: "getClientMethod", type: "Ea.Method._Base"}),
-	_supplierAttribute: new Ea.Helper.CustomProperty({get: "getSupplierAttribute", type: "Ea.Attribute._Base"}),
-	_supplierMethod: new Ea.Helper.CustomProperty({get: "getSupplierMethod", type: "Ea.Method._Base"}),
+	_clientAttribute: attribute({get: "getClientAttribute", type: "Ea.Attribute._Base"}),
+	_clientMethod: attribute({get: "getClientMethod", type: "Ea.Method._Base"}),
+	_supplierAttribute: attribute({get: "getSupplierAttribute", type: "Ea.Attribute._Base"}),
+	_supplierMethod: attribute({get: "getSupplierMethod", type: "Ea.Method._Base"}),
 	
-	_clientEnd: new Ea.Helper.Reference({api: "ClientEnd", type: "Ea.ConnectorEnd._Base"}),
-	_supplierEnd: new Ea.Helper.Reference({api: "SupplierEnd", type: "Ea.ConnectorEnd._Base"}),
+	_clientEnd: attribute({api: "ClientEnd", type: "Ea.ConnectorEnd._Base"}),
+	_supplierEnd: attribute({api: "SupplierEnd", type: "Ea.ConnectorEnd._Base"}),
 	
-	_styleEx: new Ea.Helper.Property({api: "StyleEx", private: true}),
-	_guard: new Ea.Helper.Property({api: "TransitionGuard"}),
+	_styleEx: attribute({api: "StyleEx", private: true}),
+	_guard: attribute({api: "TransitionGuard"}),
 
 	getType: function(source) {
 		var typeName = this._type.get(source).replace(/\s/g,"");

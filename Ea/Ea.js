@@ -46,7 +46,7 @@ Ea = {
 	},
 
 	initialize: function() {
-		this._prepare(Ea.Any);
+		this._prepare(Ea.Types.Any);
 		Ea.Application.initializeDefault();
 		
 		var systemTarget = new Ea.Helper.Target("System", true);
@@ -54,14 +54,15 @@ Ea = {
 		
 		Core.Log.registerTarget("error", systemTarget);
 		Core.Log.registerTarget("warn", systemTarget);
+		Core.Log.registerTarget("debug", systemTarget);
 		Core.Log.registerTarget("info", scriptTarget);
 	},
 	
 	_prepare: function(_class) {
 		for (var name in _class) {
 			var property = _class[name];
-			if (Ea.Helper.AbstractProperty.isInstance(property)) {
-				property.prepare();
+			if (Ea.Class.AttributeProxy.isInstance(property)) {
+				property.prepare(_class, name);
 			}
 		}
 		for (var c = 0; c < _class.subClass.length; c++) {
@@ -93,160 +94,10 @@ Ea = {
 	}
 };
 
+include("Ea.Class@Ea");
 include("Ea.Helper@Ea");
-
-Ea.Source = define({
-	_api: null,
-	_value: null,
-	create: function(api) {
-		this._api = api;
-		this._value = {};
-	},
-	getApi: function() {
-		return this._api;
-	},
-	getApiValue: function(property) {
-		if (property.index == null)
-			return this._api[property.api];
-		return this._api[property.api](property.index);
-	},
-	getValue: function(property) {
-		return this._value[property.property];
-	},
-	setValue: function(property, value) {
-		this._value[property.property] = value;
-	},
-	isInitialized: function(property) {
-		return (property.property in this._value);
-	}
-});
-
-
-Ea.Any = define({
-	
-	create: function() {
-		_super.create();
-	},
-	
-	getParent: function() {
-		return null;
-	},
-	
-	getXmlGuid: function() {
-		return Ea.Application.getApplication().getProject().guidToXml(this.getGuid());
-	},
-	
-	toString: function() {
-		return this._toString();
-	},
-	
-	_toString: function() {
-		return "[" + this._class + "]";
-	}
-}, 
-{
-	__parent: new Ea.Helper.CustomProperty({type: "Ea.Namespace", get: "getParent"}),
-	
-	getType: function() {
-		return this.namespace._Base;
-	},
-	
-	_get: function(api, params) {
-		return this._createProxy(api, params);
-	},
-	
-	_createProxy: function(api, params) {
-		var source = new Ea.Source(api);
-		var type = this.getType(source);
-		var proxy = new type(params);
-		proxy._source = source;
-		return proxy;
-	},
-	
-	initialize: function() {
-		this._properties = {};
-	},
-	
-	_addProperty: function(property) {
-		this._properties[property.property] = property;
-	},
-	
-	getProperties: function() {
-		var properties = {};
-		if (this._super.getProperties) {
-			var superProperties = this._super.getProperties();
-			for (var name in superProperties)
-				properties[name] = superProperties[name];
-		}
-		for (var name in this._properties)
-			properties[name] = this._properties[name];
-		return properties;
-	}
-});
-
-Ea.Named = extend(Ea.Any, {
-
-	_splitName: function() {
-		var name = this.getName();
-		var split = new RegExp("^([\\w\\-\\.]+[0-9]+):?\\s+([\\W\\w]+)$").exec(name);
-		return split || [name, "", name];
-	},
-	
-	_businessId: null,
-	_businessName: null,
-
-	getBusinessName: function() {
-		if (!this._businessName || Ea.mm) {
-			var split = this._splitName();
-			this._businessId = split[1];
-			this._businessName = split[2];
-		}
-		return this._businessName;
-	},
-	
-	getBusinessId: function() {
-		if (!this._businessId || Ea.mm) {
-			var split = this._splitName();
-			this._businessId = split[1];
-			this._businessName = split[2];
-		}
-		return this._businessId;
-	},
-	
-	hasParent: function(namespace) {
-		var parent = this.getParent();
-		if (!parent) return false;
-		namespace = Ea.ensure(Ea.Package._Base, namespace);
-		return (parent == namespace ? namespace : parent.hasParent(namespace));
-	},
-	
-	_toString: function() {
-		return this.getName() + " " + _super._toString();
-	},
-	
-	_qualifedName: null,
-	getQualifiedName: function() {
-		if (!this._qualifedName || Ea.mm) {
-			var parent = this.getParent();
-			this._qualifedName = (parent ? parent.getQualifiedName() + " / " : "") + this.getName();
-		}
-		return this._qualifedName;
-	}
-	
-},
-{
-	_name: new Ea.Helper.Property({api: "Name"}),
-	_alias: new Ea.Helper.Property({api: "Alias"}),
-	_notes: new Ea.Helper.Property({api: "Notes"}),
-	_stereotype: new Ea.Helper.Property({api: "Stereotype"}),
-	
-	_qualifiedName: new Ea.Helper.CustomProperty({get: "getQualifiedName"})
-});
-
-Ea.Namespace = extend(Ea.Named);
-
+include("Ea.Types@Ea.Types");
 include("Ea.Application@Ea.Types.Core");
-
 Ea.register("Ea.Collection@Ea.Types", 3);
 Ea.register("Ea.Package@Ea.Types", 5);
 Ea.register("Ea.Connector@Ea.Types.Connector", 7);

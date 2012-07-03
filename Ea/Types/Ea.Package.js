@@ -16,7 +16,7 @@
 
 Ea.Package = {};
 
-Ea.Package._Base = extend(Ea.Namespace, {},
+Ea.Package._Base = extend(Ea.Types.Namespace, {},
 {
 	api: "Package",
 	
@@ -28,19 +28,19 @@ Ea.Package._Base = extend(Ea.Namespace, {},
 		return type;
 	},
 	
-	_id: new Ea.Helper.Property({api: "PackageID", type: Number}),
-	_guid: new Ea.Helper.Property({api: "PackageGUID"}),
-	_model: new Ea.Helper.Property({api: "isModel", private: true, type: Boolean}),
+	_id: attribute({api: "PackageID", type: Number}),
+	_guid: attribute({api: "PackageGUID"}),
+	_model: attribute({api: "isModel", private: true, type: Boolean}),
 	
-	_version: new Ea.Helper.Property({api: "Version"}),
-	_created: new Ea.Helper.Property({api: "Created", type: Core.Types.Date}),
-	_modified: new Ea.Helper.Property({api: "Modified", type: Core.Types.Date}),
+	_version: attribute({api: "Version"}),
+	_created: attribute({api: "Created", type: Core.Types.Date}),
+	_modified: attribute({api: "Modified", type: Core.Types.Date}),
 
-	_element: new Ea.Helper.Reference({api: "Element"}),
-	_parent: new Ea.Helper.ReferenceById({api: "ParentID", type: "Ea.Package._Base"}),
-	_elements: new Ea.Helper.Collection({api: "Elements", elementType: "Ea.Element._Base", filter: "this._getParent() == null"}),
-	_diagrams: new Ea.Helper.Collection({api: "Diagrams", elementType: "Ea.Diagram._Base", filter: "this._getParent() == null"}),
-	_packages: new Ea.Helper.Collection({api: "Packages", elementType: "Ea.Package._Base"})
+	_element: attribute({api: "Element", type: "Ea.Element._Base"}),
+	_parent: attribute({api: "ParentID", type: "Ea.Package._Base", referenceType: "id"}),
+	_elements: attribute({api: "Elements", type: "Ea.Collection._Base", elementType: "Ea.Element._Base", filter: "this._getParent() == null"}),
+	_diagrams: attribute({api: "Diagrams", type: "Ea.Collection._Base", elementType: "Ea.Diagram._Base", filter: "this._getParent() == null"}),
+	_packages: attribute({api: "Packages", type: "Ea.Collection._Base", elementType: "Ea.Package._Base"})
 });
 
 Ea.Package.Package = extend(Ea.Package._Base);

@@ -51,13 +51,13 @@ Ea.DiagramObject._Base = extend(Ea.View, {
 {
 	api: "DiagramObject",
 	
-	_id: new Ea.Helper.Property({api: "InstanceID", type: Number}),
+	_id: attribute({api: "InstanceID", type: Number}),
 
-	//_diagram: new Ea.Helper.ReferenceById({api: "DiagramID", type: "Ea.Diagram._Base"}),
-	_element: new Ea.Helper.ReferenceById({api: "ElementID", type: "Ea.Element._Base"}),
-	_left: new Ea.Helper.Property({api: "Left", type: Number}),
-	_top: new Ea.Helper.Property({api: "Top", type: Number}),
-	_right: new Ea.Helper.Property({api: "Right", type: Number}),
-	_bottom: new Ea.Helper.Property({api: "Bottom", type: Number})
+	//_diagram: attribute({api: "DiagramID", type: "Ea.Diagram._Base", referenceType: "id"}),
+	_element: attribute({api: "ElementID", type: "Ea.Element._Base", referenceType: "id"}),
+	_left: attribute({api: "Left", type: Number}),
+	_top: attribute({api: "Top", type: Number}),
+	_right: attribute({api: "Right", type: Number}),
+	_bottom: attribute({api: "Bottom", type: Number})
 });
 

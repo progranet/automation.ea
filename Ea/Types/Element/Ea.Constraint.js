@@ -16,7 +16,7 @@
 
 Ea.Constraint = {};
 
-Ea.Constraint._Base = extend(Ea.Named, {},
+Ea.Constraint._Base = extend(Ea.Types.Named, {},
 {
 	api: "Constraint",
 	
@@ -28,7 +28,7 @@ Ea.Constraint._Base = extend(Ea.Named, {},
 		}
 		return type;
 	},
-	_type: new Ea.Helper.Property({api: "Type"})
+	_type: attribute({api: "Type"})
 });
 
 // TODO remove following backward compatibility

@@ -16,7 +16,7 @@
 
 Ea.ScenarioExtension = {};
 
-Ea.ScenarioExtension._Base = extend(Ea.Any, {
+Ea.ScenarioExtension._Base = extend(Ea.Types.Any, {
 	
 	_toString: function() {
 		return this.getLevel() + " [" + this._class + "]";
@@ -25,9 +25,9 @@ Ea.ScenarioExtension._Base = extend(Ea.Any, {
 {
 	api: "ScenarioExtension",
 	
-	_guid: new Ea.Helper.Property({api: "ExtensionGUID"}),
-	_pos: new Ea.Helper.Property({api: "Pos"}),
-	_level: new Ea.Helper.Property({api: "Level"}),
-	_joiningStep: new Ea.Helper.Reference({api: "JoiningStep", type: "Ea.ScenarioStep._Base"}),
-	_scenario: new Ea.Helper.Reference({api: "Scenario", type: "Ea.Scenario._Base"})
+	_guid: attribute({api: "ExtensionGUID"}),
+	_pos: attribute({api: "Pos"}),
+	_level: attribute({api: "Level"}),
+	_joiningStep: attribute({api: "JoiningStep", type: "Ea.ScenarioStep._Base"}),
+	_scenario: attribute({api: "Scenario", type: "Ea.Scenario._Base"})
 });

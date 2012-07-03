@@ -16,21 +16,18 @@
 
 Ea.Properties = {};
 
-Ea.Properties._Base = extend(Ea.Collection._Base, {},
+Ea.Properties._Base = extend(Ea.Collection._Base, {
+	_init: function(api, params) {
+		for (var e = 0; e < api.Count; e++) {
+			var element = Ea.get(params.elementType, api.Item(e));
+			this.add(element);
+		}
+	}
+},
 {
 	getType: function() {
 		return Ea.Properties._Base;
-	},
-
-	_get: function(api, params) {
-		var proxy = Ea.Any._createProxy.call(this, api, params);
-		for (var e = 0; e < api.Count; e++) {
-			var element = Ea.get(params.elementType, api.Item(e));
-			proxy.add(element);
-		}
-		return proxy;
 	}
-	
 });
 
 Ea.register("Ea.Property@Ea.Types.Element.Property", 49);

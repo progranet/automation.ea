@@ -57,11 +57,11 @@ Ea.Application = {
 	}
 };
 
-Ea.Application._Base = extend(Ea.Any, {}, {
+Ea.Application._Base = extend(Ea.Types.Any, {}, {
 	api: "App",
-	_project: new Ea.Helper.Reference({api: "Project", type: "Ea.Project._Base"}),
-	_repository: new Ea.Helper.Reference({api: "Repository", type: "Ea.Repository._Base"}),
-	_visible: new Ea.Helper.Property({api: "Visible", type: Boolean})
+	_project: attribute({api: "Project", type: "Ea.Project._Base"}),
+	_repository: attribute({api: "Repository", type: "Ea.Repository._Base"}),
+	_visible: attribute({api: "Visible", type: Boolean})
 });
 
 Ea.register("Ea.Project@Ea.Types.Core", 1);

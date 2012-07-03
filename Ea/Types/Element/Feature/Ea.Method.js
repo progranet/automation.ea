@@ -34,12 +34,12 @@ Ea.Method._Base = extend(Ea.Feature, {
 },
 {
 	api: "Method",
-	_id: new Ea.Helper.Property({api: "MethodID", type: Number}),
-	_guid: new Ea.Helper.Property({api: "AttributeGUID"}),
-	//_parent: new Ea.Helper.ReferenceById({api: "ParentID"}),
-	_parameters: new Ea.Helper.Collection({api: "Parameters", elementType: "Ea.Parameter._Base"}),
-	_classType: new Ea.Helper.ReferenceById({api: "ClassifierID", type: "Ea.Element.Type", private: true}),
-	_primitiveType: new Ea.Helper.Property({api: "ReturnType", private: true})
+	_id: attribute({api: "MethodID", type: Number}),
+	_guid: attribute({api: "AttributeGUID"}),
+	//_parent: attribute({api: "ParentID", referenceType: "id"}),
+	_parameters: attribute({api: "Parameters", type: "Ea.Collection._Base", elementType: "Ea.Parameter._Base"}),
+	_classType: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceType: "id", private: true}),
+	_primitiveType: attribute({api: "ReturnType", private: true})
 });
 
 Ea.register("Ea.Parameter@Ea.Types.Element.Feature", 25);

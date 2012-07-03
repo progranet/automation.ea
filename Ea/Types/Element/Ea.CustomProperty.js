@@ -16,10 +16,10 @@
 
 Ea.CustomProperty = {};
 
-Ea.CustomProperty._Base = extend(Ea.Named, {},
+Ea.CustomProperty._Base = extend(Ea.Types.Named, {},
 {
 	api: "CustomProperty",
-	_value: new Ea.Helper.Property({api: "Value"})
+	_value: attribute({api: "Value"})
 
 });
 

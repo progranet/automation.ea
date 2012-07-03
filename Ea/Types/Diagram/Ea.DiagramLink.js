@@ -44,9 +44,9 @@ Ea.DiagramLink._Base = extend(Ea.View, {
 {
 	api: "DiagramLink",
 	
-	_id: new Ea.Helper.Property({api: "InstanceID", type: Number}),
+	_id: attribute({api: "InstanceID", type: Number}),
 
-	//_diagram: new Ea.Helper.ReferenceById({api: "DiagramID", type: "Ea.Diagram._Base"}),
-	_connector: new Ea.Helper.ReferenceById({api: "ConnectorID", type: "Ea.Connector._Base"}),
-	_path: new Ea.Helper.Property({api: "Path", private: true})
+	//_diagram: attribute({api: "DiagramID", type: "Ea.Diagram._Base", referenceType: "id"}),
+	_connector: attribute({api: "ConnectorID", type: "Ea.Connector._Base", referenceType: "id"}),
+	_path: attribute({api: "Path", private: true})
 });

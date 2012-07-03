@@ -20,11 +20,10 @@ Ea.Attribute._Base = extend(Ea.Feature, {},
 {
 	api: "Attribute",
 	
-	_id: new Ea.Helper.Property({api: "AttributeID", type: Number}),
-	_guid: new Ea.Helper.Property({api: "AttributeGUID"}),
-	//_parent: new Ea.Helper.ReferenceById({api: "ParentID"}),
-	_alias: new Ea.Helper.Property({api: "Style"}),
-	_styleEx: new Ea.Helper.Property({api: "StyleEx", private: true}),
+	_id: attribute({api: "AttributeID", type: Number}),
+	_guid: attribute({api: "AttributeGUID"}),
+	_alias: attribute({api: "Style"}),
+	_styleEx: attribute({api: "StyleEx", private: true}),
 	
 	getType: function(source) {
 		var owner = this._parent.get(source);
@@ -57,15 +56,15 @@ Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {
 	}
 }, 
 {
-	_classType: new Ea.Helper.ReferenceById({api: "ClassifierID", type: "Ea.Element.Type", private: true}),
-	_primitiveType: new Ea.Helper.Property({api: "Type", private: true}),
-	_default: new Ea.Helper.Property({api: "Default"}),
-	_collection: new Ea.Helper.Property({api: "IsCollection", type: Boolean}),
-	_const: new Ea.Helper.Property({api: "IsConst", type: Boolean}),
-	_derived: new Ea.Helper.Property({api: "IsDerived", type: Boolean}),
-	_ordered: new Ea.Helper.Property({api: "IsOrdered", type: Boolean}),
-	_static: new Ea.Helper.Property({api: "IsStatic", type: Boolean}),
-	_lower: new Ea.Helper.Property({api: "LowerBound"}),
-	_upper: new Ea.Helper.Property({api: "UpperBound"}),
-	_visibility: new Ea.Helper.Property({api: "Visibility"})
+	_classType: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceType: "id", private: true}),
+	_primitiveType: attribute({api: "Type", private: true}),
+	_default: attribute({api: "Default"}),
+	_collection: attribute({api: "IsCollection", type: Boolean}),
+	_const: attribute({api: "IsConst", type: Boolean}),
+	_derived: attribute({api: "IsDerived", type: Boolean}),
+	_ordered: attribute({api: "IsOrdered", type: Boolean}),
+	_static: attribute({api: "IsStatic", type: Boolean}),
+	_lower: attribute({api: "LowerBound"}),
+	_upper: attribute({api: "UpperBound"}),
+	_visibility: attribute({api: "Visibility"})
 });

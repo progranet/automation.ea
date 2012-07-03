@@ -17,46 +17,38 @@
 Ea.Collection = {};
 
 Ea.Collection._Base = extend(Core.Types.Collection, {
-	create: function(params) {
+	create: function(api, params) {
 		_super.create(params);
+		this._init(api, params);
+	},
+	_init: function(api, params) {
+		for (var e = 0; e < api.Count; e++) {
+			var element = Ea.get(params.elementType, api.GetAt(e));
+			this.add(element);
+		}
 	}
 },
 {
 	getType: function() {
 		return Ea.Collection._Base;
-	},
-
-	_get: function(api, params) {
-		
-		var proxy = Ea.Any._createProxy.call(this, api, params);
-		
-		for (var e = 0; e < api.Count; e++) {
-			var element = Ea.get(params.elementType, api.GetAt(e));
-			proxy.add(element);
-		}
-		return proxy;
 	}
 	
 });
 
 Ea.Collection.Map = extend(Core.Types.Map, {
-	create: function(params) {
+	create: function(api, params) {
 		_super.create(params);
+		this._init(api, params);
+	},
+	_init: function(api, params) {
+		for (var e = 0; e < api.Count; e++) {
+			var element = Ea.get(params.elementType, api.GetAt(e));
+			this.add(element);
+		}
 	}
 },
 {
 	getType: function() {
 		return Ea.Collection.Map;
-	},
-
-	_get: function(api, params) {
-		
-		var proxy = Ea.Any._createProxy.call(this, api, params);
-		
-		for (var e = 0; e < api.Count; e++) {
-			var element = Ea.get(params.elementType, api.GetAt(e));
-			proxy.add(element);
-		}
-		return proxy;
 	}
 });

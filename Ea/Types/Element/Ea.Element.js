@@ -16,7 +16,7 @@
 
 Ea.Element = {};
 
-Ea.Element._Base = extend(Ea.Namespace, {
+Ea.Element._Base = extend(Ea.Types.Namespace, {
 	
 	isAbstract: function() {
 		return this._getAbstract() == 1;
@@ -144,44 +144,44 @@ Ea.Element._Base = extend(Ea.Namespace, {
 		return type;
 	},
 	
-	_id: new Ea.Helper.Property({api: "ElementID", type: Number}),
-	_guid: new Ea.Helper.Property({api: "ElementGUID"}),
+	_id: attribute({api: "ElementID", type: Number}),
+	_guid: attribute({api: "ElementGUID"}),
 	
-	_type: new Ea.Helper.Property({api: "Type", private: true}),
-	_subtype: new Ea.Helper.Property({api: "Subtype", type: Number, private: true}),
-	_metatype: new Ea.Helper.Property({api: "MetaType", private: true}),
+	_type: attribute({api: "Type", private: true}),
+	_subtype: attribute({api: "Subtype", type: Number, private: true}),
+	_metatype: attribute({api: "MetaType", private: true}),
 	
-	__abstract: new Ea.Helper.Property({api: "Abstract", private: true}),
-	_taggedValues: new Ea.Helper.CollectionMap({api: "TaggedValues", elementType: "Ea.TaggedValue._Base", key: "this.getName()", value: "this.getValue()"}),
-	_customProperties: new Ea.Helper.CollectionMap({api: "CustomProperties", elementType: "Ea.CustomProperty._Base", key: "this.getName()", value: "this.getValue()"}),
-	_specializedProperties: new Ea.Helper.Collection({type: "Ea.Properties._Base", api: "Properties", elementType: "Ea.Property._Base"}),
-	_constraints: new Ea.Helper.Collection({api: "Constraints", elementType: "Ea.Constraint._Base"}),
+	__abstract: attribute({api: "Abstract", private: true}),
+	_taggedValues: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.TaggedValue._Base", key: "this.getName()", value: "this.getValue()"}),
+	_customProperties: attribute({api: "CustomProperties", type: "Ea.Collection.Map", elementType: "Ea.CustomProperty._Base", key: "this.getName()", value: "this.getValue()"}),
+	_specializedProperties: attribute({api: "Properties", type: "Ea.Properties._Base", elementType: "Ea.Property._Base"}),
+	_constraints: attribute({api: "Constraints", type: "Ea.Collection._Base", elementType: "Ea.Constraint._Base"}),
 	
-	_status: new Ea.Helper.Property({api: "Status"}),
-	_keywords: new Ea.Helper.Property({api: "Tag"}),
-	_phase: new Ea.Helper.Property({api: "Phase"}),
-	_version: new Ea.Helper.Property({api: "Version"}),
-	_author: new Ea.Helper.Property({api: "Author"}),
-	_created: new Ea.Helper.Property({api: "Created", type: Core.Types.Date}),
-	_modified: new Ea.Helper.Property({api: "Modified", type: Core.Types.Date}),
+	_status: attribute({api: "Status"}),
+	_keywords: attribute({api: "Tag"}),
+	_phase: attribute({api: "Phase"}),
+	_version: attribute({api: "Version"}),
+	_author: attribute({api: "Author"}),
+	_created: attribute({api: "Created", type: Core.Types.Date}),
+	_modified: attribute({api: "Modified", type: Core.Types.Date}),
 	
-	_elements: new Ea.Helper.Collection({api: "Elements"}),
-	_diagrams: new Ea.Helper.Collection({api: "Diagrams", elementType: "Ea.Diagram._Base"}),
-	_stereotypes: new Ea.Helper.List({api: "StereotypeEx"}), // TODO
-	_connectors: new Ea.Helper.Collection({api: "Connectors", elementType: "Ea.Connector._Base"}),
-	_files: new Ea.Helper.Collection({api: "Files", elementType: "Ea.File._Base"}),
-	_parent: new Ea.Helper.ReferenceById({api: "ParentID", type: "Ea.Element._Base", private: true}),
-	_package: new Ea.Helper.ReferenceById({api: "PackageID", type: "Ea.Package._Base", private: true}),
-	_miscData0: new Ea.Helper.Property({api: "MiscData", private: true, index: 0}),
-	_miscData1: new Ea.Helper.Property({api: "MiscData", private: true, index: 1}),
-	_miscData2: new Ea.Helper.Property({api: "MiscData", private: true, index: 2}),
-	_miscData3: new Ea.Helper.Property({api: "MiscData", private: true, index: 3}),
+	_elements: attribute({api: "Elements", type: "Ea.Collection._Base", elementType: "Ea.Element._Base"}),
+	_diagrams: attribute({api: "Diagrams", type: "Ea.Collection._Base", elementType: "Ea.Diagram._Base"}),
+	_stereotypes: attribute({api: "StereotypeEx", subtype: "List"}), // TODO
+	_connectors: attribute({api: "Connectors", type: "Ea.Collection._Base", elementType: "Ea.Connector._Base"}),
+	_files: attribute({api: "Files", type: "Ea.Collection._Base", elementType: "Ea.File._Base"}),
+	_parent: attribute({api: "ParentID", type: "Ea.Element._Base", referenceType: "id", private: true}),
+	_package: attribute({api: "PackageID", type: "Ea.Package._Base", referenceType: "id", private: true}),
+	_miscData0: attribute({api: "MiscData", private: true, index: 0}),
+	_miscData1: attribute({api: "MiscData", private: true, index: 1}),
+	_miscData2: attribute({api: "MiscData", private: true, index: 2}),
+	_miscData3: attribute({api: "MiscData", private: true, index: 3}),
 	
-	_abstract: new Ea.Helper.CustomProperty({get: "isAbstract", type: Boolean}),
-	_inDiagrams: new Ea.Helper.CustomProperty({get: "findDiagrams", type: "Core.Types.Collection", elementType: "Ea.Diagram._Base"}),
-	_linkedDiagram: new Ea.Helper.CustomProperty({get: "getLinkedDiagram", type: "Ea.Diagram._Base"}),
-	_customReferences: new Ea.Helper.CustomProperty({get: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"}),
-	_complexity: new Ea.Helper.Property({api: "Complexity", type: Number})
+	_abstract: attribute({get: "isAbstract", type: Boolean}),
+	_inDiagrams: attribute({get: "findDiagrams", type: "Core.Types.Collection", elementType: "Ea.Diagram._Base"}),
+	_linkedDiagram: attribute({get: "getLinkedDiagram", type: "Ea.Diagram._Base"}),
+	_customReferences: attribute({get: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"}),
+	_complexity: attribute({api: "Complexity", type: Number})
 });
 
 Ea.Element.CustomReference = define({
@@ -259,10 +259,10 @@ Ea.Element.Object = extend(Ea.Element._Base, {
 	}
 },
 {
-	_metaClass: new Ea.Helper.ReferenceById({api: "ClassifierID", type: "Ea.Element.Classifier"}),
-	_runState: new Ea.Helper.Property({api: "RunState", private: true}),
+	_metaClass: attribute({api: "ClassifierID", type: "Ea.Element.Classifier", referenceType: "id"}),
+	_runState: attribute({api: "RunState", private: true}),
 	
-	runState: new Ea.Helper.CustomProperty({get: "getRunState", type: Object})
+	__runState: attribute({get: "getRunState", type: Object})
 });
 
 Ea.Element.Package = extend(Ea.Element._Base, {
@@ -271,16 +271,25 @@ Ea.Element.Package = extend(Ea.Element._Base, {
 	}
 },
 {
-	_package: new Ea.Helper.CustomProperty({get: "getPackage", type: "Ea.Package._Base"})
+	_package: attribute({get: "getPackage", type: "Ea.Package._Base"})
 });
 
 Ea.Element.Type = extend(Ea.Element._Base);
 	
 Ea.Element.Classifier = extend(Ea.Element.Type, {},
 {
-	_attributes: new Ea.Helper.Collection({api: "Attributes", elementType: "Ea.Attribute.Attribute"}),
-	_operations: new Ea.Helper.Collection({api: "Methods", elementType: "Ea.Method._Base"})
+	_attributes: attribute({api: "Attributes", type: "Ea.Collection._Base", elementType: "Ea.Attribute.Attribute", filter: "this.getStereotype() != 'enum'"}),
+	_operations: attribute({api: "Methods", type: "Ea.Collection._Base", elementType: "Ea.Method._Base"})
 });
+
+Ea.Element.DataType = extend(Ea.Element.Classifier);
+
+Ea.Element.Enumeration = extend(Ea.Element.DataType, {},
+{
+	_literals: attribute({api: "Attributes", type: "Ea.Collection._Base", elementType: "Ea.Attribute.EnumerationLiteral", filter: "this.getStereotype() == 'enum'"})
+});
+
+Ea.Element.PrimitiveType = extend(Ea.Element.DataType);
 
 Ea.Element.Class = extend(Ea.Element.Classifier);
 
@@ -292,19 +301,10 @@ Ea.Element.AssociationClass = extend(Ea.Element.Class, {
 	}
 },
 {
-	association: new Ea.Helper.CustomProperty({get: "getAssociation", type: "Ea.Connector._Base"})
+	__association: attribute({get: "getAssociation", type: "Ea.Connector._Base"})
 });
 
 Ea.Element.Interface = extend(Ea.Element.Classifier);
-
-Ea.Element.DataType = extend(Ea.Element.Type);
-
-Ea.Element.Enumeration = extend(Ea.Element.DataType, {},
-{
-	_literals: new Ea.Helper.Collection({api: "Attributes", elementType: "Ea.Attribute.EnumerationLiteral"})
-});
-
-Ea.Element.PrimitiveType = extend(Ea.Element.DataType);
 
 Ea.Element.Requirement = extend(Ea.Element._Base);
 
@@ -315,7 +315,7 @@ Ea.Element._BehavioralElement = extend(Ea.Element._Base, {
 			return null;
 		if (basic.size == 1)
 			return basic.first();
-		throw new Error("More than 1 basic scenarios");
+		throw new Error("More than one basic scenario");
 	},
 	
 	getScenarioExtensions: function() {
@@ -329,9 +329,9 @@ Ea.Element._BehavioralElement = extend(Ea.Element._Base, {
 	}
 },
 {
-	_scenarios: new Ea.Helper.Collection({api: "Scenarios", elementType: "Ea.Scenario._Base"}),
-	_basicScenario: new Ea.Helper.CustomProperty({type: "Ea.Scenario.BasicPath", get: "getBasicScenario"}),
-	_scenarioExtensions: new Ea.Helper.CustomProperty({type: "Core.Types.Collection", elementType: "Ea.ScenarioExtension._Base", get: "getScenarioExtensions"})
+	_scenarios: attribute({api: "Scenarios", type: "Ea.Collection._Base", elementType: "Ea.Scenario._Base"}),
+	_basicScenario: attribute({type: "Ea.Scenario.BasicPath", get: "getBasicScenario"}),
+	_scenarioExtensions: attribute({type: "Core.Types.Collection", elementType: "Ea.ScenarioExtension._Base", get: "getScenarioExtensions"})
 });
 
 Ea.Element.Pseudostate = extend(Ea.Element._BehavioralElement);
@@ -453,7 +453,7 @@ Ea.Element._CallAction = extend(Ea.Element.Action, {
 	}
 },
 {
-	_classifier: new Ea.Helper.ReferenceById({api: "ClassifierID", type: "Ea.Element.Classifier"})
+	_classifier: attribute({api: "ClassifierID", type: "Ea.Element.Classifier", referenceType: "id"})
 });
 
 Ea.Element.CallBehaviorAction = extend(Ea.Element._CallAction);
@@ -468,13 +468,13 @@ Ea.Element.UseCase = extend(Ea.Element._BehavioralElement, {
 	}	
 });
 
-Ea.Feature = extend(Ea.Named, {
+Ea.Feature = extend(Ea.Types.Named, {
 	getParent: function() {
 		return this._getParent();
 	}
 },
 {
-	_parent: new Ea.Helper.ReferenceById({api: "ParentID", type: "Ea.Element.Type", private: true})
+	_parent: attribute({api: "ParentID", type: "Ea.Element.Type", referenceType: "id", private: true})
 });
 Ea.PrimitiveType = extend(Core.Types.Named, {});
 

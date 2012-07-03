@@ -16,12 +16,12 @@
 
 Ea.TaggedValue = {};
 
-Ea.TaggedValue._Base = extend(Ea.Named, {},
+Ea.TaggedValue._Base = extend(Ea.Types.Named, {},
 {
 	api: "TaggedValue",
-	_id: new Ea.Helper.Property({api: "PropertyID"}),
-	_guid: new Ea.Helper.Property({api: "PropertyGUID"}),
-	_value: new Ea.Helper.Property({api: "Value"})
+	_id: attribute({api: "PropertyID"}),
+	_guid: attribute({api: "PropertyGUID"}),
+	_value: attribute({api: "Value"})
 
 });
 
