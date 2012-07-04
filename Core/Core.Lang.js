@@ -74,7 +74,7 @@ Core.Lang = {
 			return this._toString ? this._toString() : namespace + "." + name;
 		};
 		
-		if (superClass) superClass.subClass.push(_class);
+		if (superClass) superClass._subClass.push(_class);
 		return _class;
 	},
 	
@@ -110,6 +110,9 @@ Core.Lang = {
 		_class.qualifiedName = namespace + "." + name;
 		_class.getQualifiedName = function() {return _class.qualifiedName;};
 		_class.namespace = eval(namespace);
+		if (!_class.namespace._classes)
+			_class.namespace._classes = {};
+		_class.namespace._classes[name] = _class;
 		_class.isClass = true;
 		_class._super = _super;
 		_class.isSubclassOf = function(ofClass) {
@@ -119,7 +122,7 @@ Core.Lang = {
 		_class.isInstance = function(object) {
 			return object && object._class && object._class.isClass && (object._class === _class || object._class.isSubclassOf(_class));
 		};
-		_class.subClass = [];
+		_class._subClass = [];
 		
 		_class.ensure = function(params) {
 			return _class.isInstance(params) ? params : new _class(params);

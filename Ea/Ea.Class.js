@@ -72,6 +72,7 @@ Ea.Class.Source = define({
 
 Ea.Class.AttributeProxy = define({
 
+	id: null,
 	private: null,
 	type: null,
 	elementType: null,
@@ -100,6 +101,7 @@ Ea.Class.AttributeProxy = define({
 		
 		_super.create();
 		
+		this.id = params.id;
 		this.private = params.private;
 		this.getter = params.get;
 		this.setter = params.set;
@@ -156,29 +158,18 @@ Ea.Class.AttributeProxy = define({
 		
 		this.type = Ea.Helper.typeEval(this.type || String);
 		this.elementType = Ea.Helper.isCollectionType(this.type) ? Ea.Helper.typeEval(this.elementType) : null;
-		var attributeType = null;
 
-		if (!this.api)
-			attributeType = Ea.Class.CustomProperty;
-		else if (this.type.isClass && (this.type == Ea.Types.Any || this.type.isSubclassOf(Ea.Types.Any))) {
-			if (this.referenceType == "id")
-				attributeType = Ea.Class.ReferenceById;
-			else if (this.referenceType == "guid")
-				attributeType = Ea.Class.ReferenceByGuid;
-			else
-				attributeType = Ea.Class.Reference;
+		var attributeType = null;
+		for (var ti = 0; ti < Ea.Class.Attribute.types.length; ti++) {
+			var type = Ea.Class.Attribute.types[ti];
+			var filter = type.unique.filter;
+			if (filter) {
+				if (filter(this)) {
+					attributeType = type;
+					break;
+				}
+			}
 		}
-		else if (this.type == Ea.Collection.Map)
-			attributeType = Ea.Class.CollectionMap;
-		else if (this.type.isClass && (this.type == Ea.Collection._Base || this.type.isSubclassOf(Ea.Collection._Base)))
-			attributeType = Ea.Class.Collection;
-		else if (this.subtype == "Map")
-			attributeType = Ea.Class.Map;
-		else if (this.subtype == "List")
-			attributeType = Ea.Class.List;
-		else
-			attributeType = Ea.Class.Property;
-		
 		this._attribute = new attributeType(this);
 
 		this.owner._addProperty(this);
@@ -190,132 +181,4 @@ Ea.Class.AttributeProxy = define({
 	}
 });
 
-Ea.Class._Attribute = define({
-	
-	_proxy: null,
-	
-	create: function(proxy) {
-		this._proxy = proxy;
-	}
-});
-
-Ea.Class.ApiProperty = extend(Ea.Class._Attribute, {
-	
-	getTyped: function(source, type) {
-		var value = source.getApiValue(this._proxy);
-		return (type.isClass ? new type(value) : value);
-	},
-	
-	get: function(object, params) {
-		var source = object.instanceOf(Ea.Class.Source) ? object : object._source;
-		if (Ea.mm || !source.isInitialized(this._proxy))
-			this._init(source);
-		return this._get(source, params || []);
-	},
-	
-	_get: function(source) {
-		return source.getValue(this._proxy);
-	}
-});
-
-Ea.Class.Property = extend(Ea.Class.ApiProperty, {
-	
-	_init: function(source) {
-		source.setValue(this._proxy, this.getTyped(source, this._proxy.type));
-	}
-});
-
-Ea.Class.List = extend(Ea.Class.Property, {
-	
-	_init: function(source) {
-		var string = this.getTyped(source, String);
-		var value = string ? string.split(this._proxy.separator || ",") : [];
-		var list = {
-			value: value,
-			forEach: function(fn) {
-				for (var i = 0; i < value.length; i++) {
-					fn(value[i], i);
-				}
-			}
-		};
-		source.setValue(this._proxy, list);
-	}
-});
-
-Ea.Class.Map = extend(Ea.Class.Property, {
-	
-	_init: function(source) {
-		var string = this.getTyped(source, String);
-		var mapValue = Ea.Class.Map.stringToMap(string, this._proxy.separator || ";", this._proxy.assigment || "=");
-		var map = {
-			value: mapValue,
-			get: function(key) {
-				return mapValue[key];
-			}
-		};
-		source.setValue(this._proxy, map);
-	}
-},
-{
-	stringToMap: function(string, separator, assigment) {
-		var object = {};
-		if (string) {
-			var tab = string.split(separator);
-			for (var t = 0; t < tab.length; t++) {
-				var value = tab[t];
-				if (value) {
-					value = value.split(assigment);
-					object[value[0]] = value[1];
-				}
-			}
-		}
-		return object;
-	}
-});
-
-Ea.Class.Collection = extend(Ea.Class.ApiProperty, {
-	
-	_get: function(source, params) {
-		return source.getValue(this._proxy).filter(params[0]);
-	},
-	
-	_init: function(source) {
-		source.setValue(this._proxy, Ea.getCollection(this._proxy.type, source.getApiValue(this._proxy), this._proxy));
-	}
-});
-
-Ea.Class.CollectionMap = extend(Ea.Class.Collection);
-
-Ea.Class.Reference = extend(Ea.Class.ApiProperty, {
-	_init: function(source) {
-		var api = source.getApiValue(this._proxy);
-		var proxy = api ? Ea.get(this._proxy.type, api) : null;
-		source.setValue(this._proxy, proxy);
-	}
-});
-
-Ea.Class.ReferenceByPointer = extend(Ea.Class.Property, {
-	
-	_init: function(source) {
-		var reference = this.getTyped(source, this._class.referenceType);
-		source.setValue(this._proxy, (reference ? Ea[this._class.getBy](this._proxy.type, reference) : null));
-	}
-});
-
-Ea.Class.ReferenceById = extend(Ea.Class.ReferenceByPointer, {},
-{
-	getBy: "getById",
-	referenceType: Number
-});
-
-Ea.Class.ReferenceByGuid = extend(Ea.Class.ReferenceByPointer, {},
-{
-	getBy: "getByGuid",
-	referenceType: String
-});
-
-Ea.Class.CustomProperty = extend(Ea.Class._Attribute, {
-	get: function(object, params) {
-		return object[this._proxy.getter].apply(object, params || []);
-	}
-});
+include("Ea.Class.Attribute@Ea");

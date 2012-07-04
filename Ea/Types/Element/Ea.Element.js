@@ -164,6 +164,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 	_author: attribute({api: "Author"}),
 	_created: attribute({api: "Created", type: Core.Types.Date}),
 	_modified: attribute({api: "Modified", type: Core.Types.Date}),
+	_complexity: attribute({api: "Complexity", type: Number}),
 	
 	_elements: attribute({api: "Elements", type: "Ea.Collection._Base", elementType: "Ea.Element._Base"}),
 	_diagrams: attribute({api: "Diagrams", type: "Ea.Collection._Base", elementType: "Ea.Diagram._Base"}),
@@ -180,8 +181,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 	_abstract: attribute({get: "isAbstract", type: Boolean}),
 	_inDiagrams: attribute({get: "findDiagrams", type: "Core.Types.Collection", elementType: "Ea.Diagram._Base"}),
 	_linkedDiagram: attribute({get: "getLinkedDiagram", type: "Ea.Diagram._Base"}),
-	_customReferences: attribute({get: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"}),
-	_complexity: attribute({api: "Complexity", type: Number})
+	_customReferences: attribute({get: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"})
 });
 
 Ea.Element.CustomReference = define({

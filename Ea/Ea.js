@@ -46,7 +46,18 @@ Ea = {
 	},
 
 	initialize: function() {
-		this._prepare(Ea.Types.Any);
+		for (var namespaceName in this._namespaces) {
+			var namespace = this._namespaces[namespaceName];
+			for (var className in namespace._classes) {
+				var _class = namespace._classes[className];
+				for (var name in _class) {
+					var property = _class[name];
+					if (Ea.Class.AttributeProxy.isInstance(property)) {
+						property.prepare(_class, name);
+					}
+				}
+			}
+		}
 		Ea.Application.initializeDefault();
 		
 		var systemTarget = new Ea.Helper.Target("System", true);
@@ -56,18 +67,6 @@ Ea = {
 		Core.Log.registerTarget("warn", systemTarget);
 		Core.Log.registerTarget("debug", systemTarget);
 		Core.Log.registerTarget("info", scriptTarget);
-	},
-	
-	_prepare: function(_class) {
-		for (var name in _class) {
-			var property = _class[name];
-			if (Ea.Class.AttributeProxy.isInstance(property)) {
-				property.prepare(_class, name);
-			}
-		}
-		for (var c = 0; c < _class.subClass.length; c++) {
-			this._prepare(_class.subClass[c]);
-		}
 	},
 	
 	_guid: /^\{[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}\}$/i,
@@ -83,10 +82,13 @@ Ea = {
 	},
 	
 	_objectTypes: {},
+	_namespaces: {},
 	
 	register: function(type, objectType) {
 		var namespace = include(type);
-		this._objectTypes[objectType] = namespace;
+		this._namespaces[namespace.qualifiedName] = namespace;
+		if (objectType)
+			this._objectTypes[objectType] = namespace;
 	},
 	
 	log: function(element) {
@@ -96,8 +98,9 @@ Ea = {
 
 include("Ea.Class@Ea");
 include("Ea.Helper@Ea");
-include("Ea.Types@Ea.Types");
-include("Ea.Application@Ea.Types.Core");
+
+Ea.register("Ea.Types@Ea.Types");
+Ea.register("Ea.Application@Ea.Types.Core");
 Ea.register("Ea.Collection@Ea.Types", 3);
 Ea.register("Ea.Package@Ea.Types", 5);
 Ea.register("Ea.Connector@Ea.Types.Connector", 7);
