@@ -16,6 +16,30 @@
 
 Ea.Parameter = {};
 
-Ea.Parameter._Base = extend(Ea.Types.Named, {}, {
-	api: "Parameter"
+Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
+	getParent: function() {
+		return this._getParent();
+	}
+},
+{
+
+	api: "Parameter",
+
+	_guid: attribute({api: "ParameterGUID", id: "guid"}),
+	
+	_classType: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceBy: "id", private: true}),
+	_primitiveType: attribute({api: "Type", private: true}),
+	_default: attribute({api: "Default"}),
+	_const: attribute({api: "IsConst", type: Boolean}),
+	_kind: attribute({api: "Kind"}),
+	_position: attribute({api: "Position", type: Number}),
+	_style: attribute({api: "Style", type: Ea.DataTypes.Map, private: true}),
+	_styleEx: attribute({api: "StyleEx", type: Ea.DataTypes.Map, private: true}),
+
+	_parent: attribute({api: "OperationID", type: "Ea.Method._Base", referenceBy: "id", private: true}),
+
+	_taggedValues: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.ParameterTag._Base", key: "this.getName()", value: "this", aggregation: "composite"})
+
 });
+
+Ea.register("Ea.ParameterTag@Ea.Types.Element.Feature", 56);

@@ -16,18 +16,20 @@
 
 Ea.Attribute = {};
 
-Ea.Attribute._Base = extend(Ea.Feature, {},
+Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 {
 	api: "Attribute",
 	
-	_id: attribute({api: "AttributeID", type: Number}),
-	_guid: attribute({api: "AttributeGUID"}),
-	_alias: attribute({api: "Style"}),
-	_styleEx: attribute({api: "StyleEx", private: true}),
+	_id: attribute({api: "AttributeID", type: Number, id: "id"}),
+	_guid: attribute({api: "AttributeGUID", id: "guid"}),
+	_alias: attribute({api: "Style"}), // Not mistake, see http://www.sparxsystems.com/uml_tool_guide/sdk_for_enterprise_architect/attribute.htm
+	_styleEx: attribute({api: "StyleEx", type: Ea.DataTypes.Map, private: true}),
+	_taggedValues: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.AttributeTag._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
+	_position: attribute({api: "Pos", type: Number}),
 	
 	getType: function(source) {
-		var owner = this._parent.get(source);
-		if (owner.instanceOf(Ea.Element.Enumeration))
+		var stereotype = this._stereotype.get(source);
+		if (stereotype == "enum")
 			return Ea.Attribute.EnumerationLiteral;
 		return Ea.Attribute.Attribute;
 	}
@@ -35,28 +37,9 @@ Ea.Attribute._Base = extend(Ea.Feature, {},
 
 Ea.Attribute.EnumerationLiteral = extend(Ea.Attribute._Base);
 
-Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {
-
-	_type: null,
-	getType: function() {
-		if (!this._type || Ea.mm) {
-			this._type = this._getClassType();
-			if (!this._type) {
-				var name = this._getPrimitiveType();
-				if (name) {
-					this._type = new Ea.PrimitiveType(name);
-				}
-			}
-		}
-		return this._type;
-	},
-
-	_toString: function() {
-		return this.getName() + " :" + this.getType() + " [" + this._class  + "]";
-	}
-}, 
+Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {}, 
 {
-	_classType: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceType: "id", private: true}),
+	_classType: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceBy: "id", private: true}),
 	_primitiveType: attribute({api: "Type", private: true}),
 	_default: attribute({api: "Default"}),
 	_collection: attribute({api: "IsCollection", type: Boolean}),
@@ -68,3 +51,5 @@ Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {
 	_upper: attribute({api: "UpperBound"}),
 	_visibility: attribute({api: "Visibility"})
 });
+
+Ea.register("Ea.AttributeTag@Ea.Types.Element.Feature", 34);

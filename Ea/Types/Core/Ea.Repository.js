@@ -34,7 +34,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	},
 	
 	cacheInfo: function() {
-		info("stats: {total read: $, cache read by id: $, cache read by guid: $, cache white by id: $, cache write by guid: $}", [this.stats.tr, this.stats.cri, this.stats.crg, this.stats.cwi, this.stats.cwg]);
+		info("cache stats: {total read: $, cache read by id: $, cache read by guid: $, cache white by id: $, cache write by guid: $}", [this.stats.tr, this.stats.cri, this.stats.crg, this.stats.cwi, this.stats.cwg]);
 	},
 	
 	getCollection: function(type, api, params) {
@@ -44,17 +44,18 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	
 	get: function(type, api, params) {
 		this.stats.tr++;
-		if (this.cache[type.namespace.name]) {
-			if (type._id) {
-				var id = api[type._id.api];
+		if (!Ea.mm && this.cache[type.namespace.name]) {
+			var idAttribute, guidAttribute;
+			if (idAttribute = Ea.Class.getIdAttribute(type)) {
+				var id = api[idAttribute.api];
 				var proxy = this.cache[type.namespace.name].id[id];
 				if (proxy) {
 					this.stats.cri++;
 					return proxy;
 				}
 			}
-			else if (type._guid) {
-				var guid = api[type._guid.api];
+			else if (guidAttribute = Ea.Class.getGuidAttribute(type)) {
+				var guid = api[guidAttribute.api];
 				var proxy = this.cache[type.namespace.name].guid[guid];
 				if (proxy) {
 					this.stats.crg++;
@@ -108,22 +109,25 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	},
 
 	_get: function(type, api, params) {
-		//var proxy = type._get(api, params);
 		var proxy = Ea.Class.createProxy(type, api, params);
-		if (type._id || type._guid) {
-			if (!this.cache[type.namespace.name]) {
-				this.cache[type.namespace.name] = {
-					id: {},
-					guid: {}
-				};
-			}
-			if (type._id) {
-				this.cache[type.namespace.name].id[api[type._id.api]] = proxy;
-				this.stats.cwi++;
-			}
-			if (type._guid) {
-				this.cache[type.namespace.name].guid[api[type._guid.api]] = proxy;
-				this.stats.cwg++;
+		if (!Ea.mm) {
+			var idAttribute = Ea.Class.getIdAttribute(type);
+			var guidAttribute = Ea.Class.getGuidAttribute(type);
+			if (idAttribute || guidAttribute) {
+				if (!this.cache[type.namespace.name]) {
+					this.cache[type.namespace.name] = {
+						id: {},
+						guid: {}
+					};
+				}
+				if (idAttribute) {
+					this.cache[type.namespace.name].id[api[idAttribute.api]] = proxy;
+					this.stats.cwi++;
+				}
+				if (guidAttribute) {
+					this.cache[type.namespace.name].guid[api[guidAttribute.api]] = proxy;
+					this.stats.cwg++;
+				}
 			}
 		}
 		return proxy;
@@ -218,5 +222,5 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 }, {
 	api: "Repository",
 	
-	_models: attribute({api: "Models", type: "Ea.Collection._Base", elementType: "Ea.Package._Base"})
+	_models: attribute({api: "Models", type: "Ea.Collection._Base", elementType: "Ea.Package._Base", aggregation: "composite"})
 });

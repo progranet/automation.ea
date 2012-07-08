@@ -122,7 +122,7 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	}
 },
 {
-	_dimension: attribute({type: Object, get: "getDimension"}),
+	_dimension: derived({type: Object, getter: "getDimension"}),
 	
 	api: "Diagram",
 
@@ -135,22 +135,24 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 		return type;
 	},
 	
-	_id: attribute({api: "DiagramID", type: Number}),
-	_guid: attribute({api: "DiagramGUID"}),
+	_id: attribute({api: "DiagramID", type: Number, id: "id"}),
+	_guid: attribute({api: "DiagramGUID", id: "guid"}),
 	_type: attribute({api: "Type"}),
 	_metaType: attribute({api: "MetaType", private: true}),
 	
-	_style: attribute({api: "ExtendedStyle", subtype: "Map"}),
-	_styleEx: attribute({api: "StyleEx", subtype: "Map"}),
-	_elementViews: attribute({api: "DiagramObjects", type: "Ea.Collection._Base", elementType: "Ea.DiagramObject._Base"}),
-	_connectorViews: attribute({api: "DiagramLinks", type: "Ea.Collection._Base", elementType: "Ea.DiagramLink._Base"}),
-	_parent: attribute({api: "ParentID", type: "Ea.Element._Base", referenceType: "id", private: true}),
-	_package: attribute({api: "PackageID", type: "Ea.Package._Base", referenceType: "id", private: true}),
-	_swimlaneDef: attribute({api: "SwimlaneDef", type: "Ea.SwimlaneDef._Base"}),
+	_style: attribute({api: "ExtendedStyle", type: Ea.DataTypes.Map}),
+	_styleEx: attribute({api: "StyleEx", type: Ea.DataTypes.Map}),
+	_elementViews: attribute({api: "DiagramObjects", type: "Ea.Collection._Base", elementType: "Ea.DiagramObject._Base", aggregation: "composite"}),
+	_connectorViews: attribute({api: "DiagramLinks", type: "Ea.Collection._Base", elementType: "Ea.DiagramLink._Base", aggregation: "composite"}),
+	_parent: attribute({api: "ParentID", type: "Ea.Element._Base", referenceBy: "id", private: true}),
+	_package: attribute({api: "PackageID", type: "Ea.Package._Base", referenceBy: "id", private: true}),
+	_swimlaneDef: attribute({api: "SwimlaneDef", type: "Ea.SwimlaneDef._Base", aggregation: "composite"}),
 
 	_author: attribute({api: "Author"}),
-	_created: attribute({api: "CreatedDate", type: Core.Types.Date}),
-	_modified: attribute({api: "ModifiedDate", type: Core.Types.Date})
+	_created: attribute({api: "CreatedDate", type: Ea.DataTypes.Date}),
+	_modified: attribute({api: "ModifiedDate", type: Ea.DataTypes.Date}),
+	
+	_dimension: derived({getter: "getDimension", type: Object})
 });
 
 Ea.Diagram.Activity = extend(Ea.Diagram._Base);
@@ -187,7 +189,7 @@ Ea.View = extend(Ea.Types.Any, {
 	}
 },
 {
-	_diagram: attribute({api: "DiagramID", type: "Ea.Diagram._Base", referenceType: "id"})
+	_diagram: attribute({api: "DiagramID", type: "Ea.Diagram._Base", referenceBy: "id"})
 });
 
 Ea.register("Ea.DiagramLink@Ea.Types.Diagram", 20);

@@ -25,7 +25,7 @@ Ea.ScenarioExtension._Base = extend(Ea.Types.Any, {
 {
 	api: "ScenarioExtension",
 	
-	_guid: attribute({api: "ExtensionGUID"}),
+	_guid: attribute({api: "ExtensionGUID", id: "guid"}),
 	_pos: attribute({api: "Pos"}),
 	_level: attribute({api: "Level"}),
 	_joiningStep: attribute({api: "JoiningStep", type: "Ea.ScenarioStep._Base"}),

@@ -42,13 +42,13 @@ Ea.Helper = {
 		return indent;
 	},
 
-	_expand: function(template, params, value, indent, _private) {
+	_expand: function(template, params, value, indent, aggregation) {
 		if (Ea.Types.Any.isInstance(value) && !value.instanceOf(Ea.Types.Namespace)) {
-			if (!_private) {
+			if (aggregation == "composite" || aggregation == "shared") {
 				this._inspect(value, indent + 1, template + " = {", params);
 				return;
 			}
-			template = template + " = {#PRIVATE#}";
+			template = template + " = {...}";
 		}
 		params.push(value);
 		info(this._indent(indent + 1) + template, params);
@@ -57,7 +57,7 @@ Ea.Helper = {
 	_inspect: function(object, indent, template, params) {
 		
 		var type = object._class;
-		var properties = type.getProperties();
+		var attributes = Ea.Class.getAttributes(type);
 		
 		params.push(object);
 		info(this._indent(indent) + template, params);
@@ -67,21 +67,23 @@ Ea.Helper = {
 		}
 		else {
 			this._ids[object.__id__] = object;
-			for (var name in properties) {
+			for (var ai = 0; ai < attributes.length; ai++) {
 				
-				var property = properties[name];
+				var property = attributes[ai];
+			
 				var value = property.get(object);
 				
 				var params = {
 					name: property.name.replace(/^_+/, ""),
 					_private: property.private,
+					aggregation: property.aggregation,
 					type: property.type,
 					isCollection: value && property.type.isClass && value.instanceOf(Core.Types.Collection)
 				};
 				params.elementType = params.isCollection ? property.elementType : null;
 				params.typeName = params.isCollection ? Core.Output.getString(params.type) + "<" + Core.Output.getString(params.elementType) + ">" : Core.Output.getString(params.type);
-				params.template = (params._private ? "– " : "+ ") + params.name + " [" + params.typeName + "]";
-				
+				params.template = (params._private ? "– " : "+ ") + (property.derived ? "/" : "") + params.name + " [" + params.typeName + "]";
+
 				if (params.isCollection) {
 					if (value.instanceOf(Core.Types.Map)) {
 						if (value.size == 0) {
@@ -90,7 +92,7 @@ Ea.Helper = {
 						else {
 							info(this._indent(indent + 1) + "$ = {", [params.template]);
 							value.forEach(function(value, key) {
-								this._expand("$ = $", [key], value, indent + 1, params._private);
+								this._expand("$ = $", [key], value, indent + 1, params.aggregation);
 							});
 							info(this._indent(indent + 1) + "}");
 						}
@@ -102,14 +104,14 @@ Ea.Helper = {
 						else {
 							info(this._indent(indent + 1) + "$ = [", [params.template]);
 							value.forEach(function(value, index) {
-								this._expand("$", [], value, indent + 1, params._private);
+								this._expand("$", [], value, indent + 1, params.aggregation);
 							});
 							info(this._indent(indent + 1) + "]");
 						}
 					}
 				}
 				else {
-					this._expand("$ = $", [params.template], value, indent, params._private);
+					this._expand("$ = $", [params.template], value, indent, params.aggregation);
 				}
 				
 			}
@@ -131,140 +133,6 @@ Ea.Helper.Target = extend(Core.Target.AbstractTarget, {
 	
 	write: function(message) {
 		Ea.Application.getRepository().writeOutput(this._name, message);
-	}
-});
-
-Ea.Helper.Relationship = define({
-	
-	_connector: null,
-	_relation: null,
-	_isClient: null,
-
-	_guard: null,
-	_role: null,
-
-	_to: null,
-	_toEnd: null,
-	_toAttribute: null,
-	_toMethod: null,
-	
-	_from: null,
-	_fromEnd: null,
-	_fromAttribute: null,
-	_fromMethod: null,
-	
-	_opposite: null,
-	
-	create: function(params) {
-		
-		_super.create(params);
-		
-		this._connector = params.connector;
-		this._relation = this._connector.getRelation(!this._isClient);
-		this._isClient = params.isClient;
-		
-		this._guard = this._connector.getGuard();
-
-		this._to = params.to;
-		this._toEnd = params.toEnd;
-		this._toAttribute = !this._isClient ? this._connector.getSupplierAttribute() : this._connector.getClientAttribute();
-		this._toMethod = !this._isClient ? this._connector.getSupplierMethod() : this._connector.getClientMethod();
-		
-		this._role = this._toEnd.getRole();
-
-		this._from = params.from;
-		this._fromEnd = params.fromEnd;
-		this._fromAttribute = this._isClient ? this._connector.getSupplierAttribute() : this._connector.getClientAttribute();
-		this._fromMethod = this._isClient ? this._connector.getSupplierMethod() : this._connector.getClientMethod();
-		
-		this._opposite = params.opposite || new Ea.Helper.Relationship({
-			from: params.to, 
-			fromEnd: params.toEnd,
-			connector: params.connector, 
-			isClient: !params.isClient, 
-			to: params.from, 
-			toEnd: params.fromEnd,
-			opposite: this
-		});
-	},
-	
-	getFrom: function() {
-		return this._from;
-	},
-	
-	getFromEnd: function() {
-		return this._fromEnd;
-	},
-	
-	getFromAttribute: function() {
-		return this._fromAttribute;
-	},
-	
-	getFromMethod: function() {
-		return this._fromMethod;
-	},
-	
-	getName: function() {
-		if (this._role)
-			return this._role;
-		var name = this._to.getName();
-		return name.substr(0, 1).toLowerCase() + name.substr(1);
-	},
-	
-	getTo: function() {
-		return this._to;
-	},
-	
-	getToEnd: function() {
-		return this._toEnd;
-	},
-	
-	getToAttribute: function() {
-		return this._toAttribute;
-	},
-	
-	getToMethod: function() {
-		return this._toMethod;
-	},
-	
-	getRelation: function() {
-		return this._relation;
-	},
-	
-	getConnector: function() {
-		return this._connector;
-	},
-	
-	isAggregation: function() {
-		return this._fromEnd.getAggregation() != 0;
-	},
-	
-	getAggregation: function() {
-		return this._fromEnd.getAggregation();
-	},
-	
-	getMultiplicity: function() {
-		return this._toEnd.getCardinality();
-	},
-	
-	isNavigable: function() {
-		return this._toEnd.getNavigable() != "Non-Navigable";
-	},
-	
-	getNavigability: function() {
-		return this._toEnd.getNavigable();
-	},
-	
-	getOpposite: function() {
-		return this._opposite;
-	},
-	
-	isClient: function() {
-		return this._isClient;
-	},
-	
-	getGuard: function() {
-		return this._guard;
 	}
 });
 

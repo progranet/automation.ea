@@ -14,11 +14,9 @@
    limitations under the License.
 */
 
-Ea.Swimlane = {};
+Ea.MethodTag = {};
 
-Ea.Swimlane._Base = extend(Ea.Types.Any, {}, {
-	api: "Swimlane",
-	_width: attribute({api: "Width", type: Number}),
-	_title: attribute({api: "Title"}),
-	_classifier: attribute({api: "ClassifierGuid", referenceBy: "guid"})	
+Ea.MethodTag._Base = extend(Ea.Tag._Feature, {},
+{
+	api: "MethodTag"
 });

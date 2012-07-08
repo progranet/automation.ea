@@ -31,12 +31,12 @@ Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 {
 	api: "ScenarioStep",
 	
-	__guid: attribute({api: "StepGUID"}),
+	_guid: attribute({api: "StepGUID"}),
 	_pos: attribute({api: "Pos"}),
 	_level: attribute({api: "Level"}),
 	_extensions: attribute({api: "Extensions", type: "Ea.Collection._Base", elementType: "Ea.ScenarioExtension._Base", key: "this.getLevel()", private: true}),
 	_stepType: attribute({api: "StepType", private: true}),
-	_link: attribute({api: "Link", type: "Ea.Element.UseCase", referenceType: "guid"}),
+	_link: attribute({api: "Link", type: "Ea.Element.UseCase", referenceBy: "guid"}),
 	_uses: attribute({api: "Uses"}),
 	_results: attribute({api: "Results"})
 });

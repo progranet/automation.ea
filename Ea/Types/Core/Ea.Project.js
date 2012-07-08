@@ -32,6 +32,7 @@ Ea.Project._Base = extend(Ea.Types.Any, {
 		this._source.getApi().LoadProject(path);
 	}
 	
-}, {
+},
+{
 	api: "Project"
 });

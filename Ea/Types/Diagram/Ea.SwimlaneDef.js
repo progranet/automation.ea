@@ -18,5 +18,5 @@ Ea.SwimlaneDef = {};
 
 Ea.SwimlaneDef._Base = extend(Ea.Types.Any, {}, {
 	api: "SwimlaneDef",
-	_swimlanes: attribute({api: "Swimlanes", type: "Ea.Collection._Base", elementType: "Ea.Swimlane._Base"})
+	_swimlanes: attribute({api: "Swimlanes", type: "Ea.Collection._Base", elementType: "Ea.Swimlane._Base", aggregation: "composite"})
 });

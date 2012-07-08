@@ -80,5 +80,13 @@ Core = {
 			source = callback(qualifiedName, source);
 		}
 		return source;
+	},
+	
+	merge: function(toObject, object) {
+		for (var name in object) {
+			if (name in toObject)
+				throw new Error("Merge target object " + toObject + " already has property: " + name);
+			toObject[name] = object[name];
+		}
 	}
 };

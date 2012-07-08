@@ -39,14 +39,8 @@ Ea.Types.Any = define({
 	}
 }, 
 {
-	__parent: attribute({get: "getParent", type: "Ea.Types.Namespace"}),
-	
 	getType: function() {
 		return this.namespace._Base;
-	},
-	
-	_get: function(api, params) {
-		return Ea.Class.createProxy(this, api, params);
 	},
 	
 	init: function() {
@@ -54,28 +48,10 @@ Ea.Types.Any = define({
 	},
 	
 	initialize: function() {
-		this._properties = {};
+		Ea.Class.registerClass(this);
 	},
 	
-	_addProperty: function(property) {
-		this._properties[property.name] = property;
-	},
-
-	getOwnedAttributes: function() {
-		return this._properties;
-	},
-	
-	getProperties: function() {
-		var properties = {};
-		if (this._super.getProperties) {
-			var superProperties = this._super.getProperties();
-			for (var name in superProperties)
-				properties[name] = superProperties[name];
-		}
-		for (var name in this._properties)
-			properties[name] = this._properties[name];
-		return properties;
-	}
+	__parent: derived({getter: "getParent", type: "Ea.Types.Namespace"})
 });
 
 Ea.Types.Named = extend(Ea.Types.Any, {
@@ -122,7 +98,7 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 	getQualifiedName: function() {
 		if (!this._qualifedName || Ea.mm) {
 			var parent = this.getParent();
-			this._qualifedName = (parent ? parent.getQualifiedName() + " / " : "") + this.getName();
+			this._qualifedName = (parent ? parent.getQualifiedName() + "." : "") + this.getName();
 		}
 		return this._qualifedName;
 	}
@@ -133,7 +109,7 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 	_alias: attribute({api: "Alias"}),
 	_notes: attribute({api: "Notes"}),
 	_stereotype: attribute({api: "Stereotype"}),
-	_qualifiedName: attribute({get: "getQualifiedName"})
+	_qualifiedName: derived({getter: "getQualifiedName"})
 });
 
 Ea.Types.Namespace = extend(Ea.Types.Named);

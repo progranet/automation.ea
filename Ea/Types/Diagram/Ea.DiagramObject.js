@@ -51,13 +51,15 @@ Ea.DiagramObject._Base = extend(Ea.View, {
 {
 	api: "DiagramObject",
 	
-	_id: attribute({api: "InstanceID", type: Number}),
-
-	//_diagram: attribute({api: "DiagramID", type: "Ea.Diagram._Base", referenceType: "id"}),
-	_element: attribute({api: "ElementID", type: "Ea.Element._Base", referenceType: "id"}),
+	_id: attribute({api: "InstanceID", type: Number, id: "id"}),
+	_element: attribute({api: "ElementID", type: "Ea.Element._Base", referenceBy: "id"}),
 	_left: attribute({api: "Left", type: Number}),
 	_top: attribute({api: "Top", type: Number}),
 	_right: attribute({api: "Right", type: Number}),
-	_bottom: attribute({api: "Bottom", type: Number})
+	_bottom: attribute({api: "Bottom", type: Number}),
+	_style: attribute({api: "Style", type: "Ea.DataTypes.Map"}),
+	_sequence: attribute({api: "Sequence", type: Number}),
+	
+	_dimension: derived({getter: "getDimension", type: Object})
 });
 

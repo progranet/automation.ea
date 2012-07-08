@@ -14,11 +14,14 @@
    limitations under the License.
 */
 
-Ea.Swimlane = {};
+Ea.ParameterTag = {};
 
-Ea.Swimlane._Base = extend(Ea.Types.Any, {}, {
-	api: "Swimlane",
-	_width: attribute({api: "Width", type: Number}),
-	_title: attribute({api: "Title"}),
-	_classifier: attribute({api: "ClassifierGuid", referenceBy: "guid"})	
+Ea.ParameterTag._Base = extend(Ea.Types.Any, {},
+{
+	api: "ParameterTag",
+	_guid: attribute({api: "PropertyGUID", id: "guid"}),
+	_name: attribute({api: "Tag"}),
+	_fullyQualifiedName: attribute({api: "FQName"}),
+	_value: attribute({api: "Value"})
+	
 });

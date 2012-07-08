@@ -14,11 +14,15 @@
    limitations under the License.
 */
 
-Ea.Swimlane = {};
+Ea.Tag = {};
 
-Ea.Swimlane._Base = extend(Ea.Types.Any, {}, {
-	api: "Swimlane",
-	_width: attribute({api: "Width", type: Number}),
-	_title: attribute({api: "Title"}),
-	_classifier: attribute({api: "ClassifierGuid", referenceBy: "guid"})	
+Ea.Tag._Base = extend(Ea.Types.Named, {},
+{
+	_value: attribute({api: "Value"})
+});
+
+Ea.Tag._Feature = extend(Ea.Tag._Base, {},
+{
+	_id: attribute({api: "TagID", type: Number, id: "id"}),
+	_guid: attribute({api: "TagGUID", id: "guid"})
 });

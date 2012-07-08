@@ -18,6 +18,8 @@ Ea.DiagramLink = {};
 
 Ea.DiagramLink._Base = extend(Ea.View, {
 
+	_dimension: null,
+	
 	getDimension: function() {
 		if (!this._dimension || Ea.mm) {
 			var coords = this._getPath();
@@ -44,9 +46,12 @@ Ea.DiagramLink._Base = extend(Ea.View, {
 {
 	api: "DiagramLink",
 	
-	_id: attribute({api: "InstanceID", type: Number}),
+	_id: attribute({api: "InstanceID", type: Number, id: "id"}),
+	_connector: attribute({api: "ConnectorID", type: "Ea.Connector._Base", referenceBy: "id"}),
+	_path: attribute({api: "Path", private: true}),
+	_hidden: attribute({api: "IsHidden", type: Boolean}),
+	_geometry: attribute({api: "Geometry", type: "Ea.DataTypes.Map"}),
+	_style: attribute({api: "Style", type: "Ea.DataTypes.Map"}),
 
-	//_diagram: attribute({api: "DiagramID", type: "Ea.Diagram._Base", referenceType: "id"}),
-	_connector: attribute({api: "ConnectorID", type: "Ea.Connector._Base", referenceType: "id"}),
-	_path: attribute({api: "Path", private: true})
+	_dimension: derived({getter: "getDimension", type: Object})
 });

@@ -42,7 +42,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 				var secondEnd = client ? connector.getSupplier() : connector.getClient();
 				var secondConnectorEnd = client ? connector.getSupplierEnd() : connector.getClientEnd();
 				if (secondEnd) { // EA integrity problem (Connector.Supplier == null) workaround
-					this._relationships.add(new Ea.Helper.Relationship({
+					this._relationships.add(new Ea.Connector.Relationship({
 						from: this,
 						fromEnd: thisConnectorEnd,
 						connector: connector,
@@ -144,44 +144,45 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 		return type;
 	},
 	
-	_id: attribute({api: "ElementID", type: Number}),
-	_guid: attribute({api: "ElementGUID"}),
+	_id: attribute({api: "ElementID", type: Number, id: "id"}),
+	_guid: attribute({api: "ElementGUID", id: "guid"}),
 	
 	_type: attribute({api: "Type", private: true}),
 	_subtype: attribute({api: "Subtype", type: Number, private: true}),
 	_metatype: attribute({api: "MetaType", private: true}),
 	
 	__abstract: attribute({api: "Abstract", private: true}),
-	_taggedValues: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.TaggedValue._Base", key: "this.getName()", value: "this.getValue()"}),
-	_customProperties: attribute({api: "CustomProperties", type: "Ea.Collection.Map", elementType: "Ea.CustomProperty._Base", key: "this.getName()", value: "this.getValue()"}),
-	_specializedProperties: attribute({api: "Properties", type: "Ea.Properties._Base", elementType: "Ea.Property._Base"}),
-	_constraints: attribute({api: "Constraints", type: "Ea.Collection._Base", elementType: "Ea.Constraint._Base"}),
+	_taggedValues: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.TaggedValue._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
+	_customProperties: attribute({api: "CustomProperties", type: "Ea.Collection.Map", elementType: "Ea.CustomProperty._Base", key: "this.getName()", value: "this.getValue()", aggregation: "composite"}),
+	_specializedProperties: attribute({api: "Properties", type: "Ea.Properties._Base", elementType: "Ea.Property._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
+	_constraints: attribute({api: "Constraints", type: "Ea.Collection._Base", elementType: "Ea.Constraint._Base", aggregation: "composite"}),
 	
 	_status: attribute({api: "Status"}),
 	_keywords: attribute({api: "Tag"}),
 	_phase: attribute({api: "Phase"}),
 	_version: attribute({api: "Version"}),
 	_author: attribute({api: "Author"}),
-	_created: attribute({api: "Created", type: Core.Types.Date}),
-	_modified: attribute({api: "Modified", type: Core.Types.Date}),
+	_created: attribute({api: "Created", type: Ea.DataTypes.Date}),
+	_modified: attribute({api: "Modified", type: Ea.DataTypes.Date}),
 	_complexity: attribute({api: "Complexity", type: Number}),
 	
-	_elements: attribute({api: "Elements", type: "Ea.Collection._Base", elementType: "Ea.Element._Base"}),
-	_diagrams: attribute({api: "Diagrams", type: "Ea.Collection._Base", elementType: "Ea.Diagram._Base"}),
-	_stereotypes: attribute({api: "StereotypeEx", subtype: "List"}), // TODO
-	_connectors: attribute({api: "Connectors", type: "Ea.Collection._Base", elementType: "Ea.Connector._Base"}),
-	_files: attribute({api: "Files", type: "Ea.Collection._Base", elementType: "Ea.File._Base"}),
-	_parent: attribute({api: "ParentID", type: "Ea.Element._Base", referenceType: "id", private: true}),
-	_package: attribute({api: "PackageID", type: "Ea.Package._Base", referenceType: "id", private: true}),
+	_elements: attribute({api: "Elements", type: "Ea.Collection._Base", elementType: "Ea.Element._Base", aggregation: "composite"}),
+	_diagrams: attribute({api: "Diagrams", type: "Ea.Collection._Base", elementType: "Ea.Diagram._Base", aggregation: "composite"}),
+	//_stereotypes: attribute({api: "StereotypeEx", subtype: "List"}), // TODO
+	_stereotypes: attribute({api: "StereotypeEx", type: Ea.DataTypes.List}),
+	_connectors: attribute({api: "Connectors", type: "Ea.Collection._Base", elementType: "Ea.Connector._Base", aggregation: "shared"}),
+	_files: attribute({api: "Files", type: "Ea.Collection._Base", elementType: "Ea.File._Base", aggregation: "composite"}),
+	_parent: attribute({api: "ParentID", type: "Ea.Element._Base", referenceBy: "id", private: true}),
+	_package: attribute({api: "PackageID", type: "Ea.Package._Base", referenceBy: "id", private: true}),
 	_miscData0: attribute({api: "MiscData", private: true, index: 0}),
 	_miscData1: attribute({api: "MiscData", private: true, index: 1}),
 	_miscData2: attribute({api: "MiscData", private: true, index: 2}),
 	_miscData3: attribute({api: "MiscData", private: true, index: 3}),
 	
-	_abstract: attribute({get: "isAbstract", type: Boolean}),
-	_inDiagrams: attribute({get: "findDiagrams", type: "Core.Types.Collection", elementType: "Ea.Diagram._Base"}),
-	_linkedDiagram: attribute({get: "getLinkedDiagram", type: "Ea.Diagram._Base"}),
-	_customReferences: attribute({get: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"})
+	_abstract: derived({getter: "isAbstract", type: Boolean}),
+	_inDiagrams: derived({getter: "findDiagrams", type: "Core.Types.Collection", elementType: "Ea.Diagram._Base"}),
+	_linkedDiagram: derived({getter: "getLinkedDiagram", type: "Ea.Diagram._Base"}),
+	_customReferences: derived({getter: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"})
 });
 
 Ea.Element.CustomReference = define({
@@ -259,10 +260,10 @@ Ea.Element.Object = extend(Ea.Element._Base, {
 	}
 },
 {
-	_metaClass: attribute({api: "ClassifierID", type: "Ea.Element.Classifier", referenceType: "id"}),
+	_metaClass: attribute({api: "ClassifierID", type: "Ea.Element.Classifier", referenceBy: "id"}),
 	_runState: attribute({api: "RunState", private: true}),
 	
-	__runState: attribute({get: "getRunState", type: Object})
+	__runState: derived({getter: "getRunState", type: Object})
 });
 
 Ea.Element.Package = extend(Ea.Element._Base, {
@@ -271,22 +272,22 @@ Ea.Element.Package = extend(Ea.Element._Base, {
 	}
 },
 {
-	_package: attribute({get: "getPackage", type: "Ea.Package._Base"})
+	_package: derived({getter: "getPackage", type: "Ea.Package._Base"})
 });
 
 Ea.Element.Type = extend(Ea.Element._Base);
 	
 Ea.Element.Classifier = extend(Ea.Element.Type, {},
 {
-	_attributes: attribute({api: "Attributes", type: "Ea.Collection._Base", elementType: "Ea.Attribute.Attribute", filter: "this.getStereotype() != 'enum'"}),
-	_operations: attribute({api: "Methods", type: "Ea.Collection._Base", elementType: "Ea.Method._Base"})
+	_attributes: attribute({api: "Attributes", type: "Ea.Collection._Base", elementType: "Ea.Attribute.Attribute", filter: "this.getStereotype() != 'enum'", aggregation: "composite"}),
+	_operations: attribute({api: "Methods", type: "Ea.Collection._Base", elementType: "Ea.Method._Base", aggregation: "composite"})
 });
 
 Ea.Element.DataType = extend(Ea.Element.Classifier);
 
 Ea.Element.Enumeration = extend(Ea.Element.DataType, {},
 {
-	_literals: attribute({api: "Attributes", type: "Ea.Collection._Base", elementType: "Ea.Attribute.EnumerationLiteral", filter: "this.getStereotype() == 'enum'"})
+	_literals: attribute({api: "Attributes", type: "Ea.Collection._Base", elementType: "Ea.Attribute.EnumerationLiteral", filter: "this.getStereotype() == 'enum'", aggregation: "composite"})
 });
 
 Ea.Element.PrimitiveType = extend(Ea.Element.DataType);
@@ -301,7 +302,7 @@ Ea.Element.AssociationClass = extend(Ea.Element.Class, {
 	}
 },
 {
-	__association: attribute({get: "getAssociation", type: "Ea.Connector._Base"})
+	__association: derived({getter: "getAssociation", type: "Ea.Connector._Base"})
 });
 
 Ea.Element.Interface = extend(Ea.Element.Classifier);
@@ -329,9 +330,9 @@ Ea.Element._BehavioralElement = extend(Ea.Element._Base, {
 	}
 },
 {
-	_scenarios: attribute({api: "Scenarios", type: "Ea.Collection._Base", elementType: "Ea.Scenario._Base"}),
-	_basicScenario: attribute({type: "Ea.Scenario.BasicPath", get: "getBasicScenario"}),
-	_scenarioExtensions: attribute({type: "Core.Types.Collection", elementType: "Ea.ScenarioExtension._Base", get: "getScenarioExtensions"})
+	_scenarios: attribute({api: "Scenarios", type: "Ea.Collection._Base", elementType: "Ea.Scenario._Base", aggregation: "composite"}),
+	_basicScenario: derived({type: "Ea.Scenario.BasicPath", getter: "getBasicScenario"}),
+	_scenarioExtensions: derived({type: "Core.Types.Collection", elementType: "Ea.ScenarioExtension._Base", getter: "getScenarioExtensions"})
 });
 
 Ea.Element.Pseudostate = extend(Ea.Element._BehavioralElement);
@@ -453,7 +454,7 @@ Ea.Element._CallAction = extend(Ea.Element.Action, {
 	}
 },
 {
-	_classifier: attribute({api: "ClassifierID", type: "Ea.Element.Classifier", referenceType: "id"})
+	_classifier: attribute({api: "ClassifierID", type: "Ea.Element.Classifier", referenceBy: "id"})
 });
 
 Ea.Element.CallBehaviorAction = extend(Ea.Element._CallAction);
@@ -468,15 +469,7 @@ Ea.Element.UseCase = extend(Ea.Element._BehavioralElement, {
 	}	
 });
 
-Ea.Feature = extend(Ea.Types.Named, {
-	getParent: function() {
-		return this._getParent();
-	}
-},
-{
-	_parent: attribute({api: "ParentID", type: "Ea.Element.Type", referenceType: "id", private: true})
-});
-Ea.PrimitiveType = extend(Core.Types.Named, {});
+include("Ea.TypedElement@Ea.Types.Common");
 
 Ea.register("Ea.Attribute@Ea.Types.Element.Feature", 23);
 Ea.register("Ea.Method@Ea.Types.Element.Feature", 24);

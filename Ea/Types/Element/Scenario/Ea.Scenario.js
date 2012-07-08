@@ -31,8 +31,8 @@ Ea.Scenario._Base = extend(Ea.Types.Named, {},
 
 	_type: attribute({api: "Type"}),
 
-	_guid: attribute({api: "ScenarioGUID"}),
-	_steps: attribute({api: "Steps", type: "Ea.Collection._Base", elementType: "Ea.ScenarioStep._Base", key: "this.getPos()"})
+	_guid: attribute({api: "ScenarioGUID", id: "guid"}),
+	_steps: attribute({api: "Steps", type: "Ea.Collection._Base", elementType: "Ea.ScenarioStep._Base", key: "this.getPos()", aggregation: "composite"})
 	
 });
 

@@ -859,6 +859,7 @@ Report = {
 		
 		this.write(file, Html.templates.htmlFoot);
 		this.close(file);
+		Ea.Application.getRepository().cacheInfo();
 	},
 	
 	processUseCase: function(useCase, depth, file) {

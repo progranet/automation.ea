@@ -16,7 +16,7 @@
 
 Ea.Properties = {};
 
-Ea.Properties._Base = extend(Ea.Collection._Base, {
+Ea.Properties._Base = extend(Ea.Collection.Map, {
 	_init: function(api, params) {
 		for (var e = 0; e < api.Count; e++) {
 			var element = Ea.get(params.elementType, api.Item(e));

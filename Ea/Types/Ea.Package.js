@@ -28,19 +28,19 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {},
 		return type;
 	},
 	
-	_id: attribute({api: "PackageID", type: Number}),
-	_guid: attribute({api: "PackageGUID"}),
+	_id: attribute({api: "PackageID", type: Number, id: "id"}),
+	_guid: attribute({api: "PackageGUID", id: "guid"}),
 	_model: attribute({api: "isModel", private: true, type: Boolean}),
 	
 	_version: attribute({api: "Version"}),
-	_created: attribute({api: "Created", type: Core.Types.Date}),
-	_modified: attribute({api: "Modified", type: Core.Types.Date}),
+	_created: attribute({api: "Created", type: Ea.DataTypes.Date}),
+	_modified: attribute({api: "Modified", type: Ea.DataTypes.Date}),
 
 	_element: attribute({api: "Element", type: "Ea.Element._Base"}),
-	_parent: attribute({api: "ParentID", type: "Ea.Package._Base", referenceType: "id"}),
-	_elements: attribute({api: "Elements", type: "Ea.Collection._Base", elementType: "Ea.Element._Base", filter: "this._getParent() == null"}),
-	_diagrams: attribute({api: "Diagrams", type: "Ea.Collection._Base", elementType: "Ea.Diagram._Base", filter: "this._getParent() == null"}),
-	_packages: attribute({api: "Packages", type: "Ea.Collection._Base", elementType: "Ea.Package._Base"})
+	_parent: attribute({api: "ParentID", type: "Ea.Package._Base", referenceBy: "id"}),
+	_elements: attribute({api: "Elements", type: "Ea.Collection._Base", elementType: "Ea.Element._Base", filter: "this._getParent() == null", aggregation: "composite"}),
+	_diagrams: attribute({api: "Diagrams", type: "Ea.Collection._Base", elementType: "Ea.Diagram._Base", filter: "this._getParent() == null", aggregation: "composite"}),
+	_packages: attribute({api: "Packages", type: "Ea.Collection._Base", elementType: "Ea.Package._Base", aggregation: "composite"})
 });
 
 Ea.Package.Package = extend(Ea.Package._Base);

@@ -230,74 +230,32 @@ Core.Types.Map = extend(Core.Types.Collection, {
 
 Core.Types.Filter = define({
 	_filter: null,
-	create: function(filter) {
-		if (filter) {
-			this._filter = filter instanceof Array ? filter : [filter];
+	create: function(filters) {
+		_super.create();
+		if (filters)
+			filters = filters instanceof Array ? filters : [filters];
+		else
+			filters = [];
+		for (var f = 0; f < filters.length; f++) {
+			var filter = filters[f];
+			if (filter.isClass)
+				filter = "this.instanceOf(" + filter.qualifiedName + ")";
+			if (typeof(filter) == "string") {
+				filter = new Function("return " + filter);
+			}
+			if (typeof(filter) != "function")
+				throw new Error("Unknown filter type: " + filter);
+			filters[f] = filter;
 		}
+		this._filter = filters;
 	},
+	
 	check: function(object) {
-		if (!this._filter) return true;
 		for (var f = 0; f < this._filter.length; f++) {
 			var filter = this._filter[f];
-			if (typeof filter  == "function" || typeof filter == "string") {
-				filter = {$fn: filter.isClass ? "this.instanceOf(" + filter.qualifiedName + ")" : filter};
-			}
-			var match = true;
-			for (var a in filter) {
-				var $and = filter[a];
-				$and = $and instanceof Array ? $and : [$and];
-				var m = false;
-				for (var p = 0; p < $and.length; p++) {
-					var $or = $and[p];
-					if (a == "$fn") {
-						if (typeof $or == "string")
-							$or = new Function("return " + $or);
-						if ($or.call(object)) {
-							m = true;
-							break;
-						}
-					}
-					else {
-						if (eval("object." + a + " == $or")) {
-							m = true;
-							break;
-						}
-					}
-				}
-				if (!m) {
-					match = false;
-					break;
-				}
-			}
-			if (match) {
-				return true;
-			}
+			if (!filter.call(object))
+				return false;
 		}
-		return false;
+		return true;
 	}
-});
-
-Core.Types.Date = define({
-	date: null,
-	create: function(value) {
-		if (typeof value == "string") {
-			var d = Core.Types.Date.re.exec(string);
-			this.date = new Date(d[1], new Number(d[2]) - 1, d[3], d[5], d[6], d[7]);
-		}
-		else {
-			this.date = new Date(value);
-		}
-	},
-	valueOf: function() {
-		return this.date.valueOf();
-	},
-	_toString: function() {
-		var s = "";
-		s = s + this.date.getFullYear() + "-";
-		s = s + new String(this.date.getMonth() + 1).lpad("0", 2) + "-";
-		s = s + new String(this.date.getDate()).lpad("0", 2);
-		return s;
-	}
-}, {
-	re: new RegExp("").compile(new RegExp("^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)( (\\d\\d):(\\d\\d):(\\d\\d))?$"))
 });

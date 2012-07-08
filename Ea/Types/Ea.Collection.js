@@ -31,8 +31,11 @@ Ea.Collection._Base = extend(Core.Types.Collection, {
 {
 	getType: function() {
 		return Ea.Collection._Base;
-	}
+	},
 	
+	processValue: function(value, params) {
+		return value.filter(params[0]);
+	}
 });
 
 Ea.Collection.Map = extend(Core.Types.Map, {
@@ -50,5 +53,9 @@ Ea.Collection.Map = extend(Core.Types.Map, {
 {
 	getType: function() {
 		return Ea.Collection.Map;
+	},
+	
+	processValue: function(value, params) {
+		return value.filter(params[0]);
 	}
 });

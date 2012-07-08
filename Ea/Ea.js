@@ -46,18 +46,9 @@ Ea = {
 	},
 
 	initialize: function() {
-		for (var namespaceName in this._namespaces) {
-			var namespace = this._namespaces[namespaceName];
-			for (var className in namespace._classes) {
-				var _class = namespace._classes[className];
-				for (var name in _class) {
-					var property = _class[name];
-					if (Ea.Class.AttributeProxy.isInstance(property)) {
-						property.prepare(_class, name);
-					}
-				}
-			}
-		}
+		
+		Ea.Class.prepareClasses();
+		
 		Ea.Application.initializeDefault();
 		
 		var systemTarget = new Ea.Helper.Target("System", true);
@@ -103,6 +94,9 @@ Ea.register("Ea.Types@Ea.Types");
 Ea.register("Ea.Application@Ea.Types.Core");
 Ea.register("Ea.Collection@Ea.Types", 3);
 Ea.register("Ea.Package@Ea.Types", 5);
+
+include("Ea.Tag@Ea.Types.Common");
+
 Ea.register("Ea.Connector@Ea.Types.Connector", 7);
 Ea.register("Ea.Diagram@Ea.Types.Diagram", 8);
 Ea.register("Ea.Element@Ea.Types.Element", 4);

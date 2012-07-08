@@ -16,30 +16,17 @@
 
 Ea.Method = {};
 
-Ea.Method._Base = extend(Ea.Feature, {
-
-	_type: null,
-	getType: function() {
-		if (!this._type || Ea.mm) {
-			this._type = this._getClassType();
-			if (!this._type) {
-				var name = this._getPrimitiveType();
-				if (name) {
-					this._type = new Ea.PrimitiveType(name);
-				}
-			}
-		}
-		return this._type;
-	}
-},
+Ea.Method._Base = extend(Ea.TypedElement.Feature, {},
 {
 	api: "Method",
-	_id: attribute({api: "MethodID", type: Number}),
-	_guid: attribute({api: "AttributeGUID"}),
-	//_parent: attribute({api: "ParentID", referenceType: "id"}),
-	_parameters: attribute({api: "Parameters", type: "Ea.Collection._Base", elementType: "Ea.Parameter._Base"}),
-	_classType: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceType: "id", private: true}),
+	_id: attribute({api: "MethodID", type: Number, id: "id"}),
+	_guid: attribute({api: "MethodGUID", id: "guid"}),
+	_position: attribute({api: "Pos", type: Number}),
+	_parameters: attribute({api: "Parameters", type: "Ea.Collection._Base", elementType: "Ea.Parameter._Base", aggregation: "composite"}),
+	_taggedValues: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.MethodTag._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
+	_classType: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceBy: "id", private: true}),
 	_primitiveType: attribute({api: "ReturnType", private: true})
 });
 
 Ea.register("Ea.Parameter@Ea.Types.Element.Feature", 25);
+Ea.register("Ea.MethodTag@Ea.Types.Element.Feature", 36);

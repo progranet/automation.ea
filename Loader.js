@@ -47,7 +47,7 @@ include = function(libraryName, params) {
 	};
 	if (Core)
 		Core.enrichNamespace(namespace);
-	if (namespace.initialize)
+	if ("initialize" in namespace)
 		namespace.initialize();
 	_included[qualifiedName] = namespace;
 	return namespace;
@@ -65,7 +65,8 @@ isIncluded = function(libraryName) {
 _logBuffer = {
 	info: [],
 	error: [],
-	warn: []
+	warn: [],
+	debug: []
 };
 
 _info = function(message, params, level) {
@@ -74,7 +75,7 @@ _info = function(message, params, level) {
 			message: message,
 			params: params
 		});
-	Repository.WriteOutput("Script", message, undefined);
+	Repository.WriteOutput("Script", message + " (params: [" + params.join(", ") + "])", undefined);
 };
 
 info = function(message, params) {
@@ -87,6 +88,10 @@ error = function(message, params) {
 
 warn = function(message, params) {
 	_info(message, params, "warn");
+};
+
+debug = function(message, params) {
+	_info(message, params, "debug");
 };
 
 include("Core@Core");
