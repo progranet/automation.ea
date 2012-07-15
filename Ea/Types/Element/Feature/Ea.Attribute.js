@@ -22,9 +22,9 @@ Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 	
 	_id: attribute({api: "AttributeID", type: Number, id: "id"}),
 	_guid: attribute({api: "AttributeGUID", id: "guid"}),
-	_alias: attribute({api: "Style"}), // Not mistake, see http://www.sparxsystems.com/uml_tool_guide/sdk_for_enterprise_architect/attribute.htm
 	_styleEx: attribute({api: "StyleEx", type: Ea.DataTypes.Map, private: true}),
-	_taggedValues: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.AttributeTag._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
+	_tags: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.AttributeTag._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
+	_constraints: attribute({api: "Constraints", type: "Ea.Collection._Base", elementType: "Ea.AttributeConstraint._Base", aggregation: "composite"}),
 	_position: attribute({api: "Pos", type: Number}),
 	
 	getType: function(source) {
@@ -39,7 +39,7 @@ Ea.Attribute.EnumerationLiteral = extend(Ea.Attribute._Base);
 
 Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {}, 
 {
-	_classType: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceBy: "id", private: true}),
+	_classifier: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceBy: "id", private: true}),
 	_primitiveType: attribute({api: "Type", private: true}),
 	_default: attribute({api: "Default"}),
 	_collection: attribute({api: "IsCollection", type: Boolean}),
@@ -53,3 +53,4 @@ Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {},
 });
 
 Ea.register("Ea.AttributeTag@Ea.Types.Element.Feature", 34);
+Ea.register("Ea.AttributeConstraint@Ea.Types.Element.Feature", 33);

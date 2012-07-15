@@ -14,18 +14,9 @@
    limitations under the License.
 */
 
-Ea.Constraint = {};
+Ea.ConnectorConstraint = {};
 
-Ea.Constraint._Base = extend(Ea.Types.Named, {},
+Ea.ConnectorConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
 {
-	api: "Constraint",
-	
-	getType: function(source) {
-		return this._deriveType(source, this._type);
-	},
-
-	_notes: attribute({api: "Notes"}),
-	_status: attribute({api: "Status"}),
-	_weight: attribute({api: "Weight", type: Number}),
-	_type: attribute({api: "Type"})
+	api: "ConnectorConstraint"
 });

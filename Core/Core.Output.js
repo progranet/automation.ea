@@ -26,27 +26,13 @@ Core.Output = {
 			});
 		}
 		else if (typeof(params) == "object") {
-			return scriptlet.replace(/<%\s*([^%]+)\s*%>/g, function($0, $1) {
-				var fdef = "var fn = function(";
-				var fargs = new Array();
-				var pi = 0;
-				for (var pn in params) {
-					if (pi++ > 0) fdef = fdef + ", ";
-					fdef = fdef + pn;
-					fargs.push(params[pn]);
-				}
-				fdef = fdef + ")\
-					{\
-						var value = " + $1 + ";\
-						if (Core.Types.Object.isInstance(value)) {\
-							Session.Output(value);\
-							value = value.translated;\
-						}\
-						return value;\
-					}";
-				eval(fdef);
-				return fn.apply(params.$this, fargs);
+			return scriptlet.replace(/<%\s*([^%]+)\s*%>/g, function(whole, body) {
+				eval("var fn = function(" + Core.Helper.getNames(params).join(", ") + ") {return " + body + ";}");
+				return fn.apply(params.$this, Core.Helper.getValues(params));
 			});
+		}
+		else {
+			throw new Error("Unexpected params for output: " + scriptlet + " (typeof params: " + typeof(params) + ")");
 		}
 	},
 	

@@ -95,6 +95,7 @@ debug = function(message, params) {
 };
 
 include("Core@Core");
+include("Core.Helper@Core");
 include("Core.Log@Core");
 include("Core.Output@Core");
 include("Core.Lang@Core");

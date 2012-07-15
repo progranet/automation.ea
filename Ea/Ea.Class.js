@@ -34,10 +34,6 @@ Ea.Class = {
 		_classReflection.attributes.push(attribute);
 		if ("id" in attribute)
 			_classReflection[attribute.id] = attribute;
-		/*if (attribute.name == "_id")
-			_classReflection.id = attribute;
-		if (attribute.name == "_guid")
-			_classReflection.guid = attribute;*/
 	},
 	
 	getIdAttribute: function(_class) {
@@ -231,7 +227,7 @@ Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, {
 				return;
 			}
 		}
-		var value = new this.type(source.getApiValue(this));
+		var value = new this.type(source.getApiValue(this), this);
 		source.setValue(this, this.type.isClass ? value : value.valueOf());
 	}
 });

@@ -23,9 +23,9 @@ Ea.Application = {
 	create: function(name, path) {
 		var app = path ? new ActiveXObject("EA.App") : App;
 		this._applications[name] = {
-			application: Ea.Class.createProxy(Ea.Application._Base, app), //Ea.Application._Base._get(app),
-			project: Ea.Class.createProxy(Ea.Project._Base, app.Project), //Ea.Project._Base._get(app.Project),
-			repository: Ea.Class.createProxy(Ea.Repository._Base, app.Repository) //Ea.Repository._Base._get(app.Repository)
+			application: Ea.Class.createProxy(Ea.Application._Base, app),
+			project: Ea.Class.createProxy(Ea.Project._Base, app.Project),
+			repository: Ea.Class.createProxy(Ea.Repository._Base, app.Repository)
 		};
 		if (path)
 			this._applications[name].project.load(path);

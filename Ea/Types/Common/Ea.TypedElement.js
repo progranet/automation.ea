@@ -24,12 +24,10 @@ Ea.TypedElement._Base = extend(Ea.Types.Named, {
 	
 	getType: function() {
 		if (!this._type || Ea.mm) {
-			this._type = this._getClassType();
+			this._type = this._getClassifier();
 			if (!this._type) {
 				var name = this._getPrimitiveType();
-				if (name) {
-					this._type = new Ea.DataTypes.PrimitiveType(name);
-				}
+				this._type = Ea.DataTypes.PrimitiveType.getPrimitiveType(name);
 			}
 		}
 		return this._type;
@@ -49,6 +47,9 @@ Ea.TypedElement.Feature = extend(Ea.TypedElement._Base, {
 	}
 },
 {
+	_alias: attribute({api: "Style"}), // Not mistake, see http://www.sparxsystems.com/uml_tool_guide/sdk_for_enterprise_architect/attribute.htm
+	_notes: attribute({api: "Notes"}),
+	_stereotype: attribute({api: "Stereotype"}),
 	_parent: attribute({api: "ParentID", type: "Ea.Element.Type", referenceBy: "id", private: true})
 });
 

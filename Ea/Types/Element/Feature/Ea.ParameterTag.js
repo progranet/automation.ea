@@ -16,12 +16,7 @@
 
 Ea.ParameterTag = {};
 
-Ea.ParameterTag._Base = extend(Ea.Types.Any, {},
+Ea.ParameterTag._Base = extend(Ea.Tag._Extended, {},
 {
-	api: "ParameterTag",
-	_guid: attribute({api: "PropertyGUID", id: "guid"}),
-	_name: attribute({api: "Tag"}),
-	_fullyQualifiedName: attribute({api: "FQName"}),
-	_value: attribute({api: "Value"})
-	
+	api: "ParameterTag"
 });

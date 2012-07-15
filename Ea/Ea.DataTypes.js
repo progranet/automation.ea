@@ -23,10 +23,10 @@ Ea.DataTypes.List = define({
 	_string: null,
 	_value: null,
 	
-	create: function(string) {
+	create: function(string, params) {
 		_super.create();
 		this._string = string;
-		this._value = string ? string.split(",") : [];
+		this._value = string ? string.split(params.separator || ",") : [];
 	},
 	
 	forEach: function(fn) {
@@ -111,5 +111,16 @@ Ea.DataTypes.Date = define({
 	re: new RegExp("").compile(new RegExp("^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)( (\\d\\d):(\\d\\d):(\\d\\d))?$"))
 });
 
-Ea.DataTypes.PrimitiveType = extend(Core.Types.Named, {});
-
+Ea.DataTypes.PrimitiveType = extend(Core.Types.Named, {},
+{
+	_primitiveTypes: {},
+	getPrimitiveType: function(name) {
+		if (!name)
+			return null;
+		if (!(name in this._primitiveTypes)) {
+			this._primitiveTypes[name] = new Ea.DataTypes.PrimitiveType(name);
+		}
+		return this._primitiveTypes[name];
+		
+	}
+});

@@ -127,23 +127,21 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	api: "Diagram",
 
 	getType: function(source) {
-		var typeName = this._type.get(source).replace(/\s/g,"");
-		var type = this.namespace[typeName];
-		if (!type) {
-			throw new Error("Not implemented Diagram type: " + typeName);
-		}
-		return type;
+		return this._deriveType(source, this._type);
 	},
 	
 	_id: attribute({api: "DiagramID", type: Number, id: "id"}),
 	_guid: attribute({api: "DiagramGUID", id: "guid"}),
 	_type: attribute({api: "Type"}),
 	_metaType: attribute({api: "MetaType", private: true}),
+	_notes: attribute({api: "Notes"}),
+	_stereotype: attribute({api: "Stereotype"}),
 	
 	_style: attribute({api: "ExtendedStyle", type: Ea.DataTypes.Map}),
 	_styleEx: attribute({api: "StyleEx", type: Ea.DataTypes.Map}),
 	_elementViews: attribute({api: "DiagramObjects", type: "Ea.Collection._Base", elementType: "Ea.DiagramObject._Base", aggregation: "composite"}),
-	_connectorViews: attribute({api: "DiagramLinks", type: "Ea.Collection._Base", elementType: "Ea.DiagramLink._Base", aggregation: "composite"}),
+	_connectorViews: attribute({api: "DiagramLinks", type: "Ea.Collection._Base", elementType: "Ea.DiagramLink._Base", filter: "this.getId() != 0", aggregation: "composite"}),
+		// collection filtered because of EA returns virtual connector views for Ea.Connector.Sequence with [id = 0]
 	_parent: attribute({api: "ParentID", type: "Ea.Element._Base", referenceBy: "id", private: true}),
 	_package: attribute({api: "PackageID", type: "Ea.Package._Base", referenceBy: "id", private: true}),
 	_swimlaneDef: attribute({api: "SwimlaneDef", type: "Ea.SwimlaneDef._Base", aggregation: "composite"}),
@@ -154,22 +152,6 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	
 	_dimension: derived({getter: "getDimension", type: Object})
 });
-
-Ea.Diagram.Activity = extend(Ea.Diagram._Base);
-Ea.Diagram.Analysis = extend(Ea.Diagram._Base);
-Ea.Diagram.Collaboration = extend(Ea.Diagram._Base);
-Ea.Diagram.Component = extend(Ea.Diagram._Base);
-Ea.Diagram.CompositeStructure = extend(Ea.Diagram._Base);
-Ea.Diagram.Custom = extend(Ea.Diagram._Base);
-Ea.Diagram.Deployment = extend(Ea.Diagram._Base);
-Ea.Diagram.InteractionOverview = extend(Ea.Diagram._Base);
-Ea.Diagram.Logical = extend(Ea.Diagram._Base);
-Ea.Diagram.Object = extend(Ea.Diagram._Base);
-Ea.Diagram.Package = extend(Ea.Diagram._Base);
-Ea.Diagram.Sequence = extend(Ea.Diagram._Base);
-Ea.Diagram.Statechart = extend(Ea.Diagram._Base);
-Ea.Diagram.Timing = extend(Ea.Diagram._Base);
-Ea.Diagram.UseCase = extend(Ea.Diagram._Base);
 
 Ea.register("Ea.SwimlaneDef@Ea.Types.Diagram", 50);
 Ea.register("Ea.Swimlanes@Ea.Types.Diagram", 51);

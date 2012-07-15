@@ -19,8 +19,23 @@ Ea.ConnectorEnd = {};
 Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {},
 {
 	api: "ConnectorEnd",
-	_aggregation: attribute({api: "Aggregation"}),
+
 	_role: attribute({api: "Role"}),
+	_roleNote: attribute({api: "RoleNote"}),
+	_roleType: attribute({api: "RoleType"}),
+	_stereotype: attribute({api: "Stereotype"}),
+	_alias: attribute({api: "Alias"}),
+
+	_allowDuplicates: attribute({api: "AllowDuplicates", type: Boolean}),
+	_ownedByClassifier: attribute({api: "OwnedByClassifier", type: Boolean}),
+	_aggregation: attribute({api: "Aggregation", type: Number}),
+	_constraint: attribute({api: "Constraint"}),
+	_qualifier: attribute({api: "Qualifier"}),
 	_multiplicity: attribute({api: "Cardinality"}),
-	_navigability: attribute({api: "Navigable"})
+	_visibility: attribute({api: "Visibility"}),
+	_navigability: attribute({api: "Navigable"}),
+	
+	_tags: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.ConnectorEndTag._Base", key: "this.getName()", value: "this", aggregation: "composite"})
 });
+
+Ea.register("Ea.ConnectorEndTag@Ea.Types.Connector", 41);

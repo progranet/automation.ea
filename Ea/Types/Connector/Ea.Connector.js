@@ -35,26 +35,18 @@ Ea.Connector._Base = extend(Ea.Types.Named, {
 				unknown: null
 			};
 			var _features = this._getStyleEx();
-			_features = _features.replace(/LF([SE])P=({[0-9a-z\-]+})([LR]);/gi, function(match, z1, guid, z2, replaced) {
-				var direction = z1 == "E" ? "client" : (z1 == "S" ? "supplier" : "unknown");
+			_features = _features.replace(/LF([SE])P=(\{[0-9a-z\-]+\})([LR]);/gi, function(match, z1, guid, z2, replaced) {
+				var direction = (z1 == "E" ? "supplier" : (z1 == "S" ? "client" : "unknown"));
 				features[direction] = guid;
-				return replaced;
+				return "";
 			});
 			if (this._features.client) {
-				try {
-					this._clientAttribute = Ea.getByGuid(Ea.Attribute._Base, this._features.client);
-				}
-				catch (e) {
-					this._clientMethod = Ea.getByGuid(Ea.Method._Base, this._features.client);
-				}
+				this._clientAttribute = Ea.getByGuid(Ea.Attribute._Base, this._features.client);
+				this._clientMethod = Ea.getByGuid(Ea.Method._Base, this._features.client);
 			}
 			if (this._features.supplier) {
-				try {
-					this._supplierAttribute = Ea.getByGuid(Ea.Attribute._Base, this._features.supplier);
-				}
-				catch (e) {
-					this._supplierMethod = Ea.getByGuid(Ea.Method._Base, this._features.supplier);
-				}
+				this._supplierAttribute = Ea.getByGuid(Ea.Attribute._Base, this._features.supplier);
+				this._supplierMethod = Ea.getByGuid(Ea.Method._Base, this._features.supplier);
 			}
 		}
 	},
@@ -112,6 +104,19 @@ Ea.Connector._Base = extend(Ea.Types.Named, {
 	_guid: attribute({api: "ConnectorGUID"}),
 	_type: attribute({api: "Type"}),
 	
+	_alias: attribute({api: "Alias"}),
+	_notes: attribute({api: "Notes"}),
+	_stereotype: attribute({api: "Stereotype"}),
+	_direction: attribute({api: "Direction"}),
+
+	_eventFlags: attribute({api: "EventFlags"}),
+	_metaType: attribute({api: "MetaType", private: true}),
+	_miscData0: attribute({api: "MiscData", private: true, index: 0}),
+	_miscData1: attribute({api: "MiscData", private: true, index: 1}),
+	_miscData2: attribute({api: "MiscData", private: true, index: 2}),
+	_miscData3: attribute({api: "MiscData", private: true, index: 3}),
+	_miscData4: attribute({api: "MiscData", private: true, index: 4}),
+
 	_client: attribute({api: "ClientID", type: "Ea.Element._Base", referenceBy: "id"}),
 	_supplier: attribute({api: "SupplierID", type: "Ea.Element._Base", referenceBy: "id"}),
 	
@@ -124,17 +129,19 @@ Ea.Connector._Base = extend(Ea.Types.Named, {
 	_supplierEnd: attribute({api: "SupplierEnd", type: "Ea.ConnectorEnd._Base", aggregation: "composite"}),
 	
 	_styleEx: attribute({api: "StyleEx", private: true}),
-	_guard: attribute({api: "TransitionGuard"}),
 
-	_taggedValues: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.ConnectorTag._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
+	_guard: attribute({api: "TransitionGuard"}),
+	_transitionAction: attribute({api: "TransitionAction"}),
+	_transitionEvent: attribute({api: "TransitionEvent"}),
+	_virtualInheritance: attribute({api: "VirtualInheritance"}),
+
+	_tags: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.ConnectorTag._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
+	_constraints: attribute({api: "Constraints", type: "Ea.Collection._Base", elementType: "Ea.ConnectorConstraint._Base", aggregation: "composite"}),
+	_customProperties: attribute({api: "CustomProperties", type: "Ea.Collection.Map", elementType: "Ea.CustomProperty._Base", key: "this.getName()", value: "this.getValue()", aggregation: "composite"}),
+	_properties: attribute({api: "Properties", type: "Ea.Properties._Base", elementType: "Ea.Property._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
 
 	getType: function(source) {
-		var typeName = this._type.get(source).replace(/\s/g,"");
-		var type = this.namespace[typeName];
-		if (!type) {
-			throw new Error("Not implemented Connector type: " + typeName);
-		}
-		return type;
+		return this._deriveType(source, this._type);
 	}
 });
 
@@ -155,10 +162,6 @@ Ea.Connector.Association = extend(Ea.Connector._Base, {
 		return client ? "links from" : "links to";
 	}
 });
-
-Ea.Connector.Collaboration = extend(Ea.Connector._Base, {});
-
-Ea.Connector.CommunicationPath = extend(Ea.Connector._Base, {});
 
 Ea.Connector.Connector = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
@@ -190,8 +193,6 @@ Ea.Connector.Deployment = extend(Ea.Connector._Base, {
 	}
 });
 
-Ea.Connector.ERLink = extend(Ea.Connector._Base, {});
-
 Ea.Connector.Generalization = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
 		return client ? "supertype of" : "subtype of";
@@ -203,10 +204,6 @@ Ea.Connector.InformationFlow = extend(Ea.Connector._Base, {
 		return client ? "links from" : "links to";
 	}
 });
-
-Ea.Connector.Instantiation = extend(Ea.Connector._Base, {});
-
-Ea.Connector.InterruptFlow = extend(Ea.Connector._Base, {});
 
 Ea.Connector.Manifest = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
@@ -220,27 +217,17 @@ Ea.Connector.Nesting = extend(Ea.Connector._Base, {
 	}
 });
 
-Ea.Connector.NoteLink = extend(Ea.Connector._Base, {});
-
 Ea.Connector.ObjectFlow = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
 		return client ? "transition from" : "transition to";
 	}
 });
 
-Ea.Connector.Package = extend(Ea.Connector._Base, {});
-
-Ea.Connector.ProtocolConformance = extend(Ea.Connector._Base, {});
-
-Ea.Connector.ProtocolTransition = extend(Ea.Connector._Base, {});
-
 Ea.Connector.Realisation = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
 		return client ? "realized by" : "implements";
 	}
 });
-
-Ea.Connector.Sequence = extend(Ea.Connector._Base, {});
 
 Ea.Connector.StateFlow = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
@@ -253,6 +240,12 @@ Ea.Connector.UseCase = extend(Ea.Connector._Base, {
 		return client ? "links from" : "links to";
 	}
 });
+
+Ea.Connector.Sequence = extend(Ea.Connector._Base, {},
+{
+	_sequenceNo: attribute({api: "SequenceNo", type: Number})
+});
+
 
 Ea.Connector.Relationship = define({
 	
@@ -389,3 +382,4 @@ Ea.Connector.Relationship = define({
 });
 
 Ea.register("Ea.ConnectorTag@Ea.Types.Connector", 36);
+Ea.register("Ea.ConnectorConstraint@Ea.Types.Connector", 37);

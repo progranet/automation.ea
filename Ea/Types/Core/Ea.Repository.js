@@ -67,7 +67,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	},
 	
 	getById: function(type, id) {
-		if (!id) // || id == 0	
+		if (!id || id == 0)
 			return null;
 		this.stats.tr++;
 		if (this.cache[type.namespace.name]) {
@@ -173,7 +173,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 			if (record.type == "reference" && record.name == "Element") {
 				var supplier = this.getByGuid(Ea.Element._Base, record.supplierGuid);
 				if (supplier) {
-					var reference = new Ea.Element.CustomReference(record.description, supplier);
+					var reference = new Ea.Repository.CustomReference(record.description, supplier);
 					customReferences.add(reference);
 				}
 			}
@@ -218,9 +218,30 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	writeOutput: function(name, message) {
 		Repository.WriteOutput(name, message, undefined);
 	}
-
-}, {
+},
+{
 	api: "Repository",
 	
+	_projectGuid: attribute({api: "ProjectGUID"}),
 	_models: attribute({api: "Models", type: "Ea.Collection._Base", elementType: "Ea.Package._Base", aggregation: "composite"})
 });
+
+Ea.Repository.CustomReference = define({
+	_notes: null,
+	_supplier: null,
+	
+	create: function(notes, supplier) {
+		_super.create(params);
+		this._notes = notes;
+		this._supplier = supplier;
+	},
+	
+	getNotes: function() {
+		return this._notes;
+	},
+	
+	getSupplier: function() {
+		return this._supplier;
+	}
+});
+

@@ -14,24 +14,6 @@
    limitations under the License.
 */
 
-Array.prototype.contains = function(element) {
-	for (var i = 0; i < this.length; i++) {
-		if (this[i] === element) return true;
-	}
-	return false;
-};
-
-String.prototype.lpad = function(pad, length) {
-	var s = this;
-    while (s.length < length)
-        s = pad + s;
-    return s;
-};
-
-String.prototype.trim = function() {
-    return this.replace(/^\s*/g, "").replace(/\s*$/g, "");
-};
-
 Core.Lang = {
 
 	isClass: function(type) {

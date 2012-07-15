@@ -14,18 +14,14 @@
    limitations under the License.
 */
 
-Ea.Constraint = {};
+Ea.FeatureConstraint = {};
 
-Ea.Constraint._Base = extend(Ea.Types.Named, {},
+Ea.FeatureConstraint._Base = extend(Ea.Types.Named, {},
 {
-	api: "Constraint",
-	
 	getType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 
 	_notes: attribute({api: "Notes"}),
-	_status: attribute({api: "Status"}),
-	_weight: attribute({api: "Weight", type: Number}),
 	_type: attribute({api: "Type"})
 });

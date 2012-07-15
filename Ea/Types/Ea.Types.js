@@ -43,6 +43,12 @@ Ea.Types.Any = define({
 		return this.namespace._Base;
 	},
 	
+	_deriveType: function(source, attribute) {
+		var typeName = attribute.get(source).replace(/[-\s]/g,"");
+		var type = this.namespace[typeName] || Ea.addType(this.namespace, typeName);
+		return type;
+	},
+	
 	init: function() {
 		
 	},
@@ -106,9 +112,7 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 },
 {
 	_name: attribute({api: "Name"}),
-	_alias: attribute({api: "Alias"}),
-	_notes: attribute({api: "Notes"}),
-	_stereotype: attribute({api: "Stereotype"}),
+	__parent: derived({getter: "getParent", type: "Ea.Types.Any"}),
 	_qualifiedName: derived({getter: "getQualifiedName"})
 });
 

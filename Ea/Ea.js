@@ -82,6 +82,14 @@ Ea = {
 			this._objectTypes[objectType] = namespace;
 	},
 	
+	addType: function(namespace, typeName) {
+		if (typeName in namespace)
+			throw new Error("Type already exists: $", [namespace[typeName]]);
+		namespace[typeName] = Core.Lang.extend(namespace, typeName, namespace._Base);
+		warn("Not implemented $.$ type", [namespace.qualifiedName, typeName]);
+		return namespace[typeName];
+	},
+	
 	log: function(element) {
 		Ea.Helper.Log.getLog(element).log();
 	}
@@ -96,6 +104,7 @@ Ea.register("Ea.Collection@Ea.Types", 3);
 Ea.register("Ea.Package@Ea.Types", 5);
 
 include("Ea.Tag@Ea.Types.Common");
+include("Ea.FeatureConstraint@Ea.Types.Common");
 
 Ea.register("Ea.Connector@Ea.Types.Connector", 7);
 Ea.register("Ea.Diagram@Ea.Types.Diagram", 8);

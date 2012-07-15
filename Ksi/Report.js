@@ -1384,11 +1384,9 @@ Report = {
 			/*
 			 * Przesuwane grupy danych
 			 */
-			var type = step.getStepType();
 			var stepContext = {
 				scenario: scenario,
 				step: step,
-				type: type,
 				input: {},
 				output: {}
 			};
@@ -1402,13 +1400,13 @@ Report = {
 			/*
 			 * Sprawdzanie regu³ spójnoœci
 			 */
-			if (type == "Actor") {
+			if (step.instanceOf(Ea.ScenarioStep.Actor)) {
 				this.setStats(this.category.step, context.useCase, 2);
 				if (/^system/i.test(actionRaw)) {
 					this.addWarning(26, context.useCase, [number, scenario]);
 				}
 			}
-			else if (type == "System") {
+			else if (step.instanceOf(Ea.ScenarioStep.System)) {
 				this.setStats(this.category.step, context.useCase, 2);
 				if (/^u[z¿]ytkownik/i.test(actionRaw)) {
 					this.addWarning(26, context.useCase, [number, scenario]);
@@ -1429,7 +1427,7 @@ Report = {
 			 */
 			this.write(file, Html.templates.scenarioStep, {
 				number: number,
-				type: this._stepType[type],
+				type: this._stepType[step._class.name],
 				action: action,
 				business: business,
 				genSpec: genSpec,
@@ -1499,7 +1497,7 @@ Report = {
 				if (!stepContext[direction]._all)
 					stepContext[direction]._all = {};
 				stepContext[direction]._all[typeName] = type;
-				if (stepContext.type == "System") {
+				if (stepContext.step.instanceOf(Ea.ScenarioStep.System)) {
 					this.setStats(this.category.type, context.useCase, 1);
 					if (direction == "input") {
 						if (!/^[RE]/.test(move))
@@ -1513,7 +1511,7 @@ Report = {
 					if (stepContext.input._all || stepContext.output._all) {
 					}
 				}
-				else if (stepContext.type == "Actor") {
+				else if (stepContext.step.instanceOf(Ea.ScenarioStep.Actor)) {
 					if (!/^E/.test(move)) {
 						this.addWarning(27, context.useCase, [stepContext.step.getLevel(), stepContext.scenario, typeName, move]);
 					}

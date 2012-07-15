@@ -27,7 +27,11 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 
 	_guid: attribute({api: "ParameterGUID", id: "guid"}),
 	
-	_classType: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceBy: "id", private: true}),
+	_alias: attribute({api: "Alias"}),
+	_notes: attribute({api: "Notes"}),
+	_stereotype: attribute({api: "Stereotype"}),
+
+	_classifier: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceBy: "id", private: true}),
 	_primitiveType: attribute({api: "Type", private: true}),
 	_default: attribute({api: "Default"}),
 	_const: attribute({api: "IsConst", type: Boolean}),
@@ -38,7 +42,7 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 
 	_parent: attribute({api: "OperationID", type: "Ea.Method._Base", referenceBy: "id", private: true}),
 
-	_taggedValues: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.ParameterTag._Base", key: "this.getName()", value: "this", aggregation: "composite"})
+	_tags: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.ParameterTag._Base", key: "this.getName()", value: "this", aggregation: "composite"})
 
 });
 

@@ -19,14 +19,14 @@ Ea.File = {};
 Ea.File._Base = extend(Ea.Types.Named, {},
 {
 	api: "File",
+
 	getType: function(source) {
-		var typeName = this._type.get(source).replace(/\s/g,"");
-		var type = this.namespace[typeName];
-		if (!type) {
-			throw new Error("Not implemented File type: " + typeName);
-		}
-		return type;
+		return this._deriveType(source, this._type);
 	},
+
+	_notes: attribute({api: "Notes"}),
+	_fileDate: attribute({api: "FileDate"}),
+	_size: attribute({api: "Size"}),
 	_type: attribute({api: "Type"})
 });
 

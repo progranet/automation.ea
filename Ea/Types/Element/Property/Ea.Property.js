@@ -14,18 +14,34 @@
    limitations under the License.
 */
 
-Ea.Property = {};
+Ea.Property = {
+	PropertyType: {
+		0: "String",
+		1: "Integer",
+		2: "FloatingPoint",
+		3: "Boolean",
+		4: "Enum",
+		5: "Array"
+	}
+};
 
-Ea.Property._Base = extend(Ea.Types.Named, {
-	/*_toString: function() {
-		return this.getName() + " = " + this.getValue();
-	}*/
-},
+Ea.Property._Base = extend(Ea.Types.Named, {},
 {
 	api: "Property",
+
+	getType: function(source) {
+		var typeName = Ea.Property.PropertyType[this._type.get(source)];
+		var type = this.namespace[typeName] || Ea.addType(this.namespace, typeName);
+		return type;
+	},
+
 	_type: attribute({api: "Type"}),
-	_validation: attribute({api: "Validation"}),
+	__validation: attribute({api: "Validation", private: true}),
 	_value: attribute({api: "Value"})
 
 });
 
+Ea.Property.Enum = extend(Ea.Property._Base, {},
+{
+	_validation: attribute({api: "Validation", type: Ea.DataTypes.List, separator: ";"})
+});

@@ -21,22 +21,25 @@ Ea.ScenarioStep = {
 	}
 };
 
-Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
-
-	getStepType: function() {
-		return Ea.ScenarioStep.StepType[this._getStepType()];
-	}
-	
-},
+Ea.ScenarioStep._Base = extend(Ea.Types.Named, {},
 {
 	api: "ScenarioStep",
 	
-	_guid: attribute({api: "StepGUID"}),
+	getType: function(source) {
+		var typeName = Ea.ScenarioStep.StepType[this._type.get(source)];
+		var type = this.namespace[typeName] || Ea.addType(this.namespace, typeName);
+		return type;
+	},
+
+	_guid: attribute({api: "StepGUID"}), // GUID is not unique for ScenarioStep!
 	_pos: attribute({api: "Pos"}),
 	_level: attribute({api: "Level"}),
 	_extensions: attribute({api: "Extensions", type: "Ea.Collection._Base", elementType: "Ea.ScenarioExtension._Base", key: "this.getLevel()", private: true}),
-	_stepType: attribute({api: "StepType", private: true}),
+	_type: attribute({api: "StepType", private: true}),
 	_link: attribute({api: "Link", type: "Ea.Element.UseCase", referenceBy: "guid"}),
 	_uses: attribute({api: "Uses"}),
 	_results: attribute({api: "Results"})
 });
+
+Ea.ScenarioStep.Actor = extend(Ea.ScenarioStep._Base);
+Ea.ScenarioStep.System = extend(Ea.ScenarioStep._Base);

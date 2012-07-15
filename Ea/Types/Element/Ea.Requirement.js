@@ -14,18 +14,22 @@
    limitations under the License.
 */
 
-Ea.Constraint = {};
+Ea.Requirement = {};
 
-Ea.Constraint._Base = extend(Ea.Types.Named, {},
+Ea.Requirement._Base = extend(Ea.Types.Named, {},
 {
-	api: "Constraint",
-	
+	api: "Requirement",
+
 	getType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 
+	_id: attribute({api: "RequirementID", type: Number, id: "id"}),
+	_modified: attribute({api: "LastUpdate", type: Ea.DataTypes.Date}),
 	_notes: attribute({api: "Notes"}),
+	_priority: attribute({api: "Priority"}),
+	_stability: attribute({api: "Stability"}),
 	_status: attribute({api: "Status"}),
-	_weight: attribute({api: "Weight", type: Number}),
+	_difficulty: attribute({api: "Difficulty"}),
 	_type: attribute({api: "Type"})
 });

@@ -30,13 +30,18 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {},
 	
 	_id: attribute({api: "PackageID", type: Number, id: "id"}),
 	_guid: attribute({api: "PackageGUID", id: "guid"}),
+
+	_alias: attribute({api: "Alias"}),
+	_notes: attribute({api: "Notes"}),
+
 	_model: attribute({api: "isModel", private: true, type: Boolean}),
 	
 	_version: attribute({api: "Version"}),
 	_created: attribute({api: "Created", type: Ea.DataTypes.Date}),
 	_modified: attribute({api: "Modified", type: Ea.DataTypes.Date}),
+	_position: attribute({api: "TreePos", type: Number}),
 
-	_element: attribute({api: "Element", type: "Ea.Element._Base"}),
+	_element: attribute({api: "Element", type: "Ea.Element._Base", aggregation: "shared"}),
 	_parent: attribute({api: "ParentID", type: "Ea.Package._Base", referenceBy: "id"}),
 	_elements: attribute({api: "Elements", type: "Ea.Collection._Base", elementType: "Ea.Element._Base", filter: "this._getParent() == null", aggregation: "composite"}),
 	_diagrams: attribute({api: "Diagrams", type: "Ea.Collection._Base", elementType: "Ea.Diagram._Base", filter: "this._getParent() == null", aggregation: "composite"}),

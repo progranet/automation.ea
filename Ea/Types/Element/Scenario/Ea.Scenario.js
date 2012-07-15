@@ -21,25 +21,18 @@ Ea.Scenario._Base = extend(Ea.Types.Named, {},
 	api: "Scenario",
 
 	getType: function(source) {
-		var typeName = this._type.get(source).replace(/\s/g,"");
-		var type = this.namespace[typeName];
-		if (!type) {
-			type = this.namespace._Base;
-		}
-		return type;
+		return this._deriveType(source, this._type);
 	},
 
 	_type: attribute({api: "Type"}),
+	_notes: attribute({api: "Notes"}),
 
 	_guid: attribute({api: "ScenarioGUID", id: "guid"}),
 	_steps: attribute({api: "Steps", type: "Ea.Collection._Base", elementType: "Ea.ScenarioStep._Base", key: "this.getPos()", aggregation: "composite"})
 	
 });
 
-//TODO remove following backward compatibility
 Ea.Scenario.BasicPath = extend(Ea.Scenario._Base, {});
-Ea.Scenario.Alternate = extend(Ea.Scenario._Base, {});
-Ea.Scenario.Exception = extend(Ea.Scenario._Base, {});
 
 Ea.register("Ea.ScenarioExtension@Ea.Types.Element.Scenario", 55);
 Ea.register("Ea.ScenarioStep@Ea.Types.Element.Scenario", 54);

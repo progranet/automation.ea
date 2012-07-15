@@ -19,6 +19,7 @@ Ea.TaggedValue = {};
 Ea.TaggedValue._Base = extend(Ea.Tag._Base, {},
 {
 	api: "TaggedValue",
+	_notes: attribute({api: "Notes"}),
 	_id: attribute({api: "PropertyID", type: Number, id: "id"}),
 	_guid: attribute({api: "PropertyGUID", id: "guid"})
 });

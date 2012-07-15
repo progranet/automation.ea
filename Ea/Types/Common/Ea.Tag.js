@@ -23,6 +23,14 @@ Ea.Tag._Base = extend(Ea.Types.Named, {},
 
 Ea.Tag._Feature = extend(Ea.Tag._Base, {},
 {
+	_notes: attribute({api: "Notes"}),
 	_id: attribute({api: "TagID", type: Number, id: "id"}),
 	_guid: attribute({api: "TagGUID", id: "guid"})
+});
+
+Ea.Tag._Extended = extend(Ea.Tag._Base, {},
+{
+	_guid: attribute({api: "PropertyGUID", id: "guid"}),
+	_name: attribute({api: "Tag"}),
+	_value: attribute({api: "Value"})
 });

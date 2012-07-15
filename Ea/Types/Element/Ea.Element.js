@@ -136,72 +136,62 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 		else if (subType = (this._subTypes[typeName] || {})[this._subtype.get(source)]) {
 			typeName = subType;
 		}
-		var type = this.namespace[typeName];
-		if (!type) {
-			type = Ea.Element[typeName] = Core.Lang.extend(Ea.Element, typeName, Ea.Element._Base);
-			warn("Not implemented Ea.Element.$ type", [typeName]);
-		}
+		var type = this.namespace[typeName] || Ea.addType(this.namespace, typeName);
 		return type;
 	},
 	
 	_id: attribute({api: "ElementID", type: Number, id: "id"}),
 	_guid: attribute({api: "ElementGUID", id: "guid"}),
 	
+	_alias: attribute({api: "Alias"}),
+	_notes: attribute({api: "Notes"}),
+	_stereotype: attribute({api: "Stereotype"}),
+
 	_type: attribute({api: "Type", private: true}),
 	_subtype: attribute({api: "Subtype", type: Number, private: true}),
 	_metatype: attribute({api: "MetaType", private: true}),
 	
 	__abstract: attribute({api: "Abstract", private: true}),
-	_taggedValues: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.TaggedValue._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
+	_tags: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.TaggedValue._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
 	_customProperties: attribute({api: "CustomProperties", type: "Ea.Collection.Map", elementType: "Ea.CustomProperty._Base", key: "this.getName()", value: "this.getValue()", aggregation: "composite"}),
-	_specializedProperties: attribute({api: "Properties", type: "Ea.Properties._Base", elementType: "Ea.Property._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
+	_properties: attribute({api: "Properties", type: "Ea.Properties._Base", elementType: "Ea.Property._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
 	_constraints: attribute({api: "Constraints", type: "Ea.Collection._Base", elementType: "Ea.Constraint._Base", aggregation: "composite"}),
+	_requirements: attribute({api: "Requirements", type: "Ea.Collection._Base", elementType: "Ea.Requirement._Base", aggregation: "composite"}),
+	_embedded: attribute({api: "EmbeddedElements", type: "Ea.Collection._Base", elementType: "Ea.Element._Base", aggregation: "shared"}),
 	
 	_status: attribute({api: "Status"}),
+	_difficulty: attribute({api: "Difficulty"}),
 	_keywords: attribute({api: "Tag"}),
 	_phase: attribute({api: "Phase"}),
 	_version: attribute({api: "Version"}),
+	_visibility: attribute({api: "Visibility"}),
 	_author: attribute({api: "Author"}),
 	_created: attribute({api: "Created", type: Ea.DataTypes.Date}),
 	_modified: attribute({api: "Modified", type: Ea.DataTypes.Date}),
 	_complexity: attribute({api: "Complexity", type: Number}),
+	_multiplicity: attribute({api: "Multiplicity"}),
+	_persistence: attribute({api: "Persistence"}),
+	_priority: attribute({api: "Priority"}),
 	
 	_elements: attribute({api: "Elements", type: "Ea.Collection._Base", elementType: "Ea.Element._Base", aggregation: "composite"}),
 	_diagrams: attribute({api: "Diagrams", type: "Ea.Collection._Base", elementType: "Ea.Diagram._Base", aggregation: "composite"}),
-	//_stereotypes: attribute({api: "StereotypeEx", subtype: "List"}), // TODO
 	_stereotypes: attribute({api: "StereotypeEx", type: Ea.DataTypes.List}),
 	_connectors: attribute({api: "Connectors", type: "Ea.Collection._Base", elementType: "Ea.Connector._Base", aggregation: "shared"}),
 	_files: attribute({api: "Files", type: "Ea.Collection._Base", elementType: "Ea.File._Base", aggregation: "composite"}),
 	_parent: attribute({api: "ParentID", type: "Ea.Element._Base", referenceBy: "id", private: true}),
 	_package: attribute({api: "PackageID", type: "Ea.Package._Base", referenceBy: "id", private: true}),
+
 	_miscData0: attribute({api: "MiscData", private: true, index: 0}),
 	_miscData1: attribute({api: "MiscData", private: true, index: 1}),
 	_miscData2: attribute({api: "MiscData", private: true, index: 2}),
 	_miscData3: attribute({api: "MiscData", private: true, index: 3}),
+	_position: attribute({api: "TreePos", type: Number}),
+
+	_compositeDiagram: attribute({api: "CompositeDiagram", type: "Ea.Diagram._Base"}),
 	
 	_abstract: derived({getter: "isAbstract", type: Boolean}),
-	_inDiagrams: derived({getter: "findDiagrams", type: "Core.Types.Collection", elementType: "Ea.Diagram._Base"}),
 	_linkedDiagram: derived({getter: "getLinkedDiagram", type: "Ea.Diagram._Base"}),
 	_customReferences: derived({getter: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"})
-});
-
-Ea.Element.CustomReference = define({
-	_notes: null,
-	_supplier: null,
-	
-	create: function(notes, supplier) {
-		_super.create(params);
-		this._notes = notes;
-		this._supplier = supplier;
-	},
-	
-	getNotes: function() {
-		return this._notes;
-	},
-	
-	getSupplier: function() {
-		return this._supplier;
-	}
 });
 
 Ea.Element.ContextReference = define({
@@ -272,7 +262,7 @@ Ea.Element.Package = extend(Ea.Element._Base, {
 	}
 },
 {
-	_package: derived({getter: "getPackage", type: "Ea.Package._Base"})
+	__package: derived({getter: "getPackage", type: "Ea.Package._Base"})
 });
 
 Ea.Element.Type = extend(Ea.Element._Base);
@@ -280,7 +270,7 @@ Ea.Element.Type = extend(Ea.Element._Base);
 Ea.Element.Classifier = extend(Ea.Element.Type, {},
 {
 	_attributes: attribute({api: "Attributes", type: "Ea.Collection._Base", elementType: "Ea.Attribute.Attribute", filter: "this.getStereotype() != 'enum'", aggregation: "composite"}),
-	_operations: attribute({api: "Methods", type: "Ea.Collection._Base", elementType: "Ea.Method._Base", aggregation: "composite"})
+	_method: attribute({api: "Methods", type: "Ea.Collection._Base", elementType: "Ea.Method._Base", aggregation: "composite"})
 });
 
 Ea.Element.DataType = extend(Ea.Element.Classifier);
@@ -461,12 +451,9 @@ Ea.Element.CallBehaviorAction = extend(Ea.Element._CallAction);
 
 Ea.Element.CallOperationAction = extend(Ea.Element._CallAction);
 
-Ea.Element.UseCase = extend(Ea.Element._BehavioralElement, {
-	getExtensionPoints: function() {
-		var string = this._getMiscData0();
-		if (string == null) return null;
-		// TODO: parse '#EXP#=Po zakoñczeniu opracowywania publikacji;#EXP#=Przy wyborze publikacji do opracowywania;'
-	}	
+Ea.Element.UseCase = extend(Ea.Element._BehavioralElement, {},
+{
+	_extensionPoints: attribute({api: "ExtensionPoints", type: Ea.DataTypes.List})
 });
 
 include("Ea.TypedElement@Ea.Types.Common");
@@ -475,6 +462,7 @@ Ea.register("Ea.Attribute@Ea.Types.Element.Feature", 23);
 Ea.register("Ea.Method@Ea.Types.Element.Feature", 24);
 
 Ea.register("Ea.File@Ea.Types.Element", 13);
+Ea.register("Ea.Requirement@Ea.Types.Element", 9);
 
 Ea.register("Ea.TaggedValue@Ea.Types.Element", 12);
 Ea.register("Ea.Properties@Ea.Types.Element.Property", 48);
