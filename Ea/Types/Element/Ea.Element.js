@@ -158,6 +158,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 	_constraints: attribute({api: "Constraints", type: "Ea.Collection._Base", elementType: "Ea.Constraint._Base", aggregation: "composite"}),
 	_requirements: attribute({api: "Requirements", type: "Ea.Collection._Base", elementType: "Ea.Requirement._Base", aggregation: "composite"}),
 	_embedded: attribute({api: "EmbeddedElements", type: "Ea.Collection._Base", elementType: "Ea.Element._Base", aggregation: "shared"}),
+	_transitions: attribute({api: "StateTransitions", type: "Ea.Collection._Base", elementType: "Ea.Transition._Base", aggregation: "composite"}),
 	
 	_status: attribute({api: "Status"}),
 	_difficulty: attribute({api: "Difficulty"}),
@@ -221,29 +222,6 @@ Ea.Element.ContextReference = define({
 
 Ea.Element.Object = extend(Ea.Element._Base, {
 
-	_runState: null,
-	getRunState: function() {
-		if (!this._runState || Ea.mm) {
-			var rss = this._getRunState();
-			var rst = rss.split("@ENDVAR;");
-			this._runState = {};
-			for (var rsi = 0; rsi < rst.length; rsi++) {
-				var rs = rst[rsi];
-				if (rs.length > 0) {
-					rs = rs.substring(4).replace(/"/g, "'");
-					rs = rs.substring(0, rs.length - 1) + "\"";
-					rs = rs.replace(/;([^=]+)=/g, function($0, $1) {
-						return "\", " + $1.substring(0, 1).toLowerCase() + $1.substring(1) + ": \"";
-					});
-					rs = rs.substring(3).replace(/\n/g, "\\n").replace(/\r/g, "\\r");
-					eval("var rsot = {" + rs + "}");
-					this._runState[rsot.variable] = rsot;
-				}
-			}
-		}
-		return this._runState;
-	},
-	
 	_toString: function() {
 		var metaClass = this.getMetaClass();
 		return this.getName() + " :" + (metaClass ? metaClass.getName() : "<<unknown class>>") + " [" + this._class  + "]";
@@ -251,9 +229,7 @@ Ea.Element.Object = extend(Ea.Element._Base, {
 },
 {
 	_metaClass: attribute({api: "ClassifierID", type: "Ea.Element.Classifier", referenceBy: "id"}),
-	_runState: attribute({api: "RunState", private: true}),
-	
-	__runState: derived({getter: "getRunState", type: Object})
+	_runState: attribute({api: "RunState", type: Ea.DataTypes.RunState})
 });
 
 Ea.Element.Package = extend(Ea.Element._Base, {
@@ -301,10 +277,10 @@ Ea.Element.Requirement = extend(Ea.Element._Base);
 
 Ea.Element._BehavioralElement = extend(Ea.Element._Base, {
 	getBasicScenario: function() {
-		var basic = this.getScenarios(Ea.Scenario.BasicPath);
+		var basic = this._getBasicScenarios();
 		if (basic.isEmpty())
 			return null;
-		if (basic.size == 1)
+		if (basic.getSize() == 1)
 			return basic.first();
 		throw new Error("More than one basic scenario");
 	},
@@ -320,9 +296,13 @@ Ea.Element._BehavioralElement = extend(Ea.Element._Base, {
 	}
 },
 {
-	_scenarios: attribute({api: "Scenarios", type: "Ea.Collection._Base", elementType: "Ea.Scenario._Base", aggregation: "composite"}),
-	_basicScenario: derived({type: "Ea.Scenario.BasicPath", getter: "getBasicScenario"}),
-	_scenarioExtensions: derived({type: "Core.Types.Collection", elementType: "Ea.ScenarioExtension._Base", getter: "getScenarioExtensions"})
+	/*
+	 * _scenarios: attribute({api: "Scenarios", type: "Ea.Collection._Base", elementType: "Ea.Scenario._Base", aggregation: "composite"}),
+	 * don't use this property - EA returns faked scenarios (not used in scenario extensions)!
+	 */
+	_basicScenarios: attribute({api: "Scenarios", type: "Ea.Collection._Base", elementType: "Ea.Scenario._Base", filter: "this.instanceOf(Ea.Scenario.BasicPath)", private: true}),
+	_basicScenario: derived({type: "Ea.Scenario.BasicPath", getter: "getBasicScenario", aggregation: "composite"}),
+	_scenarioExtensions: derived({type: "Core.Types.Collection", elementType: "Ea.ScenarioExtension._Base", getter: "getScenarioExtensions", aggregation: "composite"})
 });
 
 Ea.Element.Pseudostate = extend(Ea.Element._BehavioralElement);
@@ -469,5 +449,6 @@ Ea.register("Ea.Properties@Ea.Types.Element.Property", 48);
 Ea.register("Ea.CustomProperty@Ea.Types.Element", 42);
 
 Ea.register("Ea.Constraint@Ea.Types.Element", 11);
+Ea.register("Ea.Transition@Ea.Types.Element", 44);
 
 Ea.register("Ea.Scenario@Ea.Types.Element.Scenario", 10);

@@ -18,7 +18,7 @@ Ea.TypedElement = {
 		
 };
 
-Ea.TypedElement._Base = extend(Ea.Types.Named, {
+Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 
 	_type: null,
 	
@@ -38,7 +38,7 @@ Ea.TypedElement._Base = extend(Ea.Types.Named, {
 	}
 },
 {
-	__type: derived({getter: "getType", type: Object})
+	__type: derived({getter: "getType", type: Core.Types.Object})
 });
 
 Ea.TypedElement.Feature = extend(Ea.TypedElement._Base, {

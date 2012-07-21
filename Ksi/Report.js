@@ -43,263 +43,320 @@ Report = {
 	
 	constraints: {
 		1: {
-				reported: true, 
-				kind: "error", 
-				category: "alias", 
-				description: "Brak identyfikatora",
-				message: "$ nie ma identyfikatora"
-			},
+			reported: true, 
+			kind: "error", 
+			category: "alias", 
+			description: "Brak identyfikatora",
+			message: "$ nie ma identyfikatora"
+		},
 		2: {
-				reported: true, 
-				kind: "error", 
-				category: "alias", 
-				description: "Identyfikator nie jest unikalny",
-				message: "$: identyfikator jest taki sam jak dla $ / <u>$</u>"
-			},
+			reported: true, 
+			kind: "error", 
+			category: "alias", 
+			description: "Identyfikator nie jest unikalny",
+			message: "$: identyfikator jest taki sam jak dla $ / <u>$</u>"
+		},
 		3: {
-				reported: true, 
-				kind: "warning", 
-				category: "relation", 
-				description: "Niepoprawna relacja pomiêdzy aktorem i przypadkiem u¿ycia",
-				message: "Aktor powinien byæ powi¹zany z przypadkiem $ u¿ycia relacj¹ asocjacji (aktor --&gt; przypadek u¿ycia)"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "relation", 
+			description: "Niepoprawna relacja pomiêdzy aktorem i przypadkiem u¿ycia",
+			message: "Aktor powinien byæ powi¹zany z przypadkiem $ u¿ycia relacj¹ asocjacji (aktor --&gt; przypadek u¿ycia)"
+		},
 		4: {
-				reported: true, 
-				kind: "warning", 
-				category: "relation", 
-				description: "Niepoprawna relacja pomiêdzy przypadkiem u¿ycia i wymaganiem",
-				message: "Przypadek u¿ycia powinien byæ powi¹zany z wymaganiem $ relacj¹ realizacji"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "relation", 
+			description: "Niepoprawna relacja pomiêdzy przypadkiem u¿ycia i wymaganiem",
+			message: "Przypadek u¿ycia powinien byæ powi¹zany z wymaganiem $ relacj¹ realizacji"
+		},
 		5: {
-				reported: false, 
-				kind: "warning", 
-				category: "relation", 
-				description: "Niepoprawna relacja pomiêdzy przypadkiem u¿ycia i zadaniem procesu biznesowego",
-				message: "Przypadek u¿ycia powinien byæ powi¹zany z zadaniem procesu biznesowego $ relacj¹ realizacji"
-			},
+			reported: false, 
+			kind: "warning", 
+			category: "relation", 
+			description: "Niepoprawna relacja pomiêdzy przypadkiem u¿ycia i zadaniem procesu biznesowego",
+			message: "Przypadek u¿ycia powinien byæ powi¹zany z zadaniem procesu biznesowego $ relacj¹ realizacji"
+		},
 		6: {
-				reported: true, 
-				kind: "warning", 
-				category: "diagram", 
-				description: "Zdefiniowano przebiegi, ale brak diagramu aktywnoœci",
-				message: "Brak diagramu aktywnoœci"
-			},
-		7: {
-				reported: true, 
-				kind: "warning", 
-				category: "scenario", 
-				description: "Zdefiniowano przebiegi, ale nie zdefiniowano przebiegu podstawowego",
-				message: "Brak przebiegu podstawowego"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "diagram", 
+			description: "Zdefiniowano przebiegi, ale brak diagramu aktywnoœci",
+			message: "Brak diagramu aktywnoœci"
+		},
+		/*7: {
+			reported: true, 
+			kind: "warning", 
+			category: "scenario", 
+			description: "Zdefiniowano przebiegi, ale nie zdefiniowano przebiegu podstawowego",
+			message: "Brak przebiegu podstawowego"
+		},*/
 		8: {
-				reported: true, 
-				kind: "warning", 
-				category: "scenario", 
-				description: "Wiêcej ni¿ jeden przebieg podstawowy",
-				message: "Wiêcej ni¿ jeden przebieg podstawowy"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "scenario", 
+			description: "Wiêcej ni¿ jeden przebieg podstawowy",
+			message: "Wiêcej ni¿ jeden przebieg podstawowy"
+		},
 		9: {
-				reported: true, 
-				kind: "warning", 
-				category: "relation", 
-				description: "Przypadki u¿ycia w³¹czane na poziomie modelu przypadków u¿ycia, nie s¹ w³¹czane w ¿adnym kroku przebiegu",
-				message: "Przypadek u¿ycia w³¹cza przypadek $, który nie jest w³¹czany przez ¿aden krok przebiegów"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "relation", 
+			description: "Przypadki u¿ycia w³¹czane na poziomie modelu przypadków u¿ycia, nie s¹ w³¹czane w ¿adnym kroku przebiegu",
+			message: "Przypadek u¿ycia w³¹cza przypadek $, który nie jest w³¹czany przez ¿aden krok przebiegów"
+		},
 		10: {
-				reported: true, 
-				kind: "warning", 
-				category: "relation", 
-				description: "Przypadki u¿ycia rozszerzaj¹ce na poziomie modelu przypadków u¿ycia, nie rozszerzaj¹ ¿adnego kroku przebiegu",
-				message: "Przypadek u¿ycia jest rozszerzeany przez przypadek $, który nie rozszerza ¿adnego kroku przebiegów"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "relation", 
+			description: "Przypadki u¿ycia rozszerzaj¹ce na poziomie modelu przypadków u¿ycia, nie rozszerzaj¹ ¿adnego kroku przebiegu",
+			message: "Przypadek u¿ycia jest rozszerzeany przez przypadek $, który nie rozszerza ¿adnego kroku przebiegów"
+		},
 		11: {
-				reported: true, 
-				kind: "warning", 
-				category: "scenario", 
-				description: "Brak przebiegów dla przypadku u¿ycia, który nie jest abstrakcyjny i nie jest generalizacj¹",
-				message: "Brak przebiegów"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "scenario", 
+			description: "Brak przebiegów dla przypadku u¿ycia, który nie jest abstrakcyjny i nie jest generalizacj¹",
+			message: "Brak przebiegów"
+		},
 		12: {
-				reported: true, 
-				kind: "error", 
-				category: "scenario", 
-				description: "Przebiegi odnosz¹ siê do regu³, które nie zosta³y odnalezione",
-				message: "Przebiegi odnosz¹ siê do nieistniej¹cej regu³y [$]"
-			},
+			reported: true, 
+			kind: "error", 
+			category: "scenario", 
+			description: "Przebiegi odnosz¹ siê do regu³, które nie zosta³y odnalezione",
+			message: "Przebiegi odnosz¹ siê do nieistniej¹cej regu³y [$]"
+		},
 		13: {
-				reported: true, 
-				kind: "warning", 
-				category: "step", 
-				description: "Kroki wskazuj¹ na w³¹czanie/rozszerzanie, natomiast nie odnaleziono w opisie kroków wzorca wskazanych przypadków",
-				message: "W kroku [$] przebiegu $ nie odnaleziono wzorca w³¹czanego/rozszerzaj¹cego przypadku u¿ycia"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "step", 
+			description: "Kroki wskazuj¹ na w³¹czanie/rozszerzanie, natomiast nie odnaleziono w opisie kroków wzorca wskazanych przypadków",
+			message: "W kroku [$] przebiegu $ nie odnaleziono wzorca w³¹czanego/rozszerzaj¹cego przypadku u¿ycia"
+		},
 		14: {
-				reported: true, 
-				kind: "warning", 
-				category: "step", 
-				description: "Kroki w³¹czaj¹ przypadki u¿ycia, które nie s¹ w³¹czane na poziomie modelu przypadków u¿ycia",
-				message: "Krok [$] przebiegu $ w³¹cza przypadek u¿ycia, który nie jest w³¹czany na poziomie modelu"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "step", 
+			description: "Kroki w³¹czaj¹ przypadki u¿ycia, które nie s¹ w³¹czane na poziomie modelu przypadków u¿ycia",
+			message: "Krok [$] przebiegu $ w³¹cza przypadek u¿ycia, który nie jest w³¹czany na poziomie modelu"
+		},
 		15: {
-				reported: true, 
-				kind: "error", 
-				category: "step", 
-				description: "Kroki przebiegów alternatywnych (rozszerzeñ) w³¹czaj¹ przypadki u¿ycia - powinny byæ rozszerzane",
-				message: "Krok [$] przebiegu alternatywnego (rozszerzenia) $ nie mo¿e w³¹czaæ przypadku u¿ycia (powinien byæ rozszerzany)"
-			},
+			reported: true, 
+			kind: "error", 
+			category: "step", 
+			description: "Kroki przebiegów alternatywnych (rozszerzeñ) w³¹czaj¹ przypadki u¿ycia - powinny byæ rozszerzane",
+			message: "Krok [$] przebiegu alternatywnego (rozszerzenia) $ nie mo¿e w³¹czaæ przypadku u¿ycia (powinien byæ rozszerzany)"
+		},
 		16: {
-				reported: true, 
-				kind: "warning", 
-				category: "step", 
-				description: "Kroki s¹ rozszerzane przez przypadki u¿ycia, które nie rozszerzaj¹ przypadku na poziomie modelu przypadków u¿ycia",
-				message: "Krok [$] przebiegu $ jest rozszerzany przez przypadek u¿ycia, który nie jest rozszerzeniem na poziomie modelu"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "step", 
+			description: "Kroki s¹ rozszerzane przez przypadki u¿ycia, które nie rozszerzaj¹ przypadku na poziomie modelu przypadków u¿ycia",
+			message: "Krok [$] przebiegu $ jest rozszerzany przez przypadek u¿ycia, który nie jest rozszerzeniem na poziomie modelu"
+		},
 		17: {
-				reported: true, 
-				kind: "warning", 
-				category: "step", 
-				description: "Kroki przebiegu g³ównego s¹ rozszerzane przez przypadki u¿ycia - powinny w³¹czaæ",
-				message: "Krok [$] przebiegu podstawowego nie powinien byæ rozszerzany przez inny przypadek u¿ycia (powinien w³¹czaæ)"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "step", 
+			description: "Kroki przebiegu g³ównego s¹ rozszerzane przez przypadki u¿ycia - powinny w³¹czaæ",
+			message: "Krok [$] przebiegu podstawowego nie powinien byæ rozszerzany przez inny przypadek u¿ycia (powinien w³¹czaæ)"
+		},
 		18: {
-				reported: true, 
-				kind: "warning", 
-				category: "type", 
-				description: "Brak powi¹zañ klas wykazanych w krokach przebiegów z modelem dziedziny systemu",
-				message: "Klasa [$] u¿yta w kroku [$] przebiegu $ nie zosta³a wskazana w modelu dziedziny systemu"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "type", 
+			description: "Brak powi¹zañ klas wykazanych w krokach przebiegów z modelem dziedziny systemu",
+			message: "Klasa [$] u¿yta w kroku [$] przebiegu $ nie zosta³a wskazana w modelu dziedziny systemu"
+		},
 		19: {
-				reported: true, 
-				kind: "warning", 
-				category: "rule", 
-				description: "Niepoprawne regu³y",
-				message: "$ nie jest poprawn¹ regu³¹"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "rule", 
+			description: "Niepoprawne regu³y",
+			message: "$ nie jest poprawn¹ regu³¹"
+		},
 		20: {
-				reported: true, 
-				kind: "error", 
-				category: "rule", 
-				description: "Numery regu³ s¹ nieunikalne w kontekœcie przypadku u¿ycia",
-				message: "Regu³a $ ma taki sam numer jak regu³a $"
-			},
+			reported: true, 
+			kind: "error", 
+			category: "rule", 
+			description: "Numery regu³ s¹ nieunikalne w kontekœcie przypadku u¿ycia",
+			message: "Regu³a $ ma taki sam numer jak regu³a $"
+		},
 		21: {
-				reported: true, 
-				kind: "warning", 
-				category: "rule", 
-				description: "Brak powi¹zania regu³ z krokami przebiegów",
-				message: "Brak odniesienia w przebiegach do regu³y $"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "rule", 
+			description: "Brak powi¹zania regu³ z krokami przebiegów",
+			message: "Brak odniesienia w przebiegach do regu³y $"
+		},
 		22: {
-				reported: true, 
-				kind: "warning", 
-				category: "message", 
-				description: "Komunikaty wskazane w regu³ach, nie zosta³y odnalezione w modelu",
-				message: "Komunikat '$' nie zosta³ odnaleziony w modelu"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "message", 
+			description: "Komunikaty wskazane w regu³ach, nie zosta³y odnalezione w modelu",
+			message: "Komunikat '$' nie zosta³ odnaleziony w modelu"
+		},
 		23: {
-				reported: true, 
-				kind: "warning", 
-				category: "relation", 
-				description: "Klasy abstrakcyjne nie posiadaj¹ specjalizacji",
-				message: "Klasa jest abstrakcyjna i nie posiada specjalizacji"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "relation", 
+			description: "Klasy abstrakcyjne nie posiadaj¹ specjalizacji",
+			message: "Klasa jest abstrakcyjna i nie posiada specjalizacji"
+		},
 		24: {
-				reported: true, 
-				kind: "warning", 
-				category: "scenario", 
-				description: "Przypadek, który nie jest abstrakcyjny i nie jest generalizacj¹, nie operuje na danych",
-				message: "Brak zdefiniowanych klas wejœciowych/wyjœciowych dla przypadku u¿ycia, który nie jest abstrakcyjny i nie jest generalizacj¹"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "scenario", 
+			description: "Przypadek, który nie jest abstrakcyjny i nie jest generalizacj¹, nie operuje na danych",
+			message: "Brak zdefiniowanych klas wejœciowych/wyjœciowych dla przypadku u¿ycia, który nie jest abstrakcyjny i nie jest generalizacj¹"
+		},
 		25: {
-				reported: true, 
-				kind: "warning", 
-				category: "relation", 
-				description: "Wymaganie nie jest realizowane przez ¿aden przypadek u¿ycia",
-				message: "Wymaganie nie jest realizowane przez ¿aden przypadek u¿ycia"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "relation", 
+			description: "Wymaganie nie jest realizowane przez ¿aden przypadek u¿ycia",
+			message: "Wymaganie nie jest realizowane przez ¿aden przypadek u¿ycia"
+		},
 		26: {
-				reported: true, 
-				kind: "warning", 
-				category: "step", 
-				description: "Kroki wskazuj¹ w modelu innych wykonawców ni¿ w opisach",
-				message: "Krok [$] przebiegu $ wskazuje w modelu innego wykonawcê ni¿ w opisie kroku"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "step", 
+			description: "Kroki wskazuj¹ w modelu innych wykonawców ni¿ w opisach",
+			message: "Krok [$] przebiegu $ wskazuje w modelu innego wykonawcê ni¿ w opisie kroku"
+		},
 		27: {
-				reported: true, 
-				kind: "warning", 
-				category: "step", 
-				description: "Kroki wykonywane przez u¿ytkownika operuj¹ na danych",
-				message: "Krok u¿ytkownika [$] przebiegu $ nie mo¿e operowaæ na danych [$ ($)]"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "step", 
+			description: "Kroki wykonywane przez u¿ytkownika operuj¹ na danych",
+			message: "Krok u¿ytkownika [$] przebiegu $ nie mo¿e operowaæ na danych [$ ($)]"
+		},
 		28: {
-				reported: true, 
-				kind: "warning", 
-				category: "type", 
-				description: "Te same kroki przebiegów wielokrotnie operuj¹ na tych samych grupach danych",
-				message: "Krok [$] przebiegu $ wielokrotnie operuje na takiej samej grupie danych [$ ($)]"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "type", 
+			description: "Te same kroki przebiegów wielokrotnie operuj¹ na tych samych grupach danych",
+			message: "Krok [$] przebiegu $ wielokrotnie operuje na takiej samej grupie danych [$ ($)]"
+		},
 		29: {
-				reported: true, 
-				kind: "warning", 
-				category: "rule", 
-				description: "Niepoprawne warunki pocz¹tkowe",
-				message: "$ nie jest poprawnym warunkem pocz¹tkowym"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "rule", 
+			description: "Niepoprawne warunki pocz¹tkowe",
+			message: "$ nie jest poprawnym warunkem pocz¹tkowym"
+		},
 		30: {
-				reported: true, 
-				kind: "warning", 
-				category: "rule", 
-				description: "Niepoprawne warunki koñcowe",
-				message: "$ nie jest poprawnym warunkem koñcowym"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "rule", 
+			description: "Niepoprawne warunki koñcowe",
+			message: "$ nie jest poprawnym warunkem koñcowym"
+		},
 		31: {
-				reported: true, 
-				kind: "warning", 
-				category: "step", 
-				description: "Kroki odwo³uj¹ siê do przypadków u¿ycia, które na poziomie modelu nie s¹ generalizacj¹, nie rozszerzaj¹, ani nie s¹ w³¹czane",
-				message: "W kroku [$] przebiegu $ wystêpuje identyfikator przypadku u¿ycia ($), który nie jest powi¹zany poprawn¹ relacj¹ (nie jest rozszerzeniem, nie jest w³¹czany, nie jest generalizacj¹)"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "step", 
+			description: "Kroki odwo³uj¹ siê do przypadków u¿ycia, które na poziomie modelu nie s¹ generalizacj¹, nie rozszerzaj¹, ani nie s¹ w³¹czane",
+			message: "W kroku [$] przebiegu $ wystêpuje identyfikator przypadku u¿ycia ($), który nie jest powi¹zany poprawn¹ relacj¹ (nie jest rozszerzeniem, nie jest w³¹czany, nie jest generalizacj¹)"
+		},
 		32: {
-				reported: true, 
-				kind: "error", 
-				category: "name", 
-				description: "Brak nazwy",
-				message: "$ nie ma nazwy"
-			},
+			reported: true, 
+			kind: "error", 
+			category: "name", 
+			description: "Brak nazwy",
+			message: "$ nie ma nazwy"
+		},
 		33: {
-				reported: true, 
-				kind: "error", 
-				category: "notes", 
-				description: "Brak opisu",
-				message: "$ nie ma opisu"
-			},
+			reported: true, 
+			kind: "error", 
+			category: "notes", 
+			description: "Brak opisu",
+			message: "$ nie ma opisu"
+		},
 		34: {
-				reported: true, 
-				kind: "warning", 
-				category: "notes", 
-				description: "Opis jest to¿samy z nazw¹",
-				message: "$: opis jest taki sam jak nazwa"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "notes", 
+			description: "Opis jest to¿samy z nazw¹",
+			message: "$: opis jest taki sam jak nazwa"
+		},
 		35: {
-				reported: true, 
-				kind: "warning", 
-				category: "type", 
-				description: "Kierunki przep³ywu danych (wejœciowe/wyjœciowe) s¹ niepoprawne",
-				message: "Niepoprawny rodzaj przesuniêcia ($) dla grupy danych [$] w kroku [$] przebiegu $"},
+			reported: true, 
+			kind: "warning", 
+			category: "type", 
+			description: "Kierunki przep³ywu danych (wejœciowe/wyjœciowe) s¹ niepoprawne",
+			message: "Niepoprawny rodzaj przesuniêcia ($) dla grupy danych [$] w kroku [$] przebiegu $"
+		},
 		36: {
-				reported: true, 
-				kind: "warning", 
-				category: "step", 
-				description: "Niepoprawne/zbêdne kroki - brak przypisania regu³, brak przep³ywu danych",
-				message: "Krok systemowy [$] przebiegu $ jest niepoprawny lub zbêdny - brak operacji na danych oraz brak powi¹zanych regu³"
-			},
+			reported: true, 
+			kind: "warning", 
+			category: "step", 
+			description: "Niepoprawne/zbêdne kroki - brak przypisania regu³, brak przep³ywu danych",
+			message: "Krok systemowy [$] przebiegu $ jest niepoprawny lub zbêdny - brak operacji na danych oraz brak powi¹zanych regu³"
+		},
 		37: {
-				reported: true, 
-				kind: "warning", 
-				category: "type", 
-				description: "Puste nazwy klas wykazanych w krokach przebiegów",
-				message: "Klasa u¿yta w kroku [$] przebiegu $ ma pust¹ nazwê"
-			}
+			reported: true, 
+			kind: "warning", 
+			category: "type", 
+			description: "Puste nazwy klas wykazanych w krokach przebiegów",
+			message: "Klasa u¿yta w kroku [$] przebiegu $ ma pust¹ nazwê"
+		},
+		38: {
+			reported: true, 
+			kind: "recommendation", 
+			category: "notes", 
+			description: "Opisy wskazuj¹ na przypadki u¿ycia, które nie s¹ generalizacj¹, nie rozszerzaj¹ i nie s¹ w³¹czane",
+			message: "Przypadek u¿ycia [$] wskazany w opisie, nie jest generalizacj¹, nie jest w³¹czany i nie rozszerza danego przypadku u¿ycia"
+		},
+		39: {
+			reported: true, 
+			kind: "error", 
+			category: "step", 
+			description: "Kroki w³¹czaj¹ce/rozszerzane wskazuj¹ u¿ytkownika jako wykonawcê",
+			message: "Krok u¿ytkownika [$] przebiegu $ nie mo¿e w³¹czaæ/byæ rozszerzany"
+		},
+		40: {
+			reported: true, 
+			kind: "recommendation", 
+			category: "rule", 
+			description: "Regu³y odwo³uj¹ siê do typów, które nie znajduj¹ siê w dziedzinie przebiegów",
+			message: "Typ $, do którego odnosi siê regu³a $, nie znajduje siê w dziedzinie przebiegów"
+		},
+		41: {
+			reported: true, 
+			kind: "warning", 
+			category: "step", 
+			description: "Kroki odwo³uj¹ siê do klas, które nie znajduj¹ siê w dziedzinie przebiegów",
+			message: "W kroku [$] przebiegu $ wystêpuje identyfikator klasy ($), której nie ma w dziedzinie danego przebiegu"
+		},
+		42: {
+			reported: true, 
+			kind: "warning",
+			category: "attribute",
+			description: "Nieznane typy atrybutów",
+			message: "Typ <i>$</i> przypisany do atrybutu $ jest nieznany"
+		},
+		43: {
+			reported: true, 
+			kind: "warning",
+			category: "attribute",
+			description: "Niepoprawne typy atrybutów",
+			message: "Typ <i>$</i> przypisany do atrybutu $ nie jest poprawnym typem - nie powinien byæ parametryzowany"
+		},
+		44: {
+			reported: true, 
+			kind: "recommendation",
+			category: "attribute",
+			description: "Niepoprawne zastosowanie typów wyliczeniowych",
+			message: "Typ <i>$</i> przypisany do atrybutu $ nie jest poprawnym typem - wartoœci powinny zostaæ wyspecyfikowane w modelu jako litera³y enumeracji"
+		},
+		45: {
+			reported: true, 
+			kind: "recommendation",
+			category: "attribute",
+			description: "Zalecane wprowadzenie maszyn stanowych",
+			message: "Typ <i>$</i> przypisany do atrybutu $ mo¿e nie byæ poprawnym typem - opis atrybutu wskazuje, ¿e atrybut powinien zostaæ zast¹piony maszyn¹ stanow¹: $"
+		}
 	},
 	
 	warnings: {},
@@ -330,7 +387,21 @@ Report = {
 			pattern: "[\\d\\.]+-KL-[\\d]+",
 			filter: Ea.Element.Type,
 			notes: true,
-			process: true
+			process: true,
+			dataTypes: {
+				"bajt": false,
+				"ci¹g bajtów": true,
+				"liczba ca³kowita": false,
+				"liczba naturalna": false,
+				"liczba dziesiêtna": false,
+				"kwota": true,
+				"data": false,
+				"czas": false,
+				"data i czas": false,
+				"logiczny": false,
+				"wyliczeniowy": false,
+				"tekst": true
+			}
 		},
 		BusinessTask: {
 			label: "Zadanie procesu biznesowego",
@@ -357,6 +428,7 @@ Report = {
 
 	warning: {
 		info: "Informacja",
+		recommendation: "Zalecenie",
 		question: "Pytanie",
 		warning: "Uwaga",
 		error: "B³¹d"
@@ -402,6 +474,10 @@ Report = {
 		message: {
 			label: "Komunikat",
 			type: "UseCase"
+		},
+		attribute: {
+			label: "Atrybut",
+			type: "Type"
 		}
 	},
 	
@@ -434,6 +510,14 @@ Report = {
 		
 		string = string.replace(/^USUNIÊTO\d\s*-\s*(.*)$/, "<span class=\"uu\">$1</SPAN>");
 		
+		var biz = false;
+		string = string.replace(/BIZ\s+/, function() {
+			biz = true;
+			return "";
+		});
+		if (biz)
+			string = "<span class=\"biznesowy\">" + string + "</span>";
+		
 		return string;
 	},
 	
@@ -455,6 +539,7 @@ Report = {
 		string = string.replace(/\[uu\d[^\]]*\]uu\d/g, "");
 		string = string.replace(/\[mu\d[^\]]*\]mu\d/g, "");
 		string = string.replace(/&rsb;/g, "]");
+		string = string.replace(/^BIZ\s+/, "");
 		//string = string.replace(/\s/g, "");
 		return string;
 	},
@@ -511,7 +596,7 @@ Report = {
 	
 	addWarning: function(id, element, params) {
 		
-		//if (id > 30) info("************************************************" + element.getGuid() + " *** " + id);
+		if (id >= 44) info("************************************************" + element.getGuid() + " *** " + id);
 		var warning = this.warnings[id];
 		if (!warning.isReported())
 			return;
@@ -859,7 +944,7 @@ Report = {
 		
 		this.write(file, Html.templates.htmlFoot);
 		this.close(file);
-		Ea.Application.getRepository().cacheInfo();
+		//Ea.Application.getRepository().cacheInfo();
 	},
 	
 	processUseCase: function(useCase, depth, file) {
@@ -873,6 +958,7 @@ Report = {
 		 */
 		this.write(file, Html.templates.useCaseRowPlain, {key: "Stereotyp", value: this.format(useCase.getStereotype())});
 		this.write(file, Html.templates.useCaseRowPlain, {key: "Opis", value: this.format(useCase.getNotes())});
+		this.write(file, Html.templates.useCaseRowPlain, {key: "Status", value: this.format(useCase.getStatus())});
 		
 		/*
 		 * Informacje techniczne
@@ -910,6 +996,7 @@ Report = {
 		 */
 		this.write(file, Html.templates.useCaseRowPlain, {key: "Stereotyp", value: this.format(useCase.getStereotype())});
 		this.write(file, Html.templates.useCaseRowPlain, {key: "Opis", value: this.format(useCase.getNotes())});
+		this.write(file, Html.templates.useCaseRowPlain, {key: "Status", value: this.format(useCase.getStatus())});
 		
 		/*
 		 * Informacje techniczne
@@ -945,7 +1032,7 @@ Report = {
 		 */
 		list = "";
 		var requirements = useCase.getRelationships(null, Ea.Element.Requirement);
-		this.setStats(this.category.relation, useCase, requirements.size);
+		this.setStats(this.category.relation, useCase, requirements.getSize());
 		requirements.forEach(function(property) {
 			var ro = "";
 			var requirement = property.getTo();
@@ -977,6 +1064,7 @@ Report = {
 					types: {}
 				},
 				types: {},
+				typesUsed: {},
 				useCases: {}
 			};
 		
@@ -1011,7 +1099,7 @@ Report = {
 		// przypadek u¿ycia w³¹cza
 		list="";
 		var includes = useCases.filter("this.getRelation() == 'links to' && this.getTo().instanceOf(Ea.Element.UseCase) && this.getConnector().getStereotype() == 'include'");
-		this.setStats(this.category.relation, useCase, includes.size);
+		this.setStats(this.category.relation, useCase, includes.getSize());
 		includes.forEach(function(property) {
 			var ro = "";
 			var useCase = property.getTo();
@@ -1054,7 +1142,7 @@ Report = {
 		// przypadek u¿ycia jest rozszerzany
 		list="";
 		var extendeds = useCases.filter("this.getRelation() == 'links from' && this.getTo().instanceOf(Ea.Element.UseCase) && this.getConnector().getStereotype() == 'extend'");
-		this.setStats(this.category.relation, useCase, extendeds.size);
+		this.setStats(this.category.relation, useCase, extendeds.getSize());
 		extendeds.forEach(function(property) {
 			var ro = "";
 			var useCase = property.getTo();
@@ -1068,12 +1156,20 @@ Report = {
 		});
 		this.write(file, Html.templates.useCaseRowList, {key: "Jest rozszerzany przez<br><span class=\"code\">&lt;--&nbsp;extend&nbsp;--</span>", value: "", list: this.format(list)});
 
+		// wzorce niepoprawnych przypadków u¿ycia w opisie
+		useCase.getNotes().replace(new RegExp(this.types.UseCase.pattern, "g"), function(alias) {
+			Report.setStats(Report.category.notes, useCase, 1);
+			if (!context.validAliases[alias]) {
+				Report.addWarning(38, useCase, [alias]);
+			}
+		});
+		
 		/*
 		 * Aktywnoœci procesów biznesowych wspierane przez przypadek u¿ycia
 		 */
 		list = "";
-		var processActivities = useCase.getRelationships(null, "this.instanceOf(Ea.Element.Activity) && this.getTaggedValues().get('BPMNVersion')");
-		this.setStats(this.category.relation, useCase, processActivities.size);
+		var processActivities = useCase.getRelationships(null, "this.instanceOf(Ea.Element.Activity) && this.getTags().get('BPMNVersion')");
+		this.setStats(this.category.relation, useCase, processActivities.getSize());
 		var processes = {};
 		processActivities.forEach(function(property) {
 			var activity = property.getTo();
@@ -1113,14 +1209,18 @@ Report = {
 		list = "";
 		var preconditions = conditions.filter("this.getType() == 'Pre-condition'");
 		if (preconditions.notEmpty()) {
-			this.setStats(this.category.rule, useCase, preconditions.size);
-			if (preconditions.size == 1 && /^(brak|brakwarunk[oó]wpocz[a¹]tkowych)$/i.test(this.clear(preconditions.first().getNotes()).replace(/[\s\.,\-!]/g, ""))) {
+			this.setStats(this.category.rule, useCase, preconditions.getSize());
+			if (preconditions.getSize() == 1 && /^(brak|brakwarunk[oó]wpocz[a¹]tkowych)$/i.test(this.clear(preconditions.first().getNotes()).replace(/[\s\.,\-!]/g, ""))) {
 				this.addWarning(29, useCase, [preconditions.first()]);
 			}
 			preconditions.forEach(function(condition) {
+				var notes = condition.getNotes();
 				var ro = "";
-				ro = ro + "<b>" + condition.getName() + "</b> " + condition.getNotes();
+				ro = ro + "<b>" + condition.getName() + "</b> " + notes;
 				list = list + "<li>" + ro + "</li>";
+				if (!notes) {
+					this.addWarning(29, useCase, [condition]);
+				}
 			});
 			this.write(file, Html.templates.useCaseRowList, {key: "Warunki pocz¹tkowe", value: "", list: this.format(list)});
 		}
@@ -1129,14 +1229,18 @@ Report = {
 		list = "";
 		var postconditions = conditions.filter("this.getType() == 'Post-condition'");
 		if (postconditions.notEmpty()) {
-			this.setStats(this.category.rule, useCase, postconditions.size);
-			if (postconditions.size == 1 && /^(brak|brakwarunk[oó]wko[nñ]cowych)$/i.test(this.clear(postconditions.first().getNotes()).replace(/[\s\.,\-!]/g, ""))) {
+			this.setStats(this.category.rule, useCase, postconditions.getSize());
+			if (postconditions.getSize() == 1 && /^(brak|brakwarunk[oó]wko[nñ]cowych)$/i.test(this.clear(postconditions.first().getNotes()).replace(/[\s\.,\-!]/g, ""))) {
 				this.addWarning(30, useCase, [postconditions.first()]);
 			}
 			postconditions.forEach(function(condition) {
+				var notes = condition.getNotes();
 				var ro = "";
-				ro = ro + "<b>" + condition.getName() + "</b> " + condition.getNotes();
+				ro = ro + "<b>" + condition.getName() + "</b> " + notes;
 				list = list + "<li>" + ro + "</li>";
+				if (!notes) {
+					this.addWarning(30, useCase, [condition]);
+				}
 			});
 			this.write(file, Html.templates.useCaseRowList, {key: "Warunki koñcowe", value: "", list: this.format(list)});
 		}
@@ -1153,78 +1257,19 @@ Report = {
 		});
 		this.write(file, Html.templates.spacer);
 		
-		var canEmpty = function() {
-			return useCase.getStereotype() == "abstract" || useCase.isAbstract() || useCase.getRelated("supertype of").notEmpty();
-		};
+		var contextReferences = useCase.getContextReferences();
+		contextReferences.filter("this.getSupplier().instanceOf(Ea.Element.Type)").forEach(function(reference) {
+			var type = reference.getSupplier();
+			context.types[type.getName().trim().toUpperCase()] = type;
+		});
+		contextReferences.filter("this.getSupplier().instanceOf(Ea.Element.UseCase)").forEach(function(reference) {
+			context.useCases[reference.getSupplier().getName()] = reference.getSupplier();
+		});
 		
 		/*
 		 * Scenariusze
 		 */
-		var scenarios = useCase.getScenarios();
-		this.setStats(this.category.scenario, useCase, 1);
-
-		if (scenarios.notEmpty()) {
-			
-			var contextReferences = useCase.getContextReferences();
-			contextReferences.filter("this.getSupplier().instanceOf(Ea.Element.Type)").forEach(function(reference) {
-				context.types[reference.getSupplier().getName().toUpperCase()] = reference.getSupplier();
-			});
-			contextReferences.filter("this.getSupplier().instanceOf(Ea.Element.UseCase)").forEach(function(reference) {
-				context.useCases[reference.getSupplier().getName()] = reference.getSupplier();
-			});
-			
-			// Scenariusz g³ówny
-			try {
-				var basic = useCase.getBasicScenario();
-				this.setStats(this.category.scenario, useCase, 1);
-				if (basic)
-					this.processScenario(basic, context, null, depth, file);
-				else
-					this.addWarning(7, useCase);
-			}
-			catch(e) {
-				this.addWarning(8, useCase);
-			}
-			
-			// Rozszerzenia
-			var extensions = useCase.getScenarioExtensions();
-			this.setStats(this.category.scenario, useCase, extensions.size);
-			extensions.forEach(function(extension) {
-				this.processScenario(extension.getScenario(), context, extension, depth, file);
-			});
-			
-			// regu³y scenariuszy
-			for (var guid in context.include) {
-				if (!context.scenario.include[guid]) {
-					this.addWarning(9, useCase, [context.include[guid]]);
-				}
-			}
-			for (var guid in context.extended) {
-				if (!context.scenario.extended[guid]) {
-					this.addWarning(10, useCase, [context.extended[guid]]);
-				}
-			}
-			var typeUsage = {
-				reference: 0,
-				name: 0,
-				total: 0
-			};
-			for (var typeName in context.scenario.types) {
-				typeUsage[context.scenario.types[typeName] ? "reference" : "name"]++;
-				typeUsage.total++;
-			}
-			this.setStats(this.category.scenario, useCase, 1);
-			if (typeUsage.total == 0 && !canEmpty()) {
-				this.addWarning(24, useCase);
-			}
-			this.setStats(this.category.diagram, useCase, 1);
-			if (diagrams.isEmpty())
-				this.addWarning(6, useCase);
-		}
-		else {
-			if (!canEmpty())
-				this.addWarning(11, useCase);
-		}
+		this.processScenarios(useCase, context, diagrams, depth, file);
 		
 		/*
 		 * Regu³y
@@ -1254,7 +1299,71 @@ Report = {
 		Actor: "U¿ytkownik"
 	},
 	
-	//_steps: {},
+	processScenarios: function(useCase, context, diagrams, depth, file) {
+
+		var emptyAllowed = function() {
+			return useCase.getStereotype() == "abstract" || useCase.isAbstract() || useCase.getRelated("supertype of").notEmpty();
+		};
+		
+
+		this.setStats(this.category.scenario, useCase, 1);
+
+		// Scenariusz g³ówny
+		var basic;
+		try {
+			basic = useCase.getBasicScenario();
+		}
+		catch(e) {
+			this.addWarning(8, useCase);
+			return;
+		}
+
+		if (!basic) {
+			if (!emptyAllowed())
+				this.addWarning(11, useCase);
+			return;
+		}
+
+		this.processScenario(basic, context, null, depth, file);
+		
+		// Rozszerzenia
+		var extensions = useCase.getScenarioExtensions();
+		this.setStats(this.category.scenario, useCase, extensions.getSize());
+		extensions.forEach(function(extension) {
+			this.processScenario(extension.getScenario(), context, extension, depth, file);
+		});
+		
+		// regu³y scenariuszy
+		for (var guid in context.include) {
+			if (!context.scenario.include[guid]) {
+				this.addWarning(9, useCase, [context.include[guid]]);
+			}
+		}
+		for (var guid in context.extended) {
+			if (!context.scenario.extended[guid]) {
+				this.addWarning(10, useCase, [context.extended[guid]]);
+			}
+		}
+		var typeUsage = {
+			reference: 0,
+			name: 0,
+			total: 0
+		};
+		for (var typeName in context.scenario.types) {
+			typeUsage[context.scenario.types[typeName] ? "reference" : "name"]++;
+			typeUsage.total++;
+		}
+		
+		this.setStats(this.category.scenario, useCase, 1);
+		if (typeUsage.total == 0 && !emptyAllowed()) {
+			this.addWarning(24, useCase);
+		}
+		
+		this.setStats(this.category.diagram, useCase, 1);
+		if (diagrams.isEmpty())
+			this.addWarning(6, useCase);
+		
+	},
 	
 	processScenario: function(scenario, context, extension, depth, file) {
 		this.write(file, Html.templates.scenarioHead, {name: this.format(scenario.getName())});
@@ -1264,29 +1373,28 @@ Report = {
 		}
 		
 		var steps = scenario.getSteps();
-		this.setStats(this.category.step, context.useCase, steps.size);
+		var typesUsed = {};
+		
+		this.setStats(this.category.step, context.useCase, steps.getSize());
 		steps.forEach(function(step) {
-			
-			/*if (this._steps[step.getGuid()]) {
-				info("!!! $: $", [step.getGuid(), step.getName()]);
-			}
-			else {
-				this._steps[step.getGuid()] = step;
-			}*/
 			
 			var number = step.getLevel();
 			var action = this.format(step.getName());
 			var actionRaw = this.clear(step.getName()).trim();
-			var business = false;
-			actionRaw = actionRaw.replace(/^biz[\s\-]*/i, function() {
-				business = true;
-				return "";
-			});
 			var genSpec = false;
 			actionRaw = actionRaw.replace(/^\s*\[([^\]]+)\]\s*$/, function(whole, content) {
 				genSpec = true;
 				return content;
 			});
+			var deleted = !actionRaw;
+			var stepContext = {
+					scenario: scenario,
+					step: step,
+					input: {},
+					output: {},
+					deleted: deleted,
+					typesUsed: typesUsed
+				};
 			/*
 			 * Wyszukiwanie wzorców w³¹czania/rozszerzania
 			 */
@@ -1304,6 +1412,12 @@ Report = {
 			var linkString = "";
 			var direction = null;
 			if (link) {
+				
+				this.setStats(this.category.step, context.useCase, 2);
+				if (step.instanceOf(Ea.ScenarioStep.Actor)) {
+					this.addWarning(39, context.useCase, [number, scenario]);
+				}
+				
 				this.setStats(this.category.step, context.useCase, 1);
 				linkString = this.getLink(link, link.getAlias());
 				var regExp = null;
@@ -1317,7 +1431,7 @@ Report = {
 					direction = _direction;
 					return "&lt;" + _direction + "&gt; (" + linkString + ")" + (name ? " " + name : "");
 				});
-				if (!direction) {
+				if (!direction && !deleted) {
 					this.addWarning(13, context.useCase, [number, scenario]);
 				}
 			}
@@ -1347,19 +1461,19 @@ Report = {
 				this.setStats(this.category.step, context.useCase, 2);
 				if (direction == "include") {
 					context.scenario.include[link.getGuid()] = link;
-					if (!context.include[link.getGuid()]) {
+					if (!context.include[link.getGuid()] && !deleted) {
 						this.addWarning(14, context.useCase, [number, scenario]);
 					}
-					if (extension) {
+					if (extension && !deleted) {
 						this.addWarning(15, context.useCase, [number, scenario]);
 					}
 				}
 				else {
 					context.scenario.extended[link.getGuid()] = link;
-					if (!context.extended[link.getGuid()]) {
+					if (!context.extended[link.getGuid()] && !deleted) {
 						this.addWarning(16, context.useCase, [number, scenario]);
 					}
-					if (!extension) {
+					if (!extension && !deleted) {
 						this.addWarning(17, context.useCase, [number]);
 					}
 				}
@@ -1384,12 +1498,6 @@ Report = {
 			/*
 			 * Przesuwane grupy danych
 			 */
-			var stepContext = {
-				scenario: scenario,
-				step: step,
-				input: {},
-				output: {}
-			};
 			var input = this.processStepTypes("input", step.getUses(), context, stepContext, depth);
 			var output = this.processStepTypes("output", step.getResults(), context, stepContext, depth);
 			var _rules = "";
@@ -1402,23 +1510,30 @@ Report = {
 			 */
 			if (step.instanceOf(Ea.ScenarioStep.Actor)) {
 				this.setStats(this.category.step, context.useCase, 2);
-				if (/^system/i.test(actionRaw)) {
+				if (/^system/i.test(actionRaw) && !deleted) {
 					this.addWarning(26, context.useCase, [number, scenario]);
 				}
 			}
 			else if (step.instanceOf(Ea.ScenarioStep.System)) {
 				this.setStats(this.category.step, context.useCase, 2);
-				if (/^u[z¿]ytkownik/i.test(actionRaw)) {
+				if (/^u[z¿]ytkownik/i.test(actionRaw) && !deleted) {
 					this.addWarning(26, context.useCase, [number, scenario]);
 				}
-				if (!direction && !genSpec && !input && !output && !_rules) {
+				if (!direction && !genSpec && !input && !output && !_rules && !deleted) {
 					this.addWarning(36, context.useCase, [number, scenario]);
 				}
 			}
 			actionRaw.replace(new RegExp(this.types.UseCase.pattern, "g"), function(alias) {
 				Report.setStats(Report.category.step, context.useCase, 1);
-				if (!genSpec && !context.validAliases[alias]) {
+				if (!genSpec && !context.validAliases[alias] && !deleted) {
 					Report.addWarning(31, context.useCase, [number, scenario, alias]);
+				}
+			}); 
+			actionRaw.replace(new RegExp(this.types.Type.pattern, "g"), function(alias) {
+				Session.Output(alias);
+				Report.setStats(Report.category.step, context.useCase, 1);
+				if (!genSpec && !typesUsed[alias] && !deleted) {
+					Report.addWarning(41, context.useCase, [number, scenario, alias]);
 				}
 			}); 
 			
@@ -1429,7 +1544,6 @@ Report = {
 				number: number,
 				type: this._stepType[step._class.name],
 				action: action,
-				business: business,
 				genSpec: genSpec,
 				rules: _rules,
 				input: input,
@@ -1451,44 +1565,49 @@ Report = {
 	
 	processStepTypes: function(direction, string, context, stepContext, depth) {
 
-		string = string.trim();
+		string = string.replace(/^[,\s]+/, "").trim();
 		if (!string)
 			return "";
-		var types = this.clear(string).replace(/\)\s*,/g, "),").replace(/[<>]/g, "").split("),");
+		var types = this.clear(string).replace(/\)\s*,/g, "),").replace(/[<>]/g, "").replace(/,\s*$/, "").replace(/,\s*,/g, ",").split("),");
 		string = string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 		
 		this.setStats(this.category.type, context.useCase, types.length);
 		for (var t = 0; t < types.length; t++) {
-			var typeName = "";
 			var moves = [];
-			types[t].replace(/^\s*([^\(]+)\(\s*([^\)]+)\)?\s*$/, function(whole, _typeName, _moves) {
-				typeName = _typeName.trim();
+			var typeName = types[t].replace(/\(\s*([^\)]+)\)?\s*$/, function(whole, _moves) {
 				_moves = _moves.split(",");
-				if (_moves.length > 1) {
-					Report.addWarning(28, context.useCase, [stepContext.step.getLevel(), stepContext.scenario, typeName, _moves]);
+				if (_moves.length > 1 && !stepContext.deleted) {
+					Report.addWarning(28, context.useCase, [stepContext.step.getLevel(), stepContext.scenario, types[t], _moves]);
 				}
 				for (var mi = 0; mi < _moves.length; mi++) {
 					var _move = _moves[mi].replace(/[\s0]/g, "");
 					moves.push(_move);
 				}
+				return "";
 			});
+			typeName = typeName.trim();
 			var type = null;
 			if (type = context.types[typeName.toUpperCase()]) {
 				this.processElement(this.types.Type, type, depth);
 				var typeLink = this.getLink(type, typeName);
-				string = string.replace(new RegExp(typeName, "gi"), typeLink);
+				string = string.replace(new RegExp(typeName.replace(/([\(\)\.\[\]\{\}])/g, "\\$1"), "gi"), typeLink);
 			}
 			else {
-				if (!/^parametry?(uruchomieniow[ey])?$/i.test(typeName.replace(/\s/g, ""))) {
-					if (!typeName.trim())
-						this.addWarning(37, context.useCase, [stepContext.step.getLevel(), stepContext.scenario]);
-					else	
-						this.addWarning(18, context.useCase, [typeName, stepContext.step.getLevel(), stepContext.scenario]);
+				if (!/^parametry?(uruchomieni(ow[ey]|a))?$/i.test(typeName.replace(/\s/g, ""))) {
+					if (!stepContext.deleted) {
+						if (!typeName)
+							this.addWarning(37, context.useCase, [stepContext.step.getLevel(), stepContext.scenario]);
+						else	
+							this.addWarning(18, context.useCase, [typeName, stepContext.step.getLevel(), stepContext.scenario]);
+					}
 				}
 			}
 			context.scenario.types[typeName] = type;
-			/*if (moves.length == 0)
-				info("$, {$}, {$}", [moves, types[t], typeName]);*/
+			if (type) {
+				stepContext.typesUsed[type.getAlias()] = type;
+				context.typesUsed[type.getAlias()] = type;
+			}
+			
 			for (var mi = 0; mi < moves.length; mi++) {
 				var move = moves[mi];
 				if (!stepContext[direction][move])
@@ -1500,32 +1619,33 @@ Report = {
 				if (stepContext.step.instanceOf(Ea.ScenarioStep.System)) {
 					this.setStats(this.category.type, context.useCase, 1);
 					if (direction == "input") {
-						if (!/^[RE]/.test(move))
+						if (!/^[RE]/.test(move) && !stepContext.deleted)
 							this.addWarning(35, context.useCase, [move, typeName, stepContext.step.getLevel(), stepContext.scenario]);
 					}
 					else {
-						if (!/^[WX]/.test(move))
+						if (!/^[WX]/.test(move) && !stepContext.deleted)
 							this.addWarning(35, context.useCase, [move, typeName, stepContext.step.getLevel(), stepContext.scenario]);
 					}
 					
 					if (stepContext.input._all || stepContext.output._all) {
+						
 					}
 				}
 				else if (stepContext.step.instanceOf(Ea.ScenarioStep.Actor)) {
-					if (!/^E/.test(move)) {
+					if (!/^E/.test(move) && !stepContext.deleted) {
 						this.addWarning(27, context.useCase, [stepContext.step.getLevel(), stepContext.scenario, typeName, move]);
 					}
 				}
 			}
 		}
-		string = "<li>" + this.format(string).replace(/\)\s*(<\/span>\s*)?,/g, ")</li><li>") + "</li>";
+		string = "<li>" + this.format(string.replace(/,\s*$/, "")).replace(/\)\s*(<\/span>\s*)?,/g, ")</li><li>") + "</li>";
 		return string;
 	},
 	
 	processRules: function(context, rules, file, depth) {
 		
-		this.setStats(this.category.rule, context.useCase, rules.size);
-		var number = rules.size;
+		this.setStats(this.category.rule, context.useCase, rules.getSize());
+		var number = rules.getSize();
 		
 		if (number == 1 && /^(brak|brakregu³)$/i.test(this.clear(rules.first().getNotes()).replace(/[\s\.,\-!]/g, ""))) {
 			this.addWarning(19, context.useCase, [rules.first()]);
@@ -1535,26 +1655,35 @@ Report = {
 			this.write(file, Html.templates.rulesHead, {name: "Regu³y"});
 			rules.forEach(function(rule) {
 				
-				// TODO wzorzec klasy, która nie jest uwzglêdniona w krokach odwo³uj¹cych siê do regu³y
-				
 				var name = rule.getName().replace(/^[\sr]*/i, "").replace(/\s*$/, "");
+				var notes = rule.getNotes();
+				var notesRaw = this.clear(notes).trim();
+				var deleted = !notesRaw;
+				
+				if (!deleted) {
+					notesRaw.replace(new RegExp(this.types.Type.pattern, "g"), function(typeAlias) {
+						Report.setStats(Report.category.rule, context.useCase, 1);
+						if (!context.typesUsed[typeAlias])
+							Report.addWarning(40, context.useCase, [typeAlias, rule]);
+					});					
+				}
+				
 				var ref = "R" + this.clear(name).replace(/\s/g, "").replace(/[\.\s]+$/, "");
 				if (context.rules[ref]) {
 					this.addWarning(20, context.useCase, [rule, context.rules[ref]]);
 				}
 				context.rules[ref] = rule;
-				if (!context.scenario.rules[ref]) {
+				if (!context.scenario.rules[ref] && !deleted) {
 					this.addWarning(21, context.useCase, [rule]);
 				}
 				var link = "<a name=\"" + ref + "\">" + this.format(name) + "</a>";
-				var notes = rule.getNotes();
 				
-				if (!this.clear(notes)) {
+				if (!notes.trim()) {
 					this.addWarning(19, context.useCase, [rule]);
 				}
 
 				var messages = "";
-				this.clear(notes).replace(new RegExp(this.types.Message.pattern, "g"), function(messageRef) {
+				notesRaw.replace(new RegExp(this.types.Message.pattern, "g"), function(messageRef) {
 					Report.setStats(Report.category.message, context.useCase, 1);
 					if (!Report.types.Message.aliases[messageRef]) {
 						var matching = Report._findMessage(messageRef);
@@ -1569,7 +1698,8 @@ Report = {
 						notes = notes.replace(messageRef, link);
 					}
 					else {
-						Report.addWarning(22, context.useCase, [messageRef]);
+						if (!deleted)
+							Report.addWarning(22, context.useCase, [messageRef]);
 						messages = messages + messageRef + "<br>";
 					}
 					
@@ -1672,22 +1802,41 @@ Report = {
 				var attributes = type.getAttributes();
 				if (attributes.notEmpty()) {
 					this.write(file, Html.templates.attributesHead);
+					this.setStats(this.category.attribute, type, attributes.getSize());
 					attributes.forEach(function(attribute) {
 						var name = this.format(attribute.getName());
-						var type = attribute.getType();
+						var attributeType = attribute.getType();
 						var typeName;
-						if (type) {
-							typeName = this.format(type.getName());
-							if (Ea.Element.Class.isInstance(type)) {
-								this.processElement(this.types.Type, type, depth);
-								typeName = this.getLink(type, typeName);
+						if (attributeType) {
+							typeName = this.format(attributeType.getName());
+							if (Ea.Element.Class.isInstance(attributeType)) {
+								this.processElement(this.types.Type, attributeType, depth);
+								typeName = this.getLink(attributeType, typeName);
 							}
-							else if (Ea.Element.Enumeration.isInstance(type)) {
-								this.processElement(this.types.Type, type, depth);
-								typeName = this.getLink(type, typeName);
+							else if (Ea.Element.Enumeration.isInstance(attributeType)) {
+								this.processElement(this.types.Type, attributeType, depth);
+								typeName = this.getLink(attributeType, typeName);
 							}
 							else {
-								// TODO typ jest inny ni¿ jeden ze zdefiniowanych typów prymitywnych
+								var params = null;
+								var nameRaw = this.clear(attributeType.getName()).toLowerCase();
+								nameRaw = nameRaw.replace(/\s*\(([\d]+)\)\s*$/, function(whole, _params) {
+									params = _params;
+								});
+								if (nameRaw in this.types.Type.dataTypes) {
+									if (nameRaw == "wyliczeniowy") {
+										if (/^\s*(status|stan)\s/i.test(this.clear(attribute.getNotes())))
+											this.addWarning(45, type, [typeName, attribute, attribute.getNotes()]);
+										else
+											this.addWarning(44, type, [typeName, attribute]);
+									}
+									else if (params && !this.types.Type.dataTypes[nameRaw]) {
+										this.addWarning(43, type, [typeName, attribute]);
+									}
+								}
+								else {
+									this.addWarning(42, type, [typeName, attribute]);
+								}
 							}
 						}
 						else
@@ -1808,7 +1957,7 @@ Report = {
 		 */
 		list = "";
 		var useCases = actor.getRelationships(null, Ea.Element.UseCase);
-		this.setStats(this.category.relation, actor, useCases.size);
+		this.setStats(this.category.relation, actor, useCases.getSize());
 		useCases.forEach(function(property) {
 			var ro = "";
 			if (property.getRelation() != "links to") {

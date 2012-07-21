@@ -18,5 +18,6 @@ Ea.ConnectorConstraint = {};
 
 Ea.ConnectorConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
 {
-	api: "ConnectorConstraint"
+	api: "ConnectorConstraint",
+	_parent: attribute({api: "ConnectorID", type: "Ea.Connector._Base", referenceBy: "id", private: true})
 });

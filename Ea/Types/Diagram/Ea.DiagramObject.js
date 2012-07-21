@@ -21,12 +21,12 @@ Ea.DiagramObject._Base = extend(Ea.View, {
 	_dimension: null,
 	getDimension: function() {
 		if (!this._dimension || Ea.mm) {
-			this._dimension = {
-				left: this.getLeft(),
-				top: -this.getTop(),
-				right: this.getRight(),
-				bottom: -this.getBottom()
-			};
+			this._dimension = new Ea.DataTypes.Dimension({
+				left: this._getLeft(),
+				top: -this._getTop(),
+				right: this._getRight(),
+				bottom: -this._getBottom()
+			});
 		}
 		return this._dimension;
 	},
@@ -35,15 +35,15 @@ Ea.DiagramObject._Base = extend(Ea.View, {
 	getCalculated: function() {
 		if (!this._calculated || Ea.mm) {
 			var dimension = this.getDimension();
-			var diagram = this.getDiagram();
+			var diagram = this.getParent();
 			var dd = diagram.getDimension();
 			var dc = diagram.getCalculated();
-			this._calculated = {
+			this._calculated = new Ea.DataTypes.Dimension({
 				left: Math.round((dimension.left + dd.correctionX) * dc.scale),
 				top: Math.round((dimension.top + dd.correctionY) * dc.scale),
 				right: Math.round((dimension.right + dd.correctionX) * dc.scale),
 				bottom: Math.round((dimension.bottom + dd.correctionY) * dc.scale)
-			};
+			});
 		}
 		return this._calculated;
 	}
@@ -53,13 +53,13 @@ Ea.DiagramObject._Base = extend(Ea.View, {
 	
 	_id: attribute({api: "InstanceID", type: Number, id: "id"}),
 	_element: attribute({api: "ElementID", type: "Ea.Element._Base", referenceBy: "id"}),
-	_left: attribute({api: "Left", type: Number}),
-	_top: attribute({api: "Top", type: Number}),
-	_right: attribute({api: "Right", type: Number}),
-	_bottom: attribute({api: "Bottom", type: Number}),
-	_style: attribute({api: "Style", type: "Ea.DataTypes.Map"}),
+	_left: attribute({api: "Left", type: Number, private: true}),
+	_top: attribute({api: "Top", type: Number, private: true}),
+	_right: attribute({api: "Right", type: Number, private: true}),
+	_bottom: attribute({api: "Bottom", type: Number, private: true}),
+	_style: attribute({api: "Style", type: Ea.DataTypes.Map}),
 	_sequence: attribute({api: "Sequence", type: Number}),
 	
-	_dimension: derived({getter: "getDimension", type: Object})
+	_dimension: derived({getter: "getDimension", type: Ea.DataTypes.Dimension})
 });
 

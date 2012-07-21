@@ -35,7 +35,7 @@ Ea.Property._Base = extend(Ea.Types.Named, {},
 		return type;
 	},
 
-	_type: attribute({api: "Type"}),
+	_type: attribute({api: "Type", private: true}),
 	__validation: attribute({api: "Validation", private: true}),
 	_value: attribute({api: "Value"})
 

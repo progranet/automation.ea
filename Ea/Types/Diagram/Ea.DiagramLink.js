@@ -24,18 +24,18 @@ Ea.DiagramLink._Base = extend(Ea.View, {
 		if (!this._dimension || Ea.mm) {
 			var coords = this._getPath();
 			if (coords) {
-				var dimension = this._dimension = {
+				var dimension = this._dimension = new Ea.DataTypes.Dimension({
 					right: 0,
 					bottom: 0
-				};
+				});
 				var coordst = coords.split(";");
 				for (var c = 0; c < coordst.length; c++) {
 					if (coordst[c]) {
 						var coord = coordst[c].split(":");
 						dimension.left = dimension.left !== undefined ? Math.min(dimension.left, coord[0]) : coord[0];
 						dimension.top = dimension.top !== undefined ? Math.min(dimension.top, -coord[1]) : -coord[1];
-						dimension.right = Math.max(this.right, coord[0]);
-						dimension.bottom = Math.max(this.bottom, -coord[1]);
+						dimension.right = Math.max(dimension.right, coord[0]);
+						dimension.bottom = Math.max(dimension.bottom, -coord[1]);
 					}
 				}
 			}
@@ -53,5 +53,5 @@ Ea.DiagramLink._Base = extend(Ea.View, {
 	_geometry: attribute({api: "Geometry", type: "Ea.DataTypes.Map"}),
 	_style: attribute({api: "Style", type: "Ea.DataTypes.Map"}),
 
-	_dimension: derived({getter: "getDimension", type: Object})
+	_dimension: derived({getter: "getDimension", type: Ea.DataTypes.Dimension})
 });

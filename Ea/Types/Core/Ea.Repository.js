@@ -19,6 +19,7 @@ Ea.Repository = {};
 Ea.Repository._Base = extend(Ea.Types.Any, {
 	
 	cache: null,
+	cacheEnabled: true,
 	
 	create: function() {
 		_super.create();
@@ -44,8 +45,9 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	
 	get: function(type, api, params) {
 		this.stats.tr++;
-		if (!Ea.mm && this.cache[type.namespace.name]) {
-			var idAttribute, guidAttribute;
+		if (this.cacheEnabled && !Ea.mm && this.cache[type.namespace.name]) {
+			var idAttribute;
+			var guidAttribute;
 			if (idAttribute = Ea.Class.getIdAttribute(type)) {
 				var id = api[idAttribute.api];
 				var proxy = this.cache[type.namespace.name].id[id];
@@ -70,7 +72,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 		if (!id || id == 0)
 			return null;
 		this.stats.tr++;
-		if (this.cache[type.namespace.name]) {
+		if (this.cacheEnabled && !Ea.mm && this.cache[type.namespace.name]) {
 			var proxy = this.cache[type.namespace.name].id[id];
 			if (proxy) {
 				this.stats.cri++;
@@ -92,7 +94,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	
 	getByGuid: function(type, guid) {
 		this.stats.tr++;
-		if (this.cache[type.namespace.name]) {
+		if (this.cacheEnabled && !Ea.mm && this.cache[type.namespace.name]) {
 			var proxy = this.cache[type.namespace.name].guid[guid];
 			if (proxy) {
 				this.stats.crg++;
@@ -110,7 +112,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 
 	_get: function(type, api, params) {
 		var proxy = Ea.Class.createProxy(type, api, params);
-		if (!Ea.mm) {
+		if (this.cacheEnabled && !Ea.mm) {
 			var idAttribute = Ea.Class.getIdAttribute(type);
 			var guidAttribute = Ea.Class.getGuidAttribute(type);
 			if (idAttribute || guidAttribute) {

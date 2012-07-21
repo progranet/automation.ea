@@ -24,7 +24,6 @@ Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 	_guid: attribute({api: "AttributeGUID", id: "guid"}),
 	_styleEx: attribute({api: "StyleEx", type: Ea.DataTypes.Map, private: true}),
 	_tags: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.AttributeTag._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
-	_constraints: attribute({api: "Constraints", type: "Ea.Collection._Base", elementType: "Ea.AttributeConstraint._Base", aggregation: "composite"}),
 	_position: attribute({api: "Pos", type: Number}),
 	
 	getType: function(source) {
@@ -40,6 +39,7 @@ Ea.Attribute.EnumerationLiteral = extend(Ea.Attribute._Base);
 Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {}, 
 {
 	_classifier: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceBy: "id", private: true}),
+	_constraints: attribute({api: "Constraints", type: "Ea.Collection._Base", elementType: "Ea.AttributeConstraint._Base", aggregation: "composite"}),
 	_primitiveType: attribute({api: "Type", private: true}),
 	_default: attribute({api: "Default"}),
 	_collection: attribute({api: "IsCollection", type: Boolean}),
@@ -47,6 +47,12 @@ Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {},
 	_derived: attribute({api: "IsDerived", type: Boolean}),
 	_ordered: attribute({api: "IsOrdered", type: Boolean}),
 	_static: attribute({api: "IsStatic", type: Boolean}),
+	_allowDuplicates: attribute({api: "AllowDuplicates", type: Boolean}),
+	_length: attribute({api: "Length"}),
+	_precision: attribute({api: "Precision"}),
+	_scale: attribute({api: "Scale"}),
+	_container: attribute({api: "Container"}),
+	_containment: attribute({api: "Containment"}),
 	_lower: attribute({api: "LowerBound"}),
 	_upper: attribute({api: "UpperBound"}),
 	_visibility: attribute({api: "Visibility"})

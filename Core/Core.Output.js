@@ -36,7 +36,7 @@ Core.Output = {
 		}
 	},
 	
-	getString: function(context, isArray) {
+	getString: function(context) {
 
 		if (context == null) {
 			if (context === undefined) {
@@ -48,23 +48,22 @@ Core.Output = {
 		var type = typeof(context);
 		
 		if (type == "object") {
-			if (isArray || (context instanceof Array)) {
+			if (context instanceof Array) {
 				var result = "[";
 				for (var e = 0; e < context.length; e++) {
-					if (e > 0) result = result + ", ";
+					if (e != 0) result = result + ", ";
 					result = result + Core.Output.getString(context[e]);
 				}
 				return result + "]";
 			}
 			if (Core.Types.Object.isInstance(context)) {
-				return context;
+				return context.toString();
 			}
 			var result = "{";
 			var pi = 0;
 			for (var p in context) {
-				if (pi++ > 0) result = result + ", ";
-				var value;
-					value = Core.Output.getString(context[p]);
+				if (pi++ != 0) result = result + ", ";
+				var value = Core.Output.getString(context[p]);
 				result = result + p + ": " + value;
 				//result = result + p + ": " + context[p];
 			}

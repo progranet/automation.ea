@@ -16,7 +16,18 @@
 
 Ea.Swimlanes = {};
 
-Ea.Swimlanes._Base = extend(Ea.Collection._Base, {
-
+Ea.Swimlanes._Base = extend(Ea.Collection.Map, {
+	_init: function(api, params) {
+		for (var e = 0; e < api.Count; e++) {
+			var element = Ea.get(params.elementType, api.Items(e));
+			this.add(element);
+		}
+	}
+},
+{
+	getType: function() {
+		return Ea.Swimlanes._Base;
+	}
 });
 
+Ea.register("Ea.Swimlane@Ea.Types.Diagram", 52);

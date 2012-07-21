@@ -146,7 +146,18 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	_package: attribute({api: "PackageID", type: "Ea.Package._Base", referenceBy: "id", private: true}),
 	_swimlaneDef: attribute({api: "SwimlaneDef", type: "Ea.SwimlaneDef._Base", aggregation: "composite"}),
 
+	_highlightImports: attribute({api: "HighlightImports", type: Boolean}),
+	_showDetails: attribute({api: "ShowDetails", type: Boolean}),
+	_showPackageContents: attribute({api: "ShowPackageContents", type: Boolean}),
+	_showPrivate: attribute({api: "ShowPrivate", type: Boolean}),
+	_showProtected: attribute({api: "ShowProtected", type: Boolean}),
+	_showPublic: attribute({api: "ShowPublic", type: Boolean}),
+
+	_selectedConnector: attribute({api: "SelectedConnector", type: "Ea.Connector._Base"}),
+	_selectedElements: attribute({api: "SelectedObjects", type: "Ea.Collection._Base", elementType: "Ea.Element._Base"}),
+	
 	_author: attribute({api: "Author"}),
+	_version: attribute({api: "Version"}),
 	_created: attribute({api: "CreatedDate", type: Ea.DataTypes.Date}),
 	_modified: attribute({api: "ModifiedDate", type: Ea.DataTypes.Date}),
 	
@@ -154,8 +165,6 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 });
 
 Ea.register("Ea.SwimlaneDef@Ea.Types.Diagram", 50);
-Ea.register("Ea.Swimlanes@Ea.Types.Diagram", 51);
-Ea.register("Ea.Swimlane@Ea.Types.Diagram", 52);
 
 Ea.View = extend(Ea.Types.Any, {
 	
@@ -167,11 +176,11 @@ Ea.View = extend(Ea.Types.Any, {
 	bottom: null,
 
 	getParent: function() {
-		return this.getDiagram();
+		return this._getParent();
 	}
 },
 {
-	_diagram: attribute({api: "DiagramID", type: "Ea.Diagram._Base", referenceBy: "id"})
+	_parent: attribute({api: "DiagramID", type: "Ea.Diagram._Base", referenceBy: "id", private: true})
 });
 
 Ea.register("Ea.DiagramLink@Ea.Types.Diagram", 20);

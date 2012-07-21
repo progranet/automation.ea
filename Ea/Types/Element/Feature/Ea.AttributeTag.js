@@ -18,5 +18,6 @@ Ea.AttributeTag = {};
 
 Ea.AttributeTag._Base = extend(Ea.Tag._Feature, {},
 {
-	api: "AttributeTag"
+	api: "AttributeTag",
+	_parent: attribute({api: "AttributeID", type: "Ea.Attribute._Base", referenceBy: "id", private: true})
 });

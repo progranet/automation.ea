@@ -18,5 +18,6 @@ Ea.AttributeConstraint = {};
 
 Ea.AttributeConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
 {
-	api: "AttributeConstraint"
+	api: "AttributeConstraint",
+	_parent: attribute({api: "AttributeID", type: "Ea.Attribute._Base", referenceBy: "id", private: true})
 });

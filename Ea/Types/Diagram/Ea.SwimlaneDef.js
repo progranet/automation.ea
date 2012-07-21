@@ -14,9 +14,35 @@
    limitations under the License.
 */
 
-Ea.SwimlaneDef = {};
+Ea.SwimlaneDef = {
+	SwimlaneOrientation: {
+		0: "Vertical",
+		1: "Horizontal"
+	}
+};
 
-Ea.SwimlaneDef._Base = extend(Ea.Types.Any, {}, {
+Ea.SwimlaneDef._Base = extend(Ea.Types.Any, {
+	
+	getOrientation: function() {
+		return Ea.SwimlaneDef.SwimlaneOrientation[this._getOrientation()];
+	}
+	
+},
+{
 	api: "SwimlaneDef",
-	_swimlanes: attribute({api: "Swimlanes", type: "Ea.Collection._Base", elementType: "Ea.Swimlane._Base", aggregation: "composite"})
+
+	_bold: attribute({api: "Bold", type: Boolean}),
+	_hideClassifier: attribute({api: "HideClassifier", type: Boolean}),
+	_hideNames: attribute({api: "HideNames", type: Boolean}),
+	_locked: attribute({api: "Locked", type: Boolean}),
+	_fontColor: attribute({api: "FontColor", type: Number}),
+	_lineColor: attribute({api: "LineColor", type: Number}),
+	_lineWidth: attribute({api: "LineWidth", type: Number}),
+	__orientation: attribute({api: "Orientation", private: true}),
+	_orientation: derived({getter: "getOrientation"}),
+	_showInTitleBar: attribute({api: "ShowInTitleBar", type: Boolean}),
+	
+	_swimlanes: attribute({api: "Swimlanes", type: "Ea.Swimlanes._Base", elementType: "Ea.Swimlane._Base", key: "this.getTitle()", value: "this", aggregation: "composite"})
 });
+
+Ea.register("Ea.Swimlanes@Ea.Types.Diagram", 51);

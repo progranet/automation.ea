@@ -16,7 +16,7 @@
 
 Ea.Scenario = {};
 
-Ea.Scenario._Base = extend(Ea.Types.Named, {},
+Ea.Scenario._Base = extend(Ea.Types.Namespace, {},
 {
 	api: "Scenario",
 

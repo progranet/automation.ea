@@ -22,10 +22,6 @@ Ea.Types.Any = define({
 		_super.create();
 	},
 	
-	getParent: function() {
-		return null;
-	},
-	
 	getXmlGuid: function() {
 		return Ea.Application.getApplication().getProject().guidToXml(this.getGuid());
 	},
@@ -55,9 +51,7 @@ Ea.Types.Any = define({
 	
 	initialize: function() {
 		Ea.Class.registerClass(this);
-	},
-	
-	__parent: derived({getter: "getParent", type: "Ea.Types.Namespace"})
+	}	
 });
 
 Ea.Types.Named = extend(Ea.Types.Any, {
@@ -89,6 +83,10 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 		return this._businessId;
 	},
 	
+	getParent: function() {
+		return null;
+	},
+	
 	hasParent: function(namespace) {
 		var parent = this.getParent();
 		if (!parent) return false;
@@ -112,7 +110,7 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 },
 {
 	_name: attribute({api: "Name"}),
-	__parent: derived({getter: "getParent", type: "Ea.Types.Any"}),
+	__parent: derived({getter: "getParent", type: "Ea.Types.Namespace"}),
 	_qualifiedName: derived({getter: "getQualifiedName"})
 });
 

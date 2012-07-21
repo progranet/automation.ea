@@ -79,17 +79,18 @@ Core.Log = {
 		if (!Core.Log._macth(level, qualifiedName))
 			return;
 
-		message = Core.Output.exec(message, params);
-		var c0 = message ? message.charAt(0) : "";
-		var s = (c0 == "^" ? 1 : (c0 == "!" ? 2 : false));
-		if (s) message = message.substring(1);
-
 		var contextName = fn.static === false ? context._class.qualifiedName : context.qualifiedName;
 		var sourceFn = contextName + "." + propertyName;
 		var sourceAt = qualifiedName;
 		var source = sourceFn + (sourceFn == sourceAt ? "" : " @ " + sourceAt.replace(/\.[^\.]+$/, ""));
 		var debugInfo = level.name + ": {" + (fn.static === false ? "" : "static ") + source + "} ";
 		
+		message = Core.Output.exec(message, params);
+		var description = message.charAt(0) == "!";
+		var stack = message.charAt(0) == "^";
+		if (description || stack)
+			message = message.substring(1);
+
 		if (level.targets.length == 0) {
 			//_info(message, params, level.name);
 			/*_logBuffer[level.name].push({
@@ -100,7 +101,7 @@ Core.Log = {
 		else {
 			for (var ti = 0; ti < level.targets.length; ti++) {
 				var target = level.targets[ti];
-				message = (s == 1 ? message + " " : "") + (s == 2 ? "" : (target.isDebug() ? debugInfo : "")) + (s == 1 ? "" : message);
+				message = (stack ? message + " " : "") + (description ? "" : (target.isDebug() ? debugInfo : "")) + (stack ? "" : message);
 				target.write(message);
 			}
 		}

@@ -14,10 +14,16 @@
    limitations under the License.
 */
 
-Ea.ConnectorTag = {};
+Ea.Transition = {};
 
-Ea.ConnectorTag._Base = extend(Ea.Tag._Feature, {},
+Ea.Transition._Base = extend(Ea.Types.Any, {},
 {
-	api: "ConnectorTag",
-	_parent: attribute({api: "ConnectorID", type: "Ea.Connector._Base", referenceBy: "id", private: true})
+	api: "Transition",
+	
+	_notes: attribute({api: "Notes"}),
+	_state: attribute({api: "TxState"}),
+	_time: attribute({api: "TxTime"}),
+	_durationConstraint: attribute({api: "DurationConstraint"}),
+	_timeConstraint: attribute({api: "TimeConstraint"}),
+	_event: attribute({api: "Event"})
 });

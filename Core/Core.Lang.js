@@ -52,9 +52,11 @@ Core.Lang = {
 				properties["" + superClass.qualifiedName + "." + propertyName + ""] = property;
 			}
 		}
-		properties.toString = function() {
-			return this._toString ? this._toString() : namespace + "." + name;
-		};
+		
+		if (Core.isNative(properties.toString))
+			properties.toString = function() {
+				return this._toString();
+			};
 		
 		if (superClass) superClass._subClass.push(_class);
 		return _class;

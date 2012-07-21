@@ -27,5 +27,6 @@ Ea.Constraint._Base = extend(Ea.Types.Named, {},
 	_notes: attribute({api: "Notes"}),
 	_status: attribute({api: "Status"}),
 	_weight: attribute({api: "Weight", type: Number}),
-	_type: attribute({api: "Type"})
+	_type: attribute({api: "Type"}),
+	_parent: attribute({api: "ParentID", type: "Ea.Element._Base", referenceBy: "id", private: true})
 });

@@ -77,7 +77,7 @@ Core.Types.Named = define({
 Core.Types.Collection = define({
 
 	_filter: null,
-	size: 0,
+	_size: 0,
 	_elements: null,
 	_table: null,
 
@@ -102,7 +102,7 @@ Core.Types.Collection = define({
 		}
 		this._table.push(element);
 		this._elements[element.__id__] = element;
-		this.size++;
+		this._size++;
 		this._added(element);
 		return true;
 	},
@@ -139,21 +139,25 @@ Core.Types.Collection = define({
 	},
 	
 	forEach: function(context, fn) {
-		for (var i = 0; i < this.size; i++) {
+		for (var i = 0; i < this._size; i++) {
 			if (fn.call(context, this._table[i], i)) break;
 		}
 	},
 	
+	getSize: function() {
+		return this._size;
+	},
+	
 	isEmpty: function() {
-		return this.size == 0;
+		return this._size == 0;
 	},
 	
 	notEmpty: function() {
-		return this.size > 0;
+		return this._size != 0;
 	},
 	
 	first: function() {
-		if (this.size == 0)
+		if (this._size == 0)
 			return null;
 		else {
 			var element = null;
@@ -230,32 +234,20 @@ Core.Types.Map = extend(Core.Types.Collection, {
 
 Core.Types.Filter = define({
 	_filter: null,
-	create: function(filters) {
+	create: function(filter) {
 		_super.create();
-		if (filters)
-			filters = filters instanceof Array ? filters : [filters];
-		else
-			filters = [];
-		for (var f = 0; f < filters.length; f++) {
-			var filter = filters[f];
+		if (filter) {
 			if (filter.isClass)
 				filter = "this.instanceOf(" + filter.qualifiedName + ")";
-			if (typeof(filter) == "string") {
+			if (typeof(filter) == "string")
 				filter = new Function("return " + filter);
-			}
 			if (typeof(filter) != "function")
 				throw new Error("Unknown filter type: " + filter);
-			filters[f] = filter;
 		}
-		this._filter = filters;
+		this._filter = filter;
 	},
 	
 	check: function(object) {
-		for (var f = 0; f < this._filter.length; f++) {
-			var filter = this._filter[f];
-			if (!filter.call(object))
-				return false;
-		}
-		return true;
+		return this._filter ? this._filter.call(object) : true;
 	}
 });

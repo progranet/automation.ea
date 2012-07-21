@@ -43,7 +43,7 @@ Ea.Helper = {
 	},
 
 	_expand: function(template, params, value, indent, aggregation) {
-		if (Ea.Types.Any.isInstance(value) && !value.instanceOf(Ea.Types.Namespace)) {
+		if (Ea.Types.Any.isInstance(value)) {
 			if (aggregation == "composite" || aggregation == "shared") {
 				this._inspect(value, indent + 1, template + " = {", params);
 				return;
@@ -86,7 +86,7 @@ Ea.Helper = {
 
 				if (params.isCollection) {
 					if (value.instanceOf(Core.Types.Map)) {
-						if (value.size == 0) {
+						if (value.isEmpty()) {
 							info(this._indent(indent + 1) + "$ = {}", [params.template]);
 						}
 						else {
@@ -98,7 +98,7 @@ Ea.Helper = {
 						}
 					}
 					else {
-						if (value.size == 0) {
+						if (value.isEmpty()) {
 							info(this._indent(indent + 1) + "$ = []", [params.template]);
 						}
 						else {

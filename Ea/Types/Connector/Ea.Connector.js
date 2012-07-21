@@ -18,7 +18,7 @@ Ea.register("Ea.ConnectorEnd@Ea.Types.Connector", 22);
 
 Ea.Connector = {};
 
-Ea.Connector._Base = extend(Ea.Types.Named, {
+Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	
 	_features: null,
 	
@@ -100,8 +100,8 @@ Ea.Connector._Base = extend(Ea.Types.Named, {
 {
 	api: "Connector",
 	
-	_id: attribute({api: "ConnectorID", type: Number}),
-	_guid: attribute({api: "ConnectorGUID"}),
+	_id: attribute({api: "ConnectorID", type: Number, id: "id"}),
+	_guid: attribute({api: "ConnectorGUID", id: "guid"}),
 	_type: attribute({api: "Type"}),
 	
 	_alias: attribute({api: "Alias"}),
@@ -109,7 +109,8 @@ Ea.Connector._Base = extend(Ea.Types.Named, {
 	_stereotype: attribute({api: "Stereotype"}),
 	_direction: attribute({api: "Direction"}),
 
-	_eventFlags: attribute({api: "EventFlags"}),
+	_eventFlags: attribute({api: "EventFlags", type: Ea.DataTypes.Map}),
+	_stateFlags: attribute({api: "StateFlags", type: Ea.DataTypes.Map}),
 	_metaType: attribute({api: "MetaType", private: true}),
 	_miscData0: attribute({api: "MiscData", private: true, index: 0}),
 	_miscData1: attribute({api: "MiscData", private: true, index: 1}),
@@ -349,7 +350,7 @@ Ea.Connector.Relationship = define({
 	},
 	
 	isAggregation: function() {
-		return this._fromEnd.getAggregation() != 0;
+		return this._fromEnd.getAggregation() != "none";
 	},
 	
 	getAggregation: function() {

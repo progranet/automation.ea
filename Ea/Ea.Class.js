@@ -29,19 +29,22 @@ Ea.Class = {
 	},
 	
 	registerAttribute: function(attribute) {
-		this.registerClass(attribute.owner);
-		var _classReflection = Ea.Class._types[attribute.owner];
+		var _class = attribute.owner;
+		this.registerClass(_class);
+		var _classReflection = Ea.Class._types[_class];
 		_classReflection.attributes.push(attribute);
 		if ("id" in attribute)
-			_classReflection[attribute.id] = attribute;
+			_class.namespace["__" + attribute.id] = attribute;
 	},
 	
 	getIdAttribute: function(_class) {
-		return Ea.Class._types[_class].id;
+		return _class.namespace.__id;
+		//return Ea.Class._types[_class].id;
 	},
 	
 	getGuidAttribute: function(_class) {
-		return Ea.Class._types[_class].guid;
+		return _class.namespace.__guid;
+		//return Ea.Class._types[_class].guid;
 	},
 	
 	getOwnedAttributes: function(_class) {
@@ -227,8 +230,15 @@ Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, {
 				return;
 			}
 		}
-		var value = new this.type(source.getApiValue(this), this);
-		source.setValue(this, this.type.isClass ? value : value.valueOf());
+		//var value = new this.type(source.getApiValue(this), this);
+		//source.setValue(this, this.type.isClass ? value : value.valueOf());
+		if (this.type.isClass) {
+			var value = this.type.create(source.getApiValue(this), this);
+			source.setValue(this, value);
+			return;
+		}
+		value = source.getApiValue(this);
+		source.setValue(this, value == null ? null : new this.type(value).valueOf());
 	}
 });
 
