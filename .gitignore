@@ -24,3 +24,8 @@ local.properties
 
 # PDT-specific
 .buildpath
+
+#progranet
+Ksi/
+Pue/
+Rdk/
