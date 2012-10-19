@@ -115,8 +115,16 @@ Ea.Class.Source = define({
 	},
 	
 	getApiValue: function(property) {
-		if (property.index == null)
-			return this._api[property.api];
+		if (property.index == null) {
+			try {
+				return this._api[property.api];
+			}
+			catch(error) {
+				warn("EA API exception on get attribute value $ ($)", [property.qualifiedName, error.message]);
+				return null;
+			}
+			
+		}
 		return this._api[property.api](property.index);
 	},
 	

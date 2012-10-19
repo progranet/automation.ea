@@ -181,6 +181,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 	_files: attribute({api: "Files", type: "Ea.Collection._Base", elementType: "Ea.File._Base", aggregation: "composite"}),
 	_parent: attribute({api: "ParentID", type: "Ea.Element._Base", referenceBy: "id", private: true}),
 	_package: attribute({api: "PackageID", type: "Ea.Package._Base", referenceBy: "id", private: true}),
+	_classifier: attribute({api: "ClassifierID", type: "Ea.Element.Classifier", referenceBy: "id"}),
 
 	_miscData0: attribute({api: "MiscData", private: true, index: 0}),
 	_miscData1: attribute({api: "MiscData", private: true, index: 1}),
@@ -339,8 +340,6 @@ Ea.Element.Note = extend(Ea.Element._Base, {
 
 Ea.Element.ConnectorNote = extend(Ea.Element.Note);
 
-Ea.Element.ExpansionRegion = extend(Ea.Element._Base);
-
 Ea.Element.Synchronization = extend(Ea.Element._Base);
 
 Ea.Element.UMLDiagram = extend(Ea.Element._Base);
@@ -363,7 +362,9 @@ Ea.Element.Reciever = extend(Ea.Element.Event);
 
 Ea.Element.Sender = extend(Ea.Element.Event);
 
-Ea.Element.InterruptibleActivityRegion = extend(Ea.Element._Base);
+Ea.Element.Region = extend(Ea.Element._Base);
+Ea.Element.ExpansionRegion = extend(Ea.Element.Region);
+Ea.Element.InterruptibleActivityRegion = extend(Ea.Element.Region);
 
 //Ea.Element.DataStore = extend(Ea.Element._Base);
 
@@ -422,9 +423,6 @@ Ea.Element._CallAction = extend(Ea.Element.Action, {
 		var classifier = this.getClassifier();
 		return this.getName() + " :" + (classifier ? classifier.getName() : "<<undefined reference>>") + " [" + this._class  + "]";
 	}
-},
-{
-	_classifier: attribute({api: "ClassifierID", type: "Ea.Element.Classifier", referenceBy: "id"})
 });
 
 Ea.Element.CallBehaviorAction = extend(Ea.Element._CallAction);

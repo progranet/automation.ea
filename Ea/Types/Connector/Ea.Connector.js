@@ -72,7 +72,7 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	},
 	
 	getRelation: function(client) {
-		return null;
+		return client ? "links from" : "links to";
 	},
 	
 	_otherEnd: null,
@@ -152,33 +152,9 @@ Ea.Connector.Aggregation = extend(Ea.Connector._Base, {
 	}
 });
 
-Ea.Connector.Assembly = extend(Ea.Connector._Base, {
-	getRelation: function(client) {
-		return client ? "links from" : "links to";
-	}
-});
-
-Ea.Connector.Association = extend(Ea.Connector._Base, {
-	getRelation: function(client) {
-		return client ? "links from" : "links to";
-	}
-});
-
-Ea.Connector.Connector = extend(Ea.Connector._Base, {
-	getRelation: function(client) {
-		return client ? "links from" : "links to";
-	}
-});
-
 Ea.Connector.ControlFlow = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
 		return client ? "transition from" : "transition to";
-	}
-});
-
-Ea.Connector.Delegate = extend(Ea.Connector._Base, {
-	getRelation: function(client) {
-		return client ? "links from" : "links to";
 	}
 });
 
@@ -188,27 +164,9 @@ Ea.Connector.Dependency = extend(Ea.Connector._Base, {
 	}
 });
 
-Ea.Connector.Deployment = extend(Ea.Connector._Base, {
-	getRelation: function(client) {
-		return client ? "links from" : "links to";
-	}
-});
-
 Ea.Connector.Generalization = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
 		return client ? "supertype of" : "subtype of";
-	}
-});
-
-Ea.Connector.InformationFlow = extend(Ea.Connector._Base, {
-	getRelation: function(client) {
-		return client ? "links from" : "links to";
-	}
-});
-
-Ea.Connector.Manifest = extend(Ea.Connector._Base, {
-	getRelation: function(client) {
-		return client ? "links from" : "links to";
 	}
 });
 
@@ -233,12 +191,6 @@ Ea.Connector.Realisation = extend(Ea.Connector._Base, {
 Ea.Connector.StateFlow = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
 		return client ? "transition from" : "transition to";
-	}
-});
-
-Ea.Connector.UseCase = extend(Ea.Connector._Base, {
-	getRelation: function(client) {
-		return client ? "links from" : "links to";
 	}
 });
 
