@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 300 D&C
+   Copyright 2012 300 D&C
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,28 +14,12 @@
    limitations under the License.
 */
 
-Core.Target = {
-	type: {
-		info: 0,
-		debug: 1,
-		tree: 2
+Shell = {
+	
+	shell: null,
+	
+	initialize: function() {
+		this.shell = new ActiveXObject("WScript.Shell");
 	}
-};
-
-Core.Target.AbstractTarget = define({
-	
-	_type: null,
-	
-	create: function(type) {
-		_super.create();
-		this._type = type;
-	},
-	
-	write: function(message) {
 		
-	},
-	
-	isDebug: function() {
-		return this._type == Core.Target.type.debug;
-	}
-});
+};

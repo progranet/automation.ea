@@ -14,15 +14,26 @@
    limitations under the License.
 */
 
-Ea.Repository = {};
+Ea.Repository = {
+	Syntax: {
+		JetDB: {
+			
+		},
+		Oracle: {
+			
+		}
+	}
+};
 
 Ea.Repository._Base = extend(Ea.Types.Any, {
 	
 	cache: null,
 	cacheEnabled: true,
+	syntax: null,
 	
-	create: function() {
-		_super.create();
+	create: function(api, params) {
+		_super.create(api);
+		this.syntax = params.syntax || Ea.Repository.Syntax.JetDB;
 		this.cache = {};
 	},
 	
@@ -225,6 +236,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	api: "Repository",
 	
 	_projectGuid: attribute({api: "ProjectGUID"}),
+	_connectionString: attribute({api: "ConnectionString"}),
 	_models: attribute({api: "Models", type: "Ea.Collection._Base", elementType: "Ea.Package._Base", aggregation: "composite"})
 });
 

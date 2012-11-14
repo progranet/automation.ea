@@ -132,6 +132,8 @@ Ea.Helper.Target = extend(Core.Target.AbstractTarget, {
 	},
 	
 	write: function(message) {
+		if (this._type == Core.Target.type.tree)
+			message = message.replace(/\|/g, "      |").replace(/\-/g, "—").replace(/\+/g, "[•]");
 		Ea.Application.getRepository().writeOutput(this._name, message);
 	}
 });
@@ -175,8 +177,8 @@ Ea.Helper.Log = define({
 			for (var p = 0; p < path.length; p++) {
 				if (!Ea.Helper.Log._current || p >= Ea.Helper.Log._current.length || Ea.Helper.Log._current[p] != path[p]) {
 					var element = path[p];
-					var string = element.instanceOf(Ea.Package._Base) ? "[•] " + element + "" : " " + element;
-					info(_tab(p, "      |") + "—" + string + "");
+					var string = (element.instanceOf(Ea.Package._Base) ? "+" : "") + " " + element;
+					tree(_tab(p, "|") + "-" + string);
 				}
 			}
 			Ea.Helper.Log._current = path;

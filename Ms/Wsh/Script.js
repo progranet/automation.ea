@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 300 D&C
+   Copyright 2012 300 D&C
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,28 +14,31 @@
    limitations under the License.
 */
 
-Core.Target = {
-	type: {
-		info: 0,
-		debug: 1,
-		tree: 2
+Script = {
+	
+	script: null,
+	
+	initialize: function() {
+		this.script = WScript;
+	},
+	
+	echo: function(message) {
+		this.script.Echo(message);
 	}
+		
 };
 
-Core.Target.AbstractTarget = define({
+Script.Target = extend(Core.Target.AbstractTarget, {
 	
-	_type: null,
+	_name: null,
 	
-	create: function(type) {
-		_super.create();
-		this._type = type;
+	create: function(name, debug) {
+		_super.create(debug);
+		this._name = name;
 	},
 	
 	write: function(message) {
-		
-	},
-	
-	isDebug: function() {
-		return this._type == Core.Target.type.debug;
+		//Script.echo(message);
+		WScript.StdErr.WriteLine(message);
 	}
 });

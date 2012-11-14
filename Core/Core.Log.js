@@ -20,7 +20,8 @@ Core.Log = {
 		error: ["*"],
 		info: ["*"],
 		warn: ["*"],
-		debug: ["*"]
+		debug: ["*"],
+		tree: ["*"]
 	},
 
 	logs: {},

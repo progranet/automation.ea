@@ -21,6 +21,8 @@ Ea = {
 	TRUE: 1,
 	FALSE: 0,
 	
+	params: {},
+	
 	getSelectedPackage: function() {
 		return Ea.Application.getRepository().getSelectedPackage();
 	},
@@ -46,18 +48,25 @@ Ea = {
 	},
 
 	initialize: function() {
-		
 		Ea.Class.prepareClasses();
-		
-		Ea.Application.initializeDefault();
-		
-		var systemTarget = new Ea.Helper.Target("System", true);
-		var scriptTarget = new Ea.Helper.Target("Script", false);
+	},
+	
+	initializeApplication: function(params) {
+		params = params || {};
+		Ea.Application.create(params);
+		Ea.Application.activate(params.name);
+	},
+	
+	initializeLogs: function(targetClass) {
+		var systemTarget = new targetClass("System", Core.Target.type.debug);
+		var scriptTarget = new targetClass("Script", Core.Target.type.info);
+		var treeTarget = new targetClass("Script", Core.Target.type.tree);
 		
 		Core.Log.registerTarget("error", systemTarget);
 		Core.Log.registerTarget("warn", systemTarget);
 		Core.Log.registerTarget("debug", systemTarget);
 		Core.Log.registerTarget("info", scriptTarget);
+		Core.Log.registerTarget("tree", treeTarget);
 	},
 	
 	_guid: /^\{[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}\}$/i,

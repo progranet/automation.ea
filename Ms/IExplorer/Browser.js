@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 300 D&C
+   Copyright 2012 300 D&C
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,28 +14,35 @@
    limitations under the License.
 */
 
-Core.Target = {
-	type: {
-		info: 0,
-		debug: 1,
-		tree: 2
-	}
-};
-
-Core.Target.AbstractTarget = define({
+Browser = {
 	
-	_type: null,
-	
-	create: function(type) {
-		_super.create();
-		this._type = type;
+	params: {
+		document: null
 	},
 	
-	write: function(message) {
+	initialize: function() {
 		
 	},
 	
-	isDebug: function() {
-		return this._type == Core.Target.type.debug;
+	getDocument: function() {
+		return this.params.document;
+	}
+};
+
+Browser.Target = extend(Core.Target.AbstractTarget, {
+	
+	_name: null,
+	
+	create: function(name, debug) {
+		_super.create(debug);
+		this._name = name;
+	},
+	
+	write: function(message) {
+		var document = Browser.getDocument();
+		var log = document.getElementById(this._name);
+		if (this._type == Core.Target.type.tree)
+			message = message.replace(/\|/g, "&nbsp;&nbsp;|").replace(/\-/g, "—").replace(/\+/g, "[+]");
+		log.innerHTML = log.innerHTML + message + "<br>";
 	}
 });

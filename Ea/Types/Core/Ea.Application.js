@@ -16,43 +16,58 @@
 
 Ea.Application = {
 	
-	_default: "_default",
 	_active: null,
+	_default: "_default",
 	_applications: {},
 	
-	create: function(name, path) {
-		var app = path ? new ActiveXObject("EA.App") : App;
+	create: function(params) {
+		var name = params.name || this._default;
+		var app = params.path ? new ActiveXObject("EA.App") : App;
 		this._applications[name] = {
 			application: Ea.Class.createProxy(Ea.Application._Base, app),
 			project: Ea.Class.createProxy(Ea.Project._Base, app.Project),
-			repository: Ea.Class.createProxy(Ea.Repository._Base, app.Repository)
+			repository: Ea.Class.createProxy(Ea.Repository._Base, app.Repository, {syntax: params.syntax})
 		};
-		if (path)
-			this._applications[name].project.load(path);
+		if (params.path)
+			this._applications[name].project.load(params.path);
 	},
 	
 	activate: function(name) {
+		name = name || this._default;
 		this._active = name;
 	},
 	
-	activateDefault: function() {
-		this.activate(this._default);
+	isActivated: function() {
+		return this._active != null;
 	},
 	
-	initializeDefault: function() {
-		this.create(this._default);
-		this.activateDefault();
-	},
-	
-	getApplication: function() {
+	getApplication: function(name) {
+		if (name) {
+			var application = this._applications[name];
+			return application ? application.application : null;
+		}
+		if (!this.isActivated())
+			return null;
 		return this._applications[this._active].application;
 	},
 	
-	getRepository: function() {
+	getRepository: function(name) {
+		if (name) {
+			var application = this._applications[name];
+			return application ? application.repository : null;
+		}
+		if (!this.isActivated())
+			return null;
 		return this._applications[this._active].repository;
 	},
 
-	getProject: function() {
+	getProject: function(name) {
+		if (name) {
+			var application = this._applications[name];
+			return application ? application.project : null;
+		}
+		if (!this.isActivated())
+			return null;
 		return this._applications[this._active].project;
 	}
 };

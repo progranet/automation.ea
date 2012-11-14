@@ -14,9 +14,6 @@
    limitations under the License.
 */
 
-include("Core@Core");
-include("Core.Lang@Core");
-include("Core.Types@Core");
 include("Core.IO@Core");
 include("Ea@Ea");
 
@@ -30,14 +27,19 @@ Search = {
 
 	execute: function() {
 		info("=== START ===");
+
+		if (!Ea.Application.isActivated()) {
+			Ea.initializeApplication();
+			Ea.initializeEaLogs();
+		}
 		
-		var package = Ea.getSelectedPackage();
+		var _package = Ea.getSelectedPackage();
 		
 		if (this.params.file) {
 			this.file = new Core.IO.File(this.params.file);
 		}
 		
-		this.processPackage(package);
+		this.processPackage(_package);
 		
 		this.processOutput();
 
