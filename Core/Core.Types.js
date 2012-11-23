@@ -18,69 +18,133 @@ var callback = function(source, namespace, propertyName, qualifiedName, _static)
 	return source.replace(/\.\s*forEach\s*\(/g, ".forEach(this, ");
 };
 
-Core.enrichMethodRegister(callback);
+Core.registerMethodEnrichment(callback);
 
+/**
+ * @namespace
+ */
 Core.Types = {
 	_id: 0,
-	getId: function() {
+	/**
+	 * @private
+	 */
+	_getId: function() {
 		return Core.Types._id++;
 	}
 };
 
-Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, {
+Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, /** @lends Core.Types.Object# */ {
 	
+	/**
+	 * Core.Types.Object constructor
+	 * 
+	 * @constructs
+	 */
 	create: function() {
 		this._setId();
 	},
-	
+
 	__id__: null,
+	/**
+	 * @private
+	 */
 	_setId: function() {
-		this.__id__ = "#" + Core.Types.getId();
+		this.__id__ = "#" + Core.Types._getId();
 	},
 	
+	/**
+	 * Checks if object is instance of specified class
+	 * 
+	 * @memberOf Core.Types.Object#
+	 * @param {Function} _class
+	 * @returns {Boolean}
+	 * @type Boolean
+	 */
 	instanceOf: function(_class) {
 		return this._class === _class || this._class.isSubclassOf(_class);
 	},
 	
+	/**
+	 * Checks if object match specified filter
+	 * 
+	 * @see Core.Types.Filter
+	 * @memberOf Core.Types.Object#
+	 * @param {Object} filter
+	 * @returns {Boolean}
+	 * @type Boolean
+	 */
 	match: function(filter) {
 		return (Core.Types.Filter.ensure(filter)).check(this);
 	},
 	
+	/**
+	 * @private
+	 */
 	_toString: function() {
 		return " [" + this._class + "]";
 	}
 },
 {
+	/**
+	 * Class initialization 
+	 * 
+	 * @memberOf Core.Types.Object
+	 * @static
+	 */
 	initialize: function() {
 
 	}
 });
 
-Core.Types.Named = define({
+Core.Types.Named = define(/** @lends Core.Types.Named# */{
 	
 	_name: null,
 	
+	/**
+	 * Core.Types.Named constructor
+	 * 
+	 * @constructs
+	 * @extends Core.Types.Object
+	 * @param {String} name
+	 */
 	create: function(name) {
 		_super.create();
 		this._name = name;
 	},
 	
+	/**
+	 * Returns name
+	 * 
+	 * @memberOf Core.Types.Named#
+	 * @returns {String}
+	 * @type String
+	 */
 	getName: function() {
 		return this._name;
 	},
 	
+	/**
+	 * @private
+	 */
 	_toString: function() {
 		return this.getName() + " [" + this._class + "]";
 	}
 });
 
-Core.Types.Collection = define({
+Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 
 	_filter: null,
 	_size: 0,
 	_elements: null,
 	_table: null,
 
+	/**
+	 * Core.Types.Collection constructor
+	 * 
+	 * @constructs
+	 * @extends Core.Types.Object
+	 * @param {Object} params Specifies initial parameters: {@link Core.Types.Filter} filter, {@link Core.Types.Collection} collection
+	 */
 	create: function(params) {
 		params = params || {};
 		this._elements = {};
@@ -89,6 +153,14 @@ Core.Types.Collection = define({
 		this.addAll(params.collection);
 	},
 	
+	/**
+	 * Adds element to collection
+	 * 
+	 * @memberOf Core.Types.Collection#
+	 * @param {Object} element
+	 * @returns {Boolean}
+	 * @type Boolean
+	 */
 	add: function(element) {
 		if (!element || !Core.Types.Object.isInstance(element))
 			return false;
@@ -107,14 +179,26 @@ Core.Types.Collection = define({
 		return true;
 	},
 	
+	/**
+	 * @private
+	 */
 	_add: function(element) {
 		return true;
 	},
 	
+	/**
+	 * @private
+	 */
 	_added: function(element) {
 		
 	},
 	
+	/**
+	 * Adds elements of other to collection
+	 * 
+	 * @memberOf Core.Types.Collection#
+	 * @param {Core.Types.Collection} collection
+	 */
 	addAll: function(collection) {
 		if (!collection) return;
 		collection = this._addAll(collection);
@@ -134,28 +218,66 @@ Core.Types.Collection = define({
 		}
 	},
 	
+	/**
+	 * @private
+	 */
 	_addAll: function(collection) {
 		return collection;
 	},
 	
+	/**
+	 * Collection iterator.
+	 * 
+	 * @memberOf Core.Types.Collection#
+	 * @param {Object} context
+	 * @param {Function} fn
+	 */
 	forEach: function(context, fn) {
 		for (var i = 0; i < this._size; i++) {
 			if (fn.call(context, this._table[i], i)) break;
 		}
 	},
 	
+	/**
+	 * Returns collection's size.
+	 * 
+	 * @memberOf Core.Types.Collection#
+	 * @returns {Number}
+	 * @type Number
+	 */
 	getSize: function() {
 		return this._size;
 	},
 	
+	/**
+	 * Checks if collection is empty
+	 * 
+	 * @memberOf Core.Types.Collection#
+	 * @returns {Boolean}
+	 * @type Boolean
+	 */
 	isEmpty: function() {
 		return this._size == 0;
 	},
 	
+	/**
+	 * Checks if collection is not empty
+	 * 
+	 * @memberOf Core.Types.Collection#
+	 * @returns {Boolean}
+	 * @type Boolean
+	 */
 	notEmpty: function() {
 		return this._size != 0;
 	},
 	
+	/**
+	 * Returns first element of collection
+	 * 
+	 * @memberOf Core.Types.Collection#
+	 * @returns {Object}
+	 * @type Object
+	 */
 	first: function() {
 		if (this._size == 0)
 			return null;
@@ -169,6 +291,15 @@ Core.Types.Collection = define({
 		}
 	},
 	
+	/**
+	 * Returns new collection containing elements matching specified filter
+	 * 
+	 * @see Core.Types.Filter
+	 * @memberOf Core.Types.Collection#
+	 * @param {Object} filter
+	 * @returns {Core.Types.Collection}
+	 * @type Core.Types.Collection
+	 */
 	filter: function(filter) {
 		if (!filter) return this;
 		var filtered = new Core.Types.Collection({filter: this._filter});
@@ -179,19 +310,10 @@ Core.Types.Collection = define({
 			}
 		});
 		return filtered;
-	},
-	
-	getString: function(fn, separator) {
-		var string = "";
-		fn = (typeof fn == "function" ? fn : new Function("return " + fn + ";"));
-		this.forEach(function(element, index) {
-			string = string + (separator ? (index == 0 ? "" : separator) : "") + fn.call(element);
-		});
-		return string;
 	}
 });
 
-Core.Types.Map = extend(Core.Types.Collection, {
+Core.Types.Map = extend(Core.Types.Collection, /** @lends Core.Types.Map# */{
 	
 	_keyDef: null,
 	_keyFn: null,
@@ -199,6 +321,13 @@ Core.Types.Map = extend(Core.Types.Collection, {
 	_valueFn: null,
 	_map: null,
 	
+	/**
+	 * Core.Types.Map constructor
+	 * 
+	 * @constructs
+	 * @extends Core.Types.Collection
+	 * @param {Object} params Specifies initial parameters: {@link Core.Types.Filter} filter, {@link Core.Types.Collection} collection
+	 */
 	create: function(params) {
 		params = params || {};
 		this._keyDef = params.key;
@@ -209,6 +338,9 @@ Core.Types.Map = extend(Core.Types.Collection, {
 		_super.create(params);
 	},
 	
+	/**
+	 * @private
+	 */
 	_added: function(element) {
 		var key = this._keyFn.call(element);
 		if (!key) {
@@ -221,10 +353,25 @@ Core.Types.Map = extend(Core.Types.Collection, {
 		this._map[key] = value;
 	},
 	
+	/**
+	 * Returns element for specified key
+	 * 
+	 * @memberOf Core.Types.Map#
+	 * @param {Object} key
+	 * @returns {Object}
+	 * @type Object
+	 */
 	get: function(key) {
 		return key in this._map ? this._map[key] : undefined;
 	},
 
+	/**
+	 * Map iterator.
+	 * 
+	 * @memberOf Core.Types.Map#
+	 * @param {Object} context
+	 * @param {Function} fn
+	 */
 	forEach: function(context, fn) {
 		for (var key in this._map) {
 			if (fn.call(context, this._map[key], key)) break;
@@ -232,8 +379,15 @@ Core.Types.Map = extend(Core.Types.Collection, {
 	}
 });
 
-Core.Types.Filter = define({
+Core.Types.Filter = define(/** @lends Core.Types.Filter# */{
+	
 	_filter: null,
+
+	/**
+	 * @constructs
+	 * @extends Core.Types.Object
+	 * @param {Object} filter
+	 */
 	create: function(filter) {
 		_super.create();
 		if (filter) {
@@ -247,6 +401,14 @@ Core.Types.Filter = define({
 		this._filter = filter;
 	},
 	
+	/**
+	 * Checks if object match this filter
+	 * 
+	 * @memberOf Core.Types.Filter#
+	 * @param {Object} object
+	 * @returns {Boolean}
+	 * @type Boolean
+	 */
 	check: function(object) {
 		return this._filter ? this._filter.call(object) : true;
 	}

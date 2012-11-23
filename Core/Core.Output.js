@@ -14,8 +14,20 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Core.Output = {
 	
+	/**
+	 * Returns string represented by scriptlet substituted with values evaluated from specified params
+	 * 
+	 * @memberOf Core.Output
+	 * @param {String} scriptlet Template scriptlet 
+	 * @param {Object} params Array or map of objects to be evaluated
+	 * @returns {String}
+	 * @type String
+	 */
 	exec: function(scriptlet, params) {
 		scriptlet = scriptlet + "";
 		params = params || {};
@@ -36,6 +48,14 @@ Core.Output = {
 		}
 	},
 	
+	/**
+	 * Returns string representing evaluated context in template depending on its type
+	 * 
+	 * @memberOf Core.Output
+	 * @param {Object} context
+	 * @returns {String}
+	 * @type String
+	 */
 	getString: function(context) {
 
 		if (context == null) {

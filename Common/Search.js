@@ -14,7 +14,8 @@
    limitations under the License.
 */
 
-include("Core.IO@Core");
+include("Sys@Sys");
+include("Sys.IO@Sys");
 include("Ea@Ea");
 
 Search = {
@@ -36,7 +37,7 @@ Search = {
 		var _package = Ea.getSelectedPackage();
 		
 		if (this.params.file) {
-			this.file = new Core.IO.File(this.params.file);
+			this.file = new Sys.IO.File(this.params.file);
 		}
 		
 		this.processPackage(_package);

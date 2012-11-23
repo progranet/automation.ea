@@ -14,28 +14,59 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Core.Target = {
-	type: {
-		info: 0,
-		debug: 1,
-		tree: 2
+		
+	/**
+	 * Enumeration of target types
+	 * 
+	 * @memberOf Core.Target
+	 * @enum {number}
+	 */
+	Type: {
+		INFO: 0,
+		DEBUG: 1,
+		TREE: 2
 	}
 };
 
-Core.Target.AbstractTarget = define({
+Core.Target.AbstractTarget = define(/** @lends Core.Target.AbstractTarget# */{
 	
 	_type: null,
 	
+	/**
+	 * Core.Target.AbstractTarget constructor
+	 * 
+	 * @constructs
+	 * @extends Core.Types.Object
+	 * @param {Number} type Specifies type of target as one of {@link Core.Target.Type}
+	 */
 	create: function(type) {
 		_super.create();
 		this._type = type;
 	},
 	
+	/**
+	 * Writes message to target
+	 * 
+	 * @memberOf Core.Target.AbstractTarget#
+	 * @param {String} message
+	 */
 	write: function(message) {
 		
 	},
 	
+	/**
+	 * Determines if target is debug
+	 * 
+	 * @see Core.Target.Type
+	 * @memberOf Core.Target.AbstractTarget#
+	 * @returns {Boolean}
+	 * @type Boolean
+	 */
 	isDebug: function() {
-		return this._type == Core.Target.type.debug;
+		return this._type == Core.Target.Type.DEBUG;
 	}
 });

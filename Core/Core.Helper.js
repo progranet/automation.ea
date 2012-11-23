@@ -32,21 +32,37 @@ String.prototype.trim = function() {
     return this.replace(/^\s+/g, "").replace(/\s+$/g, "");
 };
 
-
+/**
+ * @namespace
+ */
 Core.Helper = {
 	
-	getNames: function(object) {
+	/**
+	 * Returns array of names in map
+	 * 
+	 * @param {Object} map
+	 * @returns {Array}
+	 * @type Array
+	 */
+	getNames: function(map) {
 		var names = [];
-		for (name in object) {
+		for (name in map) {
 			names.push(name);
 		}
 		return names;
 	},
 	
-	getValues: function(object) {
+	/**
+	 * Returns array of values in map
+	 * 
+	 * @param {Object} map
+	 * @returns {Array}
+	 * @type Array
+	 */
+	getValues: function(map) {
 		var values = [];
-		for (name in object) {
-			values.push(object[name]);
+		for (name in map) {
+			values.push(map[name]);
 		}
 		return values;
 	}

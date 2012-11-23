@@ -14,10 +14,16 @@
    limitations under the License.
 */
 
+
+/**
+ * @namespace
+ */
 Html = {
+		
 	templates: {
 		
 	},
+	
 	params: {
 		replace: {
 			"\\r\\n": "<br>",
@@ -29,21 +35,35 @@ Html = {
 			"</ul>\\s*<br>": "</ul>"
 		}
 	},
+	
 	replace: {
 		
 	},
+	
 	_templateNamePattern: new RegExp("^<\\!--\\s*([\\w]+)\\s*-->\\s*$"),
 	
+	/**
+	 * Initializes namespace
+	 * 
+	 * @memberOf Html
+	 */
 	initialize: function() {
-		for (var search in Html.params.replace) {
+		/*for (var search in Html.params.replace) {
 			Html.replace[search] = Html.params.replace[search];
-		}
+		}*/
 		//eval(new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(scriptRoot + "Diff\\diff_match_patch_uncompressed.js", 1).ReadAll());
 	},
 	
+	/**
+	 * Loads HTML templates from specified file
+	 * 
+	 * @memberOf Html
+	 * @param {Object} file {@link Sys.IO.File} or string containing path to file
+	 * @param {Object} context Optional namespace containing file
+	 */
 	loadTemplates: function(file, context) {
 		if (typeof file == "string") {
-			file = new Core.IO.File(file, Core.IO.mode.read, Core.IO.unicode._default, context);
+			file = new Sys.IO.File(file, Sys.IO.mode.read, Sys.IO.unicode._default, context);
 		}
 		var templateName = null, template = "";
 		while (!file.atEnd()) {
@@ -66,19 +86,33 @@ Html = {
 	}
 };
 
-Html.Template = extend(Core.Types.Named, {
+Html.Template = extend(Core.Types.Named, /** @lends Html.Template# */ {
 	
 	_template: null,
 
+	/**
+	 * @constructs
+	 * @extends Core.Types.Named
+	 * @param {String} name
+	 * @param {String} template
+	 */
 	create: function(name, template) {
 		_super.create(name);
 		this._template = template;
 	},
 	
+	/**
+	 * Generates output using provided parameters
+	 * 
+	 * @memberOf Html.Template#
+	 * @param {Object} params
+	 * @returns {String}
+	 * @type String
+	 */
 	generate: function(params) {
 		var generated = Core.Output.exec(this._template, params);
-		for (var search in Html.replace) {
-			var replace = Html.replace[search];
+		for (var search in Html.params.replace) {
+			var replace = Html.params.replace[search];
 			generated = generated.replace(new RegExp(search, "g"), replace);
 		}
 		return generated;

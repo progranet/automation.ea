@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 300 D&C
+   Copyright 2012 300 D&C
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,26 +14,6 @@
    limitations under the License.
 */
 
+Sys = {
 
-include("Sys@Sys");
-include("Sys.IO@Sys");
-include("Ea@Ea");
-
-Inspect = {
-	params: {
-		
-	},
-	
-	execute: function() {
-		var object = Ea.Application.getRepository().getSelectedObject();
-		var target = null;
-		if (this.params.output) {
-			target = new Sys.IO.FileTarget(this.params.output);
-			Core.Log.registerTarget("info", target);
-		}
-		Ea.Helper.inspect(object);
-		if (target) {
-			target.close();
-		}
-	}
 };

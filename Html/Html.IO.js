@@ -14,14 +14,36 @@
    limitations under the License.
 */
 
-include("Core.IO@Core");
+include("Sys@Sys");
+include("Sys.IO@Sys");
 
+/**
+ * @namespace
+ */
 Html.IO = {};
 
-Html.IO.File = extend(Core.IO.File, {
+Html.IO.File = extend(Sys.IO.File, 
+		
+		/**
+		 * @lends Html.IO.File#
+		 */
+		{
+	
+	/**
+	 * @constructs
+	 * @param {String} path
+	 */
 	create: function(path) {
 		_super.create(path);
 	},
+	
+	/**
+	 * Writes string to output HTML according to specified template and provided parameters
+	 * 
+	 * @memberOf Html.IO.File#
+	 * @param {Html.Template} template
+	 * @param {Object} params
+	 */
 	write: function(template, params) {
 		_super.write(template.generate(params));
 	}

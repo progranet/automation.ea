@@ -14,6 +14,9 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Core.Log = {
 
 	params: {
@@ -24,10 +27,13 @@ Core.Log = {
 		tree: ["*"]
 	},
 
-	logs: {},
+	_logs: {},
 	
-	pattern: null,
-	
+	/**
+	 * Initializes namespace
+	 * 
+	 * @memberOf Core.Log
+	 */
 	initialize: function() {
 
 		var callbackStacktrace = function(source, namespace, propertyName, qualifiedName, _static) {
@@ -51,7 +57,7 @@ Core.Log = {
 			}\n";
 			return source;
 		};
-		Core.enrichMethodRegister(callbackStacktrace);
+		Core.registerMethodEnrichment(callbackStacktrace);
 
 		for (var level in Core.Log.params) {
 			this.registerLog(level, Core.Log.params[level]);
@@ -60,6 +66,9 @@ Core.Log = {
 		Core.enrichNamespace(Core);
 	},
 	
+	/**
+	 * @private
+	 */
 	_macth: function(level, namespace) {
 		var lt = level.mask;
 		for (var pi = 0; pi < lt.length; pi++) {
@@ -70,9 +79,12 @@ Core.Log = {
 		return false;
 	},
 	
+	/**
+	 * @private
+	 */
 	_log: function(level, context, propertyName, message, params) {
 		if (typeof(level) == "string")
-			level = Core.Log.logs[level];
+			level = Core.Log._logs[level];
 		var fn = context[propertyName];
 		if (!fn)
 			return;
@@ -108,8 +120,15 @@ Core.Log = {
 		}
 	},
 	
+	/**
+	 * Registers log on specified logging level and mask
+	 * 
+	 * @memberOf Core.Log
+	 * @param {String} level
+	 * @param {String} mask
+	 */
 	registerLog: function(level, mask) {
-		Core.Log.logs[level] = {
+		Core.Log._logs[level] = {
 			name: level,
 			mask: mask,
 			targets: []
@@ -120,12 +139,19 @@ Core.Log = {
 				return prefix + "Core.Log._log(\"" + level + "\", this, \"" + propertyName + "\", ";
 			});
 		};
-		Core.enrichMethodRegister(callbackLogs);
+		Core.registerMethodEnrichment(callbackLogs);
 	},
 	
+	/**
+	 * Registers target for logs
+	 * 
+	 * @memberOf Core.Log
+	 * @param {Object} level
+	 * @param {Core.Target.AbstractTarget} target
+	 */
 	registerTarget: function(level, target) {
 		if (typeof(level) == "string")
-			level = Core.Log.logs[level];
+			level = Core.Log._logs[level];
 		level.targets.push(target);
 		/*if (_logBuffer[level.name]) {
 			for (var mi = 0; mi < _logBuffer[level.name].length; mi++) {

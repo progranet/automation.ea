@@ -37,7 +37,7 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	
 	save: function(path, reuse) {
 		/*
-		var fileDate = Core.IO.getCreated(path);
+		var fileDate = Sys.IO.getCreated(path);
 		if (!reuse || (!fileDate || fileDate.valueOf() <= this.getModified())) {
 			Ea.getApplication().getProject().saveDiagram(this, path);
 			Ea.getApplication().getRepository().closeDiagram(this);

@@ -14,15 +14,34 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Core = {
 		
+	/**
+	 * Tests if property is a method 
+	 * 
+	 * @memberOf Core
+	 * @param {Object} property
+	 * @param {String} propertyName	 * @returns {Boolean}
+	 * @type Boolean	 * @static
+	 */
 	isFunction: function(property, propertyName) {
 		return typeof property == "function" && !/^_*[A-Z]/.test(propertyName) && !this.isNative(property);
 	},
 	
 	_fnPattern: new RegExp("^\\s*function\\s*([\\w$]*)\\s*\\(([\\w$,\\s]*)\\)\\s*\\{\\s*([\\w\\W]*)\\s*\\}\\s*$"),
 	_nativePattern: new RegExp("\\[native\\s*code\\]", "i"),
-	
+		/**
+	 * Returns parsed arguments of function   
+	 * 
+	 * @memberOf Core
+	 * @param {Function} fn
+	 * @returns {Object}
+	 * @type Object
+	 * @static
+	 */
 	parse: function(fn) {
 		var parsed = {
 			arguments: [],
@@ -34,20 +53,48 @@ Core = {
 			parsed.joinedArguments = pt[2];
 			parsed.body = pt[3];
 			parsed.name = pt[1];
+		
 		}
 		return parsed;
 	},
 	
+	/**
+	 * Tests if function is native 
+	 * 
+	 * @memberOf Core
+	 * @param {Function} fn
+	 * @returns {Boolean}
+	 * @type Boolean
+	 * @static
+	 */
 	isNative: function(fn) {
 		return this._nativePattern.test(this.parse(fn).body);
 	},
 	
 	_callbacksMethod: [],
-	
-	enrichMethodRegister: function(callback) {
+
+	/**
+	 * Registers method enrichment. All methods are passed to the registered callback function in order to enrich their source. 
+	 * 
+	 * @memberOf Core
+	 * @param {Function} callback function(source, namespace, propertyName, qualifiedName, _static)
+	 * @static
+	 */
+	registerMethodEnrichment: function(callback) {
 		this._callbacksMethod.push(callback);
 	},
 
+	/**
+	 * Enriches method with registered method enrichments.
+	 * 
+	 * @see Core.registerMethodEnrichment
+	 * @memberOf Core
+	 * @param {Object} namespace
+	 * @param {String} propertyName
+	 * @param {String} qualifiedName
+	 * @param {Boolean} _static
+	 * @static
+	 */
 	enrichMethod: function(namespace, propertyName, qualifiedName, _static) {
 		var property = namespace[propertyName];
 		if (!this.isFunction(namespace[propertyName], propertyName))
@@ -62,6 +109,14 @@ Core = {
 		namespace[propertyName].static = _static;
 	},
 	
+	/**
+	 * Enriches all methods in namespace with registered method enrichments. 
+	 * 
+	 * @see Core#enrichMethod
+	 * @memberOf Core
+	 * @param {Object} namespace
+	 * @static
+	 */
 	enrichNamespace: function(namespace) {
 		for (var propertyName in namespace) {
 			this.enrichMethod(namespace, propertyName, namespace.qualifiedName + "." + propertyName, true);
@@ -70,10 +125,26 @@ Core = {
 	
 	_callbackSource: [],
 	
-	enrichSourceRegister: function(callback) {
+	/**
+	 * Registers source enrichment. Source code of each being included library is passed to the registered callback function in order to enrich them. 
+	 * 
+	 * @memberOf Core
+	 * @param {Function} callback function(qualifiedName, source)
+	 * @static
+	 */
+	registerSourceEnrichment: function(callback) {
 		this._callbackSource.push(callback);
 	},
 
+	/**
+	 * Enriches source code of library with registered source enrichments.
+	 * 
+	 * @see Core.registerSourceEnrichment
+	 * @memberOf Core
+	 * @param {String} qualifiedName
+	 * @param {String} source
+	 * @static
+	 */
 	enrichSource: function(qualifiedName, source) {
 		for (var ci = 0; ci < this._callbackSource.length; ci++) {
 			var callback = this._callbackSource[ci];
@@ -82,6 +153,14 @@ Core = {
 		return source;
 	},
 	
+	/**
+	 * Merges properties of object to toObject.
+	 * 
+	 * @memberOf Core
+	 * @param {Object} toObject
+	 * @param {Object} object
+	 * @static
+	 */
 	merge: function(toObject, object) {
 		for (var name in object) {
 			if (name in toObject)

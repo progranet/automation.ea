@@ -75,7 +75,6 @@ _info = function(message, params, level) {
 			message: message,
 			params: params
 		});
-	Repository.WriteOutput("Script", message + " (params: [" + params.join(", ") + "])", undefined);
 };
 
 info = function(message, params) {

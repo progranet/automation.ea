@@ -132,7 +132,7 @@ Ea.Helper.Target = extend(Core.Target.AbstractTarget, {
 	},
 	
 	write: function(message) {
-		if (this._type == Core.Target.type.tree)
+		if (this._type == Core.Target.Type.TREE)
 			message = message.replace(/\|/g, "      |").replace(/\-/g, "—").replace(/\+/g, "[•]");
 		Ea.Application.getRepository().writeOutput(this._name, message);
 	}

@@ -87,7 +87,7 @@ Ea.Class = {
 			return source;
 		};
 
-		Core.enrichSourceRegister(callbackSource);
+		Core.registerSourceEnrichment(callbackSource);
 	},
 
 	createProxy: function(baseType, api, params) {

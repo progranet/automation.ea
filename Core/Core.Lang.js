@@ -14,17 +14,53 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Core.Lang = {
 
+	/**
+	 * Tests if specified type is class
+	 * 
+	 * @param {Function} type
+	 * @returns {Boolean}
+	 * @type Boolean
+	 * @static
+	 */
 	isClass: function(type) {
 		// TODO remove public property Core.Types.Object.isClass
 		return type.isClass;
 	},
 	
+	/**
+	 * Defines new class extending Core.Lang.Object class
+	 * 
+	 * @memberOf Core.Lang
+	 * @param {Object} namespace
+	 * @param {String} name
+	 * @param {Object} properties
+	 * @param {Object} staticProperties
+	 * @returns {Function}
+	 * @type Function
+	 * @static
+	 */
 	define: function(namespace, name, properties, staticProperties) {
 		return Core.Lang.extend(namespace, name, null, properties, staticProperties);
 	},
 	
+	/**
+	 * Defines new class extending super class
+	 * 
+	 * @memberOf Core.Lang
+	 * @param {Object} namespace
+	 * @param {String} name
+	 * @param {Function} superClass
+	 * @param {Object} properties
+	 * @param {Object} staticProperties
+	 * @returns {Function}
+	 * @type Function
+	 * @static
+	 */
 	extend: function(namespace, name, superClass, properties, staticProperties) {
 		
 		if (typeof(namespace) != "string")
@@ -62,15 +98,18 @@ Core.Lang = {
 		return _class;
 	},
 	
+	/**
+	 * @private
+	 */
 	_define: function(namespace, name, superClass, properties, staticProperties) {
 		
 		var args = Core.parse(properties.create).joinedArguments;
 		eval("var _class = function(" + args + ") {this.create.call(this" + (args ? ", " + args : "") + ");}");
-		Core.Lang.addStatic(_class, superClass, namespace, name, properties, staticProperties);
+		Core.Lang._addStatic(_class, superClass, namespace, name, properties, staticProperties);
 
 		for (var propertyName in properties) {
 			var property = properties[propertyName];
-			
+
 			if (Core.isFunction(property, propertyName)) {
 				var fn = property.toString();
 				fn = fn.replace(/_super\.([a-zA-Z0-9_$]+)\((\)?)/g, function($0, $1, $2) {
@@ -88,7 +127,10 @@ Core.Lang = {
 		return _class;
 	},
 	
-	addStatic: function(_class, _super, namespace, name, properties, staticProperties) {
+	/**
+	 * @private
+	 */
+	_addStatic: function(_class, _super, namespace, name, properties, staticProperties) {
 		_class.name = name;
 		_class.getName = function() {return name;};
 		_class.qualifiedName = namespace + "." + name;
@@ -145,4 +187,4 @@ var callbackSource = function(qualifiedName, source) {
 	});
 };
 
-Core.enrichSourceRegister(callbackSource);
+Core.registerSourceEnrichment(callbackSource);

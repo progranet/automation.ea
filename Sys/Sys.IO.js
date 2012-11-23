@@ -17,7 +17,7 @@
 var ForReading = 1, ForWriting = 2, ForAppending = 8;
 var TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0;
 
-Core.IO = {
+Sys.IO = {
 	mode: {
 		read: ForReading,
 		write: ForWriting,
@@ -37,11 +37,11 @@ Core.IO = {
 		}
 	},
 	copy: function(file, path, context) {
-		Core.IO.fileSystem.CopyFile(this._getPath(file, context), path);
+		Sys.IO.fileSystem.CopyFile(this._getPath(file, context), path);
 	},
 	createFolder: function(path) {
-		if (!Core.IO.fileSystem.FolderExists(path)) {
-			Core.IO.fileSystem.CreateFolder(path);
+		if (!Sys.IO.fileSystem.FolderExists(path)) {
+			Sys.IO.fileSystem.CreateFolder(path);
 		}
 	},
 	_getPath: function(file, library) {
@@ -54,28 +54,28 @@ Core.IO = {
 		return file;
 	},
 	getCreated: function(file) {
-		if (!Core.IO.fileSystem.FileExists(file)) return null;
-		return new Date(Core.IO.fileSystem.GetFile(file).DateCreated);
+		if (!Sys.IO.fileSystem.FileExists(file)) return null;
+		return new Date(Sys.IO.fileSystem.GetFile(file).DateCreated);
 	}
 };
 	
-Core.IO.File = define({
+Sys.IO.File = define({
 
 	_file: null,
 	path: null,
 	closed: false,
 	
 	create: function(path, mode, unicode, library) {
-		mode = mode || Core.IO.mode.write;
-		unicode = unicode || Core.IO.unicode.ascii;
-		path = Core.IO._getPath(path, library);
-		if (mode == Core.IO.mode.write) {
-			this._file = Core.IO.fileSystem.CreateTextFile(path, true, unicode);
+		mode = mode || Sys.IO.mode.write;
+		unicode = unicode || Sys.IO.unicode.ascii;
+		path = Sys.IO._getPath(path, library);
+		if (mode == Sys.IO.mode.write) {
+			this._file = Sys.IO.fileSystem.CreateTextFile(path, true, unicode);
 		}
-		else if (mode = Core.IO.mode.read) {
-			this._file = Core.IO.fileSystem.OpenTextFile(path, mode, false, Core.IO.unicode._default);
+		else if (mode = Sys.IO.mode.read) {
+			this._file = Sys.IO.fileSystem.OpenTextFile(path, mode, false, Sys.IO.unicode._default);
 		}
-		Core.IO._files.push(this);
+		Sys.IO._files.push(this);
 	},
 	
 	write: function(text) {
@@ -104,7 +104,7 @@ Core.IO.File = define({
 	}
 });
 
-Core.IO.FileTarget = extend(Core.Target.AbstractTarget, {
+Sys.IO.FileTarget = extend(Core.Target.AbstractTarget, {
 	
 	_path: null,
 	_file: null,
@@ -112,7 +112,7 @@ Core.IO.FileTarget = extend(Core.Target.AbstractTarget, {
 	create: function(path, debug) {
 		_super.create(debug);
 		this._path = path;
-		this._file = new Core.IO.File(this._path, Core.IO.mode.write);
+		this._file = new Sys.IO.File(this._path, Sys.IO.mode.write);
 	},
 	
 	write: function(message) {

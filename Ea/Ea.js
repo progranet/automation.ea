@@ -58,9 +58,9 @@ Ea = {
 	},
 	
 	initializeLogs: function(targetClass) {
-		var systemTarget = new targetClass("System", Core.Target.type.debug);
-		var scriptTarget = new targetClass("Script", Core.Target.type.info);
-		var treeTarget = new targetClass("Script", Core.Target.type.tree);
+		var systemTarget = new targetClass("System", Core.Target.Type.DEBUG);
+		var scriptTarget = new targetClass("Script", Core.Target.Type.INFO);
+		var treeTarget = new targetClass("Script", Core.Target.Type.TREE);
 		
 		Core.Log.registerTarget("error", systemTarget);
 		Core.Log.registerTarget("warn", systemTarget);
