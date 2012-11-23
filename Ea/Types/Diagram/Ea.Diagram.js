@@ -15,17 +15,17 @@
 */
 
 Ea.Diagram = {
-	margin: {
-		left: 25,
-		top: 35,
-		right: 35,
-		bottom: 25
+	Margin: {
+		LEFT: 25,
+		TOP: 35,
+		RIGHT: 35,
+		BOTTOM: 25
 	},
-	marginLanes: {
-		left: 20,
-		top: 30,
-		right: 20,
-		bottom: 10
+	MarginLanes: {
+		LEFT: 20,
+		TOP: 30,
+		RIGHT: 20,
+		BOTTOM: 10
 	}
 };
 
@@ -85,15 +85,15 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 					left = right;
 				});
 				dd.bottom = dd.bottom + 40;
-				margin = Ea.Diagram.marginLanes;
+				margin = Ea.Diagram.MarginLanes;
 			}
 			else {
-				margin = Ea.Diagram.margin;
+				margin = Ea.Diagram.Margin;
 			}
-			dd.width = dd.right - dd.left + margin.left + margin.right;
-			dd.height = dd.bottom - dd.top + margin.top + margin.bottom;
-			dd.correctionX = -dd.left + margin.left;
-			dd.correctionY = -dd.top + margin.top;
+			dd.width = dd.right - dd.left + margin.LEFT + margin.RIGHT;
+			dd.height = dd.bottom - dd.top + margin.TOP + margin.BOTTOM;
+			dd.correctionX = -dd.left + margin.LEFT;
+			dd.correctionY = -dd.top + margin.TOP;
 		}
 		return this._dimension;
 	},

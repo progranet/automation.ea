@@ -36,10 +36,6 @@ Html = {
 		}
 	},
 	
-	replace: {
-		
-	},
-	
 	_templateNamePattern: new RegExp("^<\\!--\\s*([\\w]+)\\s*-->\\s*$"),
 	
 	/**
@@ -48,9 +44,6 @@ Html = {
 	 * @memberOf Html
 	 */
 	initialize: function() {
-		/*for (var search in Html.params.replace) {
-			Html.replace[search] = Html.params.replace[search];
-		}*/
 		//eval(new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(scriptRoot + "Diff\\diff_match_patch_uncompressed.js", 1).ReadAll());
 	},
 	
@@ -58,12 +51,12 @@ Html = {
 	 * Loads HTML templates from specified file
 	 * 
 	 * @memberOf Html
-	 * @param {Object} file {@link Sys.IO.File} or string containing path to file
-	 * @param {Object} context Optional namespace containing file
+	 * @param {Sys.IO.File|String} file File reference or path to file
+	 * @param {?Object} context Namespace containing templates file
 	 */
 	loadTemplates: function(file, context) {
 		if (typeof file == "string") {
-			file = new Sys.IO.File(file, Sys.IO.mode.read, Sys.IO.unicode._default, context);
+			file = new Sys.IO.File(file, Sys.IO.Mode.READ, Sys.IO.Unicode.DEFAULT, context);
 		}
 		var templateName = null, template = "";
 		while (!file.atEnd()) {
@@ -107,7 +100,6 @@ Html.Template = extend(Core.Types.Named, /** @lends Html.Template# */ {
 	 * @memberOf Html.Template#
 	 * @param {Object} params
 	 * @returns {String}
-	 * @type String
 	 */
 	generate: function(params) {
 		var generated = Core.Output.exec(this._template, params);

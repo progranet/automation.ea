@@ -71,7 +71,7 @@ Word = {
 		info("Converting output to Office document");
 		var wordApp = new ActiveXObject("Word.Application");
 		try {
-			var template = wordApp.Documents.Open(Sys.IO._getPath(params.template, params.context), Word.WdOpenFormat.wdOpenFormatAuto, true);
+			var template = wordApp.Documents.Open(Sys.IO.getPath(params.template, params.context), Word.WdOpenFormat.wdOpenFormatAuto, true);
 			for (var mark in params.embeds) {
 				info("Embedding chapter [$] in template", [params.embeds[mark]]);
 				//debug("Embedding chapter [$] in template", [params.embeds[mark]]);

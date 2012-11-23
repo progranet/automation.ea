@@ -58,7 +58,6 @@ Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, /** @lends C
 	 * @memberOf Core.Types.Object#
 	 * @param {Function} _class
 	 * @returns {Boolean}
-	 * @type Boolean
 	 */
 	instanceOf: function(_class) {
 		return this._class === _class || this._class.isSubclassOf(_class);
@@ -71,7 +70,6 @@ Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, /** @lends C
 	 * @memberOf Core.Types.Object#
 	 * @param {Object} filter
 	 * @returns {Boolean}
-	 * @type Boolean
 	 */
 	match: function(filter) {
 		return (Core.Types.Filter.ensure(filter)).check(this);
@@ -117,7 +115,6 @@ Core.Types.Named = define(/** @lends Core.Types.Named# */{
 	 * 
 	 * @memberOf Core.Types.Named#
 	 * @returns {String}
-	 * @type String
 	 */
 	getName: function() {
 		return this._name;
@@ -159,7 +156,6 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * @memberOf Core.Types.Collection#
 	 * @param {Object} element
 	 * @returns {Boolean}
-	 * @type Boolean
 	 */
 	add: function(element) {
 		if (!element || !Core.Types.Object.isInstance(element))
@@ -243,7 +239,6 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @returns {Number}
-	 * @type Number
 	 */
 	getSize: function() {
 		return this._size;
@@ -254,7 +249,6 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @returns {Boolean}
-	 * @type Boolean
 	 */
 	isEmpty: function() {
 		return this._size == 0;
@@ -265,7 +259,6 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @returns {Boolean}
-	 * @type Boolean
 	 */
 	notEmpty: function() {
 		return this._size != 0;
@@ -276,7 +269,6 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @returns {Object}
-	 * @type Object
 	 */
 	first: function() {
 		if (this._size == 0)
@@ -298,7 +290,6 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * @memberOf Core.Types.Collection#
 	 * @param {Object} filter
 	 * @returns {Core.Types.Collection}
-	 * @type Core.Types.Collection
 	 */
 	filter: function(filter) {
 		if (!filter) return this;
@@ -359,7 +350,6 @@ Core.Types.Map = extend(Core.Types.Collection, /** @lends Core.Types.Map# */{
 	 * @memberOf Core.Types.Map#
 	 * @param {Object} key
 	 * @returns {Object}
-	 * @type Object
 	 */
 	get: function(key) {
 		return key in this._map ? this._map[key] : undefined;
@@ -384,9 +374,11 @@ Core.Types.Filter = define(/** @lends Core.Types.Filter# */{
 	_filter: null,
 
 	/**
+	 * Creates new filter
+	 * 
 	 * @constructs
 	 * @extends Core.Types.Object
-	 * @param {Object} filter
+	 * @param {?(Class|String|Function)} filter
 	 */
 	create: function(filter) {
 		_super.create();
@@ -407,7 +399,6 @@ Core.Types.Filter = define(/** @lends Core.Types.Filter# */{
 	 * @memberOf Core.Types.Filter#
 	 * @param {Object} object
 	 * @returns {Boolean}
-	 * @type Boolean
 	 */
 	check: function(object) {
 		return this._filter ? this._filter.call(object) : true;

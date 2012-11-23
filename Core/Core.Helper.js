@@ -14,6 +14,13 @@
    limitations under the License.
 */
 
+/**
+ * Checks if this array contains specified element
+ * 
+ * @memberOf Array#
+ * @param {Object} element
+ * @returns {Boolean}
+ */
 Array.prototype.contains = function(element) {
 	for (var i = 0; i < this.length; i++) {
 		if (this[i] === element) return true;
@@ -21,6 +28,14 @@ Array.prototype.contains = function(element) {
 	return false;
 };
 
+/**
+ * Left pads this string with specified string while length of this string is less than specified 
+ * 
+ * @memberOf String#
+ * @param {String} pad
+ * @param {Number} length
+ * @returns {String}
+ */
 String.prototype.lpad = function(pad, length) {
 	var s = this;
     while (s.length < length)
@@ -28,6 +43,12 @@ String.prototype.lpad = function(pad, length) {
     return s;
 };
 
+/**
+ * Trims this string both sides 
+ * 
+ * @memberOf String#
+ * @returns {String}
+ */
 String.prototype.trim = function() {
     return this.replace(/^\s+/g, "").replace(/\s+$/g, "");
 };
@@ -42,7 +63,6 @@ Core.Helper = {
 	 * 
 	 * @param {Object} map
 	 * @returns {Array}
-	 * @type Array
 	 */
 	getNames: function(map) {
 		var names = [];
@@ -57,7 +77,6 @@ Core.Helper = {
 	 * 
 	 * @param {Object} map
 	 * @returns {Array}
-	 * @type Array
 	 */
 	getValues: function(map) {
 		var values = [];

@@ -14,111 +14,221 @@
    limitations under the License.
 */
 
-var ForReading = 1, ForWriting = 2, ForAppending = 8;
-var TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0;
-
+/**
+ * @namespace
+ */
 Sys.IO = {
-	mode: {
-		read: ForReading,
-		write: ForWriting,
-		append: ForAppending
+
+	/**
+	 * @memberOf Sys.IO
+	 * @enum {Number}
+	 */
+	Mode: {
+		READ: 	1,	//ForReading,
+		WRITE: 	2,	//ForWriting,
+		APPEND:	8	//ForAppending
 	},
-	unicode: {
-		_default: TristateUseDefault,
-		unicode: TristateTrue,
-		ascii: TristateFalse
+
+	/**
+	 * @memberOf Sys.IO
+	 * @enum {Number}
+	 */
+	Unicode: {
+		DEFAULT:	-2,	//TristateUseDefault,
+		UNICODE:	-1,	//TristateTrue,
+		ASCII:		0	//TristateFalse
 	},
-	fileSystem: new ActiveXObject("Scripting.FileSystemObject"),
+	
+	
+	_fileSystem: new ActiveXObject("Scripting.FileSystemObject"),
+	
 	_files: [],
+	
+	/**
+	 * Finalizes namespace - closes used files
+	 * 
+	 * @memberOf Sys.IO
+	 */
 	finalize: function() {
 		debug("closing used files");
 		for (var f = 0; f < this._files.length; f++) {
 			this._files[f].close();
 		}
 	},
-	copy: function(file, path, context) {
-		Sys.IO.fileSystem.CopyFile(this._getPath(file, context), path);
+	
+	/**
+	 * Makes copy of specified file in script space to specified folder 
+	 * 
+	 * @see Sys.IO.getPath
+	 * @memberOf Sys.IO
+	 * @param {String} filePath
+	 * @param {String} folderPath
+	 * @param {?Object} context Namespace containing file
+	 */
+	copy: function(file, folderPath, context) {
+		Sys.IO._fileSystem.CopyFile(this.getPath(file, context), folderPath);
 	},
+	
+	/**
+	 * Creates folder on specified path
+	 * 
+	 * @memberOf Sys.IO
+	 * @param {String} path
+	 */
 	createFolder: function(path) {
-		if (!Sys.IO.fileSystem.FolderExists(path)) {
-			Sys.IO.fileSystem.CreateFolder(path);
+		if (!Sys.IO._fileSystem.FolderExists(path)) {
+			Sys.IO._fileSystem.CreateFolder(path);
 		}
 	},
-	_getPath: function(file, library) {
-		if (library) {
-			file = library._loader.package + file;
+	
+	/**
+	 * Returns absolute path to the file in script space
+	 * 
+	 * @memberOf Sys.IO
+	 * @param {String} file
+	 * @param {?Object} namespace Namespace containing file 
+	 * @returns {String}
+	 */
+	getPath: function(file, namespace) {
+		if (namespace) {
+			file = namespace._loader.package + file;
 		}
 		if (file.indexOf(":") == -1) {
 			file = scriptRoot + file;
 		}
 		return file;
 	},
-	getCreated: function(file) {
-		if (!Sys.IO.fileSystem.FileExists(file)) return null;
-		return new Date(Sys.IO.fileSystem.GetFile(file).DateCreated);
+	
+	/**
+	 * Returns creation date for specified file
+	 * 
+	 * @memberOf Sys.IO
+	 * @param {String} filePath
+	 * @returns {Date}
+	 */
+	getCreated: function(filePath) {
+		if (!Sys.IO._fileSystem.FileExists(filePath)) return null;
+		return new Date(Sys.IO._fileSystem.GetFile(filePath).DateCreated);
 	}
 };
 	
-Sys.IO.File = define({
+Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 
 	_file: null,
-	path: null,
-	closed: false,
+	_path: null,
+	_closed: false,
 	
-	create: function(path, mode, unicode, library) {
-		mode = mode || Sys.IO.mode.write;
-		unicode = unicode || Sys.IO.unicode.ascii;
-		path = Sys.IO._getPath(path, library);
-		if (mode == Sys.IO.mode.write) {
-			this._file = Sys.IO.fileSystem.CreateTextFile(path, true, unicode);
+	/**
+	 * Creates new file wrapper. According to parameters file will be opened (read mode) or created (write modes)
+	 * 
+	 * @constructs
+	 * @param {String} file
+	 * @param {?Sys.IO.Mode} mode File wrapper creation mode (default Sys.IO.Mode.WRITE)
+	 * @param {?Sys.IO.Unicode} unicode File unicode mode (default Sys.IO.Unicode.ASCII)
+	 * @param {?Object} namespace Namespace containing file
+	 */
+	create: function(file, mode, unicode, namespace) {
+		mode = mode || Sys.IO.Mode.WRITE;
+		unicode = unicode || Sys.IO.Unicode.ASCII;
+		file = Sys.IO.getPath(file, namespace);
+		if (mode == Sys.IO.Mode.WRITE) {
+			this._file = Sys.IO._fileSystem.CreateTextFile(file, true, unicode);
 		}
-		else if (mode = Sys.IO.mode.read) {
-			this._file = Sys.IO.fileSystem.OpenTextFile(path, mode, false, Sys.IO.unicode._default);
+		else if (mode = Sys.IO.Mode.READ) {
+			this._file = Sys.IO._fileSystem.OpenTextFile(file, mode, false, Sys.IO.Unicode.DEFAULT);
 		}
 		Sys.IO._files.push(this);
 	},
 	
+	/**
+	 * Writes text to file.
+	 * 
+	 * @memberOf Sys.IO.File#
+	 * @param {String} text
+	 */
 	write: function(text) {
 		this._file.Write(text);
 	},
 	
+	/**
+	 * Writes line to file.
+	 * 
+	 * @memberOf Sys.IO.File#
+	 * @param {String} text
+	 */
 	writeLine: function(text) {
 		this._file.WriteLine(text);
 	},
 	
+	/**
+	 * Reads line from file.
+	 * 
+	 * @memberOf Sys.IO.File#
+	 * @returns {String}
+	 */
 	readLine: function() {
 		return this._file.ReadLine();
 	},
 	
+	/**
+	 * Checks if file is at the end
+	 * 
+	 * @memberOf Sys.IO.File#
+	 * @returns {Boolean}
+	 */
 	atEnd: function() {
 		return this._file.AtEndOfStream;
 	},
 	
+	/**
+	 * Closes file.
+	 * 
+	 * @memberOf Sys.IO.File#
+	 */
 	close: function() {
-		if (this.closed) {
-			debug("file already closed: " + this.path);
+		if (this._closed) {
+			debug("file already closed: " + this._path);
 			return;
 		}
 		this._file.Close();
-		this.closed = true;
+		this._closed = true;
 	}
 });
 
-Sys.IO.FileTarget = extend(Core.Target.AbstractTarget, {
+Sys.IO.FileTarget = extend(Core.Target.AbstractTarget, /** @lends Sys.IO.FileTarget# */ {
 	
 	_path: null,
 	_file: null,
 	
-	create: function(path, debug) {
-		_super.create(debug);
+	/**
+	 * Creates new file target
+	 * 
+	 * @constructs
+	 * @extends Core.Target.AbstractTarget
+	 * @param {String} path Target file path
+	 * @param {Number} type Specifies type of target as one of {@link Core.Target.Type}
+	 */
+	create: function(path, type) {
+		_super.create(type);
 		this._path = path;
-		this._file = new Sys.IO.File(this._path, Sys.IO.mode.write);
+		this._file = new Sys.IO.File(this._path, Sys.IO.Mode.WRITE);
 	},
 	
+	/**
+	 * Writes message to target file
+	 * 
+	 * @memberOf Core.Target.FileTarget#
+	 * @param {String} message
+	 */
 	write: function(message) {
 		this._file.writeLine(message);
 	},
 	
+	/**
+	 * Closes target file
+	 * 
+	 * @memberOf Core.Target.FileTarget#
+	 */
 	close: function() {
 		this._file.close();
 	}

@@ -22,15 +22,11 @@ include("Sys.IO@Sys");
  */
 Html.IO = {};
 
-Html.IO.File = extend(Sys.IO.File, 
-		
-		/**
-		 * @lends Html.IO.File#
-		 */
-		{
+Html.IO.File = extend(Sys.IO.File, /** @lends Html.IO.File# */ {
 	
 	/**
 	 * @constructs
+	 * @extends Sys.IO.File
 	 * @param {String} path
 	 */
 	create: function(path) {

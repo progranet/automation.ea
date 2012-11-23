@@ -64,7 +64,6 @@ Core.Target.AbstractTarget = define(/** @lends Core.Target.AbstractTarget# */{
 	 * @see Core.Target.Type
 	 * @memberOf Core.Target.AbstractTarget#
 	 * @returns {Boolean}
-	 * @type Boolean
 	 */
 	isDebug: function() {
 		return this._type == Core.Target.Type.DEBUG;

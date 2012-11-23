@@ -25,7 +25,7 @@ Core = {
 	 * @memberOf Core
 	 * @param {Object} property
 	 * @param {String} propertyName	 * @returns {Boolean}
-	 * @type Boolean	 * @static
+	 * @static
 	 */
 	isFunction: function(property, propertyName) {
 		return typeof property == "function" && !/^_*[A-Z]/.test(propertyName) && !this.isNative(property);
@@ -39,7 +39,6 @@ Core = {
 	 * @memberOf Core
 	 * @param {Function} fn
 	 * @returns {Object}
-	 * @type Object
 	 * @static
 	 */
 	parse: function(fn) {
@@ -64,7 +63,6 @@ Core = {
 	 * @memberOf Core
 	 * @param {Function} fn
 	 * @returns {Boolean}
-	 * @type Boolean
 	 * @static
 	 */
 	isNative: function(fn) {
@@ -112,7 +110,7 @@ Core = {
 	/**
 	 * Enriches all methods in namespace with registered method enrichments. 
 	 * 
-	 * @see Core#enrichMethod
+	 * @see Core.enrichMethod
 	 * @memberOf Core
 	 * @param {Object} namespace
 	 * @static

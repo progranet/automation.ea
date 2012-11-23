@@ -146,7 +146,7 @@ Core.Log = {
 	 * Registers target for logs
 	 * 
 	 * @memberOf Core.Log
-	 * @param {Object} level
+	 * @param {String} level
 	 * @param {Core.Target.AbstractTarget} target
 	 */
 	registerTarget: function(level, target) {

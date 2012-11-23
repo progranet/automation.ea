@@ -39,9 +39,8 @@ Core.Lang = {
 	 * @param {Object} namespace
 	 * @param {String} name
 	 * @param {Object} properties
-	 * @param {Object} staticProperties
+	 * @param {?Object} staticProperties
 	 * @returns {Function}
-	 * @type Function
 	 * @static
 	 */
 	define: function(namespace, name, properties, staticProperties) {
@@ -56,9 +55,8 @@ Core.Lang = {
 	 * @param {String} name
 	 * @param {Function} superClass
 	 * @param {Object} properties
-	 * @param {Object} staticProperties
+	 * @param {?Object} staticProperties
 	 * @returns {Function}
-	 * @type Function
 	 * @static
 	 */
 	extend: function(namespace, name, superClass, properties, staticProperties) {
