@@ -25,7 +25,13 @@ Inspect = {
 	},
 	
 	execute: function() {
+		
+		if (!Ea.Application.isActivated()) {
+			Ea.initializeApplication();
+			Ea.initializeLogs(Ea.Helper.Target);
+		}
 		var object = Ea.Application.getRepository().getSelectedObject();
+		
 		var target = null;
 		if (this.params.output) {
 			target = new Sys.IO.FileTarget(this.params.output);

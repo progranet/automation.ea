@@ -123,7 +123,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 		Pseudostate: {
 			100: "ActivityInitial",
 			101: "ActivityFinal"
-		}		
+		}
 	},
 	
 	getType: function(source) {
@@ -233,6 +233,8 @@ Ea.Element.Object = extend(Ea.Element._Base, {
 	_runState: attribute({api: "RunState", type: Ea.DataTypes.RunState})
 });
 
+Ea.Element.Goal = extend(Ea.Element.Object);
+
 Ea.Element.Package = extend(Ea.Element._Base, {
 	getPackage: function() {
 		return Ea.getByGuid(Ea.Package._Base, this.getGuid());
@@ -263,6 +265,8 @@ Ea.Element.Class = extend(Ea.Element.Classifier);
 
 Ea.Element.Metaclass = extend(Ea.Element.Class);
 
+Ea.Element.Meaning = extend(Ea.Element.Class);
+
 Ea.Element.AssociationClass = extend(Ea.Element.Class, {
 	getAssociation: function() {
 		return Ea.getById(Ea.Connector._Base, Number(this._getMiscData3()).valueOf());
@@ -273,8 +277,6 @@ Ea.Element.AssociationClass = extend(Ea.Element.Class, {
 });
 
 Ea.Element.Interface = extend(Ea.Element.Classifier);
-
-Ea.Element.Requirement = extend(Ea.Element._Base);
 
 Ea.Element._BehavioralElement = extend(Ea.Element._Base, {
 	getBasicScenario: function() {
@@ -298,125 +300,21 @@ Ea.Element._BehavioralElement = extend(Ea.Element._Base, {
 },
 {
 	/*
-	 * _scenarios: attribute({api: "Scenarios", type: "Ea.Collection._Base", elementType: "Ea.Scenario._Base", aggregation: "composite"}),
 	 * don't use this property - EA returns faked scenarios (not used in scenario extensions)!
+	 * _scenarios: attribute({api: "Scenarios", type: "Ea.Collection._Base", elementType: "Ea.Scenario._Base", aggregation: "composite"}),
 	 */
 	_basicScenarios: attribute({api: "Scenarios", type: "Ea.Collection._Base", elementType: "Ea.Scenario._Base", filter: "this.instanceOf(Ea.Scenario.BasicPath)", private: true}),
 	_basicScenario: derived({type: "Ea.Scenario.BasicPath", getter: "getBasicScenario", aggregation: "composite"}),
 	_scenarioExtensions: derived({type: "Core.Types.Collection", elementType: "Ea.ScenarioExtension._Base", getter: "getScenarioExtensions", aggregation: "composite"})
 });
 
-Ea.Element.Pseudostate = extend(Ea.Element._BehavioralElement);
-
+// Activity --> Behavior --> Class --> Classifier
 Ea.Element.Activity = extend(Ea.Element._BehavioralElement);
 
-Ea.Element.ActivityInitial = extend(Ea.Element.Pseudostate);
-
-Ea.Element.ActivityFinal = extend(Ea.Element.Pseudostate);
-
-Ea.Element.ActivityPartition = extend(Ea.Element._Base);
-
+// Action --> ActivityNode --> NamedElement
 Ea.Element.Action = extend(Ea.Element._BehavioralElement);
 
-Ea.Element.StateMachine = extend(Ea.Element._BehavioralElement);
-
-Ea.Element.Actor = extend(Ea.Element._Base);
-
-Ea.Element.Boundary = extend(Ea.Element._Base);
-
-Ea.Element.DecisionNode = extend(Ea.Element._Base);
-
-Ea.Element.MergeNode = extend(Ea.Element._Base);
-
-Ea.Element.LoopNode = extend(Ea.Element._Base);
-
-Ea.Element.Note = extend(Ea.Element._Base, {
-	getNoted: function() {
-		var string = this._getMiscData0();
-		if (string == null) return null;
-		// TODO: parse 'idref1=241181;idref2=241185;idref3=243101;'
-	}
-});
-
-Ea.Element.ConnectorNote = extend(Ea.Element.Note);
-
-Ea.Element.Synchronization = extend(Ea.Element._Base);
-
-Ea.Element.UMLDiagram = extend(Ea.Element._Base);
-
-Ea.Element.ActionPin = extend(Ea.Element._Base);
-
-Ea.Element.Text = extend(Ea.Element._Base, {
-	getDiagram: function() {
-		var link = this._getMiscData0();
-		if (link == null) return null;
-		return Ea.getById(Ea.Diagram._Base, link);
-	}
-});
-
-Ea.Element.Rule = extend(Ea.Element._Base);
-
-Ea.Element.Event = extend(Ea.Element._Base);
-
-Ea.Element.Reciever = extend(Ea.Element.Event);
-
-Ea.Element.Sender = extend(Ea.Element.Event);
-
-Ea.Element.Region = extend(Ea.Element._Base);
-Ea.Element.ExpansionRegion = extend(Ea.Element.Region);
-Ea.Element.InterruptibleActivityRegion = extend(Ea.Element.Region);
-
-//Ea.Element.DataStore = extend(Ea.Element._Base);
-
-Ea.Element.Message = extend(Ea.Element._Base);
-
-Ea.Element.Constraint = extend(Ea.Element._Base, {
-	getConstrainted: function() {
-		var string = this.getMiscData0();
-		if (string == null) return null;
-		// TODO: parse 'idref1=264627;idref2=264626;'
-	}
-});
-
-Ea.Element.State = extend(Ea.Element._BehavioralElement);
-
-Ea.Element.InitialState = extend(Ea.Element.State);
-
-Ea.Element.FinalState = extend(Ea.Element.State);
-
 Ea.Element.Process = extend(Ea.Element._BehavioralElement);
-
-Ea.Element.Goal = extend(Ea.Element.Object);
-
-Ea.Element.ActivityParameter = extend(Ea.Element._Base);
-
-Ea.Element.InformationItem = extend(Ea.Element._Base);
-
-Ea.Element.Device = extend(Ea.Element._Base);
-
-Ea.Element.Server = extend(Ea.Element.Device);
-
-Ea.Element.Meaning = extend(Ea.Element.Class);
-
-Ea.Element.Node = extend(Ea.Element._Base); // deployment
-
-Ea.Element.Artifact = extend(Ea.Element._Base);
-
-Ea.Element.DeploymentSpecification = extend(Ea.Element._Base);
-
-Ea.Element.InteractionFragment = extend(Ea.Element._Base);
-
-Ea.Element.InteractionOccurrence = extend(Ea.Element._Base);
-
-Ea.Element.MessageEndpoint = extend(Ea.Element._Base);
-
-Ea.Element.MessageEnd = extend(Ea.Element.MessageEndpoint);
-
-Ea.Element.Gate = extend(Ea.Element.MessageEndpoint);
-
-Ea.Element.Sequence = extend(Ea.Element._Base);
-
-Ea.Element.ProvidedInterface = extend(Ea.Element._Base);
 
 Ea.Element._CallAction = extend(Ea.Element.Action, {
 	_toString: function() {
@@ -429,9 +327,44 @@ Ea.Element.CallBehaviorAction = extend(Ea.Element._CallAction);
 
 Ea.Element.CallOperationAction = extend(Ea.Element._CallAction);
 
+// UseCase --> BehavioredClassifier --> Classifier
 Ea.Element.UseCase = extend(Ea.Element._BehavioralElement, {},
 {
 	_extensionPoints: attribute({api: "ExtensionPoints", type: Ea.DataTypes.List})
+});
+
+Ea.Element.Pseudostate = extend(Ea.Element._Base);
+Ea.Element.ActivityInitial = extend(Ea.Element.Pseudostate);
+Ea.Element.ActivityFinal = extend(Ea.Element.Pseudostate);
+
+Ea.Element.Event = extend(Ea.Element._Base);
+Ea.Element.Reciever = extend(Ea.Element.Event);
+Ea.Element.Sender = extend(Ea.Element.Event);
+
+Ea.Element.Constraint = extend(Ea.Element._Base, {
+	getConstrainted: function() {
+		var string = this.getMiscData0();
+		if (string == null) return null;
+		// TODO: parse 'idref1=264627;idref2=264626;'
+	}
+});
+
+Ea.Element.Note = extend(Ea.Element._Base, {
+	getNoted: function() {
+		var string = this._getMiscData0();
+		if (string == null) return null;
+		// TODO: parse 'idref1=241181;idref2=241185;idref3=243101;'
+	}
+});
+Ea.Element.ConnectorNote = extend(Ea.Element.Note);
+Ea.Element.ConnectorConstraint = extend(Ea.Element.Note);
+
+Ea.Element.Text = extend(Ea.Element._Base, {
+	getDiagram: function() {
+		var link = this._getMiscData0();
+		if (link == null) return null;
+		return Ea.getById(Ea.Diagram._Base, link);
+	}
 });
 
 include("Ea.TypedElement@Ea.Types.Common");

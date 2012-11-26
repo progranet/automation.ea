@@ -217,7 +217,7 @@ Sys.IO.FileTarget = extend(Core.Target.AbstractTarget, /** @lends Sys.IO.FileTar
 	/**
 	 * Writes message to target file
 	 * 
-	 * @memberOf Core.Target.FileTarget#
+	 * @memberOf Sys.IO.FileTarget#
 	 * @param {String} message
 	 */
 	write: function(message) {
@@ -227,10 +227,9 @@ Sys.IO.FileTarget = extend(Core.Target.AbstractTarget, /** @lends Sys.IO.FileTar
 	/**
 	 * Closes target file
 	 * 
-	 * @memberOf Core.Target.FileTarget#
+	 * @memberOf Sys.IO.FileTarget#
 	 */
 	close: function() {
 		this._file.close();
 	}
 });
-

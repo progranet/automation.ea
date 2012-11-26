@@ -14,14 +14,25 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Ea.TypedElement = {
 		
 };
 
+/**
+ * @constructor
+ * @extends Ea.Types.Namespace
+ */
 Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 
 	_type: null,
 	
+	/**
+	 * @memberOf Ea.TypedElement#
+	 * @returns {Ea.DataTypes.PrimitiveType|Ea.Element._Base}
+	 */
 	getType: function() {
 		if (!this._type || Ea.mm) {
 			this._type = this._getClassifier();

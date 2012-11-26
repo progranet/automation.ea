@@ -56,7 +56,7 @@ Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, /** @lends C
 	 * Checks if object is instance of specified class
 	 * 
 	 * @memberOf Core.Types.Object#
-	 * @param {Function} _class
+	 * @param {Class} _class
 	 * @returns {Boolean}
 	 */
 	instanceOf: function(_class) {

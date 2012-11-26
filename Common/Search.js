@@ -27,14 +27,14 @@ Search = {
 	found: new Core.Types.Collection(),
 
 	execute: function() {
-		info("=== START ===");
 
 		if (!Ea.Application.isActivated()) {
 			Ea.initializeApplication();
-			Ea.initializeEaLogs();
+			Ea.initializeLogs(Ea.Helper.Target);
 		}
+		info("=== START ===");
 		
-		var _package = Ea.getSelectedPackage();
+		var _package = Ea.Application.getRepository().getSelectedPackage();
 		
 		if (this.params.file) {
 			this.file = new Sys.IO.File(this.params.file);

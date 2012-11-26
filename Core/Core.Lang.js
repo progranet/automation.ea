@@ -40,7 +40,7 @@ Core.Lang = {
 	 * @param {String} name
 	 * @param {Object} properties
 	 * @param {?Object} staticProperties
-	 * @returns {Function}
+	 * @returns {Class}
 	 * @static
 	 */
 	define: function(namespace, name, properties, staticProperties) {
@@ -53,10 +53,10 @@ Core.Lang = {
 	 * @memberOf Core.Lang
 	 * @param {Object} namespace
 	 * @param {String} name
-	 * @param {Function} superClass
+	 * @param {Class} superClass
 	 * @param {Object} properties
 	 * @param {?Object} staticProperties
-	 * @returns {Function}
+	 * @returns {Class}
 	 * @static
 	 */
 	extend: function(namespace, name, superClass, properties, staticProperties) {
@@ -101,8 +101,9 @@ Core.Lang = {
 	 */
 	_define: function(namespace, name, superClass, properties, staticProperties) {
 		
-		var args = Core.parse(properties.create).joinedArguments;
-		eval("var _class = function(" + args + ") {this.create.call(this" + (args ? ", " + args : "") + ");}");
+		//var args = Core.parse(properties.create).joinedArguments;
+		//eval("var _class = function(" + args + ") {this.create.call(this" + (args ? ", " + args : "") + ");}");
+		var _class = new Function("this.create.apply(this, arguments);");
 		Core.Lang._addStatic(_class, superClass, namespace, name, properties, staticProperties);
 
 		for (var propertyName in properties) {

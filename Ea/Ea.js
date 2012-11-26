@@ -14,12 +14,19 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Ea = {
 	
-	mm: false, // Modification Mode switch
-	
-	TRUE: 1,
-	FALSE: 0,
+	/**
+	 * Modification Mode switch
+	 * 
+	 * @memberOf Ea
+	 * @constant
+	 * @type Boolean
+	 */
+	mm: false,
 	
 	params: {},
 	

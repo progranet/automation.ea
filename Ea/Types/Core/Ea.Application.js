@@ -14,12 +14,19 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Ea.Application = {
 	
 	_active: null,
 	_default: "_default",
 	_applications: {},
 	
+	/**
+	 * @constructs
+	 * @param {Object} params
+	 */
 	create: function(params) {
 		var name = params.name || this._default;
 		var app = params.path ? new ActiveXObject("EA.App") : App;
@@ -32,6 +39,10 @@ Ea.Application = {
 			this._applications[name].project.load(params.path);
 	},
 	
+	/**
+	 * @memberOf Ea.Application
+	 * @param name
+	 */
 	activate: function(name) {
 		name = name || this._default;
 		this._active = name;

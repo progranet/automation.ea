@@ -14,6 +14,9 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Ea.Package = {};
 
 Ea.Package._Base = extend(Ea.Types.Namespace, {},
