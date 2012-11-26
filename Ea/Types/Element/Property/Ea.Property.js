@@ -25,7 +25,12 @@ Ea.Property = {
 	}
 };
 
-Ea.Property._Base = extend(Ea.Types.Named, {},
+Ea.Property._Base = extend(Ea.Types.Named, {
+	
+	/*getValue: function() {
+		return this._source.getApi().Value;
+	}*/
+},
 {
 	api: "Property",
 
@@ -38,6 +43,7 @@ Ea.Property._Base = extend(Ea.Types.Named, {},
 	_type: attribute({api: "Type", private: true}),
 	__validation: attribute({api: "Validation", private: true}),
 	_value: attribute({api: "Value"})
+	//_value: derived({getter: "getValue"})
 
 });
 

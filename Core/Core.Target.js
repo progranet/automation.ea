@@ -28,7 +28,8 @@ Core.Target = {
 	Type: {
 		INFO: 0,
 		DEBUG: 1,
-		TREE: 2
+		TREE: 2,
+		NULL: 3
 	}
 };
 

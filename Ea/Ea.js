@@ -68,12 +68,14 @@ Ea = {
 		var systemTarget = new targetClass("System", Core.Target.Type.DEBUG);
 		var scriptTarget = new targetClass("Script", Core.Target.Type.INFO);
 		var treeTarget = new targetClass("Script", Core.Target.Type.TREE);
+		var quietTarget = new Core.Target.AbstractTarget(Core.Target.Type.NULL);
 		
 		Core.Log.registerTarget("error", systemTarget);
 		Core.Log.registerTarget("warn", systemTarget);
 		Core.Log.registerTarget("debug", systemTarget);
 		Core.Log.registerTarget("info", scriptTarget);
 		Core.Log.registerTarget("tree", treeTarget);
+		Core.Log.registerTarget("quiet", quietTarget);
 	},
 	
 	_guid: /^\{[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}\}$/i,

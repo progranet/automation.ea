@@ -24,7 +24,8 @@ Core.Log = {
 		info: ["*"],
 		warn: ["*"],
 		debug: ["*"],
-		tree: ["*"]
+		tree: ["*"],
+		quiet: ["*"]
 	},
 
 	_logs: {},

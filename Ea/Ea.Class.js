@@ -115,17 +115,23 @@ Ea.Class.Source = define({
 	},
 	
 	getApiValue: function(property) {
-		if (property.index == null) {
-			try {
-				return this._api[property.api];
+			if (property.index == null) {
+				var value;
+				try {
+					value = this._api[property.api];
+					//	don't remove this dumb check:
+					//		EA for some reason throws exception on access to Ea.Property._Base._value value for NoteLink property
+					//		logging of this value is necessary for exception handing (i don't know why)
+					if (property.qualifiedName == "Ea.Property._Base._value")
+						quiet("$", [value]);
+				}
+				catch(error) {
+					warn("EA API exception on get attribute value $ ($)", [property.qualifiedName, error.message]);
+					value = null;
+				}
+				return value;
 			}
-			catch(error) {
-				warn("EA API exception on get attribute value $ ($)", [property.qualifiedName, error.message]);
-				return null;
-			}
-			
-		}
-		return this._api[property.api](property.index);
+			return this._api[property.api](property.index);
 	},
 	
 	getValue: function(property) {

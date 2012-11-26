@@ -146,19 +146,48 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 		return proxy;
 	},
 	
-	getByQuery: function(type, table, key, value, id) {
-		var sql = "select t." + id + " from " + table + " t where t." + key + " = " + value;
+	findByQuery: function(table, key, value) {
+		var sql = "select * from " + table + " where " + key + " = " + value;
 		var xml = this._source.getApi().SQLQuery(sql);
-		var ids = new Array();
-		xml.replace(new RegExp("<" + id + ">(\\d+)<\\/" + id + ">", "g"), function(whole, id) {
-			ids.push(id);
-		});
+		
+		var dom = new ActiveXObject( "MSXML2.DOMDocument" );
+		dom.validateOnParse = false;
+		dom.async = false;
+		
+		var parsed = dom.loadXML(xml);
+		if (!parsed) {
+			throw new Error("Error while XML parsing for {table: " + table + ", key: " + key + ", value: " + value + "}");
+		}
+		
+		var nodes = dom.selectNodes("//Dataset_0/Data/Row");
+		
+		var rows = [];
+		for (var ni = 0; ni < nodes.length; ni++) {
+			var node = nodes[ni];
+			var row = {};
+			var cs = node.childNodes;
+			for (var ci = 0; ci < cs.length; ci++) {
+				var c = cs[ci];
+				row[c.nodeName] = c.text;
+			}
+			rows.push(row);
+		}
+		
+		return rows;
+	},
+	
+	getByQuery: function(type, table, key, value, identity) {
+
 		var collection = new Core.Types.Collection();
-		for (var idi = 0; idi < ids.length; idi++) {
-			var id = ids[idi];
+		
+		var rows = this._findByQuery(table, key, value);
+		for (var ri = 0; ri < rows.length; ri++) {
+			var row = rows[ri];
+			var id = row[identity];
 			var proxy = this.getById(type, id);
 			collection.add(proxy);
 		}
+		
 		return collection;
 	},
 	

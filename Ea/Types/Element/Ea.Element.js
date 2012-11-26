@@ -103,6 +103,16 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 
 	findDiagrams: function() {
 		return Ea.Application.getRepository().getByQuery(Ea.Diagram._Base, "t_diagramobjects", "Object_ID", this.getId(), "Diagram_ID");
+	},
+	
+	_appearance: null,
+	getAppearance: function() {
+		if (!this._appearance || Ea.mm) {
+			var rows = Ea.Application.getRepository().findByQuery("t_object", "Object_ID", this.getId());
+			var row = rows[0];
+			this._appearance = new Ea.DataTypes.Appearance(row);
+		}
+		return this._appearance;
 	}
 },
 {
@@ -113,16 +123,32 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 			17: "AssociationClass"
 		},
 		Event: {
-			1: "Reciever",
-			0: "Sender"
+			0: "SendSignal",
+			1: "AcceptEvent",
+			2: "AcceptEvent" // Accept time event
 		},
 		Note: {
 			1: "ConnectorNote",
 			2: "ConnectorConstraint"
 		},
 		Pseudostate: {
+			3: "InitialState",
+			4: "FinalState",
+			5: "History",
+			6: "Synch",
+			10: "Junction",
+			11: "Choice",
+			12: "Terminate",
+			13: "EntryPoint",
+			14: "ExitPoint",
 			100: "ActivityInitial",
-			101: "ActivityFinal"
+			101: "ActivityFinal",
+			102: "FlowFinal"
+		},
+		Text: {
+			18: "DiagramNotes",
+			19: "Hyperlink",
+			76: "Legend"
 		}
 	},
 	
@@ -130,10 +156,10 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 		var typeName = this._type.get(source).replace(/\s/g,"");
 		var metaType = this._metatype.get(source);
 		var subType;
-		if (metaType && metaType != typeName) {
+		if (metaType) {
 			typeName = metaType;
 		}
-		else if (subType = (this._subTypes[typeName] || {})[this._subtype.get(source)]) {
+		if (subType = (this._subTypes[typeName] || {})[this._subtype.get(source)]) {
 			typeName = subType;
 		}
 		var type = this.namespace[typeName] || Ea.addType(this.namespace, typeName);
@@ -191,9 +217,12 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 
 	_compositeDiagram: attribute({api: "CompositeDiagram", type: "Ea.Diagram._Base"}),
 	
+	//_inDiagrams: derived({getter: "findDiagrams", type: "Ea.Collection._Base", elementType: "Ea.Diagram._Base"}),
+	
 	_abstract: derived({getter: "isAbstract", type: Boolean}),
 	_linkedDiagram: derived({getter: "getLinkedDiagram", type: "Ea.Diagram._Base"}),
-	_customReferences: derived({getter: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"})
+	_customReferences: derived({getter: "getCustomReferences", type: "Core.Types.Collection", elementType: "Ea.Element._Base"}),
+	_appearance: derived({getter: "getAppearance", type: "Ea.DataTypes.Appearance"})
 });
 
 Ea.Element.ContextReference = define({
@@ -311,35 +340,28 @@ Ea.Element._BehavioralElement = extend(Ea.Element._Base, {
 // Activity --> Behavior --> Class --> Classifier
 Ea.Element.Activity = extend(Ea.Element._BehavioralElement);
 
-// Action --> ActivityNode --> NamedElement
-Ea.Element.Action = extend(Ea.Element._BehavioralElement);
-
-Ea.Element.Process = extend(Ea.Element._BehavioralElement);
-
-Ea.Element._CallAction = extend(Ea.Element.Action, {
-	_toString: function() {
-		var classifier = this.getClassifier();
-		return this.getName() + " :" + (classifier ? classifier.getName() : "<<undefined reference>>") + " [" + this._class  + "]";
-	}
-});
-
-Ea.Element.CallBehaviorAction = extend(Ea.Element._CallAction);
-
-Ea.Element.CallOperationAction = extend(Ea.Element._CallAction);
-
 // UseCase --> BehavioredClassifier --> Classifier
 Ea.Element.UseCase = extend(Ea.Element._BehavioralElement, {},
 {
 	_extensionPoints: attribute({api: "ExtensionPoints", type: Ea.DataTypes.List})
 });
 
+Ea.Element.Process = extend(Ea.Element._BehavioralElement);
+
+//Action --> ActivityNode --> NamedElement
+Ea.Element.Action = extend(Ea.Element._Base);
+Ea.Element._CallAction = extend(Ea.Element.Action, {
+	_toString: function() {
+		var classifier = this.getClassifier();
+		return this.getName() + " :" + (classifier ? classifier.getName() : "<<undefined reference>>") + " [" + this._class  + "]";
+	}
+});
+Ea.Element.CallBehaviorAction = extend(Ea.Element._CallAction);
+Ea.Element.CallOperationAction = extend(Ea.Element._CallAction);
+
 Ea.Element.Pseudostate = extend(Ea.Element._Base);
 Ea.Element.ActivityInitial = extend(Ea.Element.Pseudostate);
 Ea.Element.ActivityFinal = extend(Ea.Element.Pseudostate);
-
-Ea.Element.Event = extend(Ea.Element._Base);
-Ea.Element.Reciever = extend(Ea.Element.Event);
-Ea.Element.Sender = extend(Ea.Element.Event);
 
 Ea.Element.Constraint = extend(Ea.Element._Base, {
 	getConstrainted: function() {
@@ -353,7 +375,7 @@ Ea.Element.Note = extend(Ea.Element._Base, {
 	getNoted: function() {
 		var string = this._getMiscData0();
 		if (string == null) return null;
-		// TODO: parse 'idref1=241181;idref2=241185;idref3=243101;'
+		// TODO: parse 'idref1=241181;idref2=241185;idref3=243101;' // ids of Connectors
 	}
 });
 Ea.Element.ConnectorNote = extend(Ea.Element.Note);

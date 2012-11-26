@@ -193,6 +193,117 @@ Ea.DataTypes.Dimension = extend(Ea.DataTypes._Type, {
 });
 
 
+Ea.DataTypes.Appearance = extend(Ea.DataTypes._Type, {
+	
+	_backColor: null,
+	_fontColor: null,
+	_borderColor: null,
+	_borderStyle: null,
+	_borderWidth: null,
+	
+	create: function(source) {
+		_super.create(source);
+		this._backColor = new Ea.DataTypes.Color(source.Backcolor);
+		this._fontColor = new Ea.DataTypes.Color(source.Fontcolor);
+		this._borderColor = new Ea.DataTypes.Color(source.Bordercolor);
+		this._borderStyle = source.BorderStyle;
+		this._borderWidth = source.BorderWidth;
+	},
+	
+	valueOf: function() {
+		return {
+			backColor: this._backColor,
+			fontColor: this._fontColor,
+			borderColor: this._borderColor,
+			borderStyle: this._borderStyle,
+			borderWidth: this._borderWidth
+		};
+	},
+	
+	getBackColor: function() {
+		return this._backColor;
+	},
+	
+	getFontColor: function() {
+		return this._fontColor;
+	},
+	
+	getBorderColor: function() {
+		return this._borderColor;
+	},
+	
+	getBorderStyle: function() {
+		return this._borderStyle;
+	},
+	
+	getBorderWidth: function() {
+		return this._borderWidth;
+	},
+	
+	_toString: function() {
+		return Core.Output.getString(this.valueOf());
+	}
+	
+});
+
+Ea.DataTypes.Color = extend(Ea.DataTypes._Type, {
+	
+	_red: null,
+	_green: null,
+	_blue: null,
+	_default: false,
+	
+	create: function(rgb) {
+		_super.create(rgb);
+		if (rgb == -1) {
+			this._default = true;
+		}
+		else {
+			var r = this._red = rgb >> 16;
+			var gb = rgb - (r << 16);
+			var g = this._green = gb >> 8;
+			this._blue = gb - (g << 8);
+		}
+	},
+	
+	valueOf: function() {
+		return {
+			_default: this._default,
+			red: this._red,
+			green: this._green,
+			blue: this._blue
+		};
+	},
+	
+	isDefault: function() {
+		return this._default;
+	},
+	
+	getRed: function() {
+		return this._red;
+	},
+	
+	getGreen: function() {
+		return this._green;
+	},
+	
+	getBlue: function() {
+		return this._blue;
+	},
+	
+	getHex: function() {
+		return new Number(this._source).toString(16);
+	},
+	
+	getColor: function() {
+		return this._source;
+	},
+	
+	_toString: function() {
+		return Core.Output.getString(this.valueOf());
+	}
+	
+});
 
 
 Ea.DataTypes.PrimitiveType = extend(Core.Types.Named, {},
