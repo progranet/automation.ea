@@ -15,7 +15,7 @@
 */
 
 /**
- * Checks if the array contains specified element
+ * Checks if array [this] contains provided [element]
  * 
  * @memberOf Array#
  * @param {Object} element
