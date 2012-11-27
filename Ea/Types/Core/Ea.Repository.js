@@ -192,6 +192,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	},
 	
 	_getXRef: function(guid) {
+		//TODO: refactor to findByQuery
 		var sql = "select t.XrefID, t.Name, t.Type, t.Description, t.Supplier from t_xref t where t.Client = \"" + guid + "\"";
 		var xml = this._source.getApi().SQLQuery(sql);
 		var records = {};

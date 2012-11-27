@@ -259,10 +259,9 @@ Ea.DataTypes.Color = extend(Ea.DataTypes._Type, {
 			this._default = true;
 		}
 		else {
-			var r = this._red = rgb >> 16;
-			var gb = rgb - (r << 16);
-			var g = this._green = gb >> 8;
-			this._blue = gb - (g << 8);
+			this._red = (rgb >> 16) & 0xFF;;
+			this._green = (rgb >> 8) & 0xFF;
+			this._blue = rgb & 0xFF;
 		}
 	},
 	
