@@ -15,7 +15,7 @@
 */
 
 /**
- * Checks if array [this] contains provided [element]
+ * Checks if array this contains specified element 
  * 
  * @memberOf Array#
  * @param {Object} element
@@ -44,7 +44,7 @@ String.prototype.lpad = function(pad, length) {
 };
 
 /**
- * Trims this string both sides 
+ * Trims leading or trailing whitespace from this string
  * 
  * @memberOf String#
  * @returns {String}
@@ -59,7 +59,7 @@ String.prototype.trim = function() {
 Core.Helper = {
 	
 	/**
-	 * Returns array of names in map
+	 * Returns array of names from map
 	 * 
 	 * @param {Object} map
 	 * @returns {Array}
@@ -73,7 +73,7 @@ Core.Helper = {
 	},
 	
 	/**
-	 * Returns array of values in map
+	 * Returns array of values from map
 	 * 
 	 * @param {Object} map
 	 * @returns {Array}
