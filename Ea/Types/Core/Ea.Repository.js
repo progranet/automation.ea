@@ -150,7 +150,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 		var sql = "select * from " + table + " where " + key + " = " + value;
 		var xml = this._source.getApi().SQLQuery(sql);
 		
-		var dom = new ActiveXObject( "MSXML2.DOMDocument" );
+		var dom = new ActiveXObject("MSXML2.DOMDocument");
 		dom.validateOnParse = false;
 		dom.async = false;
 		

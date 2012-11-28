@@ -21,7 +21,11 @@ Ea.ScenarioStep = {
 	}
 };
 
-Ea.ScenarioStep._Base = extend(Ea.Types.Named, {},
+Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
+	
+/*		var rows = Ea.Application.getRepository().findByQuery("t_object", "Object_ID", this.getId());
+		var row = rows[0];
+*/},
 {
 	api: "ScenarioStep",
 	
