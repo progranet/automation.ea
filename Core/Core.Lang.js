@@ -20,7 +20,7 @@
 Core.Lang = {
 
 	/**
-	 * Tests if specified type is class
+	 * Tests if specified type is a class
 	 * 
 	 * @param {Function} type
 	 * @returns {Boolean}
@@ -48,7 +48,7 @@ Core.Lang = {
 	},
 	
 	/**
-	 * Defines new class extending super class
+	 * Defines new class extending specified super class
 	 * 
 	 * @memberOf Core.Lang
 	 * @param {Object} namespace
