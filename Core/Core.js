@@ -20,11 +20,12 @@
 Core = {
 		
 	/**
-	 * Tests if property is a method 
+	 * Tests if specified property is a method 
 	 * 
 	 * @memberOf Core
 	 * @param {Object} property
-	 * @param {String} propertyName	 * @returns {Boolean}
+	 * @param {String} propertyName
+	 * @returns {Boolean}
 	 * @static
 	 */
 	isFunction: function(property, propertyName) {
@@ -33,7 +34,8 @@ Core = {
 	
 	_fnPattern: new RegExp("^\\s*function\\s*([\\w$]*)\\s*\\(([\\w$,\\s]*)\\)\\s*\\{\\s*([\\w\\W]*)\\s*\\}\\s*$"),
 	_nativePattern: new RegExp("\\[native\\s*code\\]", "i"),
-		/**
+	
+	/**
 	 * Returns parsed arguments of function   
 	 * 
 	 * @memberOf Core
@@ -58,7 +60,7 @@ Core = {
 	},
 	
 	/**
-	 * Tests if function is native 
+	 * Tests if specified function is native 
 	 * 
 	 * @memberOf Core
 	 * @param {Function} fn
@@ -152,7 +154,7 @@ Core = {
 	},
 	
 	/**
-	 * Merges properties of object to toObject.
+	 * Merges properties of specified object to (target) toObject.
 	 * 
 	 * @memberOf Core
 	 * @param {Object} toObject
