@@ -14,6 +14,9 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Ea.Repository = {
 	Syntax: {
 		JetDB: {
@@ -25,12 +28,17 @@ Ea.Repository = {
 	}
 };
 
-Ea.Repository._Base = extend(Ea.Types.Any, {
+Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	
 	cache: null,
 	cacheEnabled: true,
 	syntax: null,
 	
+	/**
+	 * @constructs
+	 * @param api
+	 * @param params
+	 */
 	create: function(api, params) {
 		_super.create(api);
 		this.syntax = params.syntax || Ea.Repository.Syntax.JetDB;
@@ -45,6 +53,9 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 		tr: 0
 	},
 	
+	/**
+	 * @memberOf Ea.Repository._Base#
+	 */
 	cacheInfo: function() {
 		info("cache stats: {total read: $, cache read by id: $, cache read by guid: $, cache white by id: $, cache write by guid: $}", [this.stats.tr, this.stats.cri, this.stats.crg, this.stats.cwi, this.stats.cwg]);
 	},
@@ -177,53 +188,33 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	},
 	
 	getByQuery: function(type, table, key, value, identity) {
-
 		var collection = new Core.Types.Collection();
-		
-		var rows = this._findByQuery(table, key, value);
+		var rows = this.findByQuery(table, key, value);
 		for (var ri = 0; ri < rows.length; ri++) {
 			var row = rows[ri];
 			var id = row[identity];
 			var proxy = this.getById(type, id);
 			collection.add(proxy);
 		}
-		
 		return collection;
 	},
 	
-	_getXRef: function(guid) {
-		//TODO: refactor to findByQuery
-		var sql = "select t.XrefID, t.Name, t.Type, t.Description, t.Supplier from t_xref t where t.Client = \"" + guid + "\"";
-		var xml = this._source.getApi().SQLQuery(sql);
-		var records = {};
-		xml.replace(new RegExp("<Row><XrefID>([^<]*)<\\/XrefID><Name>([^<]*)<\\/Name><Type>([^<]*)<\\/Type>(<Description>([^<]*)<\\/Description>)?(<Supplier>([^<]*)<\\/Supplier>)?</Row>", "g"), 
-			function(whole, guid, name, type, _t1, description, _t2, supplierGuid) {
-				records[guid] = {
-					name: name,
-					type: type,
-					description: description,
-					supplierGuid: supplierGuid
-				};
-			});
-		return records;
-	},
-	
 	getCustomReferences: function(element) {
-		var records = this._getXRef(element.getGuid());
-		var customReferences = new Core.Types.Collection();
-		for (var guid in records) {
-			var record = records[guid];
-			if (record.type == "reference" && record.name == "Element") {
-				var supplier = this.getByGuid(Ea.Element._Base, record.supplierGuid);
+		var collection = new Core.Types.Collection();
+		var rows = this.findByQuery("t_xref", "Client", "\"" + element.getGuid() + "\"");
+		for (var ri = 0; ri < rows.length; ri++) {
+			var row = rows[ri];
+			if (row["Type"] == "reference" && row["Name"] == "Element") {
+				var supplier = this.getByGuid(Ea.Element._Base, row["Supplier"]);
 				if (supplier) {
-					var reference = new Ea.Repository.CustomReference(record.description, supplier);
-					customReferences.add(reference);
+					var reference = new Ea.Repository.CustomReference(row["Description"], supplier);
+					collection.add(reference);
 				}
 			}
 		}
-		return customReferences;
+		return collection;
 	},
-
+	
 	getSelectedPackage: function() {
 		return this.get(Ea.Package._Base, this._source.getApi().GetTreeSelectedPackage());
 	},
@@ -270,22 +261,35 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	_models: attribute({api: "Models", type: "Ea.Collection._Base", elementType: "Ea.Package._Base", aggregation: "composite"})
 });
 
-Ea.Repository.CustomReference = define({
+Ea.Repository.CustomReference = define(/** @lends Ea.Repository.CustomReference# */{
 	_notes: null,
 	_supplier: null,
 	
+	/**
+	 * @constructs
+	 * @param notes
+	 * @param supplier
+	 */
 	create: function(notes, supplier) {
 		_super.create(params);
 		this._notes = notes;
 		this._supplier = supplier;
 	},
 	
+	/**
+	 * @memberOf Ea.Repository.CustomReference#
+	 * @returns
+	 */
 	getNotes: function() {
 		return this._notes;
 	},
 	
 	getSupplier: function() {
 		return this._supplier;
+	},
+	
+	_toString: function() {
+		return " --> " + this._supplier;
 	}
 });
 

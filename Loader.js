@@ -22,13 +22,23 @@ include = function(libraryName, params) {
 		return;
 	}
 	var _package = (t[1] ? t[1] + "." : "").replace(/\./g, "\\");
-	var source;
-	try {
-		source = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(scriptRoot + _package + qualifiedName  + ".js", 1).ReadAll();
+	if (!_scriptRoot)
+		_scriptRoot = scriptRoot.split(";");
+	var file = null;
+	var libraryPath = null;
+	for (var ri = 0; ri < _scriptRoot.length; ri++) {
+		libraryPath = _scriptRoot[ri] + _package;
+		try {
+			file = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(libraryPath + qualifiedName  + ".js", 1);
+		}
+		catch(e) {
+			warn("Error: Source not found: " + libraryPath + qualifiedName  + ".js");
+		}
+		if (file) break;
 	}
-	catch(e) {
+	if (!file)
 		throw new Error("Library not found: " + libraryName);
-	}
+	var source = file.ReadAll();
 	if (Core)
 		source = Core.enrichSource(qualifiedName, source);
 	eval(source);
@@ -43,7 +53,7 @@ include = function(libraryName, params) {
 		return this.qualifiedName;
 	};
 	namespace._loader = {
-		package: _package
+		path: libraryPath
 	};
 	if (Core)
 		Core.enrichNamespace(namespace);
@@ -56,6 +66,7 @@ include = function(libraryName, params) {
 Core = false;
 
 _included = {};
+_scriptRoot = null;
 
 isIncluded = function(libraryName) {
 	return (libraryName in _included);

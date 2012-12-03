@@ -23,9 +23,12 @@ Ea.ScenarioStep = {
 
 Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 	
-/*		var rows = Ea.Application.getRepository().findByQuery("t_object", "Object_ID", this.getId());
-		var row = rows[0];
-*/},
+	getLink: function() {
+		
+		return this._getLink();
+	}
+	
+},
 {
 	api: "ScenarioStep",
 	
@@ -40,7 +43,7 @@ Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 	_level: attribute({api: "Level"}),
 	_extensions: attribute({api: "Extensions", type: "Ea.Collection._Base", elementType: "Ea.ScenarioExtension._Base", key: "this.getLevel()", private: true}),
 	_type: attribute({api: "StepType", private: true}),
-	_link: attribute({api: "Link", type: "Ea.Element.UseCase", referenceBy: "guid"}),
+	_link: attribute({api: "Link", type: "Ea.Element.UseCase", referenceBy: "guid", private: true}),
 	_uses: attribute({api: "Uses"}),
 	_results: attribute({api: "Results"})
 });

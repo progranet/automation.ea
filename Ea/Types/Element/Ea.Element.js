@@ -389,6 +389,12 @@ Ea.Element.Text = extend(Ea.Element._Base, {
 	}
 });
 
+Ea.Element.Requirement = extend(Ea.Element._Base);
+
+Ea.Element.Actor = extend(Ea.Element._Base);
+
+Ea.Element.Artifact = extend(Ea.Element._Base);
+
 include("Ea.TypedElement@Ea.Types.Common");
 
 Ea.register("Ea.Attribute@Ea.Types.Element.Feature", 23);

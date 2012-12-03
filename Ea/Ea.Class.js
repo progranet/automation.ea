@@ -14,10 +14,17 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Ea.Class = {
 
 	_types: {},
 	
+	/**
+	 * @param {Class} _class
+	 * @memberOf Ea.Class
+	 */
 	registerClass: function(_class) {
 		if (_class in this._types)
 			return;
@@ -99,7 +106,7 @@ Ea.Class = {
 	}	
 };
 
-Ea.Class.Source = define({
+Ea.Class.Source = define(/** @lends Ea.Class.Source# */ {
 	
 	_api: null,
 	_value: null,
@@ -229,7 +236,8 @@ Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, {
 	_init: function(source) {
 		if (this.type.isClass) {
 			if (this.type.isSubclassOf(Core.Types.Collection)) {
-				source.setValue(this, Ea.getCollection(this.type, source.getApiValue(this), this));
+				var collection = Ea.getCollection(this.type, source.getApiValue(this), this);
+				source.setValue(this, collection);
 				return;
 			}
 			if (this.type.isSubclassOf(Ea.Types.Any)) {

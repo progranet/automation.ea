@@ -90,13 +90,7 @@ Sys.IO = {
 	 * @returns {String}
 	 */
 	getPath: function(file, namespace) {
-		if (namespace) {
-			file = namespace._loader.package + file;
-		}
-		if (file.indexOf(":") == -1) {
-			file = scriptRoot + file;
-		}
-		return file;
+		return namespace ? namespace._loader.path + file : file;
 	},
 	
 	/**

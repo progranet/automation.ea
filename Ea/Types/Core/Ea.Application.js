@@ -62,6 +62,11 @@ Ea.Application = {
 		return this._applications[this._active].application;
 	},
 	
+	/**
+	 * 
+	 * @param name
+	 * @returns {Ea.Repository._Base}
+	 */
 	getRepository: function(name) {
 		if (name) {
 			var application = this._applications[name];

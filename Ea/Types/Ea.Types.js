@@ -89,33 +89,6 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
  */
 Ea.Types.Named = extend(Ea.Types.Any, {
 
-	/*_splitName: function() {
-		var name = this.getName();
-		var split = new RegExp("^([\\w\\-\\.]+[0-9]+):?\\s+([\\W\\w]+)$").exec(name);
-		return split || [name, "", name];
-	},
-	
-	_businessId: null,
-	_businessName: null,
-
-	getBusinessName: function() {
-		if (!this._businessName || Ea.mm) {
-			var split = this._splitName();
-			this._businessId = split[1];
-			this._businessName = split[2];
-		}
-		return this._businessName;
-	},
-	
-	getBusinessId: function() {
-		if (!this._businessId || Ea.mm) {
-			var split = this._splitName();
-			this._businessId = split[1];
-			this._businessName = split[2];
-		}
-		return this._businessId;
-	},*/
-	
 	/**
 	 * Returns namespace of this element
 	 * 
