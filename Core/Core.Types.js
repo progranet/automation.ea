@@ -53,7 +53,7 @@ Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, /** @lends C
 	},
 	
 	/**
-	 * Checks if object is instance of specified class
+	 * Checks if this object is an instance of specified class
 	 * 
 	 * @memberOf Core.Types.Object#
 	 * @param {Class} _class
@@ -64,7 +64,7 @@ Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, /** @lends C
 	},
 	
 	/**
-	 * Checks if object match specified filter
+	 * Checks if this object matches specified filter
 	 * 
 	 * @see Core.Types.Filter
 	 * @memberOf Core.Types.Object#
@@ -111,7 +111,7 @@ Core.Types.Named = define(/** @lends Core.Types.Named# */{
 	},
 	
 	/**
-	 * Returns name
+	 * Returns this name
 	 * 
 	 * @memberOf Core.Types.Named#
 	 * @returns {String}
@@ -151,7 +151,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	},
 	
 	/**
-	 * Adds element to collection
+	 * Adds specified element to this collection
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @param {Object} element
@@ -190,7 +190,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	},
 	
 	/**
-	 * Adds elements of other to collection
+	 * Adds specified collection of elements to this collection
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @param {Core.Types.Collection} collection
@@ -245,7 +245,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	},
 	
 	/**
-	 * Checks if collection is empty
+	 * Checks if this collection is empty
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @returns {Boolean}
@@ -255,7 +255,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	},
 	
 	/**
-	 * Checks if collection is not empty
+	 * Checks if this collection is not empty
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @returns {Boolean}
@@ -265,7 +265,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	},
 	
 	/**
-	 * Returns first element of collection
+	 * Returns first element of this collection
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @returns {Object}
@@ -284,7 +284,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	},
 	
 	/**
-	 * Returns new collection containing elements matching specified filter
+	 * Returns new collection containing elements from this collection matching specified filter
 	 * 
 	 * @see Core.Types.Filter
 	 * @memberOf Core.Types.Collection#
@@ -345,7 +345,7 @@ Core.Types.Map = extend(Core.Types.Collection, /** @lends Core.Types.Map# */{
 	},
 	
 	/**
-	 * Returns element for specified key
+	 * Returns an element for specified key
 	 * 
 	 * @memberOf Core.Types.Map#
 	 * @param {Object} key
@@ -374,7 +374,7 @@ Core.Types.Filter = define(/** @lends Core.Types.Filter# */{
 	_filter: null,
 
 	/**
-	 * Creates new filter
+	 * Creates a new filter
 	 * 
 	 * @constructs
 	 * @extends Core.Types.Object
@@ -394,7 +394,7 @@ Core.Types.Filter = define(/** @lends Core.Types.Filter# */{
 	},
 	
 	/**
-	 * Checks if object match this filter
+	 * Checks if specified object matches this filter
 	 * 
 	 * @memberOf Core.Types.Filter#
 	 * @param {Object} object

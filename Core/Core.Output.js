@@ -20,7 +20,7 @@
 Core.Output = {
 	
 	/**
-	 * Returns string represented by scriptlet substituted with values evaluated from specified params
+	 * Returns string represented by scriptlet replaced with values evaluated from specified params
 	 * 
 	 * @memberOf Core.Output
 	 * @param {String} scriptlet Template scriptlet 

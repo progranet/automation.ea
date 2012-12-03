@@ -144,7 +144,7 @@ Core.Log = {
 	},
 	
 	/**
-	 * Registers target for logs
+	 * Registers specified target for logs
 	 * 
 	 * @memberOf Core.Log
 	 * @param {String} level

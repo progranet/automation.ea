@@ -50,7 +50,7 @@ Core.Target.AbstractTarget = define(/** @lends Core.Target.AbstractTarget# */{
 	},
 	
 	/**
-	 * Writes message to target
+	 * Writes specified message to this target
 	 * 
 	 * @memberOf Core.Target.AbstractTarget#
 	 * @param {String} message
@@ -60,7 +60,7 @@ Core.Target.AbstractTarget = define(/** @lends Core.Target.AbstractTarget# */{
 	},
 	
 	/**
-	 * Determines if target is debug
+	 * Determines if this target type is debug
 	 * 
 	 * @see Core.Target.Type
 	 * @memberOf Core.Target.AbstractTarget#
