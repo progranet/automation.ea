@@ -57,7 +57,7 @@ Sys.IO = {
 	},
 	
 	/**
-	 * Makes copy of specified file in script space to specified folder 
+	 * Makes a copy of specified file in script space to specified folder 
 	 * 
 	 * @see Sys.IO.getPath
 	 * @memberOf Sys.IO
@@ -70,7 +70,7 @@ Sys.IO = {
 	},
 	
 	/**
-	 * Creates folder on specified path
+	 * Creates a folder on specified path
 	 * 
 	 * @memberOf Sys.IO
 	 * @param {String} path
@@ -113,7 +113,7 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	_closed: false,
 	
 	/**
-	 * Creates new file wrapper. According to parameters file will be opened (read mode) or created (write modes)
+	 * Creates a new file wrapper. According to parameters file will be opened (read mode) or created (write modes)
 	 * 
 	 * @constructs
 	 * @param {String} file
@@ -135,7 +135,7 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	},
 	
 	/**
-	 * Writes text to file.
+	 * Writes specified text to this file.
 	 * 
 	 * @memberOf Sys.IO.File#
 	 * @param {String} text
@@ -145,7 +145,7 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	},
 	
 	/**
-	 * Writes line to file.
+	 * Writes line to this file.
 	 * 
 	 * @memberOf Sys.IO.File#
 	 * @param {String} text
@@ -155,7 +155,7 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	},
 	
 	/**
-	 * Reads line from file.
+	 * Reads line from this file.
 	 * 
 	 * @memberOf Sys.IO.File#
 	 * @returns {String}
@@ -165,7 +165,7 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	},
 	
 	/**
-	 * Checks if file is at the end
+	 * Checks if this file is at the end
 	 * 
 	 * @memberOf Sys.IO.File#
 	 * @returns {Boolean}
@@ -175,7 +175,7 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	},
 	
 	/**
-	 * Closes file.
+	 * Closes this file.
 	 * 
 	 * @memberOf Sys.IO.File#
 	 */
@@ -209,7 +209,7 @@ Sys.IO.FileTarget = extend(Core.Target.AbstractTarget, /** @lends Sys.IO.FileTar
 	},
 	
 	/**
-	 * Writes message to target file
+	 * Writes specified message to target file
 	 * 
 	 * @memberOf Sys.IO.FileTarget#
 	 * @param {String} message
