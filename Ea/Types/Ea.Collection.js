@@ -17,13 +17,16 @@
 Ea.Collection = {};
 
 Ea.Collection._Base = extend(Core.Types.Collection, {
-	create: function(api, params) {
+	create: function(source, params) {
 		_super.create(params);
-		this._init(api, params);
+		this._source = source;
+		this._init(params);
 	},
-	_init: function(api, params) {
+	_init: function(params) {
+		var api = this._source.getApi();
+		var repository = this._source.getApplication().getRepository();
 		for (var e = 0; e < api.Count; e++) {
-			var element = Ea.get(params.elementType, api.GetAt(e));
+			var element = repository.get(params.elementType, api.GetAt(e));
 			this.add(element);
 		}
 	}
@@ -39,13 +42,16 @@ Ea.Collection._Base = extend(Core.Types.Collection, {
 });
 
 Ea.Collection.Map = extend(Core.Types.Map, {
-	create: function(api, params) {
+	create: function(source, params) {
 		_super.create(params);
-		this._init(api, params);
+		this._source = source;
+		this._init(params);
 	},
-	_init: function(api, params) {
+	_init: function(params) {
+		var api = this._source.getApi();
+		var repository = this._source.getApplication().getRepository();
 		for (var e = 0; e < api.Count; e++) {
-			var element = Ea.get(params.elementType, api.GetAt(e));
+			var element = repository.get(params.elementType, api.GetAt(e));
 			this.add(element);
 		}
 	}

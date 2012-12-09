@@ -26,11 +26,9 @@ Inspect = {
 	
 	execute: function() {
 		
-		if (!Ea.Application.isActivated()) {
-			Ea.initializeApplication();
-			Ea.initializeLogs(Ea.Helper.Target);
-		}
-		var object = Ea.Application.getRepository().getSelectedObject();
+		var application = Ea.initializeDefaultApplication();
+
+		var object = application.getRepository().getSelectedObject();
 		
 		var target = null;
 		if (this.params.output) {

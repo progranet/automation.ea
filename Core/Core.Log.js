@@ -20,12 +20,36 @@
 Core.Log = {
 
 	params: {
-		error: ["*"],
-		info: ["*"],
-		warn: ["*"],
-		debug: ["*"],
-		tree: ["*"],
-		quiet: ["*"]
+		level: {
+			error: ["*"],
+			exception: ["*"],
+			stack: ["*"],
+			info: ["*"],
+			warn: ["*"],
+			debug: ["*"],
+			tree: ["*"],
+			quiet: ["*"]
+		},
+		output: {
+			format: {
+				_default: function(message, params, level, debug, debugInfo) {
+					message = Core.Output.exec(message, params);
+					return (debug ? level + ": " + debugInfo + " " : "") + message;
+				},
+				exception: function(message, params, level) {
+					message = params[0].description;
+					return level + ": " + message;
+				},
+				stack: function(message, params, level, debug, debugInfo) {
+					message = Core.Output.exec(message, params);
+					return "      " + message + " @ " + debugInfo;
+				}
+			},
+			level: {
+				exception: "exception",
+				stack: "stack"
+			}
+		}
 	},
 
 	_logs: {},
@@ -45,14 +69,11 @@ Core.Log = {
 					+ source.substring(bio + 1, source.length - 2) + "\n\
 				}\n\
 				catch(e) {\n\
-					if (e.throwed) {\n\
-						error(\"^      \");\n\
-					}\n\
-					else {\n\
-						error(\"!exception: \" + e.description);\n\
-						error(\"^      \");\n\
+					if (!e.throwed) {\n\
+						exception(\"$\", [e]);\n\
 						e.throwed = true;\n\
 					}\n\
+					stack(\"\");\n\
 					throw e;\n\
 				}\n\
 			}\n";
@@ -60,8 +81,10 @@ Core.Log = {
 		};
 		Core.registerMethodEnrichment(callbackStacktrace);
 
-		for (var level in Core.Log.params) {
-			this.registerLog(level, Core.Log.params[level]);
+		for (var level in this.params.level) {
+			var mask = this.params.level[level];
+			var outputFormat = this.params.output.format[this.params.output.level[level] || "_default"];
+			this.registerLog(level, mask, outputFormat);
 		}
 		
 		Core.enrichNamespace(Core);
@@ -85,26 +108,19 @@ Core.Log = {
 	 */
 	_log: function(level, context, propertyName, message, params) {
 		if (typeof(level) == "string")
-			level = Core.Log._logs[level];
+			level = this._logs[level];
 		var fn = context[propertyName];
 		if (!fn)
 			return;
 		var qualifiedName = fn.qualifiedName;
-		if (!Core.Log._macth(level, qualifiedName))
+		if (!this._macth(level, qualifiedName))
 			return;
 
-		var contextName = fn.static === false ? context._class.qualifiedName : context.qualifiedName;
+		var contextName = fn._static === false ? context._class.qualifiedName : context.qualifiedName;
 		var sourceFn = contextName + "." + propertyName;
-		var sourceAt = qualifiedName;
-		var source = sourceFn + (sourceFn == sourceAt ? "" : " @ " + sourceAt.replace(/\.[^\.]+$/, ""));
-		var debugInfo = level.name + ": {" + (fn.static === false ? "" : "static ") + source + "} ";
+		var source = sourceFn + (sourceFn == qualifiedName ? "" : " (" + qualifiedName.replace(/\.[^\.]+$/, "") + ")");
+		var debugInfo = "" + (fn._static === false ? "" : "static ") + source;
 		
-		message = Core.Output.exec(message, params);
-		var description = message.charAt(0) == "!";
-		var stack = message.charAt(0) == "^";
-		if (description || stack)
-			message = message.substring(1);
-
 		if (level.targets.length == 0) {
 			//_info(message, params, level.name);
 			/*_logBuffer[level.name].push({
@@ -115,7 +131,7 @@ Core.Log = {
 		else {
 			for (var ti = 0; ti < level.targets.length; ti++) {
 				var target = level.targets[ti];
-				message = (stack ? message + " " : "") + (description ? "" : (target.isDebug() ? debugInfo : "")) + (stack ? "" : message);
+				message = level.outputFormat(message, params, level.name, target.isDebug(), debugInfo);
 				target.write(message);
 			}
 		}
@@ -128,10 +144,11 @@ Core.Log = {
 	 * @param {String} level
 	 * @param {String} mask
 	 */
-	registerLog: function(level, mask) {
-		Core.Log._logs[level] = {
+	registerLog: function(level, mask, outputFormat) {
+		this._logs[level] = {
 			name: level,
 			mask: mask,
+			outputFormat: outputFormat,
 			targets: []
 		};
 
@@ -152,12 +169,12 @@ Core.Log = {
 	 */
 	registerTarget: function(level, target) {
 		if (typeof(level) == "string")
-			level = Core.Log._logs[level];
+			level = this._logs[level];
 		level.targets.push(target);
 		/*if (_logBuffer[level.name]) {
 			for (var mi = 0; mi < _logBuffer[level.name].length; mi++) {
 				var buffered = _logBuffer[level.name][mi];
-				Core.Log._log(level, Core.Log, "registerTarget", buffered.message, buffered.params);
+				this._log(level, this, "registerTarget", buffered.message, buffered.params);
 			}
 			delete _logBuffer[level.name];
 		}*/

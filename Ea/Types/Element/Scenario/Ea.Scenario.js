@@ -21,7 +21,7 @@ Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 	_context: null,
 	getContext: function() {
 		if (!this._context || Ea.mm) {
-			var rows = Ea.Application.getRepository().findByQuery("t_objectscenarios", "ea_guid", "\"" + this.getGuid() + "\"");
+			var rows = this._source.getApplication().getRepository().findByQuery("t_objectscenarios", "ea_guid", "\"" + this.getGuid() + "\"");
 			var row = rows[0];
 			
 			var dom = new ActiveXObject("MSXML2.DOMDocument");
@@ -40,7 +40,7 @@ Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 				var nodes = dom.selectNodes("//path/context/item");
 				for (var ni = 0; ni < nodes.length; ni++) {
 					var node = nodes[ni];
-					this._context[node.getAttribute("oldname")] = Ea.getByGuid(Ea.Element._Base, node.getAttribute("guid"));
+					this._context[node.getAttribute("oldname")] = this._source.getApplication().getRepository().getByGuid(Ea.Element._Base, node.getAttribute("guid"));
 				}
 			}
 		}

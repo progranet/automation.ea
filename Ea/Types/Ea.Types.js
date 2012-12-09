@@ -21,6 +21,8 @@ Ea.Types = {};
 
 Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	
+	_source: null,
+	
 	/**
 	 * Creates new abstraction layer wrapper for Enterprise Architect API object
 	 * 
@@ -28,8 +30,9 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	 * @extends Core.Types.Object
 	 * @param {Object} api EA API object
 	 */
-	create: function(api) {
+	create: function(source) {
 		_super.create();
+		this._source = source;
 	},
 	
 	/**
@@ -39,7 +42,7 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	 * @returns {String}
 	 */
 	getXmlGuid: function() {
-		return Ea.Application.getApplication().getProject().guidToXml(this.getGuid());
+		return this._source.getApplication().getProject().guidToXml(this.getGuid());
 	},
 	
 	toString: function() {
@@ -109,8 +112,14 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 	hasParent: function(namespace) {
 		var parent = this.getParent();
 		if (!parent) return false;
-		namespace = Ea.ensure(Ea.Package._Base, namespace);
+		namespace = this._ensure(Ea.Package._Base, namespace);
 		return (parent == namespace ? namespace : parent.hasParent(namespace));
+	},
+	
+	_ensure: function(type, ea) {
+		if (typeof ea == "string" && this.isGuid(ea))
+			ea = this._source.getApplication().getRepository().getByGuid(type, ea);
+		return ea;
 	},
 	
 	_toString: function() {

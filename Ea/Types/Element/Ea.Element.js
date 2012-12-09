@@ -14,10 +14,17 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Ea.Element = {};
 
-Ea.Element._Base = extend(Ea.Types.Namespace, {
-	
+Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
+
+	/**
+	 * @memberOf Ea.Element.Base#
+	 * @returns {Boolean}
+	 */
 	isAbstract: function() {
 		return this._getAbstract() == 1;
 	},
@@ -29,7 +36,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 	getLinkedDiagram: function() {
 		var id = this._getMiscData0();
 		if (!id || !(id = (new Number(id)).valueOf())) return null;
-		return Ea.getById(Ea.Diagram._Base, id);
+		return this._source.getApplication().getRepository().getById(Ea.Diagram._Base, id);
 	},
 	
 	_relationships: null,
@@ -42,7 +49,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 				var secondEnd = client ? connector.getSupplier() : connector.getClient();
 				var secondConnectorEnd = client ? connector.getSupplierEnd() : connector.getClientEnd();
 				if (secondEnd) { // EA integrity problem (Connector.Supplier == null) workaround
-					this._relationships.add(new Ea.Connector.Relationship({
+					this._relationships.add(new Ea.Relationship({
 						from: this,
 						fromEnd: thisConnectorEnd,
 						connector: connector,
@@ -79,7 +86,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 	_customReferences: null,
 	getCustomReferences: function() {
 		if (!this._customReferences || Ea.mm) {
-			this._customReferences = Ea.Application.getRepository().getCustomReferences(this);
+			this._customReferences = this._source.getApplication().getRepository().getCustomReferences(this);
 		}
 		return this._customReferences;
 	},
@@ -89,26 +96,26 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 		if (!this._contextReferences || Ea.mm) {
 			this._contextReferences = new Core.Types.Collection();
 			this.getCustomReferences().forEach(function(reference) {
-				this._contextReferences.add(new Ea.Element.ContextReference(reference.getNotes() || "", reference.getSupplier(), ""));
+				this._contextReferences.add(new Ea.ContextReference(reference.getNotes() || "", reference.getSupplier(), ""));
 			});
-			this._getRelationships().forEach(function(property) {
-				var connection = property.getConnector()._class.getName();
-				var supplier = property.getTo();
-				var notes = property.getConnector().getName();
-				this._contextReferences.add(new Ea.Element.ContextReference(notes, supplier, connection));
+			this._getRelationships().forEach(function(relationship) {
+				var connection = relationship.getConnector()._class.getName();
+				var supplier = relationship.getTo();
+				var notes = relationship.getConnector().getName();
+				this._contextReferences.add(new Ea.ContextReference(notes, supplier, connection));
 			});
 		}
 		return this._contextReferences;
 	},
 
 	findDiagrams: function() {
-		return Ea.Application.getRepository().getByQuery(Ea.Diagram._Base, "t_diagramobjects", "Object_ID", this.getId(), "Diagram_ID");
+		return this._source.getApplication().getRepository().getByQuery(Ea.Diagram._Base, "t_diagramobjects", "Object_ID", this.getId(), "Diagram_ID");
 	},
 	
 	_appearance: null,
 	getAppearance: function() {
 		if (!this._appearance || Ea.mm) {
-			var rows = Ea.Application.getRepository().findByQuery("t_object", "Object_ID", this.getId());
+			var rows = this._source.getApplication().getRepository().findByQuery("t_object", "Object_ID", this.getId());
 			var row = rows[0];
 			this._appearance = new Ea.DataTypes.Appearance(row);
 		}
@@ -225,31 +232,6 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 	_appearance: derived({getter: "getAppearance", type: "Ea.DataTypes.Appearance"})
 });
 
-Ea.Element.ContextReference = define({
-	_notes: null,
-	_supplier: null,
-	_connection: null,
-
-	create: function(notes, supplier, connection) {
-		_super.create(params);
-		this._notes = notes;
-		this._supplier = supplier;
-		this._connection = connection;
-	},
-	
-	getNotes: function() {
-		return this._notes;
-	},
-	
-	getSupplier: function() {
-		return this._supplier;
-	},
-	
-	getConnection: function() {
-		return this._connection;
-	}
-});
-
 Ea.Element.Object = extend(Ea.Element._Base, {
 
 	_toString: function() {
@@ -266,7 +248,7 @@ Ea.Element.Goal = extend(Ea.Element.Object);
 
 Ea.Element.Package = extend(Ea.Element._Base, {
 	getPackage: function() {
-		return Ea.getByGuid(Ea.Package._Base, this.getGuid());
+		return this._source.getApplication().getRepository().getByGuid(Ea.Package._Base, this.getGuid());
 	}
 },
 {
@@ -298,7 +280,7 @@ Ea.Element.Meaning = extend(Ea.Element.Class);
 
 Ea.Element.AssociationClass = extend(Ea.Element.Class, {
 	getAssociation: function() {
-		return Ea.getById(Ea.Connector._Base, Number(this._getMiscData3()).valueOf());
+		return this._source.getApplication().getRepository().getById(Ea.Connector._Base, Number(this._getMiscData3()).valueOf());
 	}
 },
 {
@@ -385,7 +367,7 @@ Ea.Element.Text = extend(Ea.Element._Base, {
 	getDiagram: function() {
 		var link = this._getMiscData0();
 		if (link == null) return null;
-		return Ea.getById(Ea.Diagram._Base, link);
+		return this._source.getApplication().getRepository().getById(Ea.Diagram._Base, link);
 	}
 });
 

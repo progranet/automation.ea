@@ -21,20 +21,23 @@ include("Html@Html");
 include("Ea@Ea");
 
 Report = {
+		
+	_new: null,
+	_old: null,
+		
 	params: {
 		
 	},
 
 	initialize: function() {
-		Ea.Application.create("new");
-		Ea.Application.activate("new");
-		Ea.Application.create("old", "D:\\DOKUMENTY\\EA\\TRZ1.eap");
+		this._new = new Ea.Instance();
+		this._old = new Ea.Instance({path: "D:\\DOKUMENTY\\EA\\TRZ1.eap"});
 	},
 
 	execute: function() {
 		info("=== START ===");
 		
-		var package = Ea.Application.getRepository().getSelectedPackage();
+		var package = this._new.getRepository().getSelectedPackage();
 		
 		this.processPackage(package);
 		
@@ -54,8 +57,7 @@ Report = {
 	},
 	
 	processElement: function(element) {
-		Ea.Application.activate("old");
-		var old = Ea.getByGuid(Ea.Element._Base, element.getGuid());
+		var old = this._old.getRepository().getByGuid(Ea.Element._Base, element.getGuid());
 		var n1, n2;
 		info("$", [n2 = element.getNotes()]);
 		info("$", [n1 = old.getNotes()]);
@@ -69,6 +71,5 @@ Report = {
 		var ds = dmp.diff_prettyHtml(d);
 
 		info("$", [ds]);
-		Ea.Application.activate("new");
 	}
 };

@@ -106,7 +106,7 @@ Core = {
 		}
 		eval("namespace[propertyName] = " + source);
 		namespace[propertyName].qualifiedName = qualifiedName;
-		namespace[propertyName].static = _static;
+		namespace[propertyName]._static = _static;
 	},
 	
 	/**

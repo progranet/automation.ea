@@ -14,18 +14,32 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Ea.Helper = {
 		
 	params: {
 		indent: "      "
 	},
 	
+	/**
+	 * @memberOf Ea.Helper
+	 * @param type
+	 * @returns {Boolean}
+	 * @static
+	 */
 	isCollectionType: function(type) {
 		return Core.Lang.isClass(type) && (type == Core.Types.Collection || type.isSubclassOf(Core.Types.Collection));
 	},
 	
 	typeEval: function(type) {
-		return (typeof type == "string") ? eval(type) : type;
+		var _type = type;
+		if (typeof type == "string")
+			type = eval(type);
+		if (!type)
+			throw new Error("Undefined type" + (_type ? " [" + _type + "]" : ""));
+		return type;
 	},
 	
 	inspect: function(object) {
@@ -120,25 +134,28 @@ Ea.Helper = {
 	}
 };
 
-Ea.Helper.Target = extend(Core.Target.AbstractTarget, {
+Ea.Helper.Target = extend(Core.Target.AbstractTarget, /** @lends Ea.Helper.Target# */ {
 	
 	_name: null,
 	
 	create: function(name, debug) {
 		_super.create(debug);
 		this._name = name;
-		Ea.Application.getRepository().showOutput(this._name);
-		Ea.Application.getRepository().clearOutput(this._name);
+		Ea.getApplication().getRepository().showOutput(this._name);
+		Ea.getApplication().getRepository().clearOutput(this._name);
 	},
 	
+	/**
+	 * @memberOf Ea.Helper.Target#
+	 */
 	write: function(message) {
 		if (this._type == Core.Target.Type.TREE)
 			message = message.replace(/\|/g, "      |").replace(/\-/g, "—").replace(/\+/g, "[•]");
-		Ea.Application.getRepository().writeOutput(this._name, message);
+		Ea.getApplication().getRepository().writeOutput(this._name, message);
 	}
 });
 
-Ea.Helper.Log = define({
+Ea.Helper.Log = define(/** @lends Ea.Helper.Log# */{
 	
 	_path: null,
 	_element: null,
@@ -148,6 +165,9 @@ Ea.Helper.Log = define({
 		this._element = element;
 	},
 	
+	/**
+	 * @memberOf Ea.Helper.Log#
+	 */
 	getPath: function() {
 		if (!this._path || Ea.mm) {
 			this._path = [];

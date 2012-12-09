@@ -35,6 +35,10 @@ Ea.Class = {
 		};
 	},
 	
+	/**
+	 * 
+	 * @param {Ea.Class._Attribute} attribute
+	 */
 	registerAttribute: function(attribute) {
 		var _class = attribute.owner;
 		this.registerClass(_class);
@@ -44,20 +48,40 @@ Ea.Class = {
 			_class.namespace["__" + attribute.id] = attribute;
 	},
 	
+	/**
+	 * @param {Class} _class
+	 * @returns {Ea.Class._Attribute}
+	 */
 	getIdAttribute: function(_class) {
 		return _class.namespace.__id;
 		//return Ea.Class._types[_class].id;
 	},
 	
+	/**
+	 * @param {Class} _class
+	 * @returns {Ea.Class._Attribute}
+	 */
 	getGuidAttribute: function(_class) {
 		return _class.namespace.__guid;
 		//return Ea.Class._types[_class].guid;
 	},
 	
+	/**
+	 * Returns attributes owned (directly) by specified class
+	 * 
+	 * @param {Class} _class
+	 * @returns {Array<Ea.Class._Attribute>}
+	 */
 	getOwnedAttributes: function(_class) {
 		return Ea.Class._types[_class].attributes;
 	},
 		
+	/**
+	 * Returns all attributes of specified class
+	 * 
+	 * @param {Class} _class
+	 * @returns {Array<Ea.Class._Attribute>}
+	 */
 	getAttributes: function(_class) {
 		var attributes = [];
 		if (_class._super.isSubclassOf(Ea.Types.Any)) {
@@ -67,6 +91,9 @@ Ea.Class = {
 		return attributes;
 	},
 	
+	/**
+	 * @internal
+	 */
 	prepareClasses: function() {
 		for (_class in this._types) {
 			var attributes = this._types[_class].attributes;
@@ -77,14 +104,27 @@ Ea.Class = {
 		}
 	},
 		
+	/**
+	 * Creates new attribute based on EA API
+	 * 
+	 * @internal
+	 */
 	attribute: function(params) {
 		return new Ea.Class.ApiAttribute(params);
 	},
 	
+	/**
+	 * Creates new derived attribute
+	 * 
+	 * @internal
+	 */
 	derived: function(params) {
 		return new Ea.Class.DerivedAttribute(params);
 	},
 	
+	/**
+	 * Namespace initialization
+	 */
 	initialize: function() {
 		var callbackSource = function(qualifiedName, source) {
 			source = source.replace(/([\s,\.])([A-Z_][A-Za-z0-9_$]*)(\s*[:=]\s*)(attribute|derived)\s*\(/g, function(whole, prefix, name, assignment, method) {
@@ -97,11 +137,19 @@ Ea.Class = {
 		Core.registerSourceEnrichment(callbackSource);
 	},
 
-	createProxy: function(baseType, api, params) {
-		var source = new Ea.Class.Source(api);
+	/**
+	 * Creates abstraction layer proxy object for specified EA API object
+	 * 
+	 * @param {Object} instance
+	 * @param {Class} baseType
+	 * @param {Object} api
+	 * @param {Object} params
+	 * @returns {Ea.Types.Any}
+	 */
+	createProxy: function(instance, baseType, api, params) {
+		var source = new Ea.Class.Source(instance, api);
 		var type = baseType.getType(source);
-		var proxy = new type(api, params);
-		proxy._source = source;
+		var proxy = new type(source, params);
 		return proxy;
 	}	
 };
@@ -110,15 +158,25 @@ Ea.Class.Source = define(/** @lends Ea.Class.Source# */ {
 	
 	_api: null,
 	_value: null,
+	_application: null,
 	
-	create: function(api) {
+	/**
+	 * @constructs
+	 * @memberOf Ea.Class.Source#
+	 */
+	create: function(application, api) {
 		_super.create();
 		this._api = api;
+		this._application = application;
 		this._value = {};
 	},
 	
 	getApi: function() {
 		return this._api;
+	},
+	
+	getApplication: function() {
+		return this._application;
 	},
 	
 	getApiValue: function(property) {
@@ -154,13 +212,17 @@ Ea.Class.Source = define(/** @lends Ea.Class.Source# */ {
 	}
 });
 
-Ea.Class._Attribute = define({
+Ea.Class._Attribute = define(/** @lends Ea.Class._Attribute# */{
 
 	owner: null,
 	name: null,
 	derived: null,
 	qualifiedName: null,
 	
+	/**
+	 * @constructs
+	 * @memberOf Ea.Class._Attribute#
+	 */
 	create: function(params) {
 		_super.create();
 		Core.merge(this, params);
@@ -215,8 +277,12 @@ Ea.Class._Attribute = define({
 	}
 });
 
-Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, {
+Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.ApiAttribute# */{
 	
+	/**
+	 * @constructs
+	 * @memberOf Ea.Class.ApiAttribute#
+	 */
 	create: function(params) {
 		_super.create(params);
 		this.derived = false;
@@ -236,7 +302,7 @@ Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, {
 	_init: function(source) {
 		if (this.type.isClass) {
 			if (this.type.isSubclassOf(Core.Types.Collection)) {
-				var collection = Ea.getCollection(this.type, source.getApiValue(this), this);
+				var collection = source.getApplication().getRepository().getCollection(this.type, source.getApiValue(this), this);
 				source.setValue(this, collection);
 				return;
 			}
@@ -247,7 +313,7 @@ Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, {
 				else
 					getBy = "get";
 				var api = source.getApiValue(this);
-				var proxy = api ? Ea[getBy](this.type, api) : null;
+				var proxy = api ? source.getApplication().getRepository()[getBy](this.type, api) : null;
 				source.setValue(this, proxy);
 				return;
 			}
@@ -264,8 +330,12 @@ Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, {
 	}
 });
 
-Ea.Class.DerivedAttribute = extend(Ea.Class._Attribute, {
+Ea.Class.DerivedAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.DerivedAttribute# */{
 
+	/**
+	 * @constructs
+	 * @memberOf Ea.Class.DerivedAttribute#
+	 */
 	create: function(params) {
 		_super.create(params);
 		this.derived = true;

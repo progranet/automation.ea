@@ -39,8 +39,9 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 * @param api
 	 * @param params
 	 */
-	create: function(api, params) {
-		_super.create(api);
+	create: function(source, params) {
+		_super.create(source);
+		params = params || {};
 		this.syntax = params.syntax || Ea.Repository.Syntax.JetDB;
 		this.cache = {};
 	},
@@ -61,10 +62,18 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	},
 	
 	getCollection: function(type, api, params) {
-		var proxy = Ea.Class.createProxy(type, api, params);
+		var proxy = Ea.Class.createProxy(this._source.getApplication(), type, api, params);
 		return proxy;
 	},
 	
+	/**
+	 * Returns proxy object for specified EA API object
+	 * 
+	 * @param {Class} type
+	 * @param {Object} api
+	 * @param {Object} params
+	 * @returns {Ea.Types.Any}
+	 */
 	get: function(type, api, params) {
 		this.stats.tr++;
 		if (this.cacheEnabled && !Ea.mm && this.cache[type.namespace.name]) {
@@ -133,7 +142,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	},
 
 	_get: function(type, api, params) {
-		var proxy = Ea.Class.createProxy(type, api, params);
+		var proxy = Ea.Class.createProxy(this._source.getApplication(), type, api, params);
 		if (this.cacheEnabled && !Ea.mm) {
 			var idAttribute = Ea.Class.getIdAttribute(type);
 			var guidAttribute = Ea.Class.getGuidAttribute(type);
@@ -207,7 +216,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 			if (row["Type"] == "reference" && row["Name"] == "Element") {
 				var supplier = this.getByGuid(Ea.Element._Base, row["Supplier"]);
 				if (supplier) {
-					var reference = new Ea.Repository.CustomReference(row["Description"], supplier);
+					var reference = new Ea.CustomReference(row["Description"], supplier);
 					collection.add(reference);
 				}
 			}
@@ -215,10 +224,20 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 		return collection;
 	},
 	
+	/**
+	 * Returns selected package
+	 * 
+	 * @returns {Ea.Package._Base}
+	 */
 	getSelectedPackage: function() {
 		return this.get(Ea.Package._Base, this._source.getApi().GetTreeSelectedPackage());
 	},
 	
+	/**
+	 * Returns class of selected object
+	 * 
+	 * @returns {Class}
+	 */
 	getSelectedType: function() {
 		var objectType = this._source.getApi().GetTreeSelectedItemType();
 		var namespace = Ea._objectTypes[objectType];
@@ -227,6 +246,11 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 		return namespace._Base;
 	},
 	
+	/**
+	 * Returns selected object
+	 * 
+	 * @returns {Ea.Types.Any}
+	 */
 	getSelectedObject: function() {
 		var api = this._source.getApi().GetTreeSelectedObject();
 		var object = this.get(this.getSelectedType(), api);
@@ -260,36 +284,3 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	_connectionString: attribute({api: "ConnectionString"}),
 	_models: attribute({api: "Models", type: "Ea.Collection._Base", elementType: "Ea.Package._Base", aggregation: "composite"})
 });
-
-Ea.Repository.CustomReference = define(/** @lends Ea.Repository.CustomReference# */{
-	_notes: null,
-	_supplier: null,
-	
-	/**
-	 * @constructs
-	 * @param notes
-	 * @param supplier
-	 */
-	create: function(notes, supplier) {
-		_super.create(params);
-		this._notes = notes;
-		this._supplier = supplier;
-	},
-	
-	/**
-	 * @memberOf Ea.Repository.CustomReference#
-	 * @returns
-	 */
-	getNotes: function() {
-		return this._notes;
-	},
-	
-	getSupplier: function() {
-		return this._supplier;
-	},
-	
-	_toString: function() {
-		return " --> " + this._supplier;
-	}
-});
-

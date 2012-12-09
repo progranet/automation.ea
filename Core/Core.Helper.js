@@ -15,35 +15,6 @@
 */
 
 /**
- * Checks if array this contains specified element 
- * 
- * @memberOf Array#
- * @param {Object} element
- * @returns {Boolean}
- */
-Array.prototype.contains = function(element) {
-	for (var i = 0; i < this.length; i++) {
-		if (this[i] === element) return true;
-	}
-	return false;
-};
-
-/**
- * Left pads this string with specified string while length of this string is less than specified 
- * 
- * @memberOf String#
- * @param {String} pad
- * @param {Number} length
- * @returns {String}
- */
-String.prototype.lpad = function(pad, length) {
-	var s = this;
-    while (s.length < length)
-        s = pad + s;
-    return s;
-};
-
-/**
  * Trims leading or trailing whitespace from this string
  * 
  * @memberOf String#

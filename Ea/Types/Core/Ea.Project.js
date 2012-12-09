@@ -14,20 +14,39 @@
    limitations under the License.
 */
 
-Ea.Project = {
+/**
+ * @namespace
+ */
+Ea.Project = {};
 
-};
-
-Ea.Project._Base = extend(Ea.Types.Any, {
+Ea.Project._Base = extend(Ea.Types.Any, /** @lends Ea.Project._Base# */ {
 	
+	/**
+	 * Returns specified GUID converted to XML format
+	 * 
+	 * @memberOf Ea.Project._Base#
+	 * @param {String} guid
+	 * @returns {String}
+	 */
 	guidToXml: function(guid) {
 		return guid ? this._source.getApi().GUIDtoXML(guid) : null;
 	},
 	
+	/**
+	 * Saves diagram image to specified path
+	 * 
+	 * @param {Ea.Diagram._Base} diagram
+	 * @param {String} path
+	 */
 	saveDiagram: function(diagram, path) {
 		this._source.getApi().PutDiagramImageToFile(diagram.getXmlGuid(), path, 1);
 	},
 	
+	/**
+	 * Loads project from specified path (file)
+	 * 
+	 * @param {String} path
+	 */
 	load: function(path) {
 		this._source.getApi().LoadProject(path);
 	}

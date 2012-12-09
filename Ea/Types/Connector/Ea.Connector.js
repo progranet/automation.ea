@@ -41,12 +41,12 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 				return "";
 			});
 			if (this._features.client) {
-				this._clientAttribute = Ea.getByGuid(Ea.Attribute._Base, this._features.client);
-				this._clientMethod = Ea.getByGuid(Ea.Method._Base, this._features.client);
+				this._clientAttribute = this._source.getApplication().getRepository().getByGuid(Ea.Attribute._Base, this._features.client);
+				this._clientMethod = this._source.getApplication().getRepository().getByGuid(Ea.Method._Base, this._features.client);
 			}
 			if (this._features.supplier) {
-				this._supplierAttribute = Ea.getByGuid(Ea.Attribute._Base, this._features.supplier);
-				this._supplierMethod = Ea.getByGuid(Ea.Method._Base, this._features.supplier);
+				this._supplierAttribute = this._source.getApplication().getRepository().getByGuid(Ea.Attribute._Base, this._features.supplier);
+				this._supplierMethod = this._source.getApplication().getRepository().getByGuid(Ea.Method._Base, this._features.supplier);
 			}
 		}
 	},
@@ -197,141 +197,6 @@ Ea.Connector.StateFlow = extend(Ea.Connector._Base, {
 Ea.Connector.Sequence = extend(Ea.Connector._Base, {},
 {
 	_sequenceNo: attribute({api: "SequenceNo", type: Number})
-});
-
-
-Ea.Connector.Relationship = define({
-	
-	_connector: null,
-	_relation: null,
-	_isClient: null,
-
-	_guard: null,
-	_role: null,
-
-	_to: null,
-	_toEnd: null,
-	_toAttribute: null,
-	_toMethod: null,
-	
-	_from: null,
-	_fromEnd: null,
-	_fromAttribute: null,
-	_fromMethod: null,
-	
-	_opposite: null,
-	
-	create: function(params) {
-		
-		_super.create(params);
-		
-		this._connector = params.connector;
-		this._isClient = params.isClient;
-		this._relation = this._connector.getRelation(!this._isClient);
-		
-		this._guard = this._connector.getGuard();
-
-		this._from = params.from;
-		this._fromEnd = params.fromEnd;
-		this._to = params.to;
-		this._toEnd = params.toEnd;
-		
-		this._role = this._toEnd.getRole();
-
-		this._fromAttribute = this._isClient ? this._connector.getSupplierAttribute() : this._connector.getClientAttribute();
-		this._fromMethod = this._isClient ? this._connector.getSupplierMethod() : this._connector.getClientMethod();
-		this._toAttribute = !this._isClient ? this._connector.getSupplierAttribute() : this._connector.getClientAttribute();
-		this._toMethod = !this._isClient ? this._connector.getSupplierMethod() : this._connector.getClientMethod();
-		
-		this._opposite = params.opposite || new Ea.Connector.Relationship({
-			from: params.to, 
-			fromEnd: params.toEnd,
-			connector: params.connector, 
-			isClient: !params.isClient, 
-			to: params.from, 
-			toEnd: params.fromEnd,
-			opposite: this
-		});
-	},
-	
-	getFrom: function() {
-		return this._from;
-	},
-	
-	getFromEnd: function() {
-		return this._fromEnd;
-	},
-	
-	getFromAttribute: function() {
-		return this._fromAttribute;
-	},
-	
-	getFromMethod: function() {
-		return this._fromMethod;
-	},
-	
-	getName: function() {
-		if (this._role)
-			return this._role;
-		var name = this._to.getName();
-		return name.substr(0, 1).toLowerCase() + name.substr(1);
-	},
-	
-	getTo: function() {
-		return this._to;
-	},
-	
-	getToEnd: function() {
-		return this._toEnd;
-	},
-	
-	getToAttribute: function() {
-		return this._toAttribute;
-	},
-	
-	getToMethod: function() {
-		return this._toMethod;
-	},
-	
-	getRelation: function() {
-		return this._relation;
-	},
-	
-	getConnector: function() {
-		return this._connector;
-	},
-	
-	isAggregation: function() {
-		return this._fromEnd.getAggregation() != "none";
-	},
-	
-	getAggregation: function() {
-		return this._fromEnd.getAggregation();
-	},
-	
-	getMultiplicity: function() {
-		return this._toEnd.getCardinality();
-	},
-	
-	isNavigable: function() {
-		return this._toEnd.getNavigable() != "Non-Navigable";
-	},
-	
-	getNavigability: function() {
-		return this._toEnd.getNavigable();
-	},
-	
-	getOpposite: function() {
-		return this._opposite;
-	},
-	
-	isClient: function() {
-		return this._isClient;
-	},
-	
-	getGuard: function() {
-		return this._guard;
-	}
 });
 
 Ea.register("Ea.ConnectorTag@Ea.Types.Connector", 36);

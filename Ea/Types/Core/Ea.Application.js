@@ -17,78 +17,9 @@
 /**
  * @namespace
  */
-Ea.Application = {
-	
-	_active: null,
-	_default: "_default",
-	_applications: {},
-	
-	/**
-	 * @constructs
-	 * @param {Object} params
-	 */
-	create: function(params) {
-		var name = params.name || this._default;
-		var app = params.path ? new ActiveXObject("EA.App") : App;
-		this._applications[name] = {
-			application: Ea.Class.createProxy(Ea.Application._Base, app),
-			project: Ea.Class.createProxy(Ea.Project._Base, app.Project),
-			repository: Ea.Class.createProxy(Ea.Repository._Base, app.Repository, {syntax: params.syntax})
-		};
-		if (params.path)
-			this._applications[name].project.load(params.path);
-	},
-	
-	/**
-	 * @memberOf Ea.Application
-	 * @param name
-	 */
-	activate: function(name) {
-		name = name || this._default;
-		this._active = name;
-	},
-	
-	isActivated: function() {
-		return this._active != null;
-	},
-	
-	getApplication: function(name) {
-		if (name) {
-			var application = this._applications[name];
-			return application ? application.application : null;
-		}
-		if (!this.isActivated())
-			return null;
-		return this._applications[this._active].application;
-	},
-	
-	/**
-	 * 
-	 * @param name
-	 * @returns {Ea.Repository._Base}
-	 */
-	getRepository: function(name) {
-		if (name) {
-			var application = this._applications[name];
-			return application ? application.repository : null;
-		}
-		if (!this.isActivated())
-			return null;
-		return this._applications[this._active].repository;
-	},
+Ea.Application = {};
 
-	getProject: function(name) {
-		if (name) {
-			var application = this._applications[name];
-			return application ? application.project : null;
-		}
-		if (!this.isActivated())
-			return null;
-		return this._applications[this._active].project;
-	}
-};
-
-Ea.Application._Base = extend(Ea.Types.Any, {}, {
+Ea.Application._Base = extend(Ea.Types.Any, /** @lends Ea.Application._Base# */ {}, {
 	api: "App",
 	_project: attribute({api: "Project", type: "Ea.Project._Base"}),
 	_repository: attribute({api: "Repository", type: "Ea.Repository._Base"}),

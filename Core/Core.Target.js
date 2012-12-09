@@ -29,7 +29,7 @@ Core.Target = {
 		INFO: 0,
 		DEBUG: 1,
 		TREE: 2,
-		NULL: 3
+		BLIND: 3
 	}
 };
 
