@@ -62,11 +62,11 @@ Core.Log = {
 	initialize: function() {
 
 		var callbackStacktrace = function(source, namespace, propertyName, qualifiedName, _static) {
-			var bio = source.indexOf("{");
-			source = source.substring(0, bio) +
+			var parsed = Core.parse(source);
+			source = "function " + parsed.name + "(" + parsed.joinedArguments + ") " +
 			"{\n\
 				try {"
-					+ source.substring(bio + 1, source.length - 2) + "\n\
+					+ parsed.body + "\n\
 				}\n\
 				catch(e) {\n\
 					if (!e.throwed) {\n\

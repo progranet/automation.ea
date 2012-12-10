@@ -31,14 +31,14 @@ Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 	
 	/**
 	 * @memberOf Ea.TypedElement#
-	 * @returns {Ea.DataTypes.PrimitiveType|Ea.Element._Base}
+	 * @returns {Ea.PrimitiveType|Ea.Element._Base}
 	 */
 	getType: function() {
 		if (!this._type || Ea.mm) {
 			this._type = this._getClassifier();
 			if (!this._type) {
 				var name = this._getPrimitiveType();
-				this._type = Ea.DataTypes.PrimitiveType.getPrimitiveType(name);
+				this._type = Ea.PrimitiveType.getPrimitiveType(name);
 			}
 		}
 		return this._type;

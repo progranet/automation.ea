@@ -43,8 +43,11 @@ Ea.Project._Base = extend(Ea.Types.Any, /** @lends Ea.Project._Base# */ {
 	},
 	
 	/**
-	 * Loads project from specified path (file)
+	 * Loads project from specified path (file).
+	 * For unknown reason Repository interface has OpenFile, OpenFile2 methods, too.
+	 * Those methods seems to be more complex (give possibility of specifying connection strings).
 	 * 
+	 * @see Ea.Repository._Base#open
 	 * @param {String} path
 	 */
 	load: function(path) {

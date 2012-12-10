@@ -48,10 +48,13 @@ Ea = {
 	},
 	
 	initializeDefaultApplication: function(targetClass) {
-		
 		this._application =  new Ea.Instance();
-
-		targetClass = targetClass || Ea.Helper.Target;
+		this.initializeLogs(targetClass || Ea.Helper.Target);
+		return this._application;
+	},
+	
+	initializeLogs: function(targetClass) {
+		
 		var systemTarget = new targetClass("System", Core.Target.Type.DEBUG);
 		var scriptTarget = new targetClass("Script", Core.Target.Type.INFO);
 		var treeTarget = new targetClass("Script", Core.Target.Type.TREE);
@@ -65,8 +68,6 @@ Ea = {
 		Core.Log.registerTarget("info", scriptTarget);
 		Core.Log.registerTarget("tree", treeTarget);
 		Core.Log.registerTarget("quiet", quietTarget);
-
-		return this._application;
 	},
 	
 	_guid: /^\{[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}\}$/i,
@@ -114,7 +115,7 @@ Ea.Instance = define(/** @lends Ea.Instance# */{
 		this._project = Ea.Class.createProxy(this, Ea.Project._Base, app.Project);
 		this._repository = Ea.Class.createProxy(this, Ea.Repository._Base, app.Repository, {syntax: params.syntax});
 		if (params.path)
-			this._project.load(params.path);
+			this._repository.open(params.path);
 	},
 	
 	/**
@@ -141,6 +142,217 @@ Ea.Instance = define(/** @lends Ea.Instance# */{
 		return this._repository;
 	}
 	
+});
+
+
+Ea.PrimitiveType = extend(Core.Types.Named, {},
+{
+	_primitiveTypes: {},
+	getPrimitiveType: function(name) {
+		if (!name)
+			return null;
+		if (!(name in this._primitiveTypes)) {
+			this._primitiveTypes[name] = new Ea.PrimitiveType(name);
+		}
+		return this._primitiveTypes[name];
+		
+	},
+	
+	create: function(source, params) {
+		return new this(source, params);
+	}
+});
+
+
+Ea.Relationship = define({
+	
+	_connector: null,
+	_relation: null,
+	_isClient: null,
+
+	_guard: null,
+	_role: null,
+
+	_to: null,
+	_toEnd: null,
+	_toAttribute: null,
+	_toMethod: null,
+	
+	_from: null,
+	_fromEnd: null,
+	_fromAttribute: null,
+	_fromMethod: null,
+	
+	_opposite: null,
+	
+	create: function(params) {
+		
+		_super.create(params);
+		
+		this._connector = params.connector;
+		this._isClient = params.isClient;
+		this._relation = this._connector.getRelation(!this._isClient);
+		
+		this._guard = this._connector.getGuard();
+
+		this._from = params.from;
+		this._fromEnd = params.fromEnd;
+		this._to = params.to;
+		this._toEnd = params.toEnd;
+		
+		this._role = this._toEnd.getRole();
+
+		this._fromAttribute = this._isClient ? this._connector.getSupplierAttribute() : this._connector.getClientAttribute();
+		this._fromMethod = this._isClient ? this._connector.getSupplierMethod() : this._connector.getClientMethod();
+		this._toAttribute = !this._isClient ? this._connector.getSupplierAttribute() : this._connector.getClientAttribute();
+		this._toMethod = !this._isClient ? this._connector.getSupplierMethod() : this._connector.getClientMethod();
+		
+		this._opposite = params.opposite || new Ea.Relationship({
+			from: params.to, 
+			fromEnd: params.toEnd,
+			connector: params.connector, 
+			isClient: !params.isClient, 
+			to: params.from, 
+			toEnd: params.fromEnd,
+			opposite: this
+		});
+	},
+	
+	getFrom: function() {
+		return this._from;
+	},
+	
+	getFromEnd: function() {
+		return this._fromEnd;
+	},
+	
+	getFromAttribute: function() {
+		return this._fromAttribute;
+	},
+	
+	getFromMethod: function() {
+		return this._fromMethod;
+	},
+	
+	getName: function() {
+		if (this._role)
+			return this._role;
+		var name = this._to.getName();
+		return name.substr(0, 1).toLowerCase() + name.substr(1);
+	},
+	
+	getTo: function() {
+		return this._to;
+	},
+	
+	getToEnd: function() {
+		return this._toEnd;
+	},
+	
+	getToAttribute: function() {
+		return this._toAttribute;
+	},
+	
+	getToMethod: function() {
+		return this._toMethod;
+	},
+	
+	getRelation: function() {
+		return this._relation;
+	},
+	
+	getConnector: function() {
+		return this._connector;
+	},
+	
+	isAggregation: function() {
+		return this._fromEnd.getAggregation() != "none";
+	},
+	
+	getAggregation: function() {
+		return this._fromEnd.getAggregation();
+	},
+	
+	getMultiplicity: function() {
+		return this._toEnd.getCardinality();
+	},
+	
+	isNavigable: function() {
+		return this._toEnd.getNavigable() != "Non-Navigable";
+	},
+	
+	getNavigability: function() {
+		return this._toEnd.getNavigable();
+	},
+	
+	getOpposite: function() {
+		return this._opposite;
+	},
+	
+	isClient: function() {
+		return this._isClient;
+	},
+	
+	getGuard: function() {
+		return this._guard;
+	}
+});
+
+
+Ea.CustomReference = define(/** @lends Ea.CustomReference# */{
+	_notes: null,
+	_supplier: null,
+	
+	/**
+	 * @constructs
+	 * @param notes
+	 * @param supplier
+	 */
+	create: function(notes, supplier) {
+		_super.create(params);
+		this._notes = notes;
+		this._supplier = supplier;
+	},
+	
+	/**
+	 * @memberOf Ea.CustomReference#
+	 */
+	getNotes: function() {
+		return this._notes;
+	},
+	
+	getSupplier: function() {
+		return this._supplier;
+	},
+	
+	_toString: function() {
+		return " --> " + this._supplier;
+	}
+});
+
+Ea.ContextReference = define({
+	_notes: null,
+	_supplier: null,
+	_connection: null,
+
+	create: function(notes, supplier, connection) {
+		_super.create(params);
+		this._notes = notes;
+		this._supplier = supplier;
+		this._connection = connection;
+	},
+	
+	getNotes: function() {
+		return this._notes;
+	},
+	
+	getSupplier: function() {
+		return this._supplier;
+	},
+	
+	getConnection: function() {
+		return this._connection;
+	}
 });
 
 include("Ea.Class@Ea");

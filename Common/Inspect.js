@@ -18,15 +18,37 @@
 include("Sys@Sys");
 include("Sys.IO@Sys");
 include("Ea@Ea");
+include("Browser@Ms.IExplorer");
 
 Inspect = {
 	params: {
 		
 	},
 	
+	/*fn: function() {
+		include("Browser@Ms.IExplorer", {
+			document: document
+		});
+		include("Report@Ksi", {
+			outputRoot: "C:\\Temp\\KSI\\3.5.12.wsh\\",
+			numer: 1
+		});
+		Ea.initializeApplication({path: openFileDialog.FileName});
+		Ea.initializeLogs(Browser.Target);
+	},*/
+	
 	execute: function() {
 		
 		var application = Ea.initializeDefaultApplication();
+
+		/*this.ie = new ActiveXObject("InternetExplorer.Application");
+		this.ie.Visible = true;
+		var r = this.ie.Navigate("C:\\Temp\\KSI\\raport.js\\logs.html");
+		Session.Output(">>>" + r);
+		for (var i = 0; i < 100000000; i++) {
+
+		}
+		this.ie.Document;*/
 
 		var object = application.getRepository().getSelectedObject();
 		

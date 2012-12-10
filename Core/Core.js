@@ -48,13 +48,13 @@ Core = {
 			arguments: [],
 			joinedArguments: ""
 		};
-		var pt = this._fnPattern.exec(fn.toString());
+		fn = typeof(fn) == "string" ? fn : fn.toString();
+		var pt = this._fnPattern.exec(fn);
 		if (pt) {
-			parsed.arguments = pt[2].split(",");
-			parsed.joinedArguments = pt[2];
-			parsed.body = pt[3];
 			parsed.name = pt[1];
-		
+			parsed.joinedArguments = pt[2];
+			parsed.arguments = pt[2].split(",");
+			parsed.body = pt[3];
 		}
 		return parsed;
 	},

@@ -158,6 +158,18 @@ Ea.Connector.ControlFlow = extend(Ea.Connector._Base, {
 	}
 });
 
+Ea.Connector.ObjectFlow = extend(Ea.Connector._Base, {
+	getRelation: function(client) {
+		return client ? "transition from" : "transition to";
+	}
+});
+
+Ea.Connector.StateFlow = extend(Ea.Connector._Base, {
+	getRelation: function(client) {
+		return client ? "transition from" : "transition to";
+	}
+});
+
 Ea.Connector.Dependency = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
 		return client ? "needed by" : "depends on";
@@ -176,21 +188,9 @@ Ea.Connector.Nesting = extend(Ea.Connector._Base, {
 	}
 });
 
-Ea.Connector.ObjectFlow = extend(Ea.Connector._Base, {
-	getRelation: function(client) {
-		return client ? "transition from" : "transition to";
-	}
-});
-
 Ea.Connector.Realisation = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
 		return client ? "realized by" : "implements";
-	}
-});
-
-Ea.Connector.StateFlow = extend(Ea.Connector._Base, {
-	getRelation: function(client) {
-		return client ? "transition from" : "transition to";
 	}
 });
 

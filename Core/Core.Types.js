@@ -154,12 +154,12 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * Adds specified element to this collection
 	 * 
 	 * @memberOf Core.Types.Collection#
-	 * @param {Object} element
+	 * @param {Core.Types.Object} element
 	 * @returns {Boolean}
 	 */
 	add: function(element) {
 		if (!element || !Core.Types.Object.isInstance(element))
-			return false;
+			throw new Error("No element specified or unexpected element type");
 		if (!this._add(element))
 			return false;
 		if (!this._filter.check(element))

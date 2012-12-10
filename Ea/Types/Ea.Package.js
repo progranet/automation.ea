@@ -36,6 +36,14 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {},
 
 	_alias: attribute({api: "Alias"}),
 	_notes: attribute({api: "Notes"}),
+	_flags: attribute({api: "Flags", type: "Ea.DataTypes.Map"}),
+
+	_controlled: attribute({api: "IsControlled", type: Boolean}),
+	_namespace: attribute({api: "IsNamespace", type: Boolean}),
+	_protected: attribute({api: "IsProtected", type: Boolean}),
+	_versionControlled: attribute({api: "IsVersionControlled", type: Boolean}),
+	_owner: attribute({api: "Owner"}),
+	_xmlPath: attribute({api: "XMLPath"}),
 
 	_model: attribute({api: "isModel", private: true, type: Boolean}),
 	

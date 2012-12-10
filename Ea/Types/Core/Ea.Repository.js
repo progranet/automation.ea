@@ -266,21 +266,49 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	},
 	
 	showOutput: function(name) {
-		Repository.EnsureOutputVisible(name);
+		this._source.getApi().EnsureOutputVisible(name);
 	},
 	
 	clearOutput: function(name) {
-		Repository.ClearOutput(name);
+		this._source.getApi().ClearOutput(name);
 	},
 	
 	writeOutput: function(name, message) {
-		Repository.WriteOutput(name, message, undefined);
+		this._source.getApi().WriteOutput(name, message, undefined);
+	},
+	
+	createOutput: function(name) {
+		this._source.getApi().CreateOutputTab(name);
+	},
+	
+	closeOutput: function(name) {
+		this._source.getApi().RemoveOutputTab(name);
+	},
+	
+	/**
+	 * Opens specified repository file or database connection
+	 * 
+	 * @param {String} path
+	 * @returns {Boolean}
+	 */
+	open: function(path) {
+		return this._source.getApi().OpenFile(path);
+	},
+	
+	close: function() {
+		this._source.getApi().CloseFile();
 	}
 },
 {
 	api: "Repository",
 	
 	_projectGuid: attribute({api: "ProjectGUID"}),
-	_connectionString: attribute({api: "ConnectionString"}),
+	_batchAppend: attribute({api: "BatchAppend", type: Boolean}),
+	_enableCache: attribute({api: "EnableCache", type: Boolean}),
+	_enableUIUpdates: attribute({api: "EnableUIUpdates", type: Boolean}),
+	_flagUpdate: attribute({api: "FlagUpdate", type: Boolean}),
+	_securityEnabled: attribute({api: "IsSecurityEnabled", type: Boolean}),
+	_path: attribute({api: "ConnectionString"}),
 	_models: attribute({api: "Models", type: "Ea.Collection._Base", elementType: "Ea.Package._Base", aggregation: "composite"})
+	
 });
