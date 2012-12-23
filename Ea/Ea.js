@@ -39,7 +39,7 @@ Ea = {
 	 * @returns {Ea.Application._Base}
 	 * @static
 	 */
-	getApplication: function() {
+	getDefaultApplication: function() {
 		return this._application;
 	},
 	
@@ -47,9 +47,23 @@ Ea = {
 		Ea.Class.prepareClasses();
 	},
 	
+	createApplication: function(params) {
+		params = params || {};
+		var applicationApi = params.path ? new ActiveXObject("EA.App") : App;
+		var application = Ea.Class.createProxy(null, Ea.Application._Base, applicationApi);
+		if (params.path)
+			application.getRepository().open(params.path);
+		return application;
+	},
+	
 	initializeDefaultApplication: function(targetClass) {
-		this._application =  new Ea.Instance();
-		this.initializeLogs(targetClass || Ea.Helper.Target);
+		if (!this._application) {
+			this._application = this.createApplication();
+			this.initializeLogs(targetClass || Ea.Helper.Target);
+		}
+		else {
+			warn("Default application already initialized");
+		}
 		return this._application;
 	},
 	
@@ -58,16 +72,18 @@ Ea = {
 		var systemTarget = new targetClass("System", Core.Target.Type.DEBUG);
 		var scriptTarget = new targetClass("Script", Core.Target.Type.INFO);
 		var treeTarget = new targetClass("Script", Core.Target.Type.TREE);
-		var quietTarget = new Core.Target.AbstractTarget(Core.Target.Type.BLIND);
+		var blindTarget = new Core.Target.AbstractTarget(Core.Target.Type.BLIND);
 		
+		Core.Log.registerTarget("info", scriptTarget);
 		Core.Log.registerTarget("error", systemTarget);
-		Core.Log.registerTarget("exception", systemTarget);
-		Core.Log.registerTarget("stack", systemTarget);
 		Core.Log.registerTarget("warn", systemTarget);
 		Core.Log.registerTarget("debug", systemTarget);
-		Core.Log.registerTarget("info", scriptTarget);
-		Core.Log.registerTarget("tree", treeTarget);
-		Core.Log.registerTarget("quiet", quietTarget);
+
+		Core.Log.registerTarget("_treeLogger", treeTarget);
+		Core.Log.registerTarget("_quietLogger", blindTarget);
+
+		Core.Log.registerTarget("__exceptionLogger", systemTarget);
+		Core.Log.registerTarget("__stackLogger", systemTarget);
 	},
 	
 	_guid: /^\{[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}\}$/i,
@@ -99,52 +115,6 @@ Ea = {
 	}
 };
 
-Ea.Instance = define(/** @lends Ea.Instance# */{
-	
-	_application: null,
-	_project: null,
-	_repository: null,
-	
-	/**
-	 * @constructs
-	 */
-	create: function(params) {
-		params = params || {};
-		var app = params.path ? new ActiveXObject("EA.App") : App;
-		this._application = Ea.Class.createProxy(this, Ea.Application._Base, app);
-		this._project = Ea.Class.createProxy(this, Ea.Project._Base, app.Project);
-		this._repository = Ea.Class.createProxy(this, Ea.Repository._Base, app.Repository, {syntax: params.syntax});
-		if (params.path)
-			this._repository.open(params.path);
-	},
-	
-	/**
-	 * @memberOf Ea.Instance#
-	 * @returns {Ea.Application._Base}
-	 */
-	getApplication: function() {
-		return this._application;
-	},
-	
-	/**
-	 * @memberOf Ea.Instance#
-	 * @returns {Ea.Project._Base}
-	 */
-	getProject: function() {
-		return this._project;
-	},
-	
-	/**
-	 * @memberOf Ea.Instance#
-	 * @returns {Ea.Repository._Base}
-	 */
-	getRepository: function() {
-		return this._repository;
-	}
-	
-});
-
-
 Ea.PrimitiveType = extend(Core.Types.Named, {},
 {
 	_primitiveTypes: {},
@@ -162,7 +132,6 @@ Ea.PrimitiveType = extend(Core.Types.Named, {},
 		return new this(source, params);
 	}
 });
-
 
 Ea.Relationship = define({
 	
@@ -187,7 +156,7 @@ Ea.Relationship = define({
 	
 	create: function(params) {
 		
-		_super.create(params);
+		_super.create();
 		
 		this._connector = params.connector;
 		this._isClient = params.isClient;
@@ -298,7 +267,6 @@ Ea.Relationship = define({
 	}
 });
 
-
 Ea.CustomReference = define(/** @lends Ea.CustomReference# */{
 	_notes: null,
 	_supplier: null,
@@ -309,7 +277,7 @@ Ea.CustomReference = define(/** @lends Ea.CustomReference# */{
 	 * @param supplier
 	 */
 	create: function(notes, supplier) {
-		_super.create(params);
+		_super.create();
 		this._notes = notes;
 		this._supplier = supplier;
 	},
@@ -336,7 +304,7 @@ Ea.ContextReference = define({
 	_connection: null,
 
 	create: function(notes, supplier, connection) {
-		_super.create(params);
+		_super.create();
 		this._notes = notes;
 		this._supplier = supplier;
 		this._connection = connection;

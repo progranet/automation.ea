@@ -54,7 +54,6 @@ Ea.Class = {
 	 */
 	getIdAttribute: function(_class) {
 		return _class.namespace.__id;
-		//return Ea.Class._types[_class].id;
 	},
 	
 	/**
@@ -63,7 +62,6 @@ Ea.Class = {
 	 */
 	getGuidAttribute: function(_class) {
 		return _class.namespace.__guid;
-		//return Ea.Class._types[_class].guid;
 	},
 	
 	/**
@@ -146,71 +144,17 @@ Ea.Class = {
 	 * @param {Object} params
 	 * @returns {Ea.Types.Any}
 	 */
-	createProxy: function(instance, baseType, api, params) {
-		var source = new Ea.Class.Source(instance, api);
-		var type = baseType.getType(source);
+	createProxy: function(application, baseType, api, params) {
+		var source = {
+			api: api,
+			application: application,
+			value: {}
+		};
+		var type = baseType.getType({_source: source});
 		var proxy = new type(source, params);
 		return proxy;
 	}	
 };
-
-Ea.Class.Source = define(/** @lends Ea.Class.Source# */ {
-	
-	_api: null,
-	_value: null,
-	_application: null,
-	
-	/**
-	 * @constructs
-	 * @memberOf Ea.Class.Source#
-	 */
-	create: function(application, api) {
-		_super.create();
-		this._api = api;
-		this._application = application;
-		this._value = {};
-	},
-	
-	getApi: function() {
-		return this._api;
-	},
-	
-	getApplication: function() {
-		return this._application;
-	},
-	
-	getApiValue: function(property) {
-			if (property.index == null) {
-				var value;
-				try {
-					value = this._api[property.api];
-					//	don't remove this dumb check:
-					//		EA for some reason throws exception on access to Ea.Property._Base._value value for NoteLink property
-					//		logging of this value is necessary for exception handing (i don't know why)
-					if (property.qualifiedName == "Ea.Property._Base._value")
-						quiet("$", [value]);
-				}
-				catch(error) {
-					warn("EA API exception on get attribute value $ ($)", [property.qualifiedName, error.message]);
-					value = null;
-				}
-				return value;
-			}
-			return this._api[property.api](property.index);
-	},
-	
-	getValue: function(property) {
-		return this._value[property.name];
-	},
-	
-	setValue: function(property, value) {
-		this._value[property.name] = value;
-	},
-	
-	isInitialized: function(property) {
-		return (property.name in this._value);
-	}
-});
 
 Ea.Class._Attribute = define(/** @lends Ea.Class._Attribute# */{
 
@@ -279,6 +223,8 @@ Ea.Class._Attribute = define(/** @lends Ea.Class._Attribute# */{
 
 Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.ApiAttribute# */{
 	
+	_getBy: null,
+	
 	/**
 	 * @constructs
 	 * @memberOf Ea.Class.ApiAttribute#
@@ -288,45 +234,64 @@ Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.ApiAttri
 		this.derived = false;
 	},
 	
+	prepare: function() {
+		_super.prepare();
+		if (this.type.isClass && this.type.isSubclassOf(Ea.Types.Any)) {
+			this._getBy = this.referenceBy ? ("getBy" + this.referenceBy.substr(0, 1).toUpperCase() + this.referenceBy.substr(1).toLowerCase()) : "get";
+		}
+	},
+	
 	_get: function(object, params) {
-		var source = object.instanceOf(Ea.Class.Source) ? object : object._source;
-		if (Ea.mm || !source.isInitialized(this))
+		var source = object._source;
+		if (Ea.mm || !(this.name in source.value))
 			this._init(source);
-		var value = source.getValue(this);
+		var value = source.value[this.name];
 		if (this.type.isClass && "processValue" in this.type) {
 			value = this.type.processValue(value, params || []);
 		}
 		return value;
 	},
 	
+	_getApiValue: function(source) {
+		if (this.index == null) {
+			var value;
+			try {
+				value = source.api[this.api];
+				//	don't remove this dumb check:
+				//		EA for some reason throws exception on access to Ea.Property._Base._value value for NoteLink property
+				//		logging of this value is necessary for proper exception handing (i don't know why)
+				if (this.qualifiedName == "Ea.Property._Base._value")
+					_quietLogger("$", [value]);
+			}
+			catch(error) {
+				warn("EA API exception on get attribute value $ ($)", [this.qualifiedName, error.message]);
+				value = null;
+			}
+			return value;
+		}
+		return source.api[this.api](this.index);
+	},
+	
 	_init: function(source) {
+		
+		var apiValue = this._getApiValue(source);
+		
 		if (this.type.isClass) {
 			if (this.type.isSubclassOf(Core.Types.Collection)) {
-				var collection = source.getApplication().getRepository().getCollection(this.type, source.getApiValue(this), this);
-				source.setValue(this, collection);
+				var collection = source.application.getRepository().getCollection(this.type, apiValue, this);
+				source.value[this.name] = collection;
 				return;
 			}
 			if (this.type.isSubclassOf(Ea.Types.Any)) {
-				var getBy;
-				if (this.referenceBy)
-					getBy = ("getBy" + this.referenceBy.substr(0, 1).toUpperCase() + this.referenceBy.substr(1).toLowerCase());
-				else
-					getBy = "get";
-				var api = source.getApiValue(this);
-				var proxy = api ? source.getApplication().getRepository()[getBy](this.type, api) : null;
-				source.setValue(this, proxy);
+				var proxy = apiValue ? source.application.getRepository()[this._getBy](this.type, apiValue) : null;
+				source.value[this.name] = proxy;
 				return;
 			}
-		}
-		//var value = new this.type(source.getApiValue(this), this);
-		//source.setValue(this, this.type.isClass ? value : value.valueOf());
-		if (this.type.isClass) {
-			var value = this.type.create(source.getApiValue(this), this);
-			source.setValue(this, value);
+			var value = this.type.create(apiValue, this);
+			source.value[this.name] = value;
 			return;
 		}
-		value = source.getApiValue(this);
-		source.setValue(this, value == null ? null : new this.type(value).valueOf());
+		source.value[this.name] = (apiValue == null ? null : new this.type(apiValue).valueOf());
 	}
 });
 

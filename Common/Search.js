@@ -39,7 +39,7 @@ Search = {
 			this.file = new Sys.IO.File(this.params.file);
 		}
 		
-		this.processPackage(_package);
+		this.processElement(_package);
 		
 		this.processOutput();
 
@@ -92,11 +92,19 @@ Search = {
 		this.application.getRepository().search("", "", "", this.xml);
 	},
 	
-	processPackage: function(package) {
-		Ea.log(package);
-		this.found.addAll(package.getElements(this.params.filter));
-		package.getPackages().forEach(function(element) {
-			this.processPackage(element);
-		});
+	processElement: function(element) {
+		Ea.log(element);
+		this.found.addAll(element.getElements(this.params.filter));
+		if (this.params.drill) {
+			element.getElements().forEach(function(element) {
+				this.processElement(element);
+			});
+		}
+		if (element.instanceOf(Ea.Package._Base)) {
+			element.getPackages().forEach(function(element) {
+				this.processElement(element);
+			});
+		}
 	}
+	
 };

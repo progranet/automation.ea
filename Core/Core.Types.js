@@ -14,11 +14,16 @@
    limitations under the License.
 */
 
-var callback = function(source, namespace, propertyName, qualifiedName, _static) {
+var callback = function(source, namespace) {
 	return source.replace(/\.\s*forEach\s*\(/g, ".forEach(this, ");
 };
-
 Core.registerMethodEnrichment(callback);
+
+/*var callback = function(source, namespace, propertyName, qualifiedName, _static) {
+	return source.replace(/\.\s*forEach\s*\(/g, ".forEach(this, ");
+};
+Core.registerMethod Enrichment(callback);
+*/
 
 /**
  * @namespace

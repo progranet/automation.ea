@@ -96,7 +96,7 @@ Ea.Helper = {
 				};
 				params.elementType = params.isCollection ? property.elementType : null;
 				params.typeName = params.isCollection ? Core.Output.getString(params.type) + "<" + Core.Output.getString(params.elementType) + ">" : Core.Output.getString(params.type);
-				params.template = (params._private ? "– " : "+ ") + (property.derived ? "/" : "") + params.name + " [" + params.typeName + "]";
+				params.template = (params._private ? "-" : "") + (property.derived ? "/" : "") + params.name + " [" + params.typeName + "]";
 
 				if (params.isCollection) {
 					if (value.instanceOf(Core.Types.Map)) {
@@ -107,6 +107,7 @@ Ea.Helper = {
 							info(this._indent(indent + 1) + "$ = {", [params.template]);
 							value.forEach(function(value, key) {
 								this._expand("$ = $", [key], value, indent + 1, params.aggregation);
+								//throw new Error("dupa");
 							});
 							info(this._indent(indent + 1) + "}");
 						}
@@ -141,8 +142,8 @@ Ea.Helper.Target = extend(Core.Target.AbstractTarget, /** @lends Ea.Helper.Targe
 	create: function(name, debug) {
 		_super.create(debug);
 		this._name = name;
-		Ea.getApplication().getRepository().showOutput(this._name);
-		Ea.getApplication().getRepository().clearOutput(this._name);
+		Ea.getDefaultApplication().getRepository().showOutput(this._name);
+		Ea.getDefaultApplication().getRepository().clearOutput(this._name);
 	},
 	
 	/**
@@ -151,7 +152,7 @@ Ea.Helper.Target = extend(Core.Target.AbstractTarget, /** @lends Ea.Helper.Targe
 	write: function(message) {
 		if (this._type == Core.Target.Type.TREE)
 			message = message.replace(/\|/g, "      |").replace(/\-/g, "—").replace(/\+/g, "[•]");
-		Ea.getApplication().getRepository().writeOutput(this._name, message);
+		Ea.getDefaultApplication().getRepository().writeOutput(this._name, message);
 	}
 });
 
@@ -198,7 +199,7 @@ Ea.Helper.Log = define(/** @lends Ea.Helper.Log# */{
 				if (!Ea.Helper.Log._current || p >= Ea.Helper.Log._current.length || Ea.Helper.Log._current[p] != path[p]) {
 					var element = path[p];
 					var string = (element.instanceOf(Ea.Package._Base) ? "+" : "") + " " + element;
-					tree(_tab(p, "|") + "-" + string);
+					_treeLogger(_tab(p, "|") + "-" + string);
 				}
 			}
 			Ea.Helper.Log._current = path;

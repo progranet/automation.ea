@@ -29,7 +29,7 @@ Ea.Project._Base = extend(Ea.Types.Any, /** @lends Ea.Project._Base# */ {
 	 * @returns {String}
 	 */
 	guidToXml: function(guid) {
-		return guid ? this._source.getApi().GUIDtoXML(guid) : null;
+		return guid ? this._source.api.GUIDtoXML(guid) : null;
 	},
 	
 	/**
@@ -39,7 +39,7 @@ Ea.Project._Base = extend(Ea.Types.Any, /** @lends Ea.Project._Base# */ {
 	 * @param {String} path
 	 */
 	saveDiagram: function(diagram, path) {
-		this._source.getApi().PutDiagramImageToFile(diagram.getXmlGuid(), path, 1);
+		this._source.api.PutDiagramImageToFile(diagram.getXmlGuid(), path, 1);
 	},
 	
 	/**
@@ -51,7 +51,7 @@ Ea.Project._Base = extend(Ea.Types.Any, /** @lends Ea.Project._Base# */ {
 	 * @param {String} path
 	 */
 	load: function(path) {
-		this._source.getApi().LoadProject(path);
+		this._source.api.LoadProject(path);
 	}
 	
 },

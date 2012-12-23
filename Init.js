@@ -14,20 +14,21 @@
    limitations under the License.
 */
 
-Ea.Swimlanes = {};
+_logBuffer = {};
+_reqisterLogger = function(level) {
+	_logBuffer[level] = [];
+	return function(message, params) {
+		_logBuffer[level].push({message: message, params: params});
+	};
+};
 
-Ea.Swimlanes._Base = extend(Ea.Collection.Map, {
-	_init: function(api, params) {
-		for (var e = 0; e < api.Count; e++) {
-			var element = this._source.application.getRepository().get(params.elementType, api.Items(e));
-			this.add(element);
-		}
-	}
-},
-{
-	getType: function() {
-		return Ea.Swimlanes._Base;
-	}
-});
+info = _reqisterLogger("info");
+error = _reqisterLogger("error");
+warn = _reqisterLogger("warn");
+debug = _reqisterLogger("debug");
 
-Ea.register("Ea.Swimlane@Ea.Types.Diagram", 52);
+_treeLogger = _reqisterLogger("_treeLogger");
+_quietLogger = _reqisterLogger("_quietLogger");
+
+__exceptionLogger = _reqisterLogger("__exceptionLogger");
+__stackLogger = _reqisterLogger("__stackLogger");

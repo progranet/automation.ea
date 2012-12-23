@@ -41,12 +41,12 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 				return "";
 			});
 			if (this._features.client) {
-				this._clientAttribute = this._source.getApplication().getRepository().getByGuid(Ea.Attribute._Base, this._features.client);
-				this._clientMethod = this._source.getApplication().getRepository().getByGuid(Ea.Method._Base, this._features.client);
+				this._clientAttribute = this._source.application.getRepository().getByGuid(Ea.Attribute._Base, this._features.client);
+				this._clientMethod = this._source.application.getRepository().getByGuid(Ea.Method._Base, this._features.client);
 			}
 			if (this._features.supplier) {
-				this._supplierAttribute = this._source.getApplication().getRepository().getByGuid(Ea.Attribute._Base, this._features.supplier);
-				this._supplierMethod = this._source.getApplication().getRepository().getByGuid(Ea.Method._Base, this._features.supplier);
+				this._supplierAttribute = this._source.application.getRepository().getByGuid(Ea.Attribute._Base, this._features.supplier);
+				this._supplierMethod = this._source.application.getRepository().getByGuid(Ea.Method._Base, this._features.supplier);
 			}
 		}
 	},
@@ -126,8 +126,8 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	_supplierAttribute: derived({getter: "getSupplierAttribute", type: "Ea.Attribute._Base"}),
 	_supplierMethod: derived({getter: "getSupplierMethod", type: "Ea.Method._Base"}),
 	
-	_clientEnd: attribute({api: "ClientEnd", type: "Ea.ConnectorEnd._Base", aggregation: "composite"}),
-	_supplierEnd: attribute({api: "SupplierEnd", type: "Ea.ConnectorEnd._Base", aggregation: "composite"}),
+	_clientEnd: attribute({api: "ClientEnd", type: "Ea.ConnectorEnd._Base"}),
+	_supplierEnd: attribute({api: "SupplierEnd", type: "Ea.ConnectorEnd._Base"}),
 	
 	_styleEx: attribute({api: "StyleEx", private: true}),
 

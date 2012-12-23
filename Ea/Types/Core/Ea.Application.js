@@ -19,10 +19,24 @@
  */
 Ea.Application = {};
 
-Ea.Application._Base = extend(Ea.Types.Any, /** @lends Ea.Application._Base# */ {}, {
+Ea.Application._Base = extend(Ea.Types.Any, /** @lends Ea.Application._Base# */ {
+	
+	_repository: null,
+	
+	create: function(source) {
+		source.application = this;
+		_super.create(source);
+		this._repository = Ea.Class.createProxy(this, Ea.Repository._Base, this._source.api.Repository);
+	},
+	
+	getRepository: function() {
+		return this._repository;
+	}
+},
+{
 	api: "App",
 	_project: attribute({api: "Project", type: "Ea.Project._Base"}),
-	_repository: attribute({api: "Repository", type: "Ea.Repository._Base"}),
+	_repository: derived({getter: "getRepository", type: "Ea.Repository._Base"}),
 	_visible: attribute({api: "Visible", type: Boolean})
 });
 

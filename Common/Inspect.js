@@ -22,7 +22,7 @@ include("Browser@Ms.IExplorer");
 
 Inspect = {
 	params: {
-		
+		object: null
 	},
 	
 	/*fn: function() {
@@ -43,14 +43,9 @@ Inspect = {
 
 		/*this.ie = new ActiveXObject("InternetExplorer.Application");
 		this.ie.Visible = true;
-		var r = this.ie.Navigate("C:\\Temp\\KSI\\raport.js\\logs.html");
-		Session.Output(">>>" + r);
-		for (var i = 0; i < 100000000; i++) {
+		this.ie.Navigate("C:\\Temp\\KSI\\raport.js\\logs.html");*/
 
-		}
-		this.ie.Document;*/
-
-		var object = application.getRepository().getSelectedObject();
+		var object = this.params.object || application.getRepository().getSelectedObject();
 		
 		var target = null;
 		if (this.params.output) {

@@ -42,8 +42,8 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 
 		}
 		*/
-		this._source.getApplication().getProject().saveDiagram(this, path);
-		this._source.getApplication().getRepository().closeDiagram(this);
+		this._source.application.getProject().saveDiagram(this, path);
+		this._source.application.getRepository().closeDiagram(this);
 		return true;
 	},
 	

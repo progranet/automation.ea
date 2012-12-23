@@ -30,39 +30,39 @@ Ea.Repository = {
 
 Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	
-	cache: null,
-	cacheEnabled: true,
-	syntax: null,
+	_cache: null,
+	_cacheEnabled: true,
+	_syntax: null,
+	_stats: null,
 	
 	/**
 	 * @constructs
-	 * @param api
+	 * @param source
 	 * @param params
 	 */
 	create: function(source, params) {
 		_super.create(source);
 		params = params || {};
-		this.syntax = params.syntax || Ea.Repository.Syntax.JetDB;
-		this.cache = {};
-	},
-	
-	stats: {
-		cwi: 0,
-		cwg: 0,
-		cri: 0,
-		crg: 0,
-		tr: 0
+		this._syntax = params.syntax || Ea.Repository.Syntax.JetDB;
+		this._cache = {};
+		this._stats = {
+				cwi: 0,
+				cwg: 0,
+				cri: 0,
+				crg: 0,
+				tr: 0
+			};
 	},
 	
 	/**
 	 * @memberOf Ea.Repository._Base#
 	 */
 	cacheInfo: function() {
-		info("cache stats: {total read: $, cache read by id: $, cache read by guid: $, cache white by id: $, cache write by guid: $}", [this.stats.tr, this.stats.cri, this.stats.crg, this.stats.cwi, this.stats.cwg]);
+		info("cache stats: {total read: $, cache read by id: $, cache read by guid: $, cache white by id: $, cache write by guid: $}", [this._stats.tr, this._stats.cri, this._stats.crg, this._stats.cwi, this._stats.cwg]);
 	},
 	
 	getCollection: function(type, api, params) {
-		var proxy = Ea.Class.createProxy(this._source.getApplication(), type, api, params);
+		var proxy = Ea.Class.createProxy(this._source.application, type, api, params);
 		return proxy;
 	},
 	
@@ -75,23 +75,23 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 * @returns {Ea.Types.Any}
 	 */
 	get: function(type, api, params) {
-		this.stats.tr++;
-		if (this.cacheEnabled && !Ea.mm && this.cache[type.namespace.name]) {
+		this._stats.tr++;
+		if (this._cacheEnabled && !Ea.mm && this._cache[type.namespace.name]) {
 			var idAttribute;
 			var guidAttribute;
 			if (idAttribute = Ea.Class.getIdAttribute(type)) {
 				var id = api[idAttribute.api];
-				var proxy = this.cache[type.namespace.name].id[id];
+				var proxy = this._cache[type.namespace.name].id[id];
 				if (proxy) {
-					this.stats.cri++;
+					this._stats.cri++;
 					return proxy;
 				}
 			}
 			else if (guidAttribute = Ea.Class.getGuidAttribute(type)) {
 				var guid = api[guidAttribute.api];
-				var proxy = this.cache[type.namespace.name].guid[guid];
+				var proxy = this._cache[type.namespace.name].guid[guid];
 				if (proxy) {
-					this.stats.crg++;
+					this._stats.crg++;
 					return proxy;
 				}
 			}
@@ -102,11 +102,11 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	getById: function(type, id) {
 		if (!id || id == 0)
 			return null;
-		this.stats.tr++;
-		if (this.cacheEnabled && !Ea.mm && this.cache[type.namespace.name]) {
-			var proxy = this.cache[type.namespace.name].id[id];
+		this._stats.tr++;
+		if (this._cacheEnabled && !Ea.mm && this._cache[type.namespace.name]) {
+			var proxy = this._cache[type.namespace.name].id[id];
 			if (proxy) {
-				this.stats.cri++;
+				this._stats.cri++;
 				return proxy;
 			}
 		}
@@ -114,7 +114,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 		var api;
 		// EA ElementID integrity problem
 		try {
-			api = this._source.getApi()[method](id);
+			api = this._source.api[method](id);
 		}
 		catch (e) {
 			warn("$ not found by Id = $", [type, id]);
@@ -124,16 +124,16 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	},
 	
 	getByGuid: function(type, guid) {
-		this.stats.tr++;
-		if (this.cacheEnabled && !Ea.mm && this.cache[type.namespace.name]) {
-			var proxy = this.cache[type.namespace.name].guid[guid];
+		this._stats.tr++;
+		if (this._cacheEnabled && !Ea.mm && this._cache[type.namespace.name]) {
+			var proxy = this._cache[type.namespace.name].guid[guid];
 			if (proxy) {
-				this.stats.crg++;
+				this._stats.crg++;
 				return proxy;
 			}
 		}
 		var method = "Get" + type.api + "ByGuid";
-		var api = this._source.getApi()[method](guid);
+		var api = this._source.api[method](guid);
 		if (!api) {
 			warn("$ not found by Guid = $", [type, guid]);
 			return null;
@@ -142,24 +142,24 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	},
 
 	_get: function(type, api, params) {
-		var proxy = Ea.Class.createProxy(this._source.getApplication(), type, api, params);
-		if (this.cacheEnabled && !Ea.mm) {
+		var proxy = Ea.Class.createProxy(this._source.application, type, api, params);
+		if (this._cacheEnabled && !Ea.mm) {
 			var idAttribute = Ea.Class.getIdAttribute(type);
 			var guidAttribute = Ea.Class.getGuidAttribute(type);
 			if (idAttribute || guidAttribute) {
-				if (!this.cache[type.namespace.name]) {
-					this.cache[type.namespace.name] = {
+				if (!this._cache[type.namespace.name]) {
+					this._cache[type.namespace.name] = {
 						id: {},
 						guid: {}
 					};
 				}
 				if (idAttribute) {
-					this.cache[type.namespace.name].id[api[idAttribute.api]] = proxy;
-					this.stats.cwi++;
+					this._cache[type.namespace.name].id[api[idAttribute.api]] = proxy;
+					this._stats.cwi++;
 				}
 				if (guidAttribute) {
-					this.cache[type.namespace.name].guid[api[guidAttribute.api]] = proxy;
-					this.stats.cwg++;
+					this._cache[type.namespace.name].guid[api[guidAttribute.api]] = proxy;
+					this._stats.cwg++;
 				}
 			}
 		}
@@ -168,7 +168,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	
 	findByQuery: function(table, key, value) {
 		var sql = "select * from " + table + " where " + key + " = " + value;
-		var xml = this._source.getApi().SQLQuery(sql);
+		var xml = this._source.api.SQLQuery(sql);
 		
 		var dom = new ActiveXObject("MSXML2.DOMDocument");
 		dom.validateOnParse = false;
@@ -230,7 +230,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 * @returns {Ea.Package._Base}
 	 */
 	getSelectedPackage: function() {
-		return this.get(Ea.Package._Base, this._source.getApi().GetTreeSelectedPackage());
+		return this.get(Ea.Package._Base, this._source.api.GetTreeSelectedPackage());
 	},
 	
 	/**
@@ -239,7 +239,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 * @returns {Class}
 	 */
 	getSelectedType: function() {
-		var objectType = this._source.getApi().GetTreeSelectedItemType();
+		var objectType = this._source.api.GetTreeSelectedItemType();
 		var namespace = Ea._objectTypes[objectType];
 		if (!namespace) 
 			throw new Error("Undefined EA object type: " + objectType);
@@ -252,37 +252,37 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 * @returns {Ea.Types.Any}
 	 */
 	getSelectedObject: function() {
-		var api = this._source.getApi().GetTreeSelectedObject();
+		var api = this._source.api.GetTreeSelectedObject();
 		var object = this.get(this.getSelectedType(), api);
 		return object;
 	},
 	
 	closeDiagram: function(diagram) {
-		this._source.getApi().CloseDiagram(diagram.getId());
+		this._source.api.CloseDiagram(diagram.getId());
 	},
 	
 	search: function(name, term, options, data) {
-		this._source.getApi().RunModelSearch(name, term, options, data);
+		this._source.api.RunModelSearch(name, term, options, data);
 	},
 	
 	showOutput: function(name) {
-		this._source.getApi().EnsureOutputVisible(name);
+		this._source.api.EnsureOutputVisible(name);
 	},
 	
 	clearOutput: function(name) {
-		this._source.getApi().ClearOutput(name);
+		this._source.api.ClearOutput(name);
 	},
 	
 	writeOutput: function(name, message) {
-		this._source.getApi().WriteOutput(name, message, undefined);
+		this._source.api.WriteOutput(name, message, undefined);
 	},
 	
 	createOutput: function(name) {
-		this._source.getApi().CreateOutputTab(name);
+		this._source.api.CreateOutputTab(name);
 	},
 	
 	closeOutput: function(name) {
-		this._source.getApi().RemoveOutputTab(name);
+		this._source.api.RemoveOutputTab(name);
 	},
 	
 	/**
@@ -292,11 +292,11 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 * @returns {Boolean}
 	 */
 	open: function(path) {
-		return this._source.getApi().OpenFile(path);
+		return this._source.api.OpenFile(path);
 	},
 	
 	close: function() {
-		this._source.getApi().CloseFile();
+		this._source.api.CloseFile();
 	}
 },
 {

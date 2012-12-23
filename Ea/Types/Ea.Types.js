@@ -42,7 +42,7 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	 * @returns {String}
 	 */
 	getXmlGuid: function() {
-		return this._source.getApplication().getProject().guidToXml(this.getGuid());
+		return this._source.application.getProject().guidToXml(this.getGuid());
 	},
 	
 	toString: function() {
@@ -118,7 +118,7 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 	
 	_ensure: function(type, ea) {
 		if (typeof ea == "string" && this.isGuid(ea))
-			ea = this._source.getApplication().getRepository().getByGuid(type, ea);
+			ea = this._source.application.getRepository().getByGuid(type, ea);
 		return ea;
 	},
 	
