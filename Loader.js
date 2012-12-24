@@ -14,50 +14,55 @@
    limitations under the License.
 */
 
-include = function(libraryName, params) {
-	//Session.Output("> " + libraryName);
-	var t = libraryName.split("@");
-	var qualifiedName = t[0];
-	if (isIncluded(qualifiedName)) {
-		warn("Library already included: " + qualifiedName);
-		return;
-	}
-	var _package = (t[1] || "").replace(/\./g, "\\");
-	var included = _include(qualifiedName, _package);
-	var namespace = eval(qualifiedName);
+include = function(library, params) {
+	
+	var inc = _include(library);
+
+	if (!inc)
+		return false;
+	
+	var namespace = eval(inc.qualifiedName);
 	if (!namespace.params)
 		namespace.params = {};
 	for (var param in params)
 		namespace.params[param] = params[param];
-	namespace.name = qualifiedName.split(".").pop();
-	namespace.qualifiedName = qualifiedName;
+	namespace.name = inc.qualifiedName.split(".").pop();
+	namespace.qualifiedName = inc.qualifiedName;
 	namespace.toString = function() {
 		return this.qualifiedName;
 	};
-	namespace._loader = included;
+	namespace._loader = inc;
 	Core.enrichNamespace(namespace);
 	if ("initialize" in namespace)
 		namespace.initialize();
-	_included[qualifiedName] = namespace;
+	_included[inc.qualifiedName] = namespace;
 	return namespace;
 };
 
-External = {};
+load = function(library) {
+	
+	var inc = _load(library);
 
-Core = false;
-
-_included = {};
-_scriptRoot = scriptRoot.split(";");
-
-isIncluded = function(libraryName) {
-	return (libraryName in _included);
+	if (!inc)
+		return false;
+	
+	eval(inc.source);	
 };
 
-_load = function(qualifiedName, _package) {
+_load = function(library) {
+
+	var t = library.split("@");
+	var qualifiedName = t[0];
+	if (qualifiedName in _included) {
+		warn("Library already included: " + qualifiedName);
+		return false;
+	}
+	var _package = t[1] ? t[1].replace(/\./g, "\\") + "\\" : "";
+	
 	var file = null;
 	var libraryPath = null;
 	for (var ri = 0; ri < _scriptRoot.length; ri++) {
-		libraryPath = _scriptRoot[ri] + (_package ? _package + "\\" : "");
+		libraryPath = _scriptRoot[ri] + _package;
 		try {
 			file = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(libraryPath + qualifiedName  + ".js", 1);
 		}
@@ -71,47 +76,59 @@ _load = function(qualifiedName, _package) {
 	
 	return {
 		source: source,
-		path: libraryPath
+		path: libraryPath,
+		_package: _package,
+		qualifiedName: qualifiedName
 	};
 };
 
-_include = function(qualifiedName, _package) {
-	var loaded = _load(qualifiedName, _package);
-	var source = loaded.source;
-	if (Core)
-		source = Core.enrichSource(qualifiedName, source);
+_include = function(library) {
 	
-	/*
-	CreateOutputTab("External");
-	WriteOutput("External", qualifiedName, undefined);
+	var inc = _load(library);
+	if (!inc)
+		return false;
+	
+	if (Core)
+		inc.source = Core.enrichSource(inc.qualifiedName, inc.source);
+	
+	CreateOutputTab("Loader");
+	WriteOutput("Loader", inc.qualifiedName, undefined);
+
 	var ast = null;
 	try {
-		ast = External.acorn.parse(source, {
+		ast = External.acorn.parse(inc.source, {
 			trackComments: true,
 			strictSemicolons: true,
 			allowTrailingCommas: false
 		});
 	}
 	catch (error) {
-		WriteOutput("Script", JSON.stringify(error, null, '\t'), undefined);
+		WriteOutput("Loader", JSON.stringify(error, null, '\t'), undefined);
+		throw new Error("Syntax error:\r\n" + error.message + "\r\nin " + library + "\r\n");
 	}
 	finally {
-		//WriteOutput("External", "var ast = " + qualifiedName + " = " + JSON.stringify(ast, null, '\t') + ";", undefined);
-		//var code = External.escodegen.generate(ast);
-		//WriteOutput("External", "   " + code, undefined);
-		//source = code;
-	}*/
-	eval(source);
+		//WriteOutput("Loader", "var ast = " + inc.qualifiedName + " = " + JSON.stringify(ast, null, '\t') + ";", undefined);
+		var source = External.escodegen.generate(ast);
+		//WriteOutput("Loader", "   " + source, undefined);
+		inc.source = source;
+	}
+	eval(inc.source);
 
-	return loaded;
+	return inc;
 };
 
-/*eval(_load("json2").source);
-eval(_load("acorn").source);
-eval(_load("escodegen").source);*/
+External = {};
+Core = false;
 
-eval(_load("Init").source);
-eval(_load("Lang").source);
+_included = {};
+_scriptRoot = scriptRoot.split(";");
+
+load("json2@External");
+load("acorn@External");
+load("escodegen@External");
+
+load("Init");
+load("Lang");
 
 include("Core@Core");
 include("Core.Helper@Core");

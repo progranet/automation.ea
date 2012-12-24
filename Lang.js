@@ -42,11 +42,3 @@ String.prototype.lpad = function(pad, length) {
         context = pad + context;
     return context;
 };
-
-include("Core@Core");
-include("Core.Helper@Core");
-include("Core.Log@Core");
-include("Core.Output@Core");
-include("Core.Lang@Core");
-include("Core.Types@Core");
-include("Core.Target@Core");
