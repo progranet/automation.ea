@@ -60,14 +60,27 @@ _load = function(library) {
 	var _package = t[1] ? t[1].replace(/\./g, "\\") + "\\" : "";
 	
 	var file = null;
-	var libraryPath = null;
+	var builded = false;
+	var root = null;
 	for (var ri = 0; ri < _scriptRoot.length; ri++) {
-		libraryPath = _scriptRoot[ri] + _package;
-		try {
-			file = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(libraryPath + qualifiedName  + ".js", 1);
+		root = _scriptRoot[ri];
+		if (fileSystem.FileExists(root + _package + qualifiedName  + ".js")) {
+			if (fileSystem.FileExists(root + ".build\\" + _package + qualifiedName  + ".js")) {
+				
+				sourceDate = new Date(fileSystem.GetFile(root + _package + qualifiedName  + ".js").DateLastModified);
+				buildedDate = new Date(fileSystem.GetFile(root + ".build\\" + _package + qualifiedName  + ".js").DateLastModified);
+				
+				//WriteOutput("Loader", sourceDate < buildedDate, undefined);
+				if (sourceDate < buildedDate) {
+					file = fileSystem.OpenTextFile(root + ".build\\" + _package + qualifiedName  + ".js", 1);
+					builded = true;
+				}
+			}
+			if (!file) {
+				file = fileSystem.OpenTextFile(root + _package + qualifiedName  + ".js", 1);
+			}
+			break;
 		}
-		catch(e) {}
-		if (file) break;
 	}
 	if (!file)
 		throw new Error("Library not found: " + libraryName);
@@ -76,9 +89,11 @@ _load = function(library) {
 	
 	return {
 		source: source,
-		path: libraryPath,
+		path: root + _package,
+		root: root,
 		_package: _package,
-		qualifiedName: qualifiedName
+		qualifiedName: qualifiedName,
+		builded: builded
 	};
 };
 
@@ -91,9 +106,18 @@ _include = function(library) {
 	if (Core)
 		inc.source = Core.enrichSource(inc.qualifiedName, inc.source);
 	
-	CreateOutputTab("Loader");
-	WriteOutput("Loader", inc.qualifiedName, undefined);
+	WriteOutput("Loader", "loading: " + inc.qualifiedName, undefined);
 
+	if (!inc.builded)
+		_build(inc);
+	
+	eval(inc.source);
+
+	return inc;
+};
+
+_build = function(inc) {
+	
 	var ast = null;
 	try {
 		ast = External.acorn.parse(inc.source, {
@@ -103,20 +127,37 @@ _include = function(library) {
 		});
 	}
 	catch (error) {
-		WriteOutput("Loader", JSON.stringify(error, null, '\t'), undefined);
+		WriteOutput("Loader", "syntax error: " + JSON.stringify(error, null, '\t'), undefined);
 		throw new Error("Syntax error:\r\n" + error.message + "\r\nin " + library + "\r\n");
 	}
 	finally {
 		//WriteOutput("Loader", "var ast = " + inc.qualifiedName + " = " + JSON.stringify(ast, null, '\t') + ";", undefined);
 		var source = External.escodegen.generate(ast);
+
+		var dirs = (".build\\" + inc._package).split("\\");
+		var dir = inc.root;
+		for (var di = 0; di < dirs.length; di++) {
+			dir = dir + dirs[di] + "\\";
+			if (!fileSystem.FolderExists(dir))
+				fileSystem.CreateFolder(dir);
+		}
+		var path = inc.root + ".build\\" + inc._package;
+		WriteOutput("Loader", "building changed: " + path, undefined);
+		file = fileSystem.CreateTextFile(path + inc.qualifiedName  + ".js", true);
+		file.Write(source);
+		file.Close();
+		
 		//WriteOutput("Loader", "   " + source, undefined);
 		inc.source = source;
 	}
-	eval(inc.source);
-
 	return inc;
 };
 
+CreateOutputTab("Loader");
+ClearOutput("Loader");
+//EnsureOutputVisible("Loader");
+
+fileSystem = new ActiveXObject("Scripting.FileSystemObject");
 External = {};
 Core = false;
 

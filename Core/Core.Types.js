@@ -81,6 +81,15 @@ Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, /** @lends C
 	},
 	
 	/**
+	 * Checks if specified object is equal to this.
+	 * 
+	 * @param {Core.Types.Object} object
+	 */
+	equals: function(object) {
+		return this.__id__ === object.__id__;
+	},
+	
+	/**
 	 * @private
 	 */
 	_toString: function() {
@@ -137,7 +146,6 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 
 	_filter: null,
 	_size: 0,
-	_elements: null,
 	_table: null,
 
 	/**
@@ -149,7 +157,6 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 */
 	create: function(params) {
 		params = params || {};
-		this._elements = {};
 		this._table = [];
 		this._filter = Core.Types.Filter.ensure(params.filter);
 		this.addAll(params.collection);
@@ -169,15 +176,27 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 			return false;
 		if (!this._filter.check(element))
 			return false;
-		if (element.__id__ in this._elements) {
+		if (this.contains(element)) {
 			debug("Element already exists in collection: $ (object.__id__ = $)", [element, element.__id__]);
 			return false;
 		}
 		this._table.push(element);
-		this._elements[element.__id__] = element;
 		this._size++;
 		this._added(element);
 		return true;
+	},
+	
+	/**
+	 * Checks if this collection contains element
+	 * 
+	 * @param {Core.Types.Object} element
+	 */
+	contains: function(element) {
+		for (var i = 0; i < this._size; i++) {
+			if (this._table[i].equals(element))
+				return true;
+		}
+		return false;
 	},
 	
 	/**
@@ -195,35 +214,28 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	},
 	
 	/**
-	 * Adds specified collection of elements to this collection
+	 * Adds all elements of specified collection to this collection
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @param {Core.Types.Collection} collection
 	 */
 	addAll: function(collection) {
 		if (!collection) return;
-		collection = this._addAll(collection);
-		var target = this;
-		if (collection instanceof Array) {
-			for (var e = 0; e < collection.length; e++) {
-				target.add(collection[e]);
-			}
-		}
-		else if(Core.Types.Collection.isInstance(collection)) {
-			collection.forEach(function(element) {
-				target.add(element);
-			});
-		}
-		else {
+		if (!Core.Types.Collection.isInstance(collection))
 			throw new Error("Unknown collection type: " + collection);
-		}
+		collection.addAllTo(this);
 	},
 	
 	/**
-	 * @private
+	 * Adds all elements this collection to specified collection
+	 * 
+	 * @memberOf Core.Types.Collection#
+	 * @param {Core.Types.Collection} collection
 	 */
-	_addAll: function(collection) {
-		return collection;
+	addAllTo: function(collection) {
+		for (var i = 0; i < this._size; i++) {
+			collection.add(this._table[i]);
+		}
 	},
 	
 	/**
@@ -276,16 +288,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * @returns {Object}
 	 */
 	first: function() {
-		if (this._size == 0)
-			return null;
-		else {
-			var element = null;
-			for (var id in this._elements) {
-				element = this._elements[id];
-				break;
-			}
-			return element;
-		}
+		return (this._size == 0 ? null : this._table[0]);
 	},
 	
 	/**
@@ -300,11 +303,11 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 		if (!filter) return this;
 		var filtered = new Core.Types.Collection({filter: this._filter});
 		filter = Core.Types.Filter.ensure(filter);
-		this.forEach(function(element) {
-			if (filter.check(element)) {
+		for (var i = 0; i < this._size; i++) {
+			var element = this._table[i];
+			if (filter.check(element))
 				filtered.add(element);
-			}
-		});
+		}
 		return filtered;
 	}
 });
