@@ -18,9 +18,10 @@ Ea.Scenario = {};
 
 Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 	
-	_context: null,
 	getContext: function() {
-		if (!this._context || Ea.mm) {
+		
+		var context = this.fromCache("context");
+		if (context === undefined) {
 			var rows = this._source.application.getRepository().findByQuery("t_objectscenarios", "ea_guid", "\"" + this.getGuid() + "\"");
 			var row = rows[0];
 			
@@ -31,7 +32,7 @@ Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 			var xml = row["XMLContent"];
 			var parsed = dom.loadXML(xml);
 
-			this._context = {};
+			context = {};
 
 			if (!parsed) {
 				warn("Error while XML parsing scenario content: " + xml + " " + this.getGuid());
@@ -40,11 +41,12 @@ Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 				var nodes = dom.selectNodes("//path/context/item");
 				for (var ni = 0; ni < nodes.length; ni++) {
 					var node = nodes[ni];
-					this._context[node.getAttribute("oldname")] = this._source.application.getRepository().getByGuid(Ea.Element._Base, node.getAttribute("guid"));
+					context[node.getAttribute("oldname")] = this._source.application.getRepository().getByGuid(Ea.Element._Base, node.getAttribute("guid"));
 				}
 			}
+			this.toCache("context", context);
 		}
-		return this._context;
+		return context;
 	}
 },
 {

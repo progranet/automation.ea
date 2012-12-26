@@ -19,22 +19,14 @@
  */
 Ea = {
 	
-	/**
-	 * Modification Mode switch
-	 * 
-	 * @memberOf Ea
-	 * @constant
-	 * @type Boolean
-	 */
-	mm: false,
-	
 	params: {},
 	
 	_application: null,
 	
 	/**
-	 * Returns EA application if initialized
+	 * Returns default EA application if initialized
 	 * 
+	 * @memberOf Ea
 	 * @param name
 	 * @returns {Ea.Application._Base}
 	 * @static
@@ -50,15 +42,15 @@ Ea = {
 	createApplication: function(params) {
 		params = params || {};
 		var applicationApi = params.path ? new ActiveXObject("EA.App") : App;
-		var application = Ea.Class.createProxy(null, Ea.Application._Base, applicationApi);
+		var application = Ea.Class.createProxy(null, Ea.Application._Base, applicationApi, params);
 		if (params.path)
 			application.getRepository().open(params.path);
 		return application;
 	},
 	
-	initializeDefaultApplication: function(targetClass) {
+	initializeDefaultApplication: function(targetClass, params) {
 		if (!this._application) {
-			this._application = this.createApplication();
+			this._application = this.createApplication(params);
 			this.initializeLogs(targetClass || Ea.Helper.Target);
 		}
 		else {

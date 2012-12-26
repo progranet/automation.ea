@@ -27,21 +27,21 @@ Ea.TypedElement = {
  */
 Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 
-	_type: null,
-	
 	/**
 	 * @memberOf Ea.TypedElement#
 	 * @returns {Ea.PrimitiveType|Ea.Element._Base}
 	 */
 	getType: function() {
-		if (!this._type || Ea.mm) {
-			this._type = this._getClassifier();
-			if (!this._type) {
+		var type = this.fromCache("type");
+		if (type === undefined) {
+			type = this._getClassifier();
+			if (!type) {
 				var name = this._getPrimitiveType();
-				this._type = Ea.PrimitiveType.getPrimitiveType(name);
+				type = Ea.PrimitiveType.getPrimitiveType(name);
 			}
+			this.toCache("type", type);
 		}
-		return this._type;
+		return type;
 	},
 	
 	_toString: function() {

@@ -159,28 +159,24 @@ Ea.Helper.Target = extend(Core.Target.AbstractTarget, /** @lends Ea.Helper.Targe
 Ea.Helper.Log = define(/** @lends Ea.Helper.Log# */{
 	
 	_path: null,
-	_element: null,
 	
 	create: function(element) {
 		_super.create();
-		this._element = element;
+		this._path = [];
+		var parent = element.getParent();
+		if (parent) {
+			var parentPath = Ea.Helper.Log.getLog(parent).getPath();
+			for (var p = 0; p < parentPath.length; p++) {
+				this._path.push(parentPath[p]);
+			}
+		}
+		this._path.push(element);
 	},
 	
 	/**
 	 * @memberOf Ea.Helper.Log#
 	 */
 	getPath: function() {
-		if (!this._path || Ea.mm) {
-			this._path = [];
-			var parent = this._element.getParent();
-			if (parent) {
-				var parentPath = Ea.Helper.Log.getLog(parent).getPath();
-				for (var p = 0; p < parentPath.length; p++) {
-					this._path.push(parentPath[p]);
-				}
-			}
-			this._path.push(this._element);
-		}
 		return this._path;
 	},
 	

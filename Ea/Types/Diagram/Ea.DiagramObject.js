@@ -18,34 +18,37 @@ Ea.DiagramObject = {};
 
 Ea.DiagramObject._Base = extend(Ea.View, {
 
-	_dimension: null,
 	getDimension: function() {
-		if (!this._dimension || Ea.mm) {
-			this._dimension = new Ea.DataTypes.Dimension({
+		var dimension = this.fromCache("dimension");
+		if (dimension === undefined) {
+			dimension = new Ea.DataTypes.Dimension({
 				left: this._getLeft(),
 				top: -this._getTop(),
 				right: this._getRight(),
 				bottom: -this._getBottom()
 			});
+			this.toCache("dimension", dimension);
 		}
-		return this._dimension;
+		return dimension;
 	},
 	
-	_calculated: null,
 	getCalculated: function() {
-		if (!this._calculated || Ea.mm) {
+
+		var calculated = this.fromCache("calculated");
+		if (calculated === undefined) {
 			var dimension = this.getDimension();
 			var diagram = this.getParent();
-			var dd = diagram.getDimension();
-			var dc = diagram.getCalculated();
-			this._calculated = new Ea.DataTypes.Dimension({
-				left: Math.round((dimension.left + dd.correctionX) * dc.scale),
-				top: Math.round((dimension.top + dd.correctionY) * dc.scale),
-				right: Math.round((dimension.right + dd.correctionX) * dc.scale),
-				bottom: Math.round((dimension.bottom + dd.correctionY) * dc.scale)
+			var diagramDimension = diagram.getDimension();
+			var diagramCalculated = diagram.getCalculated();
+			calculated = new Ea.DataTypes.Dimension({
+				left: Math.round((dimension.left + diagramDimension.correctionX) * diagramCalculated.scale),
+				top: Math.round((dimension.top + diagramDimension.correctionY) * diagramCalculated.scale),
+				right: Math.round((dimension.right + diagramDimension.correctionX) * diagramCalculated.scale),
+				bottom: Math.round((dimension.bottom + diagramDimension.correctionY) * diagramCalculated.scale)
 			});
+			this.toCache("calculated", calculated);
 		}
-		return this._calculated;
+		return calculated;
 	}
 },
 {

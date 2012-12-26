@@ -31,9 +31,10 @@ Ea.Repository = {
 Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	
 	_cache: null,
-	_cacheEnabled: true,
 	_syntax: null,
 	_stats: null,
+	_cacheObjects: true,
+	_cacheProperties: true,
 	
 	/**
 	 * @constructs
@@ -43,6 +44,8 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	create: function(source, params) {
 		_super.create(source);
 		params = params || {};
+		this._cacheObjects = params.cacheObjects;
+		this._cacheProperties = params.cacheProperties;
 		this._syntax = params.syntax || Ea.Repository.Syntax.JetDB;
 		this._cache = {};
 		this._stats = {
@@ -52,6 +55,10 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 				crg: 0,
 				tr: 0
 			};
+	},
+	
+	getPropertiesCached: function() {
+		return this._cacheProperties;
 	},
 	
 	/**
@@ -76,7 +83,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 */
 	get: function(type, api, params) {
 		this._stats.tr++;
-		if (this._cacheEnabled && !Ea.mm && this._cache[type.namespace.name]) {
+		if (this._cacheObjects && this._cache[type.namespace.name]) {
 			var idAttribute;
 			var guidAttribute;
 			if (idAttribute = Ea.Class.getIdAttribute(type)) {
@@ -103,7 +110,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 		if (!id || id == 0)
 			return null;
 		this._stats.tr++;
-		if (this._cacheEnabled && !Ea.mm && this._cache[type.namespace.name]) {
+		if (this._cacheObjects && this._cache[type.namespace.name]) {
 			var proxy = this._cache[type.namespace.name].id[id];
 			if (proxy) {
 				this._stats.cri++;
@@ -125,7 +132,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	
 	getByGuid: function(type, guid) {
 		this._stats.tr++;
-		if (this._cacheEnabled && !Ea.mm && this._cache[type.namespace.name]) {
+		if (this._cacheObjects && this._cache[type.namespace.name]) {
 			var proxy = this._cache[type.namespace.name].guid[guid];
 			if (proxy) {
 				this._stats.crg++;
@@ -143,7 +150,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 
 	_get: function(type, api, params) {
 		var proxy = Ea.Class.createProxy(this._source.application, type, api, params);
-		if (this._cacheEnabled && !Ea.mm) {
+		if (this._cacheObjects) {
 			var idAttribute = Ea.Class.getIdAttribute(type);
 			var guidAttribute = Ea.Class.getGuidAttribute(type);
 			if (idAttribute || guidAttribute) {

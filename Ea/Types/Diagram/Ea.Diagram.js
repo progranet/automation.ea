@@ -51,10 +51,10 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 		return this.getSwimlaneDef().getSwimlanes();
 	},
 	
-	_dimension: null,
 	getDimension: function() {
-		if (!this._dimension || Ea.mm) {
-			var dd = this._dimension = {
+		var dimension = this.fromCache("dimension");
+		if (dimension === undefined) {
+			dimension = {
 				right: 0,
 				bottom: 0,
 				width: 240,
@@ -64,52 +64,56 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 			views.addAll(this.getElementViews());
 			views.addAll(this.getConnectorViews());
 			views.forEach(function(view, n) {
-				var dimension = view.getDimension();
-				if (dimension) {
-					dd.left = dd.left !== undefined ? Math.min(dd.left, dimension.left) : dimension.left;
-					dd.top = dd.top !== undefined ? Math.min(dd.top, dimension.top) : dimension.top;
-					dd.right = Math.max(dd.right, dimension.right);
-					dd.bottom = Math.max(dd.bottom, dimension.bottom);
+				var viewDimension = view.getDimension();
+				if (viewDimension) {
+					dimension.left = dimension.left !== undefined ? Math.min(dimension.left, viewDimension.left) : viewDimension.left;
+					dimension.top = dimension.top !== undefined ? Math.min(dimension.top, viewDimension.top) : viewDimension.top;
+					dimension.right = Math.max(dimension.right, viewDimension.right);
+					dimension.bottom = Math.max(dimension.bottom, viewDimension.bottom);
 				}
 			});
 			var margin;
 			var swimlanes = this.getSwimlanes();
 			if (swimlanes.notEmpty()) {
-				dd.left = 0;
-				dd.top = 0;
+				dimension.left = 0;
+				dimension.top = 0;
 				var left = 0;
 				swimlanes.forEach(function(swimlane) {
 					var right = left + swimlane.getWidth();
-					dd.right = Math.max(dd.right, right);
+					dimension.right = Math.max(dimension.right, right);
 					left = right;
 				});
-				dd.bottom = dd.bottom + 40;
+				dimension.bottom = dimension.bottom + 40;
 				margin = Ea.Diagram.MarginLanes;
 			}
 			else {
 				margin = Ea.Diagram.Margin;
 			}
-			dd.width = dd.right - dd.left + margin.LEFT + margin.RIGHT;
-			dd.height = dd.bottom - dd.top + margin.TOP + margin.BOTTOM;
-			dd.correctionX = -dd.left + margin.LEFT;
-			dd.correctionY = -dd.top + margin.TOP;
+			dimension.width = dimension.right - dimension.left + margin.LEFT + margin.RIGHT;
+			dimension.height = dimension.bottom - dimension.top + margin.TOP + margin.BOTTOM;
+			dimension.correctionX = -dimension.left + margin.LEFT;
+			dimension.correctionY = -dimension.top + margin.TOP;
+
+			this.toCache("dimension", dimension);
 		}
-		return this._dimension;
+		return dimension;
 	},
 	
-	_calculated: null,
 	getCalculated: function(maxWidth, maxHeight) {
-		if (!this._calculated || Ea.mm) {
+		var calculated = this.fromCache("calculated");
+		if (calculated === undefined) {
 			var dimension = this.getDimension();
 			var scale;
-			this._calculated = {
+			calculated = {
 				scale: scale = Math.min((maxWidth && dimension.width > maxWidth) ? maxWidth / dimension.width : 1, (maxHeight && dimension.height > maxHeight) ? maxHeight / dimension.height : 1),
 				width: Math.round(dimension.width * scale),
 				height: Math.round(dimension.height * scale)
 			};
+			// TODO: get rid of this:
 			this.scaled = scale < 1;
+			this.toCache("calculated", calculated);
 		}
-		return this._calculated;
+		return calculated;
 	},
 	
 	getElements: function(filter) {

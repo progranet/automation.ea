@@ -22,6 +22,7 @@ Ea.Types = {};
 Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	
 	_source: null,
+	_cached: null,
 	
 	/**
 	 * Creates new abstraction layer wrapper for Enterprise Architect API object
@@ -33,6 +34,7 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	create: function(source) {
 		_super.create();
 		this._source = source;
+		this._cached = {};
 	},
 	
 	/**
@@ -55,7 +57,17 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	 */
 	_toString: function() {
 		return "[" + this._class + "]";
+	},
+	
+	fromCache: function(name) {
+		return this._cached[name];
+	},
+	
+	toCache: function(name, value) {
+		if (!this._source.application.getRepository().getPropertiesCached()) return;
+		this._cached[name] = value;
 	}
+	
 }, 
 {
 	/**
@@ -126,8 +138,6 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 		return this.getName() + " " + _super._toString();
 	},
 	
-	_qualifedName: null,
-
 	/**
 	 * Returns qualified name of named including namespace
 	 * 
@@ -135,11 +145,13 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 	 * @returns {String}
 	 */
 	getQualifiedName: function() {
-		if (!this._qualifedName || Ea.mm) {
+		var qualifiedName = this.fromCache("qualifiedName");
+		if (qualifiedName === undefined) {
 			var parent = this.getParent();
-			this._qualifedName = (parent ? parent.getQualifiedName() + "." : "") + this.getName();
+			qualifiedName = (parent ? parent.getQualifiedName() + "." : "") + this.getName();
+			this.toCache("qualifiedName", qualifiedName);
 		}
-		return this._qualifedName;
+		return qualifiedName;
 	}
 	
 },

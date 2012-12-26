@@ -144,7 +144,6 @@ Core.Types.Named = define(/** @lends Core.Types.Named# */{
 
 Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 
-	_filter: null,
 	_size: 0,
 	_table: null,
 
@@ -158,7 +157,6 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	create: function(params) {
 		params = params || {};
 		this._table = [];
-		this._filter = Core.Types.Filter.ensure(params.filter);
 		this.addAll(params.collection);
 	},
 	
@@ -173,8 +171,6 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 		if (!element || !Core.Types.Object.isInstance(element))
 			throw new Error("No element specified or unexpected element type");
 		if (!this._add(element))
-			return false;
-		if (!this._filter.check(element))
 			return false;
 		if (this.contains(element)) {
 			debug("Element already exists in collection: $ (object.__id__ = $)", [element, element.__id__]);
@@ -301,7 +297,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 */
 	filter: function(filter) {
 		if (!filter) return this;
-		var filtered = new Core.Types.Collection({filter: this._filter});
+		var filtered = new Core.Types.Collection();
 		filter = Core.Types.Filter.ensure(filter);
 		for (var i = 0; i < this._size; i++) {
 			var element = this._table[i];
@@ -312,7 +308,11 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	}
 });
 
-Core.Types.Map = extend(Core.Types.Collection, /** @lends Core.Types.Map# */{
+/**
+ * @class
+ * @extends Core.Types.Collection
+ */
+Core.Types.Map = extend(Core.Types.Collection, {
 	
 	_keyDef: null,
 	_keyFn: null,
@@ -324,6 +324,7 @@ Core.Types.Map = extend(Core.Types.Collection, /** @lends Core.Types.Map# */{
 	 * Core.Types.Map constructor
 	 * 
 	 * @constructs
+	 * @memberOf Core.Types.Map#
 	 * @extends Core.Types.Collection
 	 * @param {Object} params Specifies initial parameters: {@link Core.Types.Filter} filter, {@link Core.Types.Collection} collection
 	 */

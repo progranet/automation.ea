@@ -142,7 +142,7 @@ _build = function(inc) {
 				fileSystem.CreateFolder(dir);
 		}
 		var path = inc.root + ".build\\" + inc._package;
-		WriteOutput("Loader", "building changed: " + path, undefined);
+		WriteOutput("Loader", "building changed: " + path + inc.qualifiedName, undefined);
 		file = fileSystem.CreateTextFile(path + inc.qualifiedName  + ".js", true);
 		file.Write(source);
 		file.Close();

@@ -26,22 +26,29 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	},
 	
 	getLinkedDiagram: function() {
-		var id = this._getMiscData0();
-		if (!id || !(id = (new Number(id)).valueOf())) return null;
-		return this._source.application.getRepository().getById(Ea.Diagram._Base, id);
+		var linkedDiagram = this.fromCache("linkedDiagram");
+		if (linkedDiagram === undefined) {
+			var id = this._getMiscData0();
+			if (!id || !(id = (new Number(id)).valueOf()))
+				linkedDiagram = null;
+			else
+				linkedDiagram = this._source.application.getRepository().getById(Ea.Diagram._Base, id);
+			this.toCache("linkedDiagram", linkedDiagram);
+		}
+		return linkedDiagram;
 	},
 	
-	_relationships: null,
 	_getRelationships: function() {
-		if (!this._relationships || Ea.mm) {
-			this._relationships = new Core.Types.Collection();
+		var relationships = this.fromCache("relationships");
+		if (relationships === undefined) {
+			relationships = new Core.Types.Collection();
 			this.getConnectors().forEach(function(connector) {
 				var client = (connector.getClient() == this);
 				var thisConnectorEnd = !client ? connector.getSupplierEnd() : connector.getClientEnd();
 				var secondEnd = client ? connector.getSupplier() : connector.getClient();
 				var secondConnectorEnd = client ? connector.getSupplierEnd() : connector.getClientEnd();
 				if (secondEnd) { // EA integrity problem (Connector.Supplier == null) workaround
-					this._relationships.add(new Ea.Relationship({
+					relationships.add(new Ea.Relationship({
 						from: this,
 						fromEnd: thisConnectorEnd,
 						connector: connector,
@@ -51,8 +58,9 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 					}));		
 				}
 			});
+			this.toCache("relationships", relationships);
 		}
-		return this._relationships;
+		return relationships;
 	},
 	
 	getRelationships: function(relation, filter) {
@@ -75,76 +83,72 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 		return relations;
 	},
 	
-	_customReferences: null,
 	getCustomReferences: function() {
-		if (!this._customReferences || Ea.mm) {
-			this._customReferences = this._source.application.getRepository().getCustomReferences(this);
+		var customReferences = this.fromCache("customReferences");
+		if (customReferences === undefined) {
+			customReferences = this._source.application.getRepository().getCustomReferences(this);
+			this.toCache("customReferences", customReferences);
 		}
-		return this._customReferences;
+		return customReferences;
 	},
 	
-	_contextReferences: null,
 	getContextReferences: function() {
-		if (!this._contextReferences || Ea.mm) {
-			this._contextReferences = new Core.Types.Collection();
+		var contextReferences = this.fromCache("contextReferences");
+		if (contextReferences === undefined) {
+			contextReferences = new Core.Types.Collection();
 			this.getCustomReferences().forEach(function(reference) {
-				this._contextReferences.add(new Ea.ContextReference(reference.getNotes() || "", reference.getSupplier(), ""));
+				contextReferences.add(new Ea.ContextReference(reference.getNotes() || "", reference.getSupplier(), ""));
 			});
 			this._getRelationships().forEach(function(relationship) {
 				var connection = relationship.getConnector()._class.getName();
 				var supplier = relationship.getTo();
 				var notes = relationship.getConnector().getName();
-				this._contextReferences.add(new Ea.ContextReference(notes, supplier, connection));
+				contextReferences.add(new Ea.ContextReference(notes, supplier, connection));
 			});
+			this.toCache("contextReferences", contextReferences);
 		}
-		return this._contextReferences;
+		return contextReferences;
 	},
 
 	findDiagrams: function() {
 		return this._source.application.getRepository().getByQuery(Ea.Diagram._Base, "t_diagramobjects", "Object_ID", this.getId(), "Diagram_ID");
 	},
 	
-	_appearance: null,
 	getAppearance: function() {
-		if (!this._appearance || Ea.mm) {
+		var appearance = this.fromCache("appearance");
+		if (appearance === undefined) {
 			var rows = this._source.application.getRepository().findByQuery("t_object", "Object_ID", this.getId());
 			var row = rows[0];
-			this._appearance = new Ea.DataTypes.Appearance(row);
+			appearance = new Ea.DataTypes.Appearance(row);
+			this.toCache("appearance", appearance);
 		}
-		return this._appearance;
+		return appearance;
 	}
 },
 {
 	api: "Element",
 	
 	_subTypes: {
-		
 		Event: {
 			0: "SendSignalAction",	// Send event
 			1: "AcceptEventAction",	// Accept event
 			2: "AcceptEventAction"	// Accept time event
 		},
-		
 		Pseudostate: {
-			
 			4: "FinalState",
-			
 			100: "InitialNode",
 			101: "ActivityFinalNode",
 			102: "FlowFinalNode"
 		},
-
 		Note: {
 			1: "ConnectorNote",
 			2: "ConnectorConstraint"
 		},
-		
 		Text: {
 			18: "DiagramNotes",
 			19: "Hyperlink",
 			76: "Legend"
 		}
-		
 	},
 	
 	getType: function(source) {

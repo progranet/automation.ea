@@ -18,13 +18,12 @@ Ea.DiagramLink = {};
 
 Ea.DiagramLink._Base = extend(Ea.View, {
 
-	_dimension: null,
-	
 	getDimension: function() {
-		if (!this._dimension || Ea.mm) {
+		var dimension = this.fromCache("dimension");
+		if (dimension === undefined) {
 			var coords = this._getPath();
 			if (coords) {
-				var dimension = this._dimension = new Ea.DataTypes.Dimension({
+				dimension = new Ea.DataTypes.Dimension({
 					right: 0,
 					bottom: 0
 				});
@@ -39,8 +38,9 @@ Ea.DiagramLink._Base = extend(Ea.View, {
 					}
 				}
 			}
+			this.toCache("dimension", dimension);
 		}
-		return this._dimension;
+		return dimension;
 	}
 },
 {

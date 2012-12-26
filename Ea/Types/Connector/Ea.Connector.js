@@ -20,68 +20,54 @@ Ea.Connector = {};
 
 Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	
-	_features: null,
-	
-	_clientAttribute: null,
-	_clientMethod: null,
-	_supplierAttribute: null,
-	_supplierMethod: null,
-	
 	_getFeatures: function() {
-		if (!this._features || Ea.mm) {
-			var features = this._features = {
-				client: null,
-				supplier: null,
-				unknown: null
-			};
+		var features = this.fromCache("features");
+		if (features === undefined) {
+			var direction = {};
 			var _features = this._getStyleEx();
-			_features = _features.replace(/LF([SE])P=(\{[0-9a-z\-]+\})([LR]);/gi, function(match, z1, guid, z2, replaced) {
-				var direction = (z1 == "E" ? "supplier" : (z1 == "S" ? "client" : "unknown"));
-				features[direction] = guid;
+			_features = _features.replace(/LF([SE])P\=(\{[^\}]+\})([LR]);/gi, function(match, z1, guid, z2) {
+				var _direction = (z1 == "E" ? "supplier" : (z1 == "S" ? "client" : "unknown"));
+				direction[_direction] = guid;
 				return "";
 			});
-			if (this._features.client) {
-				this._clientAttribute = this._source.application.getRepository().getByGuid(Ea.Attribute._Base, this._features.client);
-				this._clientMethod = this._source.application.getRepository().getByGuid(Ea.Method._Base, this._features.client);
-			}
-			if (this._features.supplier) {
-				this._supplierAttribute = this._source.application.getRepository().getByGuid(Ea.Attribute._Base, this._features.supplier);
-				this._supplierMethod = this._source.application.getRepository().getByGuid(Ea.Method._Base, this._features.supplier);
-			}
+			features = {
+				clientAttribute: direction.client ? this._source.application.getRepository().getByGuid(Ea.Attribute._Base, direction.client) : null,
+				clientMethod: direction.client ? this._source.application.getRepository().getByGuid(Ea.Method._Base, direction.client) : null,
+				supplierAttribute: direction.supplier ? this._source.application.getRepository().getByGuid(Ea.Attribute._Base, direction.supplier) : null,
+				supplierMethod: direction.supplier ? this._source.application.getRepository().getByGuid(Ea.Method._Base, direction.supplier) : null
+			};
+			this.toCache("features", features);
 		}
+		return features;
 	},
 	
 	getClientAttribute: function() {
-		this._getFeatures();
-		return this._clientAttribute;
+		return this._getFeatures().clientAttribute;
 	},
 	
 	getClientMethod: function() {
-		this._getFeatures();
-		return this._clientMethod;
+		return this._getFeatures().clientMethod;
 	},
 	
 	getSupplierAttribute: function() {
-		this._getFeatures();
-		return this._supplierAttribute;
+		return this._getFeatures().supplierAttribute;
 	},
 	
 	getSupplierMethod: function() {
-		this._getFeatures();
-		return this._supplierMethod;
+		return this._getFeatures().supplierMethod;
 	},
 	
 	getRelation: function(client) {
 		return client ? "links from" : "links to";
 	},
 	
-	_otherEnd: null,
-	
 	getOtherEnd: function(thisEnd) {
-		if (!this._otherEnd || Ea.mm) {
-			this._otherEnd = this.getClient() == thisEnd ? this.getSupplier() : this.getClient();
+		var otherEnd = this.fromCach("otherEnd");
+		if (otherEnd === undefined) {
+			otherEnd = this.getClient() == thisEnd ? this.getSupplier() : this.getClient();
+			this.toCache("otherEnd", otherEnd);
 		}
-		return this._otherEnd;
+		return otherEnd;
 	},
 	
 	_toString: function() {
@@ -121,6 +107,8 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	_client: attribute({api: "ClientID", type: "Ea.Element._Base", referenceBy: "id"}),
 	_supplier: attribute({api: "SupplierID", type: "Ea.Element._Base", referenceBy: "id"}),
 	
+	_styleEx: attribute({api: "StyleEx", private: true}),
+
 	_clientAttribute: derived({getter: "getClientAttribute", type: "Ea.Attribute._Base"}),
 	_clientMethod: derived({getter: "getClientMethod", type: "Ea.Method._Base"}),
 	_supplierAttribute: derived({getter: "getSupplierAttribute", type: "Ea.Attribute._Base"}),
@@ -129,8 +117,6 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	_clientEnd: attribute({api: "ClientEnd", type: "Ea.ConnectorEnd._Base"}),
 	_supplierEnd: attribute({api: "SupplierEnd", type: "Ea.ConnectorEnd._Base"}),
 	
-	_styleEx: attribute({api: "StyleEx", private: true}),
-
 	_guard: attribute({api: "TransitionGuard"}),
 	_transitionAction: attribute({api: "TransitionAction"}),
 	_transitionEvent: attribute({api: "TransitionEvent"}),

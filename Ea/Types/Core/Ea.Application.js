@@ -23,10 +23,15 @@ Ea.Application._Base = extend(Ea.Types.Any, /** @lends Ea.Application._Base# */ 
 	
 	_repository: null,
 	
-	create: function(source) {
+	create: function(source, params) {
 		source.application = this;
 		_super.create(source);
-		this._repository = Ea.Class.createProxy(this, Ea.Repository._Base, this._source.api.Repository);
+		var cacheObjects = params.cacheObjects === undefined ? true : params.cacheObjects;
+		var cacheProperties = cacheObjects ? (params.cacheProperties === undefined ? true : params.cacheProperties) : false;
+		this._repository = Ea.Class.createProxy(this, Ea.Repository._Base, this._source.api.Repository, {
+			cacheObjects: cacheObjects,
+			cacheProperties: cacheProperties
+		});
 	},
 	
 	getRepository: function() {
@@ -35,8 +40,10 @@ Ea.Application._Base = extend(Ea.Types.Any, /** @lends Ea.Application._Base# */ 
 },
 {
 	api: "App",
-	_project: attribute({api: "Project", type: "Ea.Project._Base"}),
+
 	_repository: derived({getter: "getRepository", type: "Ea.Repository._Base"}),
+	
+	_project: attribute({api: "Project", type: "Ea.Project._Base"}),
 	_visible: attribute({api: "Visible", type: Boolean})
 });
 

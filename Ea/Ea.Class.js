@@ -243,7 +243,7 @@ Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.ApiAttri
 	
 	_get: function(object, params) {
 		var source = object._source;
-		if (Ea.mm || !(this.name in source.value))
+		if (!source.application.getRepository().getPropertiesCached() || !(this.name in source.value))
 			this._init(source);
 		var value = source.value[this.name];
 		if (this.type.isClass && "processValue" in this.type) {
