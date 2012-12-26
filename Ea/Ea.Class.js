@@ -121,21 +121,6 @@ Ea.Class = {
 	},
 	
 	/**
-	 * Namespace initialization
-	 */
-	initialize: function() {
-		var callbackSource = function(qualifiedName, source) {
-			source = source.replace(/([\s,\.])([A-Z_][A-Za-z0-9_$]*)(\s*[:=]\s*)(attribute|derived)\s*\(/g, function(whole, prefix, name, assignment, method) {
-				var result = prefix + name + assignment + "Ea.Class." + method + "(";
-				return result;
-			});
-			return source;
-		};
-
-		Core.registerSourceEnrichment(callbackSource);
-	},
-
-	/**
 	 * Creates abstraction layer proxy object for specified EA API object
 	 * 
 	 * @param {Object} instance

@@ -123,36 +123,6 @@ Core = {
 		};
 	},
 	
-	_callbackSource: [],
-	
-	/**
-	 * Registers source enrichment. Source code of each being included library is passed to the registered callback function in order to enrich them. 
-	 * 
-	 * @memberOf Core
-	 * @param {Function} callback function(qualifiedName, source)
-	 * @static
-	 */
-	registerSourceEnrichment: function(callback) {
-		this._callbackSource.push(callback);
-	},
-
-	/**
-	 * Enriches source code of library with registered source enrichments.
-	 * 
-	 * @see Core.registerSourceEnrichment
-	 * @memberOf Core
-	 * @param {String} qualifiedName
-	 * @param {String} source
-	 * @static
-	 */
-	enrichSource: function(qualifiedName, source) {
-		for (var ci = 0; ci < this._callbackSource.length; ci++) {
-			var callback = this._callbackSource[ci];
-			source = callback(qualifiedName, source);
-		}
-		return source;
-	},
-	
 	/**
 	 * Merges properties of specified object to (target) toObject.
 	 * 

@@ -19,12 +19,6 @@ var callback = function(source, namespace) {
 };
 Core.registerMethodEnrichment(callback);
 
-/*var callback = function(source, namespace, propertyName, qualifiedName, _static) {
-	return source.replace(/\.\s*forEach\s*\(/g, ".forEach(this, ");
-};
-Core.registerMethod Enrichment(callback);
-*/
-
 /**
  * @namespace
  */

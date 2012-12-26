@@ -178,12 +178,3 @@ Core.Lang = {
 		_class.initialize();
 	}
 };
-
-var callbackSource = function(qualifiedName, source) {
-	return source.replace(/([\s,\.])([A-Z_][A-Za-z0-9_$]*)(\s*[:=]\s*)(extend|define)\s*\(/g, function(whole, prefix, name, assignment, method) {
-		var result = prefix + name + assignment + "Core.Lang." + method + "(\"" + qualifiedName + "\", \"" + name + "\", ";
-		return result;
-	});
-};
-
-Core.registerSourceEnrichment(callbackSource);
