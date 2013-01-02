@@ -22,6 +22,7 @@ Ea.FeatureConstraint._Base = extend(Ea.Types.Named, {},
 		return this._deriveType(source, this._type);
 	},
 
-	_notes: attribute({api: "Notes"}),
-	_type: attribute({api: "Type"})
+	_notes: property({api: "Notes"}),
+	
+	_type: property({api: "Type"})
 });

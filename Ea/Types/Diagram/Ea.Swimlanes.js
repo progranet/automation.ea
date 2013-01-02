@@ -17,17 +17,22 @@
 Ea.Swimlanes = {};
 
 Ea.Swimlanes._Base = extend(Ea.Collection.Map, {
-	_init: function(api, params) {
-		for (var e = 0; e < api.Count; e++) {
-			var element = this._source.application.getRepository().get(params.elementType, api.Items(e));
+	_init: function(params) {
+		var repository = this._source.application.getRepository();
+		for (var e = 0; e < this._source.api.Count; e++) {
+			var element = repository.get(params.elementType, this._source.api.Items(e));
 			this.add(element);
 		}
 	}
 },
 {
+	meta: {
+		objectType: 51
+	},
+
 	getType: function() {
 		return Ea.Swimlanes._Base;
 	}
 });
 
-Ea.register("Ea.Swimlane@Ea.Types.Diagram", 52);
+include("Ea.Swimlane@Ea.Types.Diagram");

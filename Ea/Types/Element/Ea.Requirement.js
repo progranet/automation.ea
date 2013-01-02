@@ -18,18 +18,35 @@ Ea.Requirement = {};
 
 Ea.Requirement._Base = extend(Ea.Types.Named, {},
 {
-	api: "Requirement",
+	meta: {
+		//id: "RequirementID",
+		api: "Requirement",
+		objectType: 9
+	},
 
 	getType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 
-	_id: attribute({api: "RequirementID", type: Number, id: "id"}),
-	_modified: attribute({api: "LastUpdate", type: Ea.DataTypes.Date}),
-	_notes: attribute({api: "Notes"}),
-	_priority: attribute({api: "Priority"}),
-	_stability: attribute({api: "Stability"}),
-	_status: attribute({api: "Status"}),
-	_difficulty: attribute({api: "Difficulty"}),
-	_type: attribute({api: "Type"})
+	/**
+	 * @type {Number}
+	 */
+	_id: property({api: "RequirementID"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Date}
+	 */
+	_modified: property({api: "LastUpdate"}),
+	
+	_notes: property({api: "Notes"}),
+	
+	_priority: property({api: "Priority"}),
+	
+	_stability: property({api: "Stability"}),
+	
+	_status: property({api: "Status"}),
+	
+	_difficulty: property({api: "Difficulty"}),
+	
+	_type: property({api: "Type"})
 });

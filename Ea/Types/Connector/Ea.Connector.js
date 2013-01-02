@@ -14,30 +14,26 @@
    limitations under the License.
 */
 
-Ea.register("Ea.ConnectorEnd@Ea.Types.Connector", 22);
+include("Ea.ConnectorEnd@Ea.Types.Connector");
 
 Ea.Connector = {};
 
 Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	
 	_getFeatures: function() {
-		var features = this.fromCache("features");
-		if (features === undefined) {
-			var direction = {};
-			var _features = this._getStyleEx();
-			_features = _features.replace(/LF([SE])P\=(\{[^\}]+\})([LR]);/gi, function(match, z1, guid, z2) {
-				var _direction = (z1 == "E" ? "supplier" : (z1 == "S" ? "client" : "unknown"));
-				direction[_direction] = guid;
-				return "";
-			});
-			features = {
-				clientAttribute: direction.client ? this._source.application.getRepository().getByGuid(Ea.Attribute._Base, direction.client) : null,
-				clientMethod: direction.client ? this._source.application.getRepository().getByGuid(Ea.Method._Base, direction.client) : null,
-				supplierAttribute: direction.supplier ? this._source.application.getRepository().getByGuid(Ea.Attribute._Base, direction.supplier) : null,
-				supplierMethod: direction.supplier ? this._source.application.getRepository().getByGuid(Ea.Method._Base, direction.supplier) : null
-			};
-			this.toCache("features", features);
-		}
+		var direction = {};
+		var _features = this._getStyleEx();
+		_features = _features.replace(/LF([SE])P\=(\{[^\}]+\})([LR]);/gi, function(match, z1, guid, z2) {
+			var _direction = (z1 == "E" ? "supplier" : (z1 == "S" ? "client" : "unknown"));
+			direction[_direction] = guid;
+			return "";
+		});
+		var features = {
+			clientAttribute: direction.client ? this._source.application.getRepository().getByGuid(Ea.Attribute._Base, direction.client) : null,
+			clientMethod: direction.client ? this._source.application.getRepository().getByGuid(Ea.Method._Base, direction.client) : null,
+			supplierAttribute: direction.supplier ? this._source.application.getRepository().getByGuid(Ea.Attribute._Base, direction.supplier) : null,
+			supplierMethod: direction.supplier ? this._source.application.getRepository().getByGuid(Ea.Method._Base, direction.supplier) : null
+		};
 		return features;
 	},
 	
@@ -61,15 +57,6 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 		return client ? "links from" : "links to";
 	},
 	
-	getOtherEnd: function(thisEnd) {
-		var otherEnd = this.fromCach("otherEnd");
-		if (otherEnd === undefined) {
-			otherEnd = this.getClient() == thisEnd ? this.getSupplier() : this.getClient();
-			this.toCache("otherEnd", otherEnd);
-		}
-		return otherEnd;
-	},
-	
 	_toString: function() {
 		var client = this.getClientEnd().getRole();
 		client = client ? " (" + client + ")" : "";
@@ -84,48 +71,161 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	}
 },
 {
-	api: "Connector",
+	meta: {
+		id: "ConnectorID",
+		guid: "ConnectorGUID",
+		api: "Connector",
+		objectType: 7
+	},
 	
-	_id: attribute({api: "ConnectorID", type: Number, id: "id"}),
-	_guid: attribute({api: "ConnectorGUID", id: "guid"}),
-	_type: attribute({api: "Type"}),
+	/**
+	 * @type {Number}
+	 */
+	_id: property({api: "ConnectorID"}),
 	
-	_alias: attribute({api: "Alias"}),
-	_notes: attribute({api: "Notes"}),
-	_stereotype: attribute({api: "Stereotype"}),
-	_direction: attribute({api: "Direction"}),
+	_guid: property({api: "ConnectorGUID"}),
+	
+	_type: property({api: "Type"}),
+	
+	_alias: property({api: "Alias"}),
+	
+	_notes: property({api: "Notes"}),
+	
+	_stereotype: property({api: "Stereotype"}),
+	
+	_direction: property({api: "Direction"}),
 
-	_eventFlags: attribute({api: "EventFlags", type: Ea.DataTypes.Map}),
-	_stateFlags: attribute({api: "StateFlags", type: Ea.DataTypes.Map}),
-	_metaType: attribute({api: "MetaType", private: true}),
-	_miscData0: attribute({api: "MiscData", private: true, index: 0}),
-	_miscData1: attribute({api: "MiscData", private: true, index: 1}),
-	_miscData2: attribute({api: "MiscData", private: true, index: 2}),
-	_miscData3: attribute({api: "MiscData", private: true, index: 3}),
-	_miscData4: attribute({api: "MiscData", private: true, index: 4}),
+	/**
+	 * @type {Ea.DataTypes.Map}
+	 */
+	_eventFlags: property({api: "EventFlags"}),
 
-	_client: attribute({api: "ClientID", type: "Ea.Element._Base", referenceBy: "id"}),
-	_supplier: attribute({api: "SupplierID", type: "Ea.Element._Base", referenceBy: "id"}),
-	
-	_styleEx: attribute({api: "StyleEx", private: true}),
+	/**
+	 * @type {Ea.DataTypes.Map}
+	 * @private
+	 */
+	_stateFlags: property({api: "StateFlags"}),
 
-	_clientAttribute: derived({getter: "getClientAttribute", type: "Ea.Attribute._Base"}),
-	_clientMethod: derived({getter: "getClientMethod", type: "Ea.Method._Base"}),
-	_supplierAttribute: derived({getter: "getSupplierAttribute", type: "Ea.Attribute._Base"}),
-	_supplierMethod: derived({getter: "getSupplierMethod", type: "Ea.Method._Base"}),
-	
-	_clientEnd: attribute({api: "ClientEnd", type: "Ea.ConnectorEnd._Base"}),
-	_supplierEnd: attribute({api: "SupplierEnd", type: "Ea.ConnectorEnd._Base"}),
-	
-	_guard: attribute({api: "TransitionGuard"}),
-	_transitionAction: attribute({api: "TransitionAction"}),
-	_transitionEvent: attribute({api: "TransitionEvent"}),
-	_virtualInheritance: attribute({api: "VirtualInheritance"}),
+	/**
+	 * @private
+	 */
+	_metaType: property({api: "MetaType"}),
 
-	_tags: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.ConnectorTag._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
-	_constraints: attribute({api: "Constraints", type: "Ea.Collection._Base", elementType: "Ea.ConnectorConstraint._Base", aggregation: "composite"}),
-	_customProperties: attribute({api: "CustomProperties", type: "Ea.Collection.Map", elementType: "Ea.CustomProperty._Base", key: "this.getName()", value: "this.getValue()", aggregation: "composite"}),
-	_properties: attribute({api: "Properties", type: "Ea.Properties._Base", elementType: "Ea.Property._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
+	/**
+	 * @private
+	 */
+	_miscData0: property({api: "MiscData", index: 0}),
+
+	/**
+	 * @private
+	 */
+	_miscData1: property({api: "MiscData", index: 1}),
+
+	/**
+	 * @private
+	 */
+	_miscData2: property({api: "MiscData", index: 2}),
+
+	/**
+	 * @private
+	 */
+	_miscData3: property({api: "MiscData", index: 3}),
+
+	/**
+	 * @private
+	 */
+	_miscData4: property({api: "MiscData", index: 4}),
+
+	/**
+	 * @type {Ea.Element._Base}
+	 */
+	_client: property({api: "ClientID", referenceBy: "id"}),
+
+	/**
+	 * @type {Ea.Element._Base}
+	 */
+	_supplier: property({api: "SupplierID", referenceBy: "id"}),
+	
+	/**
+	 * @private
+	 */
+	_styleEx: property({api: "StyleEx"}),
+
+	/**
+	 * @type {Object}
+	 * @private
+	 * @derived
+	 */
+	_features: property(),
+
+	/**
+	 * @type {Ea.Attribute._Base}
+	 * @derived
+	 */
+	_clientAttribute: property(),
+
+	/**
+	 * @type {Ea.Method._Base}
+	 * @derived
+	 */
+	_clientMethod: property(),
+
+	/**
+	 * @type {Ea.Attribute._Base}
+	 * @derived
+	 */
+	_supplierAttribute: property(),
+
+	/**
+	 * @type {Ea.Method._Base}
+	 * @derived
+	 */
+	_supplierMethod: property(),
+
+	/**
+	 * @type {Ea.ConnectorEnd._Base}
+	 */
+	_clientEnd: property({api: "ClientEnd"}),
+
+	/**
+	 * @type {Ea.ConnectorEnd._Base}
+	 */
+	_supplierEnd: property({api: "SupplierEnd"}),
+	
+	_guard: property({api: "TransitionGuard"}),
+	
+	_transitionAction: property({api: "TransitionAction"}),
+	
+	_transitionEvent: property({api: "TransitionEvent"}),
+	
+	_virtualInheritance: property({api: "VirtualInheritance"}),
+
+	/**
+	 * @type {Ea.Collection.Map<Ea.ConnectorTag._Base>}
+	 * @qualifier this.getName()
+	 * @aggregation composite
+	 */
+	_tags: property({api: "TaggedValues"}),
+
+	/**
+	 * @type {Ea.Collection._Base<Ea.ConnectorConstraint._Base>}
+	 * @aggregation composite
+	 */
+	_constraints: property({api: "Constraints"}),
+
+	/**
+	 * @type {Ea.Collection.Map<Ea.CustomProperty._Base>}
+	 * @qualifier this.getName()
+	 * @aggregation composite
+	 */
+	_customProperties: property({api: "CustomProperties"}),
+
+	/**
+	 * @type {Ea.Properties._Base<Ea.Property._Base>}
+	 * @qualifier this.getName()
+	 * @aggregation composite
+	 */
+	_properties: property({api: "Properties"}),
 
 	getType: function(source) {
 		return this._deriveType(source, this._type);
@@ -166,6 +266,9 @@ Ea.Connector.Generalization = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
 		return client ? "supertype of" : "subtype of";
 	}
+}, {
+	elementType: "Generalization"
+	
 });
 
 Ea.Connector.Nesting = extend(Ea.Connector._Base, {
@@ -182,8 +285,11 @@ Ea.Connector.Realisation = extend(Ea.Connector._Base, {
 
 Ea.Connector.Sequence = extend(Ea.Connector._Base, {},
 {
-	_sequenceNo: attribute({api: "SequenceNo", type: Number})
+	/**
+	 * @type {Number}
+	 */
+	_sequenceNo: property({api: "SequenceNo"})
 });
 
-Ea.register("Ea.ConnectorTag@Ea.Types.Connector", 36);
-Ea.register("Ea.ConnectorConstraint@Ea.Types.Connector", 37);
+include("Ea.ConnectorTag@Ea.Types.Connector");
+include("Ea.ConnectorConstraint@Ea.Types.Connector");

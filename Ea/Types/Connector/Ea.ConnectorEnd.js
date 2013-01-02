@@ -28,29 +28,76 @@ Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {
 	}
 },
 {
-	api: "ConnectorEnd",
+	meta: {
+		api: "ConnectorEnd",
+		objectType: 22
+	},
 
-	_role: attribute({api: "Role"}),
-	_roleNote: attribute({api: "RoleNote"}),
-	_roleType: attribute({api: "RoleType"}),
-	_stereotype: attribute({api: "Stereotype"}),
-	_alias: attribute({api: "Alias"}),
-
-	_derived: attribute({api: "Derived", type: Boolean}),
-	_derivedUnion: attribute({api: "DerivedUnion", type: Boolean}),
-	_allowDuplicates: attribute({api: "AllowDuplicates", type: Boolean}),
-	_ownedByClassifier: attribute({api: "OwnedByClassifier", type: Boolean}),
-	__aggregation: attribute({api: "Aggregation", type: Number, private: true}),
-	_aggregation: derived({getter: "getAggregation"}),
-	_ordering: attribute({api: "Ordering", type: Number}),
-	_constraint: attribute({api: "Constraint"}),
-	_qualifier: attribute({api: "Qualifier"}),
-	_multiplicity: attribute({api: "Cardinality"}),
-	_visibility: attribute({api: "Visibility"}),
-	_changeability: attribute({api: "IsChangeable"}),
-	_navigability: attribute({api: "Navigable"}),
+	_role: property({api: "Role"}),
 	
-	_tags: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.ConnectorEndTag._Base", key: "this.getName()", value: "this", aggregation: "composite"})
+	_roleNote: property({api: "RoleNote"}),
+	
+	_roleType: property({api: "RoleType"}),
+	
+	_stereotype: property({api: "Stereotype"}),
+	
+	_alias: property({api: "Alias"}),
+
+	/**
+	 * @type {Boolean}
+	 */
+	_derived: property({api: "Derived"}),
+
+	/**
+	 * @type {Boolean}
+	 */
+	_derivedUnion: property({api: "DerivedUnion"}),
+
+	/**
+	 * @type {Boolean}
+	 */
+	_allowDuplicates: property({api: "AllowDuplicates"}),
+
+	/**
+	 * @type {Boolean}
+	 */
+	_ownedByClassifier: property({api: "OwnedByClassifier"}),
+
+	/**
+	 * @type {Number}
+	 * @private
+	 */
+	__aggregation: property({api: "Aggregation"}),
+
+	/**
+	 * @derived
+	 */
+	_aggregation: property(),
+
+	/**
+	 * @type {Number}
+	 */
+	_ordering: property({api: "Ordering"}),
+
+	_constraint: property({api: "Constraint"}),
+	
+	_qualifier: property({api: "Qualifier"}),
+	
+	_multiplicity: property({api: "Cardinality"}),
+	
+	_visibility: property({api: "Visibility"}),
+	
+	_changeability: property({api: "IsChangeable"}),
+	
+	_navigability: property({api: "Navigable"}),
+	
+
+	/**
+	 * @type {Ea.Collection.Map<Ea.ConnectorEndTag._Base>}
+	 * @qualifier this.getName()
+	 * @aggregation composite
+	 */
+	_tags: property({api: "TaggedValues"})
 });
 
-Ea.register("Ea.ConnectorEndTag@Ea.Types.Connector", 41);
+include("Ea.ConnectorEndTag@Ea.Types.Connector");

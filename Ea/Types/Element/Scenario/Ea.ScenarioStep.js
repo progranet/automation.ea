@@ -30,22 +30,44 @@ Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 	
 },
 {
-	api: "ScenarioStep",
+	meta: {
+		api: "ScenarioStep",
+		objectType: 54
+	},
 	
 	getType: function(source) {
 		var typeName = Ea.ScenarioStep.StepType[this._type.get(source)];
-		var type = this.namespace[typeName] || Ea.addType(this.namespace, typeName);
+		var type = this.namespace[typeName] || this._createType(typeName);
 		return type;
 	},
 
-	_guid: attribute({api: "StepGUID"}), // GUID is not unique for ScenarioStep!
-	_pos: attribute({api: "Pos"}),
-	_level: attribute({api: "Level"}),
-	_extensions: attribute({api: "Extensions", type: "Ea.Collection._Base", elementType: "Ea.ScenarioExtension._Base", key: "this.getLevel()", private: true}),
-	_type: attribute({api: "StepType", private: true}),
-	_link: attribute({api: "Link", type: "Ea.Element.UseCase", referenceBy: "guid", private: true}),
-	_uses: attribute({api: "Uses"}),
-	_results: attribute({api: "Results"})
+	_guid: property({api: "StepGUID"}), // GUID is not unique for ScenarioStep!
+	
+	_pos: property({api: "Pos"}),
+	
+	_level: property({api: "Level"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.ScenarioExtension._Base>}
+	 * @qualifier this.getLevel()
+	 * @private
+	 */
+	_extensions: property({api: "Extensions"}),
+	
+	/**
+	 * @private
+	 */
+	_type: property({api: "StepType"}),
+	
+	/**
+	 * @type {Ea.Element.UseCase}
+	 * @private
+	 */
+	_link: property({api: "Link", referenceBy: "guid"}),
+	
+	_uses: property({api: "Uses"}),
+	
+	_results: property({api: "Results"})
 });
 
 Ea.ScenarioStep.Actor = extend(Ea.ScenarioStep._Base);

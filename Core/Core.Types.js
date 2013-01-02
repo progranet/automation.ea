@@ -23,7 +23,9 @@ Core.registerMethodEnrichment(callback);
  * @namespace
  */
 Core.Types = {
+
 	_id: 0,
+	
 	/**
 	 * @private
 	 */
@@ -44,6 +46,7 @@ Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, /** @lends C
 	},
 
 	__id__: null,
+
 	/**
 	 * @private
 	 */
@@ -56,7 +59,7 @@ Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, /** @lends C
 	 * 
 	 * @memberOf Core.Types.Object#
 	 * @param {Class} _class
-	 * @returns {Boolean}
+	 * @type {Boolean}
 	 */
 	instanceOf: function(_class) {
 		return this._class === _class || this._class.isSubclassOf(_class);
@@ -68,7 +71,7 @@ Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, /** @lends C
 	 * @see Core.Types.Filter
 	 * @memberOf Core.Types.Object#
 	 * @param {Object} filter
-	 * @returns {Boolean}
+	 * @type {Boolean}
 	 */
 	match: function(filter) {
 		return (Core.Types.Filter.ensure(filter)).check(this);
@@ -122,7 +125,7 @@ Core.Types.Named = define(/** @lends Core.Types.Named# */{
 	 * Returns this name
 	 * 
 	 * @memberOf Core.Types.Named#
-	 * @returns {String}
+	 * @type {String}
 	 */
 	getName: function() {
 		return this._name;
@@ -159,7 +162,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @param {Core.Types.Object} element
-	 * @returns {Boolean}
+	 * @type {Boolean}
 	 */
 	add: function(element) {
 		if (!element || !Core.Types.Object.isInstance(element))
@@ -245,7 +248,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * Returns collection's size.
 	 * 
 	 * @memberOf Core.Types.Collection#
-	 * @returns {Number}
+	 * @type {Number}
 	 */
 	getSize: function() {
 		return this._size;
@@ -255,7 +258,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * Checks if this collection is empty
 	 * 
 	 * @memberOf Core.Types.Collection#
-	 * @returns {Boolean}
+	 * @type {Boolean}
 	 */
 	isEmpty: function() {
 		return this._size == 0;
@@ -265,7 +268,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * Checks if this collection is not empty
 	 * 
 	 * @memberOf Core.Types.Collection#
-	 * @returns {Boolean}
+	 * @type {Boolean}
 	 */
 	notEmpty: function() {
 		return this._size != 0;
@@ -275,7 +278,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * Returns first element of this collection
 	 * 
 	 * @memberOf Core.Types.Collection#
-	 * @returns {Object}
+	 * @type {Object}
 	 */
 	first: function() {
 		return (this._size == 0 ? null : this._table[0]);
@@ -287,7 +290,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * @see Core.Types.Filter
 	 * @memberOf Core.Types.Collection#
 	 * @param {Object} filter
-	 * @returns {Core.Types.Collection}
+	 * @type {Core.Types.Collection}
 	 */
 	filter: function(filter) {
 		if (!filter) return this;
@@ -310,8 +313,6 @@ Core.Types.Map = extend(Core.Types.Collection, {
 	
 	_keyDef: null,
 	_keyFn: null,
-	_valueDef: null,
-	_valueFn: null,
 	_map: null,
 	
 	/**
@@ -326,8 +327,6 @@ Core.Types.Map = extend(Core.Types.Collection, {
 		params = params || {};
 		this._keyDef = params.key;
 		this._keyFn = new Function("return " + this._keyDef + ";");
-		this._valueDef = params.value;
-		this._valueFn = this._valueDef ? new Function("return " + this._valueDef + ";") : null;
 		this._map = {};
 		_super.create(params);
 	},
@@ -343,8 +342,7 @@ Core.Types.Map = extend(Core.Types.Collection, {
 		if (this._map[key]) {
 			debug("Key already exisis in map: " + key);
 		}
-		var value = this._valueFn ? this._valueFn.call(element) : element;
-		this._map[key] = value;
+		this._map[key] = element;
 	},
 	
 	/**
@@ -352,7 +350,7 @@ Core.Types.Map = extend(Core.Types.Collection, {
 	 * 
 	 * @memberOf Core.Types.Map#
 	 * @param {Object} key
-	 * @returns {Object}
+	 * @type {Object}
 	 */
 	get: function(key) {
 		return key in this._map ? this._map[key] : undefined;
@@ -401,7 +399,7 @@ Core.Types.Filter = define(/** @lends Core.Types.Filter# */{
 	 * 
 	 * @memberOf Core.Types.Filter#
 	 * @param {Object} object
-	 * @returns {Boolean}
+	 * @type {Boolean}
 	 */
 	check: function(object) {
 		return this._filter ? this._filter.call(object) : true;

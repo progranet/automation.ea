@@ -25,7 +25,7 @@ Core.Output = {
 	 * @memberOf Core.Output
 	 * @param {String} scriptlet Template scriptlet 
 	 * @param {Array|Object} params Array or map of objects to be evaluated
-	 * @returns {String}
+	 * @type {String}
 	 */
 	exec: function(scriptlet, params) {
 		scriptlet = scriptlet + "";
@@ -52,7 +52,7 @@ Core.Output = {
 	 * 
 	 * @memberOf Core.Output
 	 * @param {Object} context
-	 * @returns {String}
+	 * @type {String}
 	 */
 	getString: function(context) {
 

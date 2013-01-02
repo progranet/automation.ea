@@ -21,6 +21,15 @@ include = function(library, params) {
 	if (!inc)
 		return false;
 	
+	var _ownerArray = inc.qualifiedName.split(".");
+	_ownerArray.pop();
+	var _ownerString = _ownerArray.join(".");
+	var owner = null;
+	if (_ownerString) {
+		owner = eval(_ownerString);
+		inc.owner = owner;
+	}
+	
 	var namespace = eval(inc.qualifiedName);
 	if (!namespace.params)
 		namespace.params = {};
@@ -35,6 +44,8 @@ include = function(library, params) {
 	Core.enrichNamespace(namespace);
 	if ("initialize" in namespace)
 		namespace.initialize();
+	if (owner && "addOwned" in owner)
+		owner.addOwned(namespace);
 	_included[inc.qualifiedName] = namespace;
 	return namespace;
 };
@@ -83,7 +94,7 @@ _load = function(library) {
 		}
 	}
 	if (!file)
-		throw new Error("Library not found: " + libraryName);
+		throw new Error("Library not found: " + library);
 	
 	var source = file.ReadAll();
 	
@@ -99,46 +110,47 @@ _load = function(library) {
 
 _include = function(library) {
 	
+	WriteOutput("Loader", "loading: " + library, undefined);
+
 	var inc = _load(library);
 
 	if (!inc)
 		return false;
 	
-	WriteOutput("Loader", "loaded: " + inc.qualifiedName, undefined);
-
 	if (!inc.builded)
 		_build(inc);
 	
+	WriteOutput("Loader", "evaluating: " + inc.qualifiedName, undefined);
+
 	eval(inc.source);
 
+	if (!inc.builded)
+		_save(inc);
+	
 	return inc;
 };
 
-var extend = "";
-
-_find = function(object, condition, context, found) {
+_find = function(object, name, condition, context, found) {
 	
-	found = found || [];
-	
-	for (var name in object) {
-		var value = object[name];
-		var match = false;
-		try {
-			match = condition.call(value, name, context);
+	if (typeof object == "object") {
+		if (object instanceof Array) {
+			for (var i = 0; i < object.length; i++) {
+				var value = object[i];
+				_find(value, null, condition, context);
+			}
 		}
-		catch (error) {
-			
+		else {
+			try {
+				condition.call(object, name, context);
+			}
+			catch (error) {}
+			finally {}
+			for (var name in object) {
+				var value = object[name];
+				_find(value, name, condition, context);
+			}
 		}
-		finally {
-			if (match)
-				found.push(value);
-		}
-		if (typeof value == "object")
-			found = _find(value, condition, context, found);
 	}
-	
-	return found;
-	
 };
 
 var lang = function(name, context) {
@@ -180,7 +192,7 @@ var lang = function(name, context) {
                 "raw": "'" + typeName + "'"
 			});
 		
-		//WriteOutput("Loader", "/*1*/" + context.qualifiedName + "." + typeName + " = " + JSON.stringify(this) + ";", undefined);
+		//WriteOutput("Loader", "/*define/extend*/" + context.qualifiedName + "." + typeName + " = " + JSON.stringify(this) + ";", undefined);
 		
 		return true;
 	}
@@ -189,11 +201,9 @@ var lang = function(name, context) {
 
 var ea = function(name, context) {
 	
-	var method = this.callee.name;
-	
-	if (this.type == "CallExpression" && this.callee.type == "Identifier" && (method == "attribute" || method == "derived")) {
+	if (this.value.type == "CallExpression" && this.value.callee.type == "Identifier" && this.value.callee.name == "property") {
 		
-		this.callee = {
+		this.value.callee = {
 	            "type": "MemberExpression",
 	            "computed": false,
 	            "object": {
@@ -210,11 +220,128 @@ var ea = function(name, context) {
 	            },
 	            "property": {
 	                "type": "Identifier",
-	                "name": method
+	                "name": "property"
 	            }
 	        };
 		
-		//WriteOutput("Loader", "/*2*/prop = " + JSON.stringify(this) + ";", undefined);
+		var tags = this.key.commentsBefore.join("\r\n").split("@");
+		var ast = this;
+		if (ast.value.arguments.length == 0) {
+			ast.value.arguments.push({
+                "type": "ObjectExpression",
+                "properties": []
+            });
+		}
+		for (var ti = 0; ti < tags.length; ti++) {
+			var tag = tags[ti];
+			tag = tag.replace(/^\s*type\s+\{([^\}<]+)(<([^\{>]+)>)?[^\}]*\}/g, function(whole, type, nm, elementType) {
+				ast.value.arguments[0].properties.push({
+					"type": "Property",
+					"key": {
+						"type": "Identifier",
+						"name": "type"
+					},
+					"value": {
+						"type": "Literal",
+						"value": type,
+						"raw": "'" + type + "'"
+					},
+					"kind": "init"
+				});
+				if (elementType) {
+					ast.value.arguments[0].properties.push({
+						"type": "Property",
+						"key": {
+							"type": "Identifier",
+							"name": "elementType"
+						},
+						"value": {
+							"type": "Literal",
+							"value": elementType,
+							"raw": "'" + elementType + "'"
+						},
+						"kind": "init"
+					});
+				}
+			});
+			tag = tag.replace(/^\s*private/g, function(whole) {
+				ast.value.arguments[0].properties.push({
+					"type": "Property",
+					"key": {
+						"type": "Identifier",
+						"name": "private"
+					},
+					"value": {
+						"type": "Literal",
+						"value": true,
+						"raw": "'true'"
+					},
+					"kind": "init"
+				});
+			});
+			tag = tag.replace(/^\s*derived/g, function(whole) {
+				ast.value.arguments[0].properties.push({
+					"type": "Property",
+					"key": {
+						"type": "Identifier",
+						"name": "derived"
+					},
+					"value": {
+						"type": "Literal",
+						"value": true,
+						"raw": "'true'"
+					},
+					"kind": "init"
+				});
+			});
+			tag = tag.replace(/^\s*aggregation\s+([a-z]+)\s*/g, function(whole, kind) {
+				ast.value.arguments[0].properties.push({
+					"type": "Property",
+					"key": {
+						"type": "Identifier",
+						"name": "aggregation"
+					},
+					"value": {
+						"type": "Literal",
+						"value": kind,
+						"raw": "'" + kind + "'"
+					},
+					"kind": "init"
+				});
+			});
+			tag = tag.replace(/^\s*separator\s+(.+)\s*/g, function(whole, separator) {
+				ast.value.arguments[0].properties.push({
+					"type": "Property",
+					"key": {
+						"type": "Identifier",
+						"name": "separator"
+					},
+					"value": {
+						"type": "Literal",
+						"value": separator,
+						"raw": "'" + separator + "'"
+					},
+					"kind": "init"
+				});
+			});
+			tag = tag.replace(/^\s*qualifier\s+(.+)\s*/g, function(whole, qualifier) {
+				ast.value.arguments[0].properties.push({
+					"type": "Property",
+					"key": {
+						"type": "Identifier",
+						"name": "key"
+					},
+					"value": {
+						"type": "Literal",
+						"value": qualifier,
+						"raw": "'" + qualifier + "'"
+					},
+					"kind": "init"
+				});
+			});
+		}
+		
+		WriteOutput("Loader", "" + context.qualifiedName + "." + this.key.name + " = " + JSON.stringify(this) + ";", undefined);
 	
 		return true;
 	}
@@ -223,6 +350,8 @@ var ea = function(name, context) {
 
 _build = function(inc) {
 	
+	WriteOutput("Loader", "building: " + inc.qualifiedName, undefined);
+
 	var ast = null;
 	try {
 		ast = External.acorn.parse(inc.source, {
@@ -233,15 +362,32 @@ _build = function(inc) {
 	}
 	catch (error) {
 		WriteOutput("Loader", "syntax error: " + JSON.stringify(error, null, '\t'), undefined);
-		throw new Error("Syntax error:\r\n" + error.message + "\r\nin " + library + "\r\n");
+		throw new Error("Syntax error:\r\n" + error.message + "\r\nin " + inc.qualifiedName + "\r\n");
 	}
 
-	_find(ast, lang, inc);
-	_find(ast, ea, inc);
+	_find(ast, null, lang, inc);
+	_find(ast, null, ea, inc);
 	
-	//WriteOutput("Loader", "var ast = " + inc.qualifiedName + " = " + JSON.stringify(ast, null, '\t') + ";", undefined);
-	var source = External.escodegen.generate(ast);
+	WriteOutput("Loader", "generating: " + inc.qualifiedName, undefined);
 
+	inc.source = External.escodegen.generate(ast, {
+		format: {
+			indent: {
+				style: "\t"
+			},
+			quotes: "double"
+		}
+	});
+
+	return inc;
+};
+
+_save = function(inc) {
+
+	var path = inc.root + ".build\\" + inc._package;
+
+	WriteOutput("Loader", "saving: " + path + inc.qualifiedName, undefined);
+	
 	var dirs = (".build\\" + inc._package).split("\\");
 	var dir = inc.root;
 	for (var di = 0; di < dirs.length; di++) {
@@ -249,16 +395,9 @@ _build = function(inc) {
 		if (!fileSystem.FolderExists(dir))
 			fileSystem.CreateFolder(dir);
 	}
-	var path = inc.root + ".build\\" + inc._package;
-	WriteOutput("Loader", "building changed: " + path + inc.qualifiedName, undefined);
 	file = fileSystem.CreateTextFile(path + inc.qualifiedName  + ".js", true);
-	file.Write(source);
+	file.Write(inc.source);
 	file.Close();
-	
-	//WriteOutput("Loader", "   " + source, undefined);
-	inc.source = source;
-	
-	return inc;
 };
 
 CreateOutputTab("Loader");
@@ -267,7 +406,6 @@ ClearOutput("Loader");
 
 fileSystem = new ActiveXObject("Scripting.FileSystemObject");
 External = {};
-Core = false;
 
 _included = {};
 _scriptRoot = scriptRoot.split(";");
@@ -280,9 +418,3 @@ load("Init");
 load("Lang");
 
 include("Core@Core");
-include("Core.Helper@Core");
-include("Core.Log@Core");
-include("Core.Output@Core");
-include("Core.Lang@Core");
-include("Core.Types@Core");
-include("Core.Target@Core");

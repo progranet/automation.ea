@@ -17,17 +17,22 @@
 Ea.Properties = {};
 
 Ea.Properties._Base = extend(Ea.Collection.Map, {
-	_init: function(api, params) {
-		for (var e = 0; e < api.Count; e++) {
-			var element = this._source.application.getRepository().get(params.elementType, api.Item(e));
+	_init: function(params) {
+		var repository = this._source.application.getRepository();
+		for (var e = 0; e < this._source.api.Count; e++) {
+			var element = repository.get(params.elementType, this._source.api.Item(e));
 			this.add(element);
 		}
 	}
 },
 {
+	meta: {
+		objectType: 48
+	},
+
 	getType: function() {
 		return Ea.Properties._Base;
 	}
 });
 
-Ea.register("Ea.Property@Ea.Types.Element.Property", 49);
+include("Ea.Property@Ea.Types.Element.Property");

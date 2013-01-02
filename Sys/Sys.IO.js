@@ -65,7 +65,7 @@ Sys.IO = {
 	 * @param {String} folderPath
 	 * @param {?Object} context Namespace containing file
 	 */
-	copy: function(file, folderPath, context) {
+	copy: function(filePath, folderPath, context) {
 		Sys.IO._fileSystem.CopyFile(this.getPath(file, context), folderPath);
 	},
 	
@@ -87,7 +87,7 @@ Sys.IO = {
 	 * @memberOf Sys.IO
 	 * @param {String} file
 	 * @param {?Object} namespace Namespace containing file 
-	 * @returns {String}
+	 * @type {String}
 	 */
 	getPath: function(file, namespace) {
 		return namespace ? namespace._loader.path + file : file;
@@ -98,11 +98,34 @@ Sys.IO = {
 	 * 
 	 * @memberOf Sys.IO
 	 * @param {String} filePath
-	 * @returns {Date}
+	 * @type {Date}
 	 */
 	getCreated: function(filePath) {
 		if (!Sys.IO._fileSystem.FileExists(filePath)) return null;
 		return new Date(Sys.IO._fileSystem.GetFile(filePath).DateCreated);
+	},
+
+	/**
+	 * Returns last modification date for specified file
+	 * 
+	 * @memberOf Sys.IO
+	 * @param {String} filePath
+	 * @type {Date}
+	 */
+	getModified: function(filePath) {
+		if (!Sys.IO._fileSystem.FileExists(filePath)) return null;
+		return new Date(Sys.IO._fileSystem.GetFile(filePath).DateLastModified);
+	},
+	
+	/**
+	 * Checks if specified file exists in file system
+	 * 
+	 * @memberOf Sys.IO
+	 * @param {String} filePath
+	 * @type {Boolean}
+	 */
+	fileExists: function(filePath) {
+		return Sys.IO._fileSystem.FileExists(filePath);
 	}
 };
 	
@@ -158,17 +181,27 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	 * Reads line from this file.
 	 * 
 	 * @memberOf Sys.IO.File#
-	 * @returns {String}
+	 * @type {String}
 	 */
 	readLine: function() {
 		return this._file.ReadLine();
 	},
 	
 	/**
+	 * Reads entire file.
+	 * 
+	 * @memberOf Sys.IO.File#
+	 * @type {String}
+	 */
+	readAll: function() {
+		return this._file.ReadAll();
+	},
+	
+	/**
 	 * Checks if this file is at the end
 	 * 
 	 * @memberOf Sys.IO.File#
-	 * @returns {Boolean}
+	 * @type {Boolean}
 	 */
 	atEnd: function() {
 		return this._file.AtEndOfStream;

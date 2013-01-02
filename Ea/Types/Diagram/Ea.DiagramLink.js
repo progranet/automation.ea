@@ -19,39 +19,67 @@ Ea.DiagramLink = {};
 Ea.DiagramLink._Base = extend(Ea.View, {
 
 	getDimension: function() {
-		var dimension = this.fromCache("dimension");
-		if (dimension === undefined) {
-			var coords = this._getPath();
-			if (coords) {
-				dimension = new Ea.DataTypes.Dimension({
-					right: 0,
-					bottom: 0
-				});
-				var coordst = coords.split(";");
-				for (var c = 0; c < coordst.length; c++) {
-					if (coordst[c]) {
-						var coord = coordst[c].split(":");
-						dimension.left = dimension.left !== undefined ? Math.min(dimension.left, coord[0]) : coord[0];
-						dimension.top = dimension.top !== undefined ? Math.min(dimension.top, -coord[1]) : -coord[1];
-						dimension.right = Math.max(dimension.right, coord[0]);
-						dimension.bottom = Math.max(dimension.bottom, -coord[1]);
-					}
+		var coords = this._getPath();
+		var dimension = null;
+		if (coords) {
+			dimension = new Ea.DataTypes.Dimension({
+				right: 0,
+				bottom: 0
+			});
+			var coordst = coords.split(";");
+			for (var c = 0; c < coordst.length; c++) {
+				if (coordst[c]) {
+					var coord = coordst[c].split(":");
+					dimension.left = dimension.left !== undefined ? Math.min(dimension.left, coord[0]) : coord[0];
+					dimension.top = dimension.top !== undefined ? Math.min(dimension.top, -coord[1]) : -coord[1];
+					dimension.right = Math.max(dimension.right, coord[0]);
+					dimension.bottom = Math.max(dimension.bottom, -coord[1]);
 				}
 			}
-			this.toCache("dimension", dimension);
 		}
 		return dimension;
 	}
 },
 {
-	api: "DiagramLink",
+	meta: {
+		//id: "InstanceID",
+		api: "DiagramLink",
+		objectType: 20
+	},
 	
-	_id: attribute({api: "InstanceID", type: Number, id: "id"}),
-	_connector: attribute({api: "ConnectorID", type: "Ea.Connector._Base", referenceBy: "id"}),
-	_path: attribute({api: "Path", private: true}),
-	_hidden: attribute({api: "IsHidden", type: Boolean}),
-	_geometry: attribute({api: "Geometry", type: "Ea.DataTypes.Map"}),
-	_style: attribute({api: "Style", type: "Ea.DataTypes.Map"}),
+	/**
+	 * @type {Number}
+	 */
+	_id: property({api: "InstanceID"}),
+	
+	/**
+	 * @type {Ea.Connector._Base}
+	 */
+	_connector: property({api: "ConnectorID", referenceBy: "id"}),
+	
+	/**
+	 * @private
+	 */
+	_path: property({api: "Path"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_hidden: property({api: "IsHidden"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Map}
+	 */
+	_geometry: property({api: "Geometry"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Map}
+	 */
+	_style: property({api: "Style"}),
 
-	_dimension: derived({getter: "getDimension", type: Ea.DataTypes.Dimension})
+	/**
+	 * @type {Ea.DataTypes.Dimension}
+	 * @derived
+	 */
+	_dimension: property()
 });

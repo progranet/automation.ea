@@ -99,7 +99,7 @@ Html.Template = extend(Core.Types.Named, /** @lends Html.Template# */ {
 	 * 
 	 * @memberOf Html.Template#
 	 * @param {Object} params
-	 * @returns {String}
+	 * @type {String}
 	 */
 	generate: function(params) {
 		var generated = Core.Output.exec(this._template, params);

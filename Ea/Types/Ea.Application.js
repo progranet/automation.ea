@@ -19,33 +19,41 @@
  */
 Ea.Application = {};
 
-Ea.Application._Base = extend(Ea.Types.Any, /** @lends Ea.Application._Base# */ {
+Ea.Application._Base = extend(Ea.Types.Any, {
 	
 	_repository: null,
+	cacheProperties: null,
 	
 	create: function(source, params) {
 		source.application = this;
 		_super.create(source);
-		var cacheObjects = params.cacheObjects === undefined ? true : params.cacheObjects;
-		var cacheProperties = cacheObjects ? (params.cacheProperties === undefined ? true : params.cacheProperties) : false;
-		this._repository = Ea.Class.createProxy(this, Ea.Repository._Base, this._source.api.Repository, {
-			cacheObjects: cacheObjects,
-			cacheProperties: cacheProperties
-		});
+		this.cacheProperties = params.cacheProperties === undefined ? true : params.cacheProperties;
+		this._repository = Ea.Class.createProxy(this, Ea.Repository._Base, this._source.api.Repository, params);
 	},
 	
+	/**
+	 * @memberOf Ea.Application._Base#
+	 * @type {Ea.Repository._Base}
+	 */
 	getRepository: function() {
 		return this._repository;
 	}
 },
 {
-	api: "App",
+	meta: {
+		api: "App"
+	},
 
-	_repository: derived({getter: "getRepository", type: "Ea.Repository._Base"}),
-	
-	_project: attribute({api: "Project", type: "Ea.Project._Base"}),
-	_visible: attribute({api: "Visible", type: Boolean})
+	/**
+	 * @type {Ea.Project._Base}
+	 */
+	_project: property({api: "Project"}),
+
+	/**
+	 * @type {Boolean}
+	 */
+	_visible: property({api: "Visible"})
 });
 
-Ea.register("Ea.Project@Ea.Types.Core", 1);
-Ea.register("Ea.Repository@Ea.Types.Core", 2);
+include("Ea.Project@Ea.Types");
+include("Ea.Repository@Ea.Types");

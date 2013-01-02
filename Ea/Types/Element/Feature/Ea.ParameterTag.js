@@ -18,5 +18,9 @@ Ea.ParameterTag = {};
 
 Ea.ParameterTag._Base = extend(Ea.Tag._Extended, {},
 {
-	api: "ParameterTag"
+	meta: {
+		//guid: "PropertyGUID",
+		api: "ParameterTag",
+		objectType: 56
+	}
 });

@@ -23,9 +23,7 @@ Core.Lang = {
 	 * Tests if specified type is a class
 	 * 
 	 * @param {Function} type
-	 * @returns {Boolean}
-	 * @type Boolean
-	 * @static
+	 * @type {Boolean}
 	 */
 	isClass: function(type) {
 		// TODO remove public property Core.Types.Object.isClass
@@ -40,8 +38,7 @@ Core.Lang = {
 	 * @param {String} name
 	 * @param {Object} properties
 	 * @param {?Object} staticProperties
-	 * @returns {Class}
-	 * @static
+	 * @type {Class}
 	 */
 	define: function(namespace, name, properties, staticProperties) {
 		return Core.Lang.extend(namespace, name, null, properties, staticProperties);
@@ -56,8 +53,7 @@ Core.Lang = {
 	 * @param {Class} superClass
 	 * @param {Object} properties
 	 * @param {?Object} staticProperties
-	 * @returns {Class}
-	 * @static
+	 * @type {Class}
 	 */
 	extend: function(namespace, name, superClass, properties, staticProperties) {
 		

@@ -18,9 +18,25 @@ Ea.TaggedValue = {};
 
 Ea.TaggedValue._Base = extend(Ea.Tag._Base, {},
 {
-	api: "TaggedValue",
-	_notes: attribute({api: "Notes"}),
-	_id: attribute({api: "PropertyID", type: Number, id: "id"}),
-	_guid: attribute({api: "PropertyGUID", id: "guid"}),
-	_parent: attribute({api: "ElementID", type: "Ea.Element._Base", referenceBy: "id", private: true})
+	meta: {
+		//id: "PropertyID",
+		//guid: "PropertyGUID",
+		api: "TaggedValue",
+		objectType: 12
+	},
+	
+	_notes: property({api: "Notes"}),
+	
+	/**
+	 * @type {Number}
+	 */
+	_id: property({api: "PropertyID"}),
+	
+	_guid: property({api: "PropertyGUID"}),
+	
+	/**
+	 * @type {Ea.Element._Base}
+	 * @private
+	 */
+	_parent: property({api: "ElementID", referenceBy: "id"})
 });

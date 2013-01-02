@@ -47,72 +47,72 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 		return true;
 	},
 	
-	getSwimlanes: function(filter) {
+	getSwimlanes: function() {
 		return this.getSwimlaneDef().getSwimlanes();
 	},
 	
 	getDimension: function() {
-		var dimension = this.fromCache("dimension");
-		if (dimension === undefined) {
-			dimension = {
-				right: 0,
-				bottom: 0,
-				width: 240,
-				height: 150
-			};
-			var views = new Core.Types.Collection();
-			views.addAll(this.getElementViews());
-			views.addAll(this.getConnectorViews());
-			views.forEach(function(view, n) {
-				var viewDimension = view.getDimension();
-				if (viewDimension) {
-					dimension.left = dimension.left !== undefined ? Math.min(dimension.left, viewDimension.left) : viewDimension.left;
-					dimension.top = dimension.top !== undefined ? Math.min(dimension.top, viewDimension.top) : viewDimension.top;
-					dimension.right = Math.max(dimension.right, viewDimension.right);
-					dimension.bottom = Math.max(dimension.bottom, viewDimension.bottom);
-				}
-			});
-			var margin;
-			var swimlanes = this.getSwimlanes();
-			if (swimlanes.notEmpty()) {
-				dimension.left = 0;
-				dimension.top = 0;
-				var left = 0;
-				swimlanes.forEach(function(swimlane) {
-					var right = left + swimlane.getWidth();
-					dimension.right = Math.max(dimension.right, right);
-					left = right;
-				});
-				dimension.bottom = dimension.bottom + 40;
-				margin = Ea.Diagram.MarginLanes;
-			}
-			else {
-				margin = Ea.Diagram.Margin;
-			}
-			dimension.width = dimension.right - dimension.left + margin.LEFT + margin.RIGHT;
-			dimension.height = dimension.bottom - dimension.top + margin.TOP + margin.BOTTOM;
-			dimension.correctionX = -dimension.left + margin.LEFT;
-			dimension.correctionY = -dimension.top + margin.TOP;
+		
+		var dimension = {
+			right: 0,
+			bottom: 0,
+			width: 240,
+			height: 150
+		};
+		var views = new Core.Types.Collection();
+		
+		//Session.Output("1:" + this.getElementViews().getSize());
+		views.addAll(this.getElementViews());
+		//Session.Output("2:" + this.getConnectorViews().getSize());
+		views.addAll(this.getConnectorViews());
 
-			this.toCache("dimension", dimension);
+		//Session.Output("3:" + views._class);
+		views.forEach(function(view) {
+			//Session.Output("4:" + "!");
+			var viewDimension = view.getDimension();
+			//Session.Output("5:" + viewDimension);
+			if (viewDimension) {
+				dimension.left = dimension.left !== undefined ? Math.min(dimension.left, viewDimension.left) : viewDimension.left;
+				dimension.top = dimension.top !== undefined ? Math.min(dimension.top, viewDimension.top) : viewDimension.top;
+				dimension.right = Math.max(dimension.right, viewDimension.right);
+				dimension.bottom = Math.max(dimension.bottom, viewDimension.bottom);
+			}
+		});
+		var margin;
+		var swimlanes = this.getSwimlanes();
+		if (swimlanes.notEmpty()) {
+			dimension.left = 0;
+			dimension.top = 0;
+			var left = 0;
+			swimlanes.forEach(function(swimlane) {
+				var right = left + swimlane.getWidth();
+				dimension.right = Math.max(dimension.right, right);
+				left = right;
+			});
+			dimension.bottom = dimension.bottom + 40;
+			margin = Ea.Diagram.MarginLanes;
 		}
+		else {
+			margin = Ea.Diagram.Margin;
+		}
+		dimension.width = dimension.right - dimension.left + margin.LEFT + margin.RIGHT;
+		dimension.height = dimension.bottom - dimension.top + margin.TOP + margin.BOTTOM;
+		dimension.correctionX = -dimension.left + margin.LEFT;
+		dimension.correctionY = -dimension.top + margin.TOP;
+
 		return dimension;
 	},
 	
 	getCalculated: function(maxWidth, maxHeight) {
-		var calculated = this.fromCache("calculated");
-		if (calculated === undefined) {
-			var dimension = this.getDimension();
-			var scale;
-			calculated = {
-				scale: scale = Math.min((maxWidth && dimension.width > maxWidth) ? maxWidth / dimension.width : 1, (maxHeight && dimension.height > maxHeight) ? maxHeight / dimension.height : 1),
-				width: Math.round(dimension.width * scale),
-				height: Math.round(dimension.height * scale)
-			};
-			// TODO: get rid of this:
-			this.scaled = scale < 1;
-			this.toCache("calculated", calculated);
-		}
+		var dimension = this.getDimension();
+		var scale;
+		var calculated = {
+			scale: scale = Math.min((maxWidth && dimension.width > maxWidth) ? maxWidth / dimension.width : 1, (maxHeight && dimension.height > maxHeight) ? maxHeight / dimension.height : 1),
+			width: Math.round(dimension.width * scale),
+			height: Math.round(dimension.height * scale)
+		};
+		// TODO: get rid of this:
+		this.scaled = scale < 1;
 		return calculated;
 	},
 	
@@ -122,52 +122,165 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 			elements.add(view.getElement());
 		});			
 		return this._elements.filter(filter);
+	},
+	
+	getConnectorViews: function() {
+		var connectorViews = this._getConnectorViews().filter("this.getId() != 0");
+		return connectorViews;
 	}
 },
 {
-	_dimension: derived({type: Object, getter: "getDimension"}),
-	
-	api: "Diagram",
+	meta: {
+		id: "DiagramID",
+		guid: "DiagramGUID",
+		api: "Diagram",
+		objectType: 8
+	},
 
 	getType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 	
-	_id: attribute({api: "DiagramID", type: Number, id: "id"}),
-	_guid: attribute({api: "DiagramGUID", id: "guid"}),
-	_type: attribute({api: "Type"}),
-	_metaType: attribute({api: "MetaType", private: true}),
-	_notes: attribute({api: "Notes"}),
-	_stereotype: attribute({api: "Stereotype"}),
+	/**
+	 * @type {Number}
+	 */
+	_id: property({api: "DiagramID"}),
 	
-	_style: attribute({api: "ExtendedStyle", type: Ea.DataTypes.Map}),
-	_styleEx: attribute({api: "StyleEx", type: Ea.DataTypes.Map}),
-	_elementViews: attribute({api: "DiagramObjects", type: "Ea.Collection._Base", elementType: "Ea.DiagramObject._Base", aggregation: "composite"}),
-	_connectorViews: attribute({api: "DiagramLinks", type: "Ea.Collection._Base", elementType: "Ea.DiagramLink._Base", filter: "this.getId() != 0", aggregation: "composite"}),
+	_guid: property({api: "DiagramGUID"}),
+	
+	_type: property({api: "Type"}),
+	
+	/**
+	 * @private
+	 */
+	_metaType: property({api: "MetaType"}),
+	
+	_notes: property({api: "Notes"}),
+	
+	_stereotype: property({api: "Stereotype"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Map}
+	 */
+	_style: property({api: "ExtendedStyle"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Map}
+	 */
+	_styleEx: property({api: "StyleEx"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.DiagramObject._Base>}
+	 * @aggregation composite
+	 */
+	_elementViews: property({api: "DiagramObjects"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.DiagramLink._Base>}
+	 * @private
+	 */
+	__connectorViews: property({api: "DiagramLinks"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.DiagramLink._Base>}
+	 * @aggregation composite
+	 * @derived
+	 */
+	_connectorViews: property(),
 		// collection filtered because of EA returns virtual connector views for Ea.Connector.Sequence with [id = 0]
-	_parent: attribute({api: "ParentID", type: "Ea.Element._Base", referenceBy: "id", private: true}),
-	_package: attribute({api: "PackageID", type: "Ea.Package._Base", referenceBy: "id", private: true}),
-	_swimlaneDef: attribute({api: "SwimlaneDef", type: "Ea.SwimlaneDef._Base", aggregation: "composite"}),
-
-	_highlightImports: attribute({api: "HighlightImports", type: Boolean}),
-	_showDetails: attribute({api: "ShowDetails", type: Boolean}),
-	_showPackageContents: attribute({api: "ShowPackageContents", type: Boolean}),
-	_showPrivate: attribute({api: "ShowPrivate", type: Boolean}),
-	_showProtected: attribute({api: "ShowProtected", type: Boolean}),
-	_showPublic: attribute({api: "ShowPublic", type: Boolean}),
-
-	_selectedConnector: attribute({api: "SelectedConnector", type: "Ea.Connector._Base"}),
-	_selectedElements: attribute({api: "SelectedObjects", type: "Ea.Collection._Base", elementType: "Ea.Element._Base"}),
 	
-	_author: attribute({api: "Author"}),
-	_version: attribute({api: "Version"}),
-	_created: attribute({api: "CreatedDate", type: Ea.DataTypes.Date}),
-	_modified: attribute({api: "ModifiedDate", type: Ea.DataTypes.Date}),
+	/**
+	 * @type {Ea.Types.Namespace}
+	 * @derived
+	 */
+	__parent: property(),
+
+	/**
+	 * @type {Ea.Element._Base}
+	 * @private
+	 */
+	_parent: property({api: "ParentID", referenceBy: "id"}),
 	
-	_dimension: derived({getter: "getDimension", type: Object})
+	/**
+	 * @type {Ea.Package._Base}
+	 * @private
+	 */
+	_package: property({api: "PackageID", referenceBy: "id"}),
+	
+	/**
+	 * @type {Ea.SwimlaneDef._Base}
+	 * @aggregation composite
+	 */
+	_swimlaneDef: property({api: "SwimlaneDef"}),
+	
+	/**
+	 * @type {Ea.Swimlanes._Base<Ea.Swimlane._Base>}
+	 * @derived
+	 */
+	_swimlanes: property(),
+
+	/**
+	 * @type {Boolean}
+	 */
+	_highlightImports: property({api: "HighlightImports"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_showDetails: property({api: "ShowDetails"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_showPackageContents: property({api: "ShowPackageContents"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_showPrivate: property({api: "ShowPrivate"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_showProtected: property({api: "ShowProtected"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_showPublic: property({api: "ShowPublic"}),
+
+	/**
+	 * @type {Ea.Connector._Base}
+	 */
+	_selectedConnector: property({api: "SelectedConnector"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.Element._Base>}
+	 */
+	_selectedElements: property({api: "SelectedObjects"}),
+	
+	_author: property({api: "Author"}),
+	
+	_version: property({api: "Version"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Date}
+	 */
+	_created: property({api: "CreatedDate"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Date}
+	 */
+	_modified: property({api: "ModifiedDate"}),
+	
+	/**
+	 * @type {Object}
+	 * @derived
+	 */
+	_dimension: property()
 });
 
-Ea.register("Ea.SwimlaneDef@Ea.Types.Diagram", 50);
+include("Ea.SwimlaneDef@Ea.Types.Diagram");
 
 Ea.View = extend(Ea.Types.Any, {
 	
@@ -183,8 +296,18 @@ Ea.View = extend(Ea.Types.Any, {
 	}
 },
 {
-	_parent: attribute({api: "DiagramID", type: "Ea.Diagram._Base", referenceBy: "id", private: true})
+	/**
+	 * @type {Ea.Types.Namespace}
+	 * @derived
+	 */
+	__parent: property(),
+
+	/**
+	 * @type {Ea.Diagram._Base}
+	 * @private
+	 */
+	_parent: property({api: "DiagramID", referenceBy: "id"})
 });
 
-Ea.register("Ea.DiagramLink@Ea.Types.Diagram", 20);
-Ea.register("Ea.DiagramObject@Ea.Types.Diagram", 19);
+include("Ea.DiagramLink@Ea.Types.Diagram");
+include("Ea.DiagramObject@Ea.Types.Diagram");

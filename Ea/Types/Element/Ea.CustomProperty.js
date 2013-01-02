@@ -18,8 +18,12 @@ Ea.CustomProperty = {};
 
 Ea.CustomProperty._Base = extend(Ea.Types.Named, {},
 {
-	api: "CustomProperty",
-	_value: attribute({api: "Value"})
+	meta: {
+		api: "CustomProperty",
+		objectType: 42
+	},
+	
+	_value: property({api: "Value"})
 
 });
 

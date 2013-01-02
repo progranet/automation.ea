@@ -17,20 +17,55 @@
 Ea.Collection = {};
 
 Ea.Collection._Base = extend(Core.Types.Collection, {
+	
+	_elementType: null,
+	//_index: null,
+	
 	create: function(source, params) {
 		_super.create(params);
 		this._source = source;
+		this._elementType = params.elementType;
+		//this._index = {};
 		this._init(params);
 	},
+	
 	_init: function(params) {
 		var repository = this._source.application.getRepository();
 		for (var e = 0; e < this._source.api.Count; e++) {
-			var element = repository.get(params.elementType, this._source.api.GetAt(e));
+			var element = repository.get(this._elementType, this._source.api.GetAt(e));
 			this.add(element);
+			/*if (this.add(element))
+				this._index[element.__id__] = e;*/
 		}
+	},
+	
+	_create: function(name, type, element) {
+		type = type || this._elementType;
+		var elementTypeName = type.elementType || type.meta.api;
+		var api = this._source.api.AddNew(name, elementTypeName);
+		if (element) {
+			api.SupplierID = element.getId();;
+		}
+		api.Update();
+		this._source.api.Refresh();
+		var element = this._source.application.getRepository().get(type, api);
+		//this.add(element);
+		return element;
+	},
+
+	_delete: function(element) {
+		//var api = element._source.api;
+		//var index = this._index[element.__id__];
+		this._source.api.Delete(index);
+		this._source.api.Refresh();
+		//this.remove(element);
 	}
 },
 {
+	meta: {
+		objectType: 3
+	},
+
 	getType: function() {
 		return Ea.Collection._Base;
 	},
@@ -44,6 +79,7 @@ Ea.Collection.Map = extend(Core.Types.Map, {
 	create: function(source, params) {
 		_super.create(params);
 		this._source = source;
+		this._elementType = params.elementType;
 		this._init(params);
 	},
 	_init: function(params) {

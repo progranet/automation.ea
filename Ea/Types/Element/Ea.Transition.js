@@ -18,12 +18,20 @@ Ea.Transition = {};
 
 Ea.Transition._Base = extend(Ea.Types.Any, {},
 {
-	api: "Transition",
+	meta: {
+		api: "Transition",
+		objectType: 44
+	},
 	
-	_notes: attribute({api: "Notes"}),
-	_state: attribute({api: "TxState"}),
-	_time: attribute({api: "TxTime"}),
-	_durationConstraint: attribute({api: "DurationConstraint"}),
-	_timeConstraint: attribute({api: "TimeConstraint"}),
-	_event: attribute({api: "Event"})
+	_notes: property({api: "Notes"}),
+	
+	_state: property({api: "TxState"}),
+	
+	_time: property({api: "TxTime"}),
+	
+	_durationConstraint: property({api: "DurationConstraint"}),
+	
+	_timeConstraint: property({api: "TimeConstraint"}),
+	
+	_event: property({api: "Event"})
 });

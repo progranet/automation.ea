@@ -25,11 +25,10 @@ Core = {
 	 * @memberOf Core
 	 * @param {Object} property
 	 * @param {String} propertyName
-	 * @returns {Boolean}
-	 * @static
+	 * @type {Boolean}
 	 */
 	isFunction: function(property, propertyName) {
-		return typeof property == "function" && !/^_*[A-Z]/.test(propertyName) && !this.isNative(property);
+		return typeof property == "function" && !/^[A-Z]/.test(propertyName.replace(/^_+/, "")) && !this.isNative(property);
 	},
 	
 	_fnPattern: new RegExp("^\\s*function\\s*([\\w$]*)\\s*\\(([\\w$,\\s]*)\\)\\s*\\{\\s*([\\w\\W]*)\\s*\\}\\s*$"),
@@ -40,8 +39,7 @@ Core = {
 	 * 
 	 * @memberOf Core
 	 * @param {Function} fn
-	 * @returns {Object}
-	 * @static
+	 * @type {Object}
 	 */
 	parse: function(fn) {
 		var parsed = {
@@ -64,8 +62,7 @@ Core = {
 	 * 
 	 * @memberOf Core
 	 * @param {Function} fn
-	 * @returns {Boolean}
-	 * @static
+	 * @type {Boolean}
 	 */
 	isNative: function(fn) {
 		return this._nativePattern.test(this.parse(fn).body);
@@ -78,7 +75,6 @@ Core = {
 	 * 
 	 * @memberOf Core
 	 * @param {Function} callback function(source, namespace, propertyName, qualifiedName, _static)
-	 * @static
 	 */
 	registerMethodEnrichment: function(callback) {
 		this._callbacksMethod.push(callback);
@@ -93,12 +89,9 @@ Core = {
 	 * @param {String} propertyName
 	 * @param {String} qualifiedName
 	 * @param {Boolean} _static
-	 * @static
 	 */
 	enrichMethod: function(namespace, propertyName, qualifiedName, _static) {
 		var property = namespace[propertyName];
-		if (!this.isFunction(namespace[propertyName], propertyName))
-			return;
 		var source = property.toString();
 		for (var ci = 0; ci < this._callbacksMethod.length; ci++) {
 			var callback = this._callbacksMethod[ci];
@@ -107,6 +100,7 @@ Core = {
 		eval("namespace[propertyName] = " + source);
 		namespace[propertyName].qualifiedName = qualifiedName;
 		namespace[propertyName]._static = _static;
+		return namespace[propertyName];
 	},
 	
 	/**
@@ -115,11 +109,11 @@ Core = {
 	 * @see Core.enrichMethod
 	 * @memberOf Core
 	 * @param {Object} namespace
-	 * @static
 	 */
 	enrichNamespace: function(namespace) {
 		for (var propertyName in namespace) {
-			this.enrichMethod(namespace, propertyName, namespace.qualifiedName + "." + propertyName, true);
+			if (this.isFunction(namespace[propertyName], propertyName))
+				this.enrichMethod(namespace, propertyName, namespace.qualifiedName + "." + propertyName, true);
 		};
 	},
 	
@@ -129,7 +123,6 @@ Core = {
 	 * @memberOf Core
 	 * @param {Object} toObject
 	 * @param {Object} object
-	 * @static
 	 */
 	merge: function(toObject, object) {
 		for (var name in object) {
@@ -139,3 +132,10 @@ Core = {
 		}
 	}
 };
+
+include("Core.Helper@Core");
+include("Core.Log@Core");
+include("Core.Output@Core");
+include("Core.Lang@Core");
+include("Core.Types@Core");
+include("Core.Target@Core");

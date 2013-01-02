@@ -19,6 +19,8 @@
  */
 Ea = {
 	
+	OBJECT_TYPES_NUMBER: 100,
+
 	params: {},
 	
 	_application: null,
@@ -27,9 +29,7 @@ Ea = {
 	 * Returns default EA application if initialized
 	 * 
 	 * @memberOf Ea
-	 * @param name
-	 * @returns {Ea.Application._Base}
-	 * @static
+	 * @type {Ea.Application._Base}
 	 */
 	getDefaultApplication: function() {
 		return this._application;
@@ -39,6 +39,12 @@ Ea = {
 		Ea.Class.prepareClasses();
 	},
 	
+	/**
+	 * Creates new EA application
+	 * 
+	 * @param {Object} params Specifies parameters of application: params.path - path in the file system
+	 * @type {Ea.Application._Base}
+	 */
 	createApplication: function(params) {
 		params = params || {};
 		var applicationApi = params.path ? new ActiveXObject("EA.App") : App;
@@ -48,10 +54,18 @@ Ea = {
 		return application;
 	},
 	
+	
+	/**
+	 * Initializes default EA application
+	 * 
+	 * @param {Core.Target.AbstractTarget} targetClass Target for logger mechanizm
+	 * @param {Object} params
+	 * @type {Ea.Application._Base}
+	 */
 	initializeDefaultApplication: function(targetClass, params) {
 		if (!this._application) {
 			this._application = this.createApplication(params);
-			this.initializeLogs(targetClass || Ea.Helper.Target);
+			this._initializeLogs(targetClass || Ea.Helper.Target);
 		}
 		else {
 			warn("Default application already initialized");
@@ -59,7 +73,11 @@ Ea = {
 		return this._application;
 	},
 	
-	initializeLogs: function(targetClass) {
+	/**
+	 * @private
+	 * @param {Core.Target.AbstractTarget} targetClass
+	 */
+	_initializeLogs: function(targetClass) {
 		
 		var systemTarget = new targetClass("System", Core.Target.Type.DEBUG);
 		var scriptTarget = new targetClass("Script", Core.Target.Type.INFO);
@@ -80,28 +98,23 @@ Ea = {
 	
 	_guid: /^\{[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}\}$/i,
 	
+	/**
+	 * Checks if specified string has proper GUID format
+	 * 
+	 * @param {String} guid
+	 * @type {Boolean}
+	 */
 	isGuid: function(guid) {
 		return this._guid.test(guid);
 	},
 	
-	_objectTypes: {},
-	_namespaces: {},
+	_objectTypes: new Array(this.OBJECT_TYPES_NUMBER),
 	
-	register: function(type, objectType) {
-		var namespace = include(type);
-		this._namespaces[namespace.qualifiedName] = namespace;
-		if (objectType)
-			this._objectTypes[objectType] = namespace;
-	},
-	
-	addType: function(namespace, typeName) {
-		if (typeName in namespace)
-			throw new Error("Type already exists: $", [namespace[typeName]]);
-		namespace[typeName] = Core.Lang.extend(namespace, typeName, namespace._Base);
-		warn("Not implemented $.$ type", [namespace.qualifiedName, typeName]);
-		return namespace[typeName];
-	},
-	
+	/**
+	 * Logs element to tree logger
+	 * 
+	 * @param {Ea.Types.Any} element
+	 */
 	log: function(element) {
 		Ea.Helper.Log.getLog(element).log();
 	}
@@ -318,14 +331,15 @@ Ea.ContextReference = define({
 include("Ea.Class@Ea");
 include("Ea.Helper@Ea");
 
-Ea.register("Ea.Types@Ea.Types");
-Ea.register("Ea.Application@Ea.Types.Core");
-Ea.register("Ea.Collection@Ea.Types", 3);
-Ea.register("Ea.Package@Ea.Types", 5);
+include("Ea.Types@Ea.Types.Abstract");
 
-include("Ea.Tag@Ea.Types.Common");
-include("Ea.FeatureConstraint@Ea.Types.Common");
+include("Ea.Application@Ea.Types");
+include("Ea.Collection@Ea.Types");
+include("Ea.Package@Ea.Types");
 
-Ea.register("Ea.Connector@Ea.Types.Connector", 7);
-Ea.register("Ea.Diagram@Ea.Types.Diagram", 8);
-Ea.register("Ea.Element@Ea.Types.Element", 4);
+include("Ea.Tag@Ea.Types.Abstract");
+include("Ea.FeatureConstraint@Ea.Types.Abstract");
+
+include("Ea.Connector@Ea.Types.Connector");
+include("Ea.Diagram@Ea.Types.Diagram");
+include("Ea.Element@Ea.Types.Element");

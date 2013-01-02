@@ -19,9 +19,30 @@
  */
 Ea.Package = {};
 
-Ea.Package._Base = extend(Ea.Types.Namespace, {},
+Ea.Package._Base = extend(Ea.Types.Namespace, {
+	
+	getElements: function() {
+		var elements = this._getElements().filter("this._getParent() == null");
+		return elements;
+	},
+	
+	createElement: function(name, type) {
+		var element = this._createElement(name, type);
+		return element;
+	},
+	
+	getDiagrams: function() {
+		var diagrams = this._getDiagrams().filter("this._getParent() == null");
+		return diagrams;
+	}
+},
 {
-	api: "Package",
+	meta: {
+		id: "PackageID",
+		guid: "PackageGUID",
+		api: "Package",
+		objectType: 5
+	},
 	
 	getType: function(source) {
 		if (this._model.get(source))
@@ -31,32 +52,111 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {},
 		return type;
 	},
 	
-	_id: attribute({api: "PackageID", type: Number, id: "id"}),
-	_guid: attribute({api: "PackageGUID", id: "guid"}),
+	/**
+	 * @type {Number}
+	 */
+	_id: property({api: "PackageID"}),
 
-	_alias: attribute({api: "Alias"}),
-	_notes: attribute({api: "Notes"}),
-	_flags: attribute({api: "Flags", type: "Ea.DataTypes.Map"}),
+	_guid: property({api: "PackageGUID"}),
 
-	_controlled: attribute({api: "IsControlled", type: Boolean}),
-	_namespace: attribute({api: "IsNamespace", type: Boolean}),
-	_protected: attribute({api: "IsProtected", type: Boolean}),
-	_versionControlled: attribute({api: "IsVersionControlled", type: Boolean}),
-	_owner: attribute({api: "Owner"}),
-	_xmlPath: attribute({api: "XMLPath"}),
-
-	_model: attribute({api: "isModel", private: true, type: Boolean}),
+	_alias: property({api: "Alias"}),
 	
-	_version: attribute({api: "Version"}),
-	_created: attribute({api: "Created", type: Ea.DataTypes.Date}),
-	_modified: attribute({api: "Modified", type: Ea.DataTypes.Date}),
-	_position: attribute({api: "TreePos", type: Number}),
+	_notes: property({api: "Notes"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Map}
+	 */
+	_flags: property({api: "Flags"}),
 
-	_element: attribute({api: "Element", type: "Ea.Element._Base", aggregation: "shared"}),
-	_parent: attribute({api: "ParentID", type: "Ea.Package._Base", referenceBy: "id"}),
-	_elements: attribute({api: "Elements", type: "Ea.Collection._Base", elementType: "Ea.Element._Base", filter: "this._getParent() == null", aggregation: "composite"}),
-	_diagrams: attribute({api: "Diagrams", type: "Ea.Collection._Base", elementType: "Ea.Diagram._Base", filter: "this._getParent() == null", aggregation: "composite"}),
-	_packages: attribute({api: "Packages", type: "Ea.Collection._Base", elementType: "Ea.Package._Base", aggregation: "composite"})
+	/**
+	 * @type {Boolean}
+	 */
+	_controlled: property({api: "IsControlled"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_namespace: property({api: "IsNamespace"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_protected: property({api: "IsProtected"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_versionControlled: property({api: "IsVersionControlled"}),
+	
+	_owner: property({api: "Owner"}),
+	
+	_xmlPath: property({api: "XMLPath"}),
+
+	/**
+	 * @type {Boolean}
+	 * @private
+	 */
+	_model: property({api: "isModel"}),
+	
+	_version: property({api: "Version"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Date}
+	 */
+	_created: property({api: "Created"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Date}
+	 */
+	_modified: property({api: "Modified"}),
+	
+	/**
+	 * @type {Number}
+	 */
+	_position: property({api: "TreePos"}),
+
+	/**
+	 * @type {Ea.Element._Base}
+	 * @aggregation shared
+	 */
+	_element: property({api: "Element"}),
+	
+	/**
+	 * @type {Ea.Package._Base}
+	 */
+	_parent: property({api: "ParentID", referenceBy: "id"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.Element._Base>}
+	 * @aggregation composite
+	 * @private
+	 */
+	__elements: property({api: "Elements"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.Element._Base>}
+	 * @derived
+	 */
+	_elements: property(),
+
+	/**
+	 * @type {Ea.Collection._Base<Ea.Diagram._Base>}
+	 * @aggregation composite
+	 * @private
+	 */
+	__diagrams: property({api: "Diagrams"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.Diagram._Base>}
+	 * @derived
+	 */
+	_diagrams: property(),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.Package._Base>}
+	 * @aggregation composite
+	 */
+	_packages: property({api: "Packages"})
 });
 
 Ea.Package.Package = extend(Ea.Package._Base);

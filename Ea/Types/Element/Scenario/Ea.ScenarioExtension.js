@@ -23,11 +23,25 @@ Ea.ScenarioExtension._Base = extend(Ea.Types.Any, {
 	}
 },
 {
-	api: "ScenarioExtension",
+	meta: {
+		guid: "ExtensionGUID",
+		api: "ScenarioExtension",
+		objectType: 55
+	},
 	
-	_guid: attribute({api: "ExtensionGUID", id: "guid"}),
-	_pos: attribute({api: "Pos"}),
-	_level: attribute({api: "Level"}),
-	_joiningStep: attribute({api: "JoiningStep", type: "Ea.ScenarioStep._Base"}),
-	_scenario: attribute({api: "Scenario", type: "Ea.Scenario._Base"})
+	_guid: property({api: "ExtensionGUID"}),
+	
+	_pos: property({api: "Pos"}),
+	
+	_level: property({api: "Level"}),
+	
+	/**
+	 * @type {Ea.ScenarioStep._Base}
+	 */
+	_joiningStep: property({api: "JoiningStep"}),
+	
+	/**
+	 * @type {Ea.Scenario._Base}
+	 */
+	_scenario: property({api: "Scenario"})
 });

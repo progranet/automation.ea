@@ -17,8 +17,21 @@
 Ea.Swimlane = {};
 
 Ea.Swimlane._Base = extend(Ea.Types.Any, {}, {
-	api: "Swimlane",
-	_width: attribute({api: "Width", type: Number}),
-	_title: attribute({api: "Title"}),
-	_classifier: attribute({api: "ClassifierGuid", type: "Ea.Element._Base", referenceBy: "guid"})	
+	
+	meta: {
+		api: "Swimlane",
+		objectType: 52
+	},
+	
+	/**
+	 * @type {Number}
+	 */
+	_width: property({api: "Width"}),
+	
+	_title: property({api: "Title"}),
+	
+	/**
+	 * @type {Ea.Element._Base}
+	 */
+	_classifier: property({api: "ClassifierGuid", referenceBy: "guid"})	
 });

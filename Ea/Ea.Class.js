@@ -26,13 +26,16 @@ Ea.Class = {
 	 * @memberOf Ea.Class
 	 */
 	registerClass: function(_class) {
+		
 		if (_class in this._types)
 			return;
-		Ea.Class._types[_class] = {
-			attributes: [],
-			id: null,
-			guid: null
+
+		this._types[_class] = {
+			attributes: []
 		};
+		
+		if (_class.meta && _class.meta.objectType)
+			Ea._objectTypes[_class.meta.objectType] = _class;
 	},
 	
 	/**
@@ -44,31 +47,13 @@ Ea.Class = {
 		this.registerClass(_class);
 		var _classReflection = Ea.Class._types[_class];
 		_classReflection.attributes.push(attribute);
-		if ("id" in attribute)
-			_class.namespace["__" + attribute.id] = attribute;
-	},
-	
-	/**
-	 * @param {Class} _class
-	 * @returns {Ea.Class._Attribute}
-	 */
-	getIdAttribute: function(_class) {
-		return _class.namespace.__id;
-	},
-	
-	/**
-	 * @param {Class} _class
-	 * @returns {Ea.Class._Attribute}
-	 */
-	getGuidAttribute: function(_class) {
-		return _class.namespace.__guid;
 	},
 	
 	/**
 	 * Returns attributes owned (directly) by specified class
 	 * 
 	 * @param {Class} _class
-	 * @returns {Array<Ea.Class._Attribute>}
+	 * @type {Array<Ea.Class._Attribute>}
 	 */
 	getOwnedAttributes: function(_class) {
 		return Ea.Class._types[_class].attributes;
@@ -78,11 +63,11 @@ Ea.Class = {
 	 * Returns all attributes of specified class
 	 * 
 	 * @param {Class} _class
-	 * @returns {Array<Ea.Class._Attribute>}
+	 * @type {Array<Ea.Class._Attribute>}
 	 */
 	getAttributes: function(_class) {
 		var attributes = [];
-		if (_class._super.isSubclassOf(Ea.Types.Any)) {
+		if (_class._super == Ea.Types.Any || _class._super.isSubclassOf(Ea.Types.Any)) {
 			attributes = attributes.concat(this.getAttributes(_class._super));
 		}
 		attributes = attributes.concat(this.getOwnedAttributes(_class));
@@ -103,31 +88,25 @@ Ea.Class = {
 	},
 		
 	/**
-	 * Creates new attribute based on EA API
+	 * Creates new property. Used on class initialization, to create accessors
 	 * 
-	 * @internal
+	 * @param {Object} params Parameters of property such as type, visibility
 	 */
-	attribute: function(params) {
+	property: function(params) {
+		if (params.derived) {
+			return new Ea.Class.DerivedAttribute(params);
+		}
 		return new Ea.Class.ApiAttribute(params);
-	},
-	
-	/**
-	 * Creates new derived attribute
-	 * 
-	 * @internal
-	 */
-	derived: function(params) {
-		return new Ea.Class.DerivedAttribute(params);
 	},
 	
 	/**
 	 * Creates abstraction layer proxy object for specified EA API object
 	 * 
-	 * @param {Object} instance
+	 * @param {Object} application
 	 * @param {Class} baseType
 	 * @param {Object} api
 	 * @param {Object} params
-	 * @returns {Ea.Types.Any}
+	 * @type {Ea.Types.Any}
 	 */
 	createProxy: function(application, baseType, api, params) {
 		var source = {
@@ -145,9 +124,8 @@ Ea.Class._Attribute = define(/** @lends Ea.Class._Attribute# */{
 
 	owner: null,
 	name: null,
-	derived: null,
 	qualifiedName: null,
-	
+
 	/**
 	 * @constructs
 	 * @memberOf Ea.Class._Attribute#
@@ -157,22 +135,6 @@ Ea.Class._Attribute = define(/** @lends Ea.Class._Attribute# */{
 		Core.merge(this, params);
 	},
 	
-	_getAccessor: function(kind) {
-		var body = "return this._class." + this.name + "." + kind + "(this, arguments);";
-		var accessor = new Function(body);
-		return accessor;
-	},
-	
-	_createAccessor: function(kind, properties, accesorName) {
-		var accessor = this._getAccessor(kind);
-		var name = (this.private ? "_" : "") + kind + accesorName;
-		if (name in properties)
-			throw new Error("Accesor already exists: " + this.owner.qualifiedName + "." + name);
-		properties[name] = accessor;
-		Core.enrichMethod(properties, name, this.qualifiedName, false);
-		return accessor;
-	},
-	
 	initialize: function(_class, propertyName, properties) {
 		this.owner = _class;
 		this.name = propertyName;
@@ -180,11 +142,21 @@ Ea.Class._Attribute = define(/** @lends Ea.Class._Attribute# */{
 
 		var accesorName = this.name.replace(/^_+/g, "");
 		accesorName = accesorName.substring(0,1).toUpperCase() + accesorName.substring(1);
-
-		if (!this.getter)
-			this.getter = this._createAccessor("get", properties, accesorName);
-		/*if (!this.setter)
-			this.setter = this._createAccessor("set", properties, accesorName);*/
+		
+		var prefix = this.type == "Boolean" ? "is" : "get";
+		var getter = (this.private ? "_" : "") + prefix + accesorName;
+		this._createAccessor("get", getter, properties);
+		
+		if (this.elementType) {
+			var adder = (this.private ? "_" : "") + "create" + accesorName.substr(0, accesorName.length - 1);
+			this._createAccessor("add", adder, properties);
+			var remover = (this.private ? "_" : "") + "delete" + accesorName.substr(0, accesorName.length - 1);
+			this._createAccessor("remove", remover, properties);
+		}
+		else {
+			var setter = (this.private ? "_" : "") + "set" + accesorName;
+			this._createAccessor("set", setter, properties);
+		}
 		
 		Ea.Class.registerAttribute(this);
 	},
@@ -197,27 +169,29 @@ Ea.Class._Attribute = define(/** @lends Ea.Class._Attribute# */{
 		
 		this.type = Ea.Helper.typeEval(this.type || String);
 		this.elementType = Ea.Helper.isCollectionType(this.type) ? Ea.Helper.typeEval(this.elementType) : null;
-
 		this._prepared = true;
 	},
 	
 	get: function(object, params) {
 		return this._get(object, params);
+	},
+	
+	set: function(object, params) {
+		return this._set(object, params);
+	},
+	
+	add: function(object, params) {
+		return this._add(object, params);
+	},
+	
+	remove: function(object, params) {
+		return this._remove(object, params);
 	}
 });
 
 Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.ApiAttribute# */{
 	
 	_getBy: null,
-	
-	/**
-	 * @constructs
-	 * @memberOf Ea.Class.ApiAttribute#
-	 */
-	create: function(params) {
-		_super.create(params);
-		this.derived = false;
-	},
 	
 	prepare: function() {
 		_super.prepare();
@@ -226,35 +200,22 @@ Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.ApiAttri
 		}
 	},
 	
+	_createAccessor: function(kind, name, properties) {
+		if (name in properties)
+			throw new Error("Accesor already exists for not derived property: " + this.owner.qualifiedName + "." + name);
+		properties[name] = new Function("return this._class." + this.name + "." + kind + "(this, arguments);");
+		Core.enrichMethod(properties, name, this.qualifiedName, false);
+	},
+	
 	_get: function(object, params) {
 		var source = object._source;
-		if (!source.application.getRepository().getPropertiesCached() || !(this.name in source.value))
+		if (!source.application.cacheProperties || !(this.name in source.value))
 			this._init(source);
 		var value = source.value[this.name];
 		if (this.type.isClass && "processValue" in this.type) {
 			value = this.type.processValue(value, params || []);
 		}
 		return value;
-	},
-	
-	_getApiValue: function(source) {
-		if (this.index == null) {
-			var value;
-			try {
-				value = source.api[this.api];
-				//	don't remove this dumb check:
-				//		EA for some reason throws exception on access to Ea.Property._Base._value value for NoteLink property
-				//		logging of this value is necessary for proper exception handing (i don't know why)
-				if (this.qualifiedName == "Ea.Property._Base._value")
-					_quietLogger("$", [value]);
-			}
-			catch(error) {
-				warn("EA API exception on get attribute value $ ($)", [this.qualifiedName, error.message]);
-				value = null;
-			}
-			return value;
-		}
-		return source.api[this.api](this.index);
 	},
 	
 	_init: function(source) {
@@ -277,22 +238,144 @@ Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.ApiAttri
 			return;
 		}
 		source.value[this.name] = (apiValue == null ? null : new this.type(apiValue).valueOf());
+	},
+	
+	_getApiValue: function(source) {
+		if (this.index == null) {
+			var value;
+			try {
+				value = source.api[this.api];
+				//	don't remove this dumb check:
+				//		EA for some reason throws exception on access to Ea.Property._Base._value value for NoteLink property
+				//		logging of this value is necessary for proper exception handing (i don't know why)
+				if (this.qualifiedName == "Ea.Property._Base._value")
+					_quietLogger("$", [value]);
+			}
+			catch(error) {
+				warn("EA API exception on get attribute value $ ($)", [this.qualifiedName, error.message]);
+				value = null;
+			}
+			return value;
+		}
+		return source.api[this.api](this.index);
+	},
+	
+	_set: function(object, params) {
+		var source = object._source;
+		var value = params[0];
+		try {
+			this._setApiValue(source, value);
+		}
+		catch (error) {
+			throw new Error("Setting value for " + this.qualifiedName + " threw exception:\r\n" + error.message);
+		}
+		delete source.value[this.name];
+	},
+	
+	_setApiValue: function(source, value) {
+		if (this.type.isClass) {
+			if (this.type.isSubclassOf(Core.Types.Collection)) {
+
+				return;
+			}
+			if (this.type.isSubclassOf(Ea.Types.Any)) {
+				switch (this.referenceBy) {
+				case "guid":
+					source.api[this.api] = value ? value.getGuid() : null;
+					break;
+				case "id":
+					source.api[this.api] = value ? value.getId() : null;
+					break;
+				default:
+					source.api[this.api] = value ? value._source.api : null;
+				}
+				return;
+			}
+			// TODO: better solution based on data types
+			source.api[this.api] = value;
+			return;
+		}
+		if (this.index == null) {
+			source.api[this.api] = value;
+			return;
+		}
+	},
+	
+	_add: function(object, params) {
+		var source = object._source;
+		var name = params[0];
+		var type = params[1];
+		var element = params[2];
+		if (!(this.name in source.value)){
+			object._class[this.name].get(object);
+		}
+		var added = source.value[this.name]._create(name, type, element);
+		delete source.value[this.name];
+		this._get(object);
+		return added;
+	},
+	
+	_remove: function(object, params) {
+		var source = object._source;
+		var element = params[0];
+		source.value[this.name]._delete(element);
+		delete source.value[this.name];
+		// TODO: remove from repository cache
 	}
 });
 
 Ea.Class.DerivedAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.DerivedAttribute# */{
-
-	/**
-	 * @constructs
-	 * @memberOf Ea.Class.DerivedAttribute#
-	 */
+	
+	_accesors: null,
+	
 	create: function(params) {
 		_super.create(params);
-		this.derived = true;
+		this._accesors = {};
 	},
 	
+	_createAccessor: function(kind, name, properties) {
+		var accessor = properties[name];
+		if (!accessor) {
+			if (kind == "get")
+				throw new Error("Getter not defined for derived property: " + this.owner.qualifiedName + "." + name);
+			return;
+		}
+		
+		properties[name + "$inner"] = accessor;
+		Core.enrichMethod(properties, name + "$inner", this.qualifiedName + "$inner", false);
+		this._accesors[kind] = name + "$inner";
+		
+		properties[name] = new Function("return this._class." + this.name + "." + kind + "(this, arguments);");
+		Core.enrichMethod(properties, name, this.qualifiedName, false);
+	},
+
 	_get: function(object, params) {
-		return object[this.getter].apply(object, params || []);
+		var source = object._source;
+		if (!source.application.cacheProperties || !(this.name in source.value))
+			this._init(object, params);
+		var value = source.value[this.name];
+		return value;
+	},
+	
+	_init: function(object, params) {
+		var value = object._source.value[this.name] = object[this._accesors["get"]].apply(object, params || []);
+		return value;
+	},
+	
+	_set: function(object, params) {
+		object[this._accesors["set"]].apply(object, params || []);
+		delete object._source.value[this.name];
+	},
+	
+	_add: function(object, params) {
+		var added = object[this._accesors["add"]].apply(object, params || []);
+		delete object._source.value[this.name];
+		this._get(object);
+		return added;
+	},
+	
+	_remove: function(object, params) {
+		//return object[this._accesors["remove"]].apply(object, params || []);
 	}
 });
 

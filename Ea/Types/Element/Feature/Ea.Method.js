@@ -23,30 +23,102 @@ Ea.Method._Base = extend(Ea.TypedElement.Feature, {
 	}
 },
 {
-	api: "Method",
+	meta: {
+		id: "MethodID",
+		guid: "MethodGUID",
+		api: "Method",
+		objectType: 24		
+	},
 
-	_id: attribute({api: "MethodID", type: Number, id: "id"}),
-	_guid: attribute({api: "MethodGUID", id: "guid"}),
-	_abstract: attribute({api: "Abstract", type: Boolean}),
-	_behavior: attribute({api: "Behavior"}),
-	_code: attribute({api: "Code"}),
-	_concurrency: attribute({api: "Concurrency"}),
-	_const: attribute({api: "IsConst", type: Boolean}),
-	_query: attribute({api: "IsQuery", type: Boolean}),
-	_static: attribute({api: "IsStatic", type: Boolean}),
-	_synchronized: attribute({api: "IsSynchronized", type: Boolean}),
-	_array: attribute({api: "ReturnIsArray", type: Boolean}),
-	_throws: attribute({api: "Throws"}),
-	_visibility: attribute({api: "Visibility"}),
-	_position: attribute({api: "Pos", type: Number}),
-	_parameters: attribute({api: "Parameters", type: "Ea.Collection._Base", elementType: "Ea.Parameter._Base", aggregation: "composite"}),
-	_tags: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.MethodTag._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
-	_preConditions: attribute({api: "PreConditions", type: "Ea.Collection._Base", elementType: "Ea.MethodConstraint._Base", aggregation: "composite"}),
-	_postConditions: attribute({api: "PostConditions", type: "Ea.Collection._Base", elementType: "Ea.MethodConstraint._Base", aggregation: "composite"}),
-	_classifier: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceBy: "id", private: true}),
-	_returnType: attribute({api: "ReturnType", private: true})
+	/**
+	 * @type {Number}
+	 */
+	_id: property({api: "MethodID"}),
+	
+	_guid: property({api: "MethodGUID"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_abstract: property({api: "Abstract"}),
+	
+	_behavior: property({api: "Behavior"}),
+	
+	_code: property({api: "Code"}),
+	
+	_concurrency: property({api: "Concurrency"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_const: property({api: "IsConst"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_query: property({api: "IsQuery"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_static: property({api: "IsStatic"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_synchronized: property({api: "IsSynchronized"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_array: property({api: "ReturnIsArray"}),
+	
+	_throws: property({api: "Throws"}),
+	
+	_visibility: property({api: "Visibility"}),
+	
+	/**
+	 * @type {Number}
+	 */
+	_position: property({api: "Pos"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.Parameter._Base>}
+	 * @aggregation composite
+	 */
+	_parameters: property({api: "Parameters"}),
+	
+	/**
+	 * @type {Ea.Collection.Map<Ea.MethodTag._Base>}
+	 * @qualifier this.getName()
+	 * @aggregation composite
+	 */
+	_tags: property({api: "TaggedValues"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.MethodConstraint._Base>}
+	 * @aggregation composite
+	 */
+	_preConditions: property({api: "PreConditions"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.MethodConstraint._Base>}
+	 * @aggregation composite
+	 */
+	_postConditions: property({api: "PostConditions"}),
+	
+	/**
+	 * @type {Ea.Element.Type}
+	 * @private
+	 */
+	_classifier: property({api: "ClassifierID", referenceBy: "id"}),
+	
+	/**
+	 * @private
+	 */
+	_returnType: property({api: "ReturnType"})
 });
 
-Ea.register("Ea.Parameter@Ea.Types.Element.Feature", 25);
-Ea.register("Ea.MethodTag@Ea.Types.Element.Feature", 36);
-Ea.register("Ea.MethodConstraint@Ea.Types.Element.Feature", 35);
+include("Ea.Parameter@Ea.Types.Element.Feature");
+include("Ea.MethodTag@Ea.Types.Element.Feature");
+include("Ea.MethodConstraint@Ea.Types.Element.Feature");

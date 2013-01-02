@@ -27,21 +27,36 @@ Ea.Property = {
 
 Ea.Property._Base = extend(Ea.Types.Named, {},
 {
-	api: "Property",
+	meta: {
+		api: "Property",
+		objectType: 49
+	},
 
 	getType: function(source) {
 		var typeName = Ea.Property.PropertyType[this._type.get(source)];
-		var type = this.namespace[typeName] || Ea.addType(this.namespace, typeName);
+		var type = this.namespace[typeName] || this._createType(typeName);
 		return type;
 	},
 
-	_type: attribute({api: "Type", private: true}),
-	__validation: attribute({api: "Validation", private: true}),
-	_value: attribute({api: "Value"})
+	/**
+	 * @private
+	 */
+	_type: property({api: "Type"}),
+	
+	/**
+	 * @private
+	 */
+	__validation: property({api: "Validation"}),
+	
+	_value: property({api: "Value"})
 
 });
 
 Ea.Property.Enum = extend(Ea.Property._Base, {},
 {
-	_validation: attribute({api: "Validation", type: Ea.DataTypes.List, separator: ";"})
+	/**
+	 * @type {Ea.DataTypes.List}
+	 * @separator ;
+	 */
+	_validation: property({api: "Validation"})
 });

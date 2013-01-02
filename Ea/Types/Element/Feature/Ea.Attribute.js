@@ -14,17 +14,44 @@
    limitations under the License.
 */
 
+/**
+ * @namespace
+ */
 Ea.Attribute = {};
 
 Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 {
-	api: "Attribute",
+	meta: {
+		id: "AttributeID",
+		guid: "AttributeGUID",
+		api: "Attribute",
+		objectType: 23
+	},
 	
-	_id: attribute({api: "AttributeID", type: Number, id: "id"}),
-	_guid: attribute({api: "AttributeGUID", id: "guid"}),
-	_styleEx: attribute({api: "StyleEx", type: Ea.DataTypes.Map, private: true}),
-	_tags: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.AttributeTag._Base", key: "this.getName()", value: "this", aggregation: "composite"}),
-	_position: attribute({api: "Pos", type: Number}),
+	/**
+	 * @type {Number}
+	 */
+	_id: property({api: "AttributeID"}),
+	
+	_guid: property({api: "AttributeGUID"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Map}
+	 * @private
+	 */
+	_styleEx: property({api: "StyleEx"}),
+	
+	/**
+	 * @type {Ea.Collection.Map<Ea.AttributeTag._Base>}
+	 * @qualifier this.getName()
+	 * @aggregation composite
+	 */
+	_tags: property({api: "TaggedValues"}),
+	
+	/**
+	 * @type {Number}
+	 */
+	_position: property({api: "Pos"}),
 	
 	getType: function(source) {
 		var stereotype = this._stereotype.get(source);
@@ -38,25 +65,72 @@ Ea.Attribute.EnumerationLiteral = extend(Ea.Attribute._Base);
 
 Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {}, 
 {
-	_classifier: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceBy: "id", private: true}),
-	_constraints: attribute({api: "Constraints", type: "Ea.Collection._Base", elementType: "Ea.AttributeConstraint._Base", aggregation: "composite"}),
-	_primitiveType: attribute({api: "Type", private: true}),
-	_default: attribute({api: "Default"}),
-	_collection: attribute({api: "IsCollection", type: Boolean}),
-	_const: attribute({api: "IsConst", type: Boolean}),
-	_derived: attribute({api: "IsDerived", type: Boolean}),
-	_ordered: attribute({api: "IsOrdered", type: Boolean}),
-	_static: attribute({api: "IsStatic", type: Boolean}),
-	_allowDuplicates: attribute({api: "AllowDuplicates", type: Boolean}),
-	_length: attribute({api: "Length"}),
-	_precision: attribute({api: "Precision"}),
-	_scale: attribute({api: "Scale"}),
-	_container: attribute({api: "Container"}),
-	_containment: attribute({api: "Containment"}),
-	_lower: attribute({api: "LowerBound"}),
-	_upper: attribute({api: "UpperBound"}),
-	_visibility: attribute({api: "Visibility"})
+
+	/**
+	 * @type {Ea.Element.Type}
+	 * @private
+	 */
+	_classifier: property({api: "ClassifierID", referenceBy: "id"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.AttributeConstraint._Base>}
+	 * @aggregation composite
+	 */
+	_constraints: property({api: "Constraints"}),
+	
+	/**
+	 * @private
+	 */
+	_primitiveType: property({api: "Type"}),
+	
+	_default: property({api: "Default"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_collection: property({api: "IsCollection"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_const: property({api: "IsConst"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_derived: property({api: "IsDerived"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_ordered: property({api: "IsOrdered"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_static: property({api: "IsStatic"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_allowDuplicates: property({api: "AllowDuplicates"}),
+	
+	_length: property({api: "Length"}),
+	
+	_precision: property({api: "Precision"}),
+	
+	_scale: property({api: "Scale"}),
+	
+	_container: property({api: "Container"}),
+	
+	_containment: property({api: "Containment"}),
+	
+	_lower: property({api: "LowerBound"}),
+	
+	_upper: property({api: "UpperBound"}),
+	
+	_visibility: property({api: "Visibility"})
 });
 
-Ea.register("Ea.AttributeTag@Ea.Types.Element.Feature", 34);
-Ea.register("Ea.AttributeConstraint@Ea.Types.Element.Feature", 33);
+include("Ea.AttributeTag@Ea.Types.Element.Feature");
+include("Ea.AttributeConstraint@Ea.Types.Element.Feature");

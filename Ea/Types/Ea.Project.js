@@ -26,7 +26,7 @@ Ea.Project._Base = extend(Ea.Types.Any, /** @lends Ea.Project._Base# */ {
 	 * 
 	 * @memberOf Ea.Project._Base#
 	 * @param {String} guid
-	 * @returns {String}
+	 * @type {String}
 	 */
 	guidToXml: function(guid) {
 		return guid ? this._source.api.GUIDtoXML(guid) : null;
@@ -56,5 +56,8 @@ Ea.Project._Base = extend(Ea.Types.Any, /** @lends Ea.Project._Base# */ {
 	
 },
 {
-	api: "Project"
+	meta: {
+		api: "Project",
+		objectType: 1
+	}
 });

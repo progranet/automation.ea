@@ -18,16 +18,22 @@ Ea.File = {};
 
 Ea.File._Base = extend(Ea.Types.Named, {},
 {
-	api: "File",
+	meta: {
+		api: "File",
+		objectType: 13
+	},
 
 	getType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 
-	_notes: attribute({api: "Notes"}),
-	_fileDate: attribute({api: "FileDate"}),
-	_size: attribute({api: "Size"}),
-	_type: attribute({api: "Type"})
+	_notes: property({api: "Notes"}),
+	
+	_fileDate: property({api: "FileDate"}),
+	
+	_size: property({api: "Size"}),
+	
+	_type: property({api: "Type"})
 });
 
 Ea.File.WebAdress = extend(Ea.File._Base, {

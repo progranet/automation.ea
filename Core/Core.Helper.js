@@ -18,7 +18,7 @@
  * Trims leading or trailing whitespace from this string
  * 
  * @memberOf String#
- * @returns {String}
+ * @type {String}
  */
 String.prototype.trim = function() {
     return this.replace(/^\s+/g, "").replace(/\s+$/g, "");
@@ -33,7 +33,7 @@ Core.Helper = {
 	 * Returns array of names from map
 	 * 
 	 * @param {Object} map
-	 * @returns {Array}
+	 * @type {Array}
 	 */
 	getNames: function(map) {
 		var names = [];
@@ -47,7 +47,7 @@ Core.Helper = {
 	 * Returns array of values from map
 	 * 
 	 * @param {Object} map
-	 * @returns {Array}
+	 * @type {Array}
 	 */
 	getValues: function(map) {
 		var values = [];

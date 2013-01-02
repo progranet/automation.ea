@@ -14,18 +14,42 @@
    limitations under the License.
 */
 
-Ea.MethodConstraint = {};
+/**
+ * @namespace
+ */
+Ea.Tag = {};
 
-Ea.MethodConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
+/**
+ * @class
+ */
+Ea.Tag._Base = extend(Ea.Types.Named, {},
 {
-	meta: {
-		api: "MethodConstraint",
-		objectType: 35
-	},
+	_value: property({api: "Value"})
+});
+
+/**
+ * @class
+ */
+Ea.Tag._Feature = extend(Ea.Tag._Base, {},
+{
+	_notes: property({api: "Notes"}),
 	
 	/**
-	 * @type {Ea.Method._Base}
-	 * @private
+	 * @type {Number}
 	 */
-	_parent: property({api: "MethodID", referenceBy: "id"})
+	_id: property({api: "TagID"}),
+	
+	_guid: property({api: "TagGUID"})
+});
+
+/**
+ * @class
+ */
+Ea.Tag._Extended = extend(Ea.Tag._Base, {},
+{
+	_guid: property({api: "PropertyGUID"}),
+	
+	_name: property({api: "Tag"}),
+	
+	_value: property({api: "Value"})
 });

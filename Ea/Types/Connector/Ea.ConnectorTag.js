@@ -18,6 +18,16 @@ Ea.ConnectorTag = {};
 
 Ea.ConnectorTag._Base = extend(Ea.Tag._Feature, {},
 {
-	api: "ConnectorTag",
-	_parent: attribute({api: "ConnectorID", type: "Ea.Connector._Base", referenceBy: "id", private: true})
+	meta: {
+		//id: "TagID",
+		//guid: "TagGUID",
+		api: "ConnectorTag",
+		objectType: 36
+	},
+	
+	/**
+	 * @type {Ea.Connector._Base}
+	 * @private
+	 */
+	_parent: property({api: "ConnectorID", referenceBy: "id"})
 });

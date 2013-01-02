@@ -18,5 +18,9 @@ Ea.ConnectorEndTag = {};
 
 Ea.ConnectorEndTag._Base = extend(Ea.Tag._Extended, {},
 {
-	api: "RoleTag"
+	meta: {
+		//guid: "PropertyGUID",
+		api: "RoleTag",
+		objectType: 41
+	}
 });

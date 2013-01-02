@@ -14,23 +14,30 @@
    limitations under the License.
 */
 
-Ea.Tag = {};
+include("Ea@Ea");
+include("Sys@Sys");
+include("Sys.IO@Sys");
 
-Ea.Tag._Base = extend(Ea.Types.Named, {},
-{
-	_value: attribute({api: "Value"})
-});
+Documentation = {
+	params: {
 
-Ea.Tag._Feature = extend(Ea.Tag._Base, {},
-{
-	_notes: attribute({api: "Notes"}),
-	_id: attribute({api: "TagID", type: Number, id: "id"}),
-	_guid: attribute({api: "TagGUID", id: "guid"})
-});
+	},
+	
+	execute: function() {
+		
+		var application = Ea.initializeDefaultApplication();
+		
+		info("=== START ===");
+		
+		var root = application.getRepository().getSelectedPackage();
+		
+		Ea.Helper.reverse(root, "Core@Core");
+		Ea.Helper.reverse(root, "Ea@Ea");
+		Ea.Helper.reverse(root, "Sys@Sys");
+		Ea.Helper.reverse(root, "Sys.IO@Sys");
+		Ea.Helper.reverse(root, "Html@Html");
+		Ea.Helper.reverse(root, "Html.IO@Html");
 
-Ea.Tag._Extended = extend(Ea.Tag._Base, {},
-{
-	_guid: attribute({api: "PropertyGUID", id: "guid"}),
-	_name: attribute({api: "Tag"}),
-	_value: attribute({api: "Value"})
-});
+		info("=== FINISHED ===");
+	}
+};

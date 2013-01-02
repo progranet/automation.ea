@@ -19,7 +19,7 @@
  * 
  * @memberOf Array#
  * @param {Object} element
- * @returns {Boolean}
+ * @type {Boolean}
  */
 Array.prototype.contains = function(element) {
 	for (var i = 0; i < this.length; i++) {
@@ -34,7 +34,7 @@ Array.prototype.contains = function(element) {
  * @memberOf String#
  * @param {String} pad
  * @param {Number} length
- * @returns {String}
+ * @type {String}
  */
 String.prototype.lpad = function(pad, length) {
 	var context = this;

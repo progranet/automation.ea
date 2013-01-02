@@ -29,17 +29,13 @@ Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 
 	/**
 	 * @memberOf Ea.TypedElement#
-	 * @returns {Ea.PrimitiveType|Ea.Element._Base}
+	 * @type {Ea.PrimitiveType|Ea.Element._Base}
 	 */
 	getType: function() {
-		var type = this.fromCache("type");
-		if (type === undefined) {
-			type = this._getClassifier();
-			if (!type) {
-				var name = this._getPrimitiveType();
-				type = Ea.PrimitiveType.getPrimitiveType(name);
-			}
-			this.toCache("type", type);
+		var type = this._getClassifier();
+		if (!type) {
+			var name = this._getPrimitiveType();
+			type = Ea.PrimitiveType.getPrimitiveType(name);
 		}
 		return type;
 	},
@@ -49,7 +45,11 @@ Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 	}
 },
 {
-	__type: derived({getter: "getType", type: Core.Types.Object})
+	/**
+	 * @type {Core.Types.Object}
+	 * @derived
+	 */
+	__type: property()
 });
 
 Ea.TypedElement.Feature = extend(Ea.TypedElement._Base, {
@@ -58,9 +58,22 @@ Ea.TypedElement.Feature = extend(Ea.TypedElement._Base, {
 	}
 },
 {
-	_alias: attribute({api: "Style"}), // Not mistake, see http://www.sparxsystems.com/uml_tool_guide/sdk_for_enterprise_architect/attribute.htm
-	_notes: attribute({api: "Notes"}),
-	_stereotype: attribute({api: "Stereotype"}),
-	_parent: attribute({api: "ParentID", type: "Ea.Element.Type", referenceBy: "id", private: true})
+	_alias: property({api: "Style"}), // Not mistake, see http://www.sparxsystems.com/uml_tool_guide/sdk_for_enterprise_architect/attribute.htm
+	
+	_notes: property({api: "Notes"}),
+	
+	_stereotype: property({api: "Stereotype"}),
+	
+	/**
+	 * @type {Ea.Types.Namespace}
+	 * @derived
+	 */
+	__parent: property(),
+
+	/**
+	 * @type {Ea.Element.Type}
+	 * @private
+	 */
+	_parent: property({api: "ParentID", referenceBy: "id"})
 });
 

@@ -30,11 +30,11 @@ Ea.Repository = {
 
 Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	
-	_cache: null,
+	_cacheId: null,
+	_cacheGuid: null,
+	_cacheStats: null,
+	
 	_syntax: null,
-	_stats: null,
-	_cacheObjects: true,
-	_cacheProperties: true,
 	
 	/**
 	 * @constructs
@@ -44,28 +44,75 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	create: function(source, params) {
 		_super.create(source);
 		params = params || {};
-		this._cacheObjects = params.cacheObjects;
-		this._cacheProperties = params.cacheProperties;
 		this._syntax = params.syntax || Ea.Repository.Syntax.JetDB;
-		this._cache = {};
-		this._stats = {
+		
+		this._cacheId = new Array(Ea.OBJECT_TYPES_NUMBER);
+		this._cacheGuid = new Array(Ea.OBJECT_TYPES_NUMBER);
+		this._cacheStats = new Array(Ea.OBJECT_TYPES_NUMBER + 1);
+		for (var ot = 0; ot < Ea.OBJECT_TYPES_NUMBER; ot++) {
+			this._cacheId[ot] = [];
+			this._cacheGuid[ot] = {};
+			this._cacheStats[ot] = {
+					cwi: 0,
+					cwg: 0,
+					cri: 0,
+					crgi: 0,
+					crg: 0,
+					crgg: 0,
+					tr: 0,
+					trg: 0,
+					trgi: 0,
+					trgg: 0,
+					trgig: 0,
+					trggg: 0
+				};
+		}
+		this._cacheStats[Ea.OBJECT_TYPES_NUMBER] = {
 				cwi: 0,
 				cwg: 0,
 				cri: 0,
+				crgi: 0,
 				crg: 0,
-				tr: 0
+				crgg: 0,
+				tr: 0,
+				trg: 0,
+				trgi: 0,
+				trgg: 0,
+				trgig: 0,
+				trggg: 0
 			};
-	},
-	
-	getPropertiesCached: function() {
-		return this._cacheProperties;
+
 	},
 	
 	/**
 	 * @memberOf Ea.Repository._Base#
 	 */
 	cacheInfo: function() {
-		info("cache stats: {total read: $, cache read by id: $, cache read by guid: $, cache white by id: $, cache write by guid: $}", [this._stats.tr, this._stats.cri, this._stats.crg, this._stats.cwi, this._stats.cwg]);
+		var stats = {};
+		var g = this._cacheStats[Ea.OBJECT_TYPES_NUMBER];
+		for (var ot = 0; ot <= Ea.OBJECT_TYPES_NUMBER; ot++) {
+			var type = Ea._objectTypes[ot];
+			if (!type && ot != Ea.OBJECT_TYPES_NUMBER)
+				continue;
+			var s = this._cacheStats[ot];
+			stats[ot != Ea.OBJECT_TYPES_NUMBER ? type.namespace : "TOTAL"] = {
+					"total read from get": s.trg,
+					"total read by id from get": s.trgig,
+					"total read by guid from get": s.trggg,
+					"total read by id": s.trgi,
+					"total read by guid": s.trgg,
+					"cache read by id": s.cri,
+					"cache read by id from get": s.crgi,
+					"cache read by guid": s.crg,
+					"cache read by guid from get": s.crgg,
+					"cache white by id": s.cwi,
+					"cache white by guid": s.cwg
+				};
+			for (var n in g) {
+				g[n] = (ot != Ea.OBJECT_TYPES_NUMBER) ? (g[n] + s[n]) : 0;
+			}
+		}
+		info("cache stats: $", [JSON.stringify(stats, null, '\t')]);
 	},
 	
 	getCollection: function(type, api, params) {
@@ -79,28 +126,26 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 * @param {Class} type
 	 * @param {Object} api
 	 * @param {Object} params
-	 * @returns {Ea.Types.Any}
+	 * @type {Ea.Types.Any}
 	 */
 	get: function(type, api, params) {
-		this._stats.tr++;
-		if (this._cacheObjects && this._cache[type.namespace.name]) {
-			var idAttribute;
-			var guidAttribute;
-			if (idAttribute = Ea.Class.getIdAttribute(type)) {
-				var id = api[idAttribute.api];
-				var proxy = this._cache[type.namespace.name].id[id];
-				if (proxy) {
-					this._stats.cri++;
-					return proxy;
-				}
+		this._cacheStats[type.meta.objectType].trg++;
+		if (type.meta.id) {
+			this._cacheStats[type.meta.objectType].trgig++;
+			var id = api[type.meta.id];
+			var proxy = this._cacheId[type.meta.objectType][id];
+			if (proxy) {
+				this._cacheStats[type.meta.objectType].crgi++;
+				return proxy;
 			}
-			else if (guidAttribute = Ea.Class.getGuidAttribute(type)) {
-				var guid = api[guidAttribute.api];
-				var proxy = this._cache[type.namespace.name].guid[guid];
-				if (proxy) {
-					this._stats.crg++;
-					return proxy;
-				}
+		}
+		else if (type.meta.guid) {
+			this._cacheStats[type.meta.objectType].trggg++;
+			var guid = api[type.meta.guid];
+			var proxy = this._cacheGuid[type.meta.objectType][guid];
+			if (proxy) {
+				this._cacheStats[type.meta.objectType].crgg++;
+				return proxy;
 			}
 		}
 		return this._get(type, api, params);
@@ -109,15 +154,13 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	getById: function(type, id) {
 		if (!id || id == 0)
 			return null;
-		this._stats.tr++;
-		if (this._cacheObjects && this._cache[type.namespace.name]) {
-			var proxy = this._cache[type.namespace.name].id[id];
-			if (proxy) {
-				this._stats.cri++;
-				return proxy;
-			}
+		this._cacheStats[type.meta.objectType].trgi++;
+		var proxy = this._cacheId[type.meta.objectType][id];
+		if (proxy) {
+			this._cacheStats[type.meta.objectType].cri++;
+			return proxy;
 		}
-		var method = "Get" + type.api + "ByID";
+		var method = "Get" + type.meta.api + "ByID";
 		var api;
 		// EA ElementID integrity problem
 		try {
@@ -131,15 +174,13 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	},
 	
 	getByGuid: function(type, guid) {
-		this._stats.tr++;
-		if (this._cacheObjects && this._cache[type.namespace.name]) {
-			var proxy = this._cache[type.namespace.name].guid[guid];
-			if (proxy) {
-				this._stats.crg++;
-				return proxy;
-			}
+		this._cacheStats[type.meta.objectType].trgg++;
+		var proxy = this._cacheGuid[type.meta.objectType][guid];
+		if (proxy) {
+			this._cacheStats[type.meta.objectType].crg++;
+			return proxy;
 		}
-		var method = "Get" + type.api + "ByGuid";
+		var method = "Get" + type.meta.api + "ByGuid";
 		var api = this._source.api[method](guid);
 		if (!api) {
 			warn("$ not found by Guid = $", [type, guid]);
@@ -150,25 +191,13 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 
 	_get: function(type, api, params) {
 		var proxy = Ea.Class.createProxy(this._source.application, type, api, params);
-		if (this._cacheObjects) {
-			var idAttribute = Ea.Class.getIdAttribute(type);
-			var guidAttribute = Ea.Class.getGuidAttribute(type);
-			if (idAttribute || guidAttribute) {
-				if (!this._cache[type.namespace.name]) {
-					this._cache[type.namespace.name] = {
-						id: {},
-						guid: {}
-					};
-				}
-				if (idAttribute) {
-					this._cache[type.namespace.name].id[api[idAttribute.api]] = proxy;
-					this._stats.cwi++;
-				}
-				if (guidAttribute) {
-					this._cache[type.namespace.name].guid[api[guidAttribute.api]] = proxy;
-					this._stats.cwg++;
-				}
-			}
+		if (type.meta.id) {
+			this._cacheId[type.meta.objectType][api[type.meta.id]] = proxy;
+			this._cacheStats[type.meta.objectType].cwi++;
+		}
+		if (type.meta.guid) {
+			this._cacheGuid[type.meta.objectType][api[type.meta.guid]] = proxy;
+			this._cacheStats[type.meta.objectType].cwg++;
 		}
 		return proxy;
 	},
@@ -234,7 +263,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	/**
 	 * Returns selected package
 	 * 
-	 * @returns {Ea.Package._Base}
+	 * @type {Ea.Package._Base}
 	 */
 	getSelectedPackage: function() {
 		return this.get(Ea.Package._Base, this._source.api.GetTreeSelectedPackage());
@@ -243,20 +272,20 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	/**
 	 * Returns class of selected object
 	 * 
-	 * @returns {Class}
+	 * @type {Class}
 	 */
 	getSelectedType: function() {
 		var objectType = this._source.api.GetTreeSelectedItemType();
-		var namespace = Ea._objectTypes[objectType];
-		if (!namespace) 
-			throw new Error("Undefined EA object type: " + objectType);
-		return namespace._Base;
+		var type = Ea._objectTypes[objectType];
+		if (!type) 
+			throw new Error("Unregistered EA object type: " + objectType);
+		return type;
 	},
 	
 	/**
 	 * Returns selected object
 	 * 
-	 * @returns {Ea.Types.Any}
+	 * @type {Ea.Types.Any}
 	 */
 	getSelectedObject: function() {
 		var api = this._source.api.GetTreeSelectedObject();
@@ -296,7 +325,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 * Opens specified repository file or database connection
 	 * 
 	 * @param {String} path
-	 * @returns {Boolean}
+	 * @type {Boolean}
 	 */
 	open: function(path) {
 		return this._source.api.OpenFile(path);
@@ -307,15 +336,44 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	}
 },
 {
-	api: "Repository",
+	meta: {
+		api: "Repository",
+		objectType: 2
+	},
 	
-	_projectGuid: attribute({api: "ProjectGUID"}),
-	_batchAppend: attribute({api: "BatchAppend", type: Boolean}),
-	_enableCache: attribute({api: "EnableCache", type: Boolean}),
-	_enableUIUpdates: attribute({api: "EnableUIUpdates", type: Boolean}),
-	_flagUpdate: attribute({api: "FlagUpdate", type: Boolean}),
-	_securityEnabled: attribute({api: "IsSecurityEnabled", type: Boolean}),
-	_path: attribute({api: "ConnectionString"}),
-	_models: attribute({api: "Models", type: "Ea.Collection._Base", elementType: "Ea.Package._Base", aggregation: "composite"})
+	_projectGuid: property({api: "ProjectGUID"}),
+
+	/**
+	 * @type {Boolean}
+	 */
+	_batchAppend: property({api: "BatchAppend"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_enableCache: property({api: "EnableCache"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_enableUIUpdates: property({api: "EnableUIUpdates"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_flagUpdate: property({api: "FlagUpdate"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_securityEnabled: property({api: "IsSecurityEnabled"}),
+	
+	_path: property({api: "ConnectionString"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.Package._Base>}
+	 * @aggregation composite
+	 */
+	_models: property({api: "Models"})
 	
 });

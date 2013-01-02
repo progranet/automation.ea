@@ -18,15 +18,29 @@ Ea.Constraint = {};
 
 Ea.Constraint._Base = extend(Ea.Types.Named, {},
 {
-	api: "Constraint",
+	meta: {
+		api: "Constraint",
+		objectType: 11
+	},
 	
 	getType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 
-	_notes: attribute({api: "Notes"}),
-	_status: attribute({api: "Status"}),
-	_weight: attribute({api: "Weight", type: Number}),
-	_type: attribute({api: "Type"}),
-	_parent: attribute({api: "ParentID", type: "Ea.Element._Base", referenceBy: "id", private: true})
+	_notes: property({api: "Notes"}),
+	
+	_status: property({api: "Status"}),
+	
+	/**
+	 * @type {Number}
+	 */
+	_weight: property({api: "Weight"}),
+	
+	_type: property({api: "Type"}),
+	
+	/**
+	 * @type {Ea.Element._Base}
+	 * @private
+	 */
+	_parent: property({api: "ParentID", referenceBy: "id"})
 });

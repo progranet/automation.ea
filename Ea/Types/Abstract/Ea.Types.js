@@ -22,7 +22,6 @@ Ea.Types = {};
 Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	
 	_source: null,
-	_cached: null,
 	
 	/**
 	 * Creates new abstraction layer wrapper for Enterprise Architect API object
@@ -34,14 +33,13 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	create: function(source) {
 		_super.create();
 		this._source = source;
-		this._cached = {};
 	},
 	
 	/**
 	 * Returns GUID of EA object in XML format
 	 * 
 	 * @memberOf Ea.Types.Any#
-	 * @returns {String}
+	 * @type {String}
 	 */
 	getXmlGuid: function() {
 		return this._source.application.getProject().guidToXml(this.getGuid());
@@ -53,19 +51,15 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	
 	/**
 	 * @private
-	 * @returns {String}
+	 * @type {String}
 	 */
 	_toString: function() {
 		return "[" + this._class + "]";
 	},
 	
-	fromCache: function(name) {
-		return this._cached[name];
-	},
-	
-	toCache: function(name, value) {
-		if (!this._source.application.getRepository().getPropertiesCached()) return;
-		this._cached[name] = value;
+	update: function() {
+		var api = this._source.api;
+		api.Update();
 	}
 	
 }, 
@@ -75,7 +69,7 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	 * 
 	 * @memberOf Ea.Types.Any
 	 * @param {Object} source
-	 * @returns {Class}
+	 * @type {Class}
 	 */
 	getType: function(source) {
 		return this.namespace._Base;
@@ -86,8 +80,19 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	 */
 	_deriveType: function(source, attribute) {
 		var typeName = attribute.get(source).replace(/[-\s]/g,"");
-		var type = this.namespace[typeName] || Ea.addType(this.namespace, typeName);
+		var type = this.namespace[typeName] || this._createType(typeName);
 		return type;
+	},
+	
+	/**
+	 * @private
+	 */
+	_createType: function(typeName) {
+		if (typeName in this.namespace)
+			throw new Error("Type already exists: $", [this.namespace[typeName]]);
+		this.namespace[typeName] = Core.Lang.extend(this.namespace, typeName, this.namespace._Base);
+		warn("Not implemented type: $.$", [this.namespace.qualifiedName, typeName]);
+		return this.namespace[typeName];
 	},
 	
 	/**
@@ -95,7 +100,7 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	 */
 	initialize: function() {
 		Ea.Class.registerClass(this);
-	}	
+	}
 });
 
 /**
@@ -108,7 +113,7 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 	 * Returns namespace of this element
 	 * 
 	 * @memberOf Ea.Types.Named#
-	 * @returns {Ea.Types.Namespace}
+	 * @type {Ea.Types.Namespace}
 	 */
 	getParent: function() {
 		return null;
@@ -119,7 +124,7 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 	 * 
 	 * @memberOf Ea.Types.Named#
 	 * @param {Ea.Types.Namespace} namespace
-	 * @returns {Boolean}
+	 * @type {Boolean}
 	 */
 	hasParent: function(namespace) {
 		var parent = this.getParent();
@@ -142,37 +147,28 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 	 * Returns qualified name of named including namespace
 	 * 
 	 * @memberOf Ea.Types.Named#
-	 * @returns {String}
+	 * @type {String}
 	 */
 	getQualifiedName: function() {
-		var qualifiedName = this.fromCache("qualifiedName");
-		if (qualifiedName === undefined) {
-			var parent = this.getParent();
-			qualifiedName = (parent ? parent.getQualifiedName() + "." : "") + this.getName();
-			this.toCache("qualifiedName", qualifiedName);
-		}
+		var parent = this.getParent();
+		qualifiedName = (parent ? parent.getQualifiedName() + "." : "") + this.getName();
 		return qualifiedName;
 	}
 	
 },
 {
-	/**
-	 * @property {String} _name
-	 * @memberOf Ea.Types.Named
-	 */
-	_name: attribute({api: "Name"}),
+	_name: property({api: "Name"}),
 
 	/**
-	 * @property {Ea.Types.Namespace} __parent
-	 * @memberOf Ea.Types.Named
+	 * @type {Ea.Types.Namespace}
+	 * @derived
 	 */
-	__parent: derived({getter: "getParent", type: "Ea.Types.Namespace"}),
+	__parent: property(),
 	
 	/**
-	 * @property {String} _qualifiedName
-	 * @memberOf Ea.Types.Named
+	 * @derived
 	 */
-	_qualifiedName: derived({getter: "getQualifiedName"})
+	_qualifiedName: property()
 });
 
 /**

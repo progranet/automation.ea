@@ -29,20 +29,67 @@ Ea.SwimlaneDef._Base = extend(Ea.Types.Any, {
 	
 },
 {
-	api: "SwimlaneDef",
+	meta: {
+		api: "SwimlaneDef",
+		objectType: 50
+	},
 
-	_bold: attribute({api: "Bold", type: Boolean}),
-	_hideClassifier: attribute({api: "HideClassifier", type: Boolean}),
-	_hideNames: attribute({api: "HideNames", type: Boolean}),
-	_locked: attribute({api: "Locked", type: Boolean}),
-	_fontColor: attribute({api: "FontColor", type: Number}),
-	_lineColor: attribute({api: "LineColor", type: Number}),
-	_lineWidth: attribute({api: "LineWidth", type: Number}),
-	__orientation: attribute({api: "Orientation", private: true}),
-	_orientation: derived({getter: "getOrientation"}),
-	_showInTitleBar: attribute({api: "ShowInTitleBar", type: Boolean}),
+	/**
+	 * @type {Boolean}
+	 */
+	_bold: property({api: "Bold"}),
 	
-	_swimlanes: attribute({api: "Swimlanes", type: "Ea.Swimlanes._Base", elementType: "Ea.Swimlane._Base", key: "this.getTitle()", value: "this", aggregation: "composite"})
+	/**
+	 * @type {Boolean}
+	 */
+	_hideClassifier: property({api: "HideClassifier"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_hideNames: property({api: "HideNames"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_locked: property({api: "Locked"}),
+	
+	/**
+	 * @type {Number}
+	 */
+	_fontColor: property({api: "FontColor"}),
+	
+	/**
+	 * @type {Number}
+	 */
+	_lineColor: property({api: "LineColor"}),
+	
+	/**
+	 * @type {Number}
+	 */
+	_lineWidth: property({api: "LineWidth"}),
+	
+	/**
+	 * @private
+	 */
+	__orientation: property({api: "Orientation"}),
+	
+	/**
+	 * @derived
+	 */
+	_orientation: property(),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_showInTitleBar: property({api: "ShowInTitleBar"}),
+	
+	/**
+	 * @type {Ea.Swimlanes._Base<Ea.Swimlane._Base>}
+	 * @qualifier this.getTitle()
+	 * @aggregation composite
+	 */
+	_swimlanes: property({api: "Swimlanes"})
 });
 
-Ea.register("Ea.Swimlanes@Ea.Types.Diagram", 51);
+include("Ea.Swimlanes@Ea.Types.Diagram");

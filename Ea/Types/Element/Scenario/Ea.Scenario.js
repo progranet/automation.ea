@@ -20,51 +20,63 @@ Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 	
 	getContext: function() {
 		
-		var context = this.fromCache("context");
-		if (context === undefined) {
-			var rows = this._source.application.getRepository().findByQuery("t_objectscenarios", "ea_guid", "\"" + this.getGuid() + "\"");
-			var row = rows[0];
-			
-			var dom = new ActiveXObject("MSXML2.DOMDocument");
-			dom.validateOnParse = false;
-			dom.async = false;
-			
-			var xml = row["XMLContent"];
-			var parsed = dom.loadXML(xml);
+		var rows = this._source.application.getRepository().findByQuery("t_objectscenarios", "ea_guid", "\"" + this.getGuid() + "\"");
+		var row = rows[0];
+		
+		var dom = new ActiveXObject("MSXML2.DOMDocument");
+		dom.validateOnParse = false;
+		dom.async = false;
+		
+		var xml = row["XMLContent"];
+		var parsed = dom.loadXML(xml);
 
-			context = {};
+		var context = {};
 
-			if (!parsed) {
-				warn("Error while XML parsing scenario content: " + xml + " " + this.getGuid());
+		if (!parsed) {
+			warn("Error while XML parsing scenario content: " + xml + " " + this.getGuid());
+		}
+		else {
+			var nodes = dom.selectNodes("//path/context/item");
+			for (var ni = 0; ni < nodes.length; ni++) {
+				var node = nodes[ni];
+				context[node.getAttribute("oldname")] = this._source.application.getRepository().getByGuid(Ea.Element._Base, node.getAttribute("guid"));
 			}
-			else {
-				var nodes = dom.selectNodes("//path/context/item");
-				for (var ni = 0; ni < nodes.length; ni++) {
-					var node = nodes[ni];
-					context[node.getAttribute("oldname")] = this._source.application.getRepository().getByGuid(Ea.Element._Base, node.getAttribute("guid"));
-				}
-			}
-			this.toCache("context", context);
 		}
 		return context;
 	}
 },
 {
-	api: "Scenario",
+	meta: {
+		guid: "ScenarioGUID",
+		api: "Scenario",
+		objectType: 10
+	},
 
 	getType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 
-	_type: attribute({api: "Type"}),
-	_notes: attribute({api: "Notes"}),
-
-	_guid: attribute({api: "ScenarioGUID", id: "guid"}),
-	_steps: attribute({api: "Steps", type: "Ea.Collection._Base", elementType: "Ea.ScenarioStep._Base", key: "this.getPos()", aggregation: "composite"})
+	_type: property({api: "Type"}),
 	
+	_notes: property({api: "Notes"}),
+
+	_guid: property({api: "ScenarioGUID"}),
+	
+	/**
+	 * @type {Ea.Collection._Base<Ea.ScenarioStep._Base>}
+	 * @qualifier this.getPos()
+	 * @aggregation composite
+	 */
+	_steps: property({api: "Steps"}),
+	
+	/**
+	 * @type {Object}
+	 * @derived
+	 */
+	_context: property()
 });
 
 Ea.Scenario.BasicPath = extend(Ea.Scenario._Base, {});
 
-Ea.register("Ea.ScenarioExtension@Ea.Types.Element.Scenario", 55);
-Ea.register("Ea.ScenarioStep@Ea.Types.Element.Scenario", 54);
+include("Ea.ScenarioExtension@Ea.Types.Element.Scenario");
+include("Ea.ScenarioStep@Ea.Types.Element.Scenario");

@@ -22,28 +22,76 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	}
 },
 {
+	meta: {
+		//guid: "ParameterGUID",
+		api: "Parameter",
+		objectType: 25
+	},
 
-	api: "Parameter",
-
-	_guid: attribute({api: "ParameterGUID", id: "guid"}),
+	_guid: property({api: "ParameterGUID"}),
 	
-	_alias: attribute({api: "Alias"}),
-	_notes: attribute({api: "Notes"}),
-	_stereotype: attribute({api: "Stereotype"}),
+	_alias: property({api: "Alias"}),
+	
+	_notes: property({api: "Notes"}),
+	
+	_stereotype: property({api: "Stereotype"}),
 
-	_classifier: attribute({api: "ClassifierID", type: "Ea.Element.Type", referenceBy: "id", private: true}),
-	_primitiveType: attribute({api: "Type", private: true}),
-	_default: attribute({api: "Default"}),
-	_const: attribute({api: "IsConst", type: Boolean}),
-	_kind: attribute({api: "Kind"}),
-	_position: attribute({api: "Position", type: Number}),
-	_style: attribute({api: "Style", type: Ea.DataTypes.Map, private: true}),
-	_styleEx: attribute({api: "StyleEx", type: Ea.DataTypes.Map, private: true}),
+	/**
+	 * @type {Ea.Element.Type}
+	 * @private
+	 */
+	_classifier: property({api: "ClassifierID", referenceBy: "id"}),
+	
+	/**
+	 * @private
+	 */
+	_primitiveType: property({api: "Type"}),
+	
+	_default: property({api: "Default"}),
+	
+	/**
+	 * @type {Boolean}
+	 */
+	_const: property({api: "IsConst"}),
+	
+	_kind: property({api: "Kind"}),
+	
+	/**
+	 * @type {Number}
+	 */
+	_position: property({api: "Position"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Map}
+	 * @private
+	 */
+	_style: property({api: "Style"}),
+	
+	/**
+	 * @type {Ea.DataTypes.Map}
+	 * @private
+	 */
+	_styleEx: property({api: "StyleEx"}),
 
-	_parent: attribute({api: "OperationID", type: "Ea.Method._Base", referenceBy: "id", private: true}),
+	/**
+	 * @type {Ea.Types.Namespace}
+	 * @derived
+	 */
+	__parent: property(),
 
-	_tags: attribute({api: "TaggedValues", type: "Ea.Collection.Map", elementType: "Ea.ParameterTag._Base", key: "this.getName()", value: "this", aggregation: "composite"})
+	/**
+	 * @type {Ea.Method._Base}
+	 * @private
+	 */
+	_parent: property({api: "OperationID", referenceBy: "id"}),
+
+	/**
+	 * @type {Ea.Collection.Map<Ea.ParameterTag._Base>}
+	 * @qualifier this.getName()
+	 * @aggregation composite
+	 */
+	_tags: property({api: "TaggedValues"})
 
 });
 
-Ea.register("Ea.ParameterTag@Ea.Types.Element.Feature", 56);
+include("Ea.ParameterTag@Ea.Types.Element.Feature");
