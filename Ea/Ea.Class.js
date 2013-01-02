@@ -342,7 +342,7 @@ Ea.Class.DerivedAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.Deri
 		}
 		
 		properties[name + "$inner"] = accessor;
-		Core.enrichMethod(properties, name + "$inner", this.qualifiedName + "$inner", false);
+		//Core.enrichMethod(properties, name + "$inner", this.qualifiedName + "$inner", false);
 		this._accesors[kind] = name + "$inner";
 		
 		properties[name] = new Function("return this._class." + this.name + "." + kind + "(this, arguments);");

@@ -91,6 +91,11 @@ Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {
 	
 	_navigability: property({api: "Navigable"}),
 	
+	/**
+	 * @type {Boolean}
+	 */
+	_navigable: property({api: "IsNavigable"}),
+	
 
 	/**
 	 * @type {Ea.Collection.Map<Ea.ConnectorEndTag._Base>}

@@ -282,6 +282,7 @@ Ea.Helper = {
 					var callee = expression.expression.right.callee.name;
 					if (callee == "define" || callee == "extend") {
 						qualifiedName = External.escodegen.generate(expression.expression.left);
+						//info(" * * * $", [qualifiedName]);
 						arguments = expression.expression.right.arguments;
 						baseClass = callee == "define" ? null  : External.escodegen.generate(arguments[0]);
 						methods = arguments[callee == "define" ? 0 : 1].properties;
@@ -308,8 +309,10 @@ Ea.Helper = {
 				
 				if (baseClass) {
 					baseClass = this._findType(root, baseClass).type;
-					//_class.getConnectors();
-					_class.createConnector("", Ea.Connector.Generalization, baseClass);
+					_class.getConnectors().filter("").first();
+					var generalization = _class.getConnectors().filter("this.instanceOf(Ea.Connector.Generalization)").first();
+					if (!generalization)
+						_class.createConnector("", Ea.Connector.Generalization, baseClass);
 				}
 
 				if (methods)
@@ -368,6 +371,7 @@ Ea.Helper = {
 				var commentsBefore = property.key.commentsBefore ? property.key.commentsBefore.pop() : "";
 				var doc = this._parseDoc(commentsBefore);
 				var type = "String";
+				var multiplicityLower = 1;
 				var multiplicityUpper = 1;
 				if (doc) {
 					attribute.setNotes(doc.comment);
@@ -375,11 +379,12 @@ Ea.Helper = {
 						type = doc.type[0].type;
 						if (type.indexOf("<") != -1) {
 							type = type.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
+								multiplicityLower = 0;
 								multiplicityUpper = "*";
 								return elementType;
 							});
 						}
-						attribute.setLower(0);
+						attribute.setLower(multiplicityLower);
 						attribute.setUpper(multiplicityUpper);
 					}
 					if (doc["private"])
@@ -388,12 +393,37 @@ Ea.Helper = {
 						attribute.setDerived(true);
 				}
 				if (type.indexOf(".") != -1) {
-					info(">>>$", [type]);
+					info(">>>1:$", [type]);
 					type = this._findType(root, type).type;
+					info(">>>2:$", [type]);
 					attribute._setClassifier(type);
+					attribute._setPrimitiveType(type.getName());
+					
+					var association = _class.getConnectors().filter("this.instanceOf(Ea.Connector.Association) && this.getSupplierEnd().getRole() == '" + property.key.name + "'").first();
+					if (!association) {
+						info("    * association changed");
+						association = _class.createConnector("", Ea.Connector.Association, type);
+					}
+					var clientEnd = association.getClientEnd();
+					clientEnd.setNavigability("Non-Navigable");
+					clientEnd.setNavigable(false);
+					clientEnd.update();
+					
+					var supplierEnd = association.getSupplierEnd();
+					supplierEnd.setNavigability("Navigable");
+					supplierEnd.setNavigable(true);
+					if (multiplicityLower != 1 || multiplicityUpper != 1)
+						supplierEnd.setMultiplicity(multiplicityLower + ".." + multiplicityUpper);
+					else
+						supplierEnd.setMultiplicity("");
+					supplierEnd.setRole(property.key.name);
+					if (doc["private"])
+						supplierEnd.setVisibility("Private");
+					supplierEnd.update();
 				}
-				else
+				else {
 					attribute._setPrimitiveType(type);
+				}
 				attribute.setStereotype("property");
 				attribute.update();
 			}

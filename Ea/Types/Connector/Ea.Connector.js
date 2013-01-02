@@ -232,6 +232,11 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	}
 });
 
+Ea.Connector.Association = extend(Ea.Connector._Base, {}, {
+	elementType: "Association"
+	
+});
+
 Ea.Connector.Aggregation = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
 		return client ? "composed of" : "part of";

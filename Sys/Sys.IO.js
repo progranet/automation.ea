@@ -66,7 +66,7 @@ Sys.IO = {
 	 * @param {?Object} context Namespace containing file
 	 */
 	copy: function(filePath, folderPath, context) {
-		Sys.IO._fileSystem.CopyFile(this.getPath(file, context), folderPath);
+		Sys.IO._fileSystem.CopyFile(this.getPath(filePath, context), folderPath);
 	},
 	
 	/**
