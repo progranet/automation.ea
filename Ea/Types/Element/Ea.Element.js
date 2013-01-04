@@ -43,7 +43,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 			var secondEnd = client ? connector.getSupplier() : connector.getClient();
 			var secondConnectorEnd = client ? connector.getSupplierEnd() : connector.getClientEnd();
 			if (secondEnd) { // EA integrity problem (Connector.Supplier == null) workaround
-				relationships.add(new Ea.Relationship({
+				relationships.add(new Ea._Base.Relationship({
 					from: this,
 					fromEnd: thisConnectorEnd,
 					connector: connector,
@@ -84,13 +84,13 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	getContextReferences: function() {
 		var contextReferences = new Core.Types.Collection();
 		this.getCustomReferences().forEach(function(reference) {
-			contextReferences.add(new Ea.ContextReference(reference.getNotes() || "", reference.getSupplier(), ""));
+			contextReferences.add(new Ea._Base.ContextReference(reference.getNotes() || "", reference.getSupplier(), ""));
 		});
 		this._getRelationships().forEach(function(relationship) {
 			var connection = relationship.getConnector()._class.getName();
 			var supplier = relationship.getTo();
 			var notes = relationship.getConnector().getName();
-			contextReferences.add(new Ea.ContextReference(notes, supplier, connection));
+			contextReferences.add(new Ea._Base.ContextReference(notes, supplier, connection));
 		});
 		return contextReferences;
 	},
@@ -102,7 +102,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	getAppearance: function() {
 		var rows = this._source.application.getRepository().findByQuery("t_object", "Object_ID", this.getId());
 		var row = rows[0];
-		appearance = new Ea.DataTypes.Appearance(row);
+		appearance = new Ea._Base.DataTypes.Appearance(row);
 		return appearance;
 	}
 },
@@ -137,9 +137,9 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 		}
 	},
 	
-	getType: function(source) {
+	determineType: function(source) {
 		
-		var typeName = this._type.get(source).replace(/\s/g,"");
+		var typeName = this.__type.get(source).replace(/\s/g,"");
 		var metaType = this._metatype.get(source);
 		
 		if (metaType)
@@ -180,7 +180,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	/**
 	 * @private
 	 */
-	_type: property({api: "Type"}),
+	__type: property({api: "Type"}),
 	
 	/**
 	 * @type {Number}
@@ -253,12 +253,12 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	_author: property({api: "Author"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Date}
+	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_created: property({api: "Created"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Date}
+	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_modified: property({api: "Modified"}),
 	
@@ -274,7 +274,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	_priority: property({api: "Priority"}),
 	
 	/**
-	 * @type {Core.Types.Collection<Ea.Relationship>}
+	 * @type {Core.Types.Collection<Ea._Base.Relationship>}
 	 * @derived
 	 * @private
 	 */
@@ -293,7 +293,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	_diagrams: property({api: "Diagrams"}),
 	
 	/**
-	 * @type {Ea.DataTypes.List}
+	 * @type {Ea._Base.DataTypes.List}
 	 */
 	_stereotypes: property({api: "StereotypeEx"}),
 	
@@ -313,19 +313,19 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Types.Namespace}
 	 * @derived
 	 */
-	__parent: property(),
+	_parent: property(),
 
 	/**
 	 * @type {Ea.Element._Base}
 	 * @private
 	 */
-	_parent: property({api: "ParentID", referenceBy: "id"}),
+	__parent: property({api: "ParentID", referenceBy: "id"}),
 	
 	/**
 	 * @type {Ea.Package._Base}
 	 * @private
 	 */
-	_package: property({api: "PackageID", referenceBy: "id"}),
+	__package: property({api: "PackageID", referenceBy: "id"}),
 	
 	/**
 	 * @type {Ea.Element.Classifier}
@@ -375,13 +375,13 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	_customReferences: property(),
 	
 	/**
-	 * @type {Core.Types.Collection<Ea.ContextReference>}
+	 * @type {Core.Types.Collection<Ea._Base.ContextReference>}
 	 * @derived
 	 */
 	_contextReferences: property(),
 	
 	/**
-	 * @type {Ea.DataTypes.Appearance}
+	 * @type {Ea._Base.DataTypes.Appearance}
 	 * @derived
 	 */
 	_appearance: property()
@@ -401,7 +401,7 @@ Ea.Element.Package = extend(Ea.Element.PackageableElement, {
 	 * @type {Ea.Package._Base}
 	 * @derived
 	 */
-	__package: property()
+	_package: property()
 });
 
 Ea.Element.Type = extend(Ea.Element.PackageableElement);
@@ -556,7 +556,7 @@ Ea.Element.AssociationClass = extend(Ea.Element.Class, {
 	 * @type {Ea.Connector._Base}
 	 * @derived
 	 */
-	__association: property()
+	_association: property()
 });
 
 Ea.Element.Interface = extend(Ea.Element.Classifier, {}, {
@@ -574,7 +574,7 @@ Ea.Element.UseCase = extend(Ea.Element.BehavioredClassifier, {},
 	elementType: "UseCase",
 	
 	/**
-	 * @type {Ea.DataTypes.List}
+	 * @type {Ea._Base.DataTypes.List}
 	 */
 	_extensionPoints: property({api: "ExtensionPoints"})
 });
@@ -720,7 +720,7 @@ Ea.Element.Object = extend(Ea.Element._Base, {
 	_metaClass: property({api: "ClassifierID", referenceBy: "id"}),
 	
 	/**
-	 * @type {Ea.DataTypes.RunState}
+	 * @type {Ea._Base.DataTypes.RunState}
 	 */
 	_runState: property({api: "RunState"})
 });

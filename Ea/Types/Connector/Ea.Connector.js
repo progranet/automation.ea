@@ -96,12 +96,12 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	_direction: property({api: "Direction"}),
 
 	/**
-	 * @type {Ea.DataTypes.Map}
+	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_eventFlags: property({api: "EventFlags"}),
 
 	/**
-	 * @type {Ea.DataTypes.Map}
+	 * @type {Ea._Base.DataTypes.Map}
 	 * @private
 	 */
 	_stateFlags: property({api: "StateFlags"}),
@@ -227,7 +227,7 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	 */
 	_properties: property({api: "Properties"}),
 
-	getType: function(source) {
+	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	}
 });

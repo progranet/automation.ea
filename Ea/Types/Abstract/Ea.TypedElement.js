@@ -29,13 +29,13 @@ Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 
 	/**
 	 * @memberOf Ea.TypedElement#
-	 * @type {Ea.PrimitiveType|Ea.Element._Base}
+	 * @type {Core.Types.Object}
 	 */
 	getType: function() {
 		var type = this._getClassifier();
 		if (!type) {
 			var name = this._getPrimitiveType();
-			type = Ea.PrimitiveType.getPrimitiveType(name);
+			type = Ea._Base.PrimitiveType.getPrimitiveType(name);
 		}
 		return type;
 	},
@@ -49,7 +49,7 @@ Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 	 * @type {Core.Types.Object}
 	 * @derived
 	 */
-	__type: property()
+	_type: property()
 });
 
 Ea.TypedElement.Feature = extend(Ea.TypedElement._Base, {
@@ -68,12 +68,12 @@ Ea.TypedElement.Feature = extend(Ea.TypedElement._Base, {
 	 * @type {Ea.Types.Namespace}
 	 * @derived
 	 */
-	__parent: property(),
+	_parent: property(),
 
 	/**
 	 * @type {Ea.Element.Type}
 	 * @private
 	 */
-	_parent: property({api: "ParentID", referenceBy: "id"})
+	__parent: property({api: "ParentID", referenceBy: "id"})
 });
 

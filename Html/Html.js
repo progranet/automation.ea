@@ -51,7 +51,7 @@ Html = {
 	 * Loads HTML templates from specified file
 	 * 
 	 * @memberOf Html
-	 * @param {Sys.IO.File|String} file File reference or path to file
+	 * @param {Sys.IO.File} file File reference or path to file (string)
 	 * @param {?Object} context Namespace containing templates file
 	 */
 	loadTemplates: function(file, context) {

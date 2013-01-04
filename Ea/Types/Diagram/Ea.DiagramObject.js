@@ -16,10 +16,10 @@
 
 Ea.DiagramObject = {};
 
-Ea.DiagramObject._Base = extend(Ea.View, {
+Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 
 	getDimension: function() {
-		var dimension = new Ea.DataTypes.Dimension({
+		var dimension = new Ea._Base.DataTypes.Dimension({
 			left: this._getLeft(),
 			top: -this._getTop(),
 			right: this._getRight(),
@@ -34,7 +34,7 @@ Ea.DiagramObject._Base = extend(Ea.View, {
 		var diagram = this.getParent();
 		var diagramDimension = diagram.getDimension();
 		var diagramCalculated = diagram.getCalculated();
-		calculated = new Ea.DataTypes.Dimension({
+		calculated = new Ea._Base.DataTypes.Dimension({
 			left: Math.round((dimension.left + diagramDimension.correctionX) * diagramCalculated.scale),
 			top: Math.round((dimension.top + diagramDimension.correctionY) * diagramCalculated.scale),
 			right: Math.round((dimension.right + diagramDimension.correctionX) * diagramCalculated.scale),
@@ -85,7 +85,7 @@ Ea.DiagramObject._Base = extend(Ea.View, {
 	_bottom: property({api: "Bottom"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Map}
+	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_style: property({api: "Style"}),
 	
@@ -95,7 +95,7 @@ Ea.DiagramObject._Base = extend(Ea.View, {
 	_sequence: property({api: "Sequence"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Dimension}
+	 * @type {Ea._Base.DataTypes.Dimension}
 	 * @derived
 	 */
 	_dimension: property()

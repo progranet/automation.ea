@@ -17,11 +17,11 @@
 /**
  * @namespace
  */
-Ea.DataTypes = {
+Ea._Base.DataTypes = {
 
 };
 
-Ea.DataTypes._Type = define({
+Ea._Base.DataTypes.DataType = define({
 	
 	_source: null,
 	
@@ -36,7 +36,7 @@ Ea.DataTypes._Type = define({
 	}
 });
 
-Ea.DataTypes.List = extend(Ea.DataTypes._Type, {
+Ea._Base.DataTypes.List = extend(Ea._Base.DataTypes.DataType, {
 	
 	_value: null,
 	
@@ -60,7 +60,7 @@ Ea.DataTypes.List = extend(Ea.DataTypes._Type, {
 	}
 });
 
-Ea.DataTypes.Map = extend(Ea.DataTypes._Type, {
+Ea._Base.DataTypes.Map = extend(Ea._Base.DataTypes.DataType, {
 	
 	_value: null,
 	
@@ -100,7 +100,7 @@ Ea.DataTypes.Map = extend(Ea.DataTypes._Type, {
 	}
 });
 
-Ea.DataTypes.Date = extend(Ea.DataTypes._Type, {
+Ea._Base.DataTypes.Date = extend(Ea._Base.DataTypes.DataType, {
 	
 	date: null,
 	
@@ -131,7 +131,7 @@ Ea.DataTypes.Date = extend(Ea.DataTypes._Type, {
 	re: new RegExp("").compile(new RegExp("^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)( (\\d\\d):(\\d\\d):(\\d\\d))?$"))
 });
 
-Ea.DataTypes.RunState = extend(Ea.DataTypes._Type, {
+Ea._Base.DataTypes.RunState = extend(Ea._Base.DataTypes.DataType, {
 	
 	_value: null,
 	
@@ -163,7 +163,7 @@ Ea.DataTypes.RunState = extend(Ea.DataTypes._Type, {
 	}
 });
 
-Ea.DataTypes.Dimension = extend(Ea.DataTypes._Type, {
+Ea._Base.DataTypes.Dimension = extend(Ea._Base.DataTypes.DataType, {
 	
 	left: null,
 	right: null,
@@ -193,7 +193,7 @@ Ea.DataTypes.Dimension = extend(Ea.DataTypes._Type, {
 });
 
 
-Ea.DataTypes.Appearance = extend(Ea.DataTypes._Type, {
+Ea._Base.DataTypes.Appearance = extend(Ea._Base.DataTypes.DataType, {
 	
 	_backColor: null,
 	_fontColor: null,
@@ -203,9 +203,9 @@ Ea.DataTypes.Appearance = extend(Ea.DataTypes._Type, {
 	
 	create: function(source) {
 		_super.create(source);
-		this._backColor = new Ea.DataTypes.Color(source.Backcolor);
-		this._fontColor = new Ea.DataTypes.Color(source.Fontcolor);
-		this._borderColor = new Ea.DataTypes.Color(source.Bordercolor);
+		this._backColor = new Ea._Base.DataTypes.Color(source.Backcolor);
+		this._fontColor = new Ea._Base.DataTypes.Color(source.Fontcolor);
+		this._borderColor = new Ea._Base.DataTypes.Color(source.Bordercolor);
 		this._borderStyle = source.BorderStyle;
 		this._borderWidth = source.BorderWidth;
 	},
@@ -246,7 +246,7 @@ Ea.DataTypes.Appearance = extend(Ea.DataTypes._Type, {
 	
 });
 
-Ea.DataTypes.Color = extend(Ea.DataTypes._Type, {
+Ea._Base.DataTypes.Color = extend(Ea._Base.DataTypes.DataType, {
 	
 	_red: null,
 	_green: null,

@@ -34,7 +34,12 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	getDiagrams: function() {
 		var diagrams = this._getDiagrams().filter("this._getParent() == null");
 		return diagrams;
+	},
+	
+	getParent: function() {
+		return this._getParent();
 	}
+	
 },
 {
 	meta: {
@@ -44,7 +49,7 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 		objectType: 5
 	},
 	
-	getType: function(source) {
+	determineType: function(source) {
 		if (this._model.get(source))
 			type = Ea.Package.Model;
 		else
@@ -64,7 +69,7 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	_notes: property({api: "Notes"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Map}
+	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_flags: property({api: "Flags"}),
 
@@ -96,17 +101,17 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	 * @type {Boolean}
 	 * @private
 	 */
-	_model: property({api: "isModel"}),
+	_model: property({api: "IsModel"}),
 	
 	_version: property({api: "Version"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Date}
+	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_created: property({api: "Created"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Date}
+	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_modified: property({api: "Modified"}),
 	
@@ -123,8 +128,15 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	
 	/**
 	 * @type {Ea.Package._Base}
+	 * @private
 	 */
-	_parent: property({api: "ParentID", referenceBy: "id"}),
+	__parent: property({api: "ParentID", referenceBy: "id"}),
+	
+	/**
+	 * @type {Ea.Package._Base}
+	 * @derived
+	 */
+	_parent: property(),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Element._Base>}

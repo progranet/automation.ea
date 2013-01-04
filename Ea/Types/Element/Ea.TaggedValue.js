@@ -38,5 +38,5 @@ Ea.TaggedValue._Base = extend(Ea.Tag._Base, {},
 	 * @type {Ea.Element._Base}
 	 * @private
 	 */
-	_parent: property({api: "ElementID", referenceBy: "id"})
+	__parent: property({api: "ElementID", referenceBy: "id"})
 });

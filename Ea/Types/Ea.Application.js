@@ -17,7 +17,24 @@
 /**
  * @namespace
  */
-Ea.Application = {};
+Ea.Application = {
+		
+		
+	/**
+	 * Creates new EA application
+	 * 
+	 * @param {Object} params Specifies parameters of application: params.path - path in the file system
+	 * @type {Ea.Application._Base}
+	 */
+	createApplication: function(params) {
+		params = params || {};
+		var applicationApi = params.path ? new ActiveXObject("EA.App") : App;
+		var application = Ea._Base.Class.createProxy(null, Ea.Application._Base, applicationApi, params);
+		if (params.path)
+			application.getRepository().open(params.path);
+		return application;
+	}
+};
 
 Ea.Application._Base = extend(Ea.Types.Any, {
 	
@@ -28,7 +45,7 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 		source.application = this;
 		_super.create(source);
 		this.cacheProperties = params.cacheProperties === undefined ? true : params.cacheProperties;
-		this._repository = Ea.Class.createProxy(this, Ea.Repository._Base, this._source.api.Repository, params);
+		this._repository = Ea._Base.Class.createProxy(this, Ea.Repository._Base, this._source.api.Repository, params);
 	},
 	
 	/**

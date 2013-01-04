@@ -29,5 +29,5 @@ Ea.ConnectorTag._Base = extend(Ea.Tag._Feature, {},
 	 * @type {Ea.Connector._Base}
 	 * @private
 	 */
-	_parent: property({api: "ConnectorID", referenceBy: "id"})
+	__parent: property({api: "ConnectorID", referenceBy: "id"})
 });

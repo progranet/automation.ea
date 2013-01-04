@@ -29,5 +29,5 @@ Ea.AttributeTag._Base = extend(Ea.Tag._Feature, {},
 	 * @type {Ea.Attribute._Base}
 	 * @private
 	 */
-	_parent: property({api: "AttributeID", referenceBy: "id"})
+	__parent: property({api: "AttributeID", referenceBy: "id"})
 });

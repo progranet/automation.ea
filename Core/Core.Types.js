@@ -34,7 +34,7 @@ Core.Types = {
 	}
 };
 
-Core.Types.Object = Core.Lang._define("Core.Types", "Object", null, /** @lends Core.Types.Object# */ {
+Core.Types.Object = define(/** @lends Core.Types.Object# */ {
 	
 	/**
 	 * Core.Types.Object constructor
@@ -375,11 +375,14 @@ Core.Types.Filter = define(/** @lends Core.Types.Filter# */{
 	_filter: null,
 
 	/**
-	 * Creates a new filter
+	 * Creates a new filter based on provided definition.
+	 * Definition may be based on:
+	 * - class as subclass of Core.Types.Object (e.g. new Filter(Ea.Element.Class)),
+	 * - function returning boolean value (e.g. new Filter(function(element) {return element.getName() == 'ABC';})),
+	 * - string containing function body (e.g. new Filter("this.getName() == 'ABC'")).
 	 * 
 	 * @constructs
-	 * @extends Core.Types.Object
-	 * @param {?(Class|String|Function)} filter
+	 * @param {Object} filter
 	 */
 	create: function(filter) {
 		_super.create();

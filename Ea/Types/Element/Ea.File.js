@@ -23,7 +23,7 @@ Ea.File._Base = extend(Ea.Types.Named, {},
 		objectType: 13
 	},
 
-	getType: function(source) {
+	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 

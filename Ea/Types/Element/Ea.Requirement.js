@@ -24,7 +24,7 @@ Ea.Requirement._Base = extend(Ea.Types.Named, {},
 		objectType: 9
 	},
 
-	getType: function(source) {
+	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 
@@ -34,7 +34,7 @@ Ea.Requirement._Base = extend(Ea.Types.Named, {},
 	_id: property({api: "RequirementID"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Date}
+	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_modified: property({api: "LastUpdate"}),
 	

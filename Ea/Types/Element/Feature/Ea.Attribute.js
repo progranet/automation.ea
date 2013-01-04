@@ -36,7 +36,7 @@ Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 	_guid: property({api: "AttributeGUID"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Map}
+	 * @type {Ea._Base.DataTypes.Map}
 	 * @private
 	 */
 	_styleEx: property({api: "StyleEx"}),
@@ -53,7 +53,7 @@ Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 	 */
 	_position: property({api: "Pos"}),
 	
-	getType: function(source) {
+	determineType: function(source) {
 		var stereotype = this._stereotype.get(source);
 		if (stereotype == "enum")
 			return Ea.Attribute.EnumerationLiteral;

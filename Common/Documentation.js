@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 300 D&C
+   Copyright 2012 300 D&C
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@
 include("Ea@Ea");
 include("Sys@Sys");
 include("Sys.IO@Sys");
+include("Ea._Base.Documentation@Ea.Base");
 
 Documentation = {
+		
 	params: {
-
+		
 	},
 	
 	execute: function() {
@@ -31,12 +33,10 @@ Documentation = {
 		
 		var root = application.getRepository().getSelectedPackage();
 		
-		Ea.Helper.reverse(root, "Core@Core");
-		Ea.Helper.reverse(root, "Ea@Ea");
-		Ea.Helper.reverse(root, "Sys@Sys");
-		Ea.Helper.reverse(root, "Sys.IO@Sys");
-		Ea.Helper.reverse(root, "Html@Html");
-		Ea.Helper.reverse(root, "Html.IO@Html");
+		for (var l = 0; l < this.params.libs.length; l++) {
+			var lib = this.params.libs[l];
+			Ea._Base.Documentation.process(root, lib);
+		}
 
 		info("=== FINISHED ===");
 	}

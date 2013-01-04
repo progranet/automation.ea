@@ -210,8 +210,16 @@ var ea = function(name, context) {
 	                "type": "MemberExpression",
 	                "computed": false,
 	                "object": {
-	                    "type": "Identifier",
-	                    "name": "Ea"
+                        "type": "MemberExpression",
+                        "computed": false,
+                        "object": {
+                            "type": "Identifier",
+                            "name": "Ea"
+                        },
+                        "property": {
+                            "type": "Identifier",
+                            "name": "_Base"
+                        }
 	                },
 	                "property": {
 	                    "type": "Identifier",

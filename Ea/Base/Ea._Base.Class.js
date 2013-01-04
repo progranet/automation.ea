@@ -17,13 +17,13 @@
 /**
  * @namespace
  */
-Ea.Class = {
+Ea._Base.Class = {
 
 	_types: {},
 	
 	/**
 	 * @param {Class} _class
-	 * @memberOf Ea.Class
+	 * @memberOf Ea._Base.Class
 	 */
 	registerClass: function(_class) {
 		
@@ -39,13 +39,12 @@ Ea.Class = {
 	},
 	
 	/**
-	 * 
-	 * @param {Ea.Class._Attribute} attribute
+	 * @param {Ea._Base.Class._Attribute} attribute
 	 */
 	registerAttribute: function(attribute) {
 		var _class = attribute.owner;
 		this.registerClass(_class);
-		var _classReflection = Ea.Class._types[_class];
+		var _classReflection = Ea._Base.Class._types[_class];
 		_classReflection.attributes.push(attribute);
 	},
 	
@@ -53,17 +52,17 @@ Ea.Class = {
 	 * Returns attributes owned (directly) by specified class
 	 * 
 	 * @param {Class} _class
-	 * @type {Array<Ea.Class._Attribute>}
+	 * @type {Array<Ea._Base.Class._Attribute>}
 	 */
 	getOwnedAttributes: function(_class) {
-		return Ea.Class._types[_class].attributes;
+		return Ea._Base.Class._types[_class].attributes;
 	},
 		
 	/**
 	 * Returns all attributes of specified class
 	 * 
 	 * @param {Class} _class
-	 * @type {Array<Ea.Class._Attribute>}
+	 * @type {Array<Ea._Base.Class._Attribute>}
 	 */
 	getAttributes: function(_class) {
 		var attributes = [];
@@ -94,9 +93,9 @@ Ea.Class = {
 	 */
 	property: function(params) {
 		if (params.derived) {
-			return new Ea.Class.DerivedAttribute(params);
+			return new Ea._Base.Class.DerivedAttribute(params);
 		}
-		return new Ea.Class.ApiAttribute(params);
+		return new Ea._Base.Class.ApiAttribute(params);
 	},
 	
 	/**
@@ -114,13 +113,13 @@ Ea.Class = {
 			application: application,
 			value: {}
 		};
-		var type = baseType.getType({_source: source});
+		var type = baseType.determineType({_source: source});
 		var proxy = new type(source, params);
 		return proxy;
 	}	
 };
 
-Ea.Class._Attribute = define(/** @lends Ea.Class._Attribute# */{
+Ea._Base.Class._Attribute = define(/** @lends Ea._Base.Class._Attribute# */{
 
 	owner: null,
 	name: null,
@@ -128,7 +127,7 @@ Ea.Class._Attribute = define(/** @lends Ea.Class._Attribute# */{
 
 	/**
 	 * @constructs
-	 * @memberOf Ea.Class._Attribute#
+	 * @memberOf Ea._Base.Class._Attribute#
 	 */
 	create: function(params) {
 		_super.create();
@@ -158,7 +157,7 @@ Ea.Class._Attribute = define(/** @lends Ea.Class._Attribute# */{
 			this._createAccessor("set", setter, properties);
 		}
 		
-		Ea.Class.registerAttribute(this);
+		Ea._Base.Class.registerAttribute(this);
 	},
 	
 	_prepared: false,
@@ -167,8 +166,8 @@ Ea.Class._Attribute = define(/** @lends Ea.Class._Attribute# */{
 		if (this._prepared)
 			throw new Error("Property " + this.qualifiedName + " already prepared");
 		
-		this.type = Ea.Helper.typeEval(this.type || String);
-		this.elementType = Ea.Helper.isCollectionType(this.type) ? Ea.Helper.typeEval(this.elementType) : null;
+		this.type = Ea._Base.Helper.typeEval(this.type || String);
+		this.elementType = Ea._Base.Helper.isCollectionType(this.type) ? Ea._Base.Helper.typeEval(this.elementType) : null;
 		this._prepared = true;
 	},
 	
@@ -189,7 +188,7 @@ Ea.Class._Attribute = define(/** @lends Ea.Class._Attribute# */{
 	}
 });
 
-Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.ApiAttribute# */{
+Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._Base.Class.ApiAttribute# */{
 	
 	_getBy: null,
 	
@@ -324,7 +323,7 @@ Ea.Class.ApiAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.ApiAttri
 	}
 });
 
-Ea.Class.DerivedAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.DerivedAttribute# */{
+Ea._Base.Class.DerivedAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._Base.Class.DerivedAttribute# */{
 	
 	_accesors: null,
 	
@@ -379,4 +378,3 @@ Ea.Class.DerivedAttribute = extend(Ea.Class._Attribute, /** @lends Ea.Class.Deri
 	}
 });
 
-include("Ea.DataTypes@Ea");

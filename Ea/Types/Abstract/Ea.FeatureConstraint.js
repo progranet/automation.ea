@@ -18,7 +18,7 @@ Ea.FeatureConstraint = {};
 
 Ea.FeatureConstraint._Base = extend(Ea.Types.Named, {},
 {
-	getType: function(source) {
+	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 

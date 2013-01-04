@@ -26,12 +26,12 @@ Ea.Swimlanes._Base = extend(Ea.Collection.Map, {
 	}
 },
 {
+	determineType: function(source) {
+		return Ea.Swimlanes._Base;
+	},
+	
 	meta: {
 		objectType: 51
-	},
-
-	getType: function() {
-		return Ea.Swimlanes._Base;
 	}
 });
 

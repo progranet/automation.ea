@@ -116,7 +116,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	},
 	
 	getCollection: function(type, api, params) {
-		var proxy = Ea.Class.createProxy(this._source.application, type, api, params);
+		var proxy = Ea._Base.Class.createProxy(this._source.application, type, api, params);
 		return proxy;
 	},
 	
@@ -190,7 +190,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	},
 
 	_get: function(type, api, params) {
-		var proxy = Ea.Class.createProxy(this._source.application, type, api, params);
+		var proxy = Ea._Base.Class.createProxy(this._source.application, type, api, params);
 		if (type.meta.id) {
 			this._cacheId[type.meta.objectType][api[type.meta.id]] = proxy;
 			this._cacheStats[type.meta.objectType].cwi++;
@@ -252,7 +252,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 			if (row["Type"] == "reference" && row["Name"] == "Element") {
 				var supplier = this.getByGuid(Ea.Element._Base, row["Supplier"]);
 				if (supplier) {
-					var reference = new Ea.CustomReference(row["Description"], supplier);
+					var reference = new Ea._Base.CustomReference(row["Description"], supplier);
 					collection.add(reference);
 				}
 			}

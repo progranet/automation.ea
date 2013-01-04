@@ -16,13 +16,13 @@
 
 Ea.DiagramLink = {};
 
-Ea.DiagramLink._Base = extend(Ea.View, {
+Ea.DiagramLink._Base = extend(Ea.Diagram.View, {
 
 	getDimension: function() {
 		var coords = this._getPath();
 		var dimension = null;
 		if (coords) {
-			dimension = new Ea.DataTypes.Dimension({
+			dimension = new Ea._Base.DataTypes.Dimension({
 				right: 0,
 				bottom: 0
 			});
@@ -68,17 +68,17 @@ Ea.DiagramLink._Base = extend(Ea.View, {
 	_hidden: property({api: "IsHidden"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Map}
+	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_geometry: property({api: "Geometry"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Map}
+	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_style: property({api: "Style"}),
 
 	/**
-	 * @type {Ea.DataTypes.Dimension}
+	 * @type {Ea._Base.DataTypes.Dimension}
 	 * @derived
 	 */
 	_dimension: property()

@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 300 D&C
+   Copyright 2013 300 D&C
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -17,121 +17,25 @@
 /**
  * @namespace
  */
-Ea.Helper = {
+Ea._Base.Documentation = {
 		
-	params: {
-		indent: "      "
-	},
+	_buffer: null,
 	
-	/**
-	 * @memberOf Ea.Helper
-	 * @param type
-	 * @type {Boolean}
-	 */
-	isCollectionType: function(type) {
-		return Core.Lang.isClass(type) && (type == Core.Types.Collection || type.isSubclassOf(Core.Types.Collection));
-	},
-	
-	typeEval: function(type) {
-		var _type = type;
-		if (typeof type == "string")
-			type = eval(type);
-		if (!type)
-			throw new Error("Undefined type" + (_type ? " [" + _type + "]" : ""));
-		return type;
-	},
-	
-	inspect: function(object) {
-		this._inspect(object, 0, "$ = {", []);
-	},
-	
-	_ids: {},
-	
-	_indent: function(number) {
-		var indent = "";
-		for (var i = 0; i < number; i++) {
-			indent = indent + this.params.indent;
-		}
-		return indent;
-	},
-
-	_expand: function(template, params, value, indent, aggregation) {
-		if (Ea.Types.Any.isInstance(value)) {
-			if (aggregation == "composite" || aggregation == "shared") {
-				this._inspect(value, indent + 1, template + " = {", params);
-				return;
-			}
-			template = template + " = {...}";
-		}
-		params.push(value);
-		info(this._indent(indent + 1) + template, params);
-	},
-	
-	_inspect: function(object, indent, template, params) {
+	process: function(rootPackage, library) {
 		
-		var type = object._class;
-		var attributes = Ea.Class.getAttributes(type);
+		this._buffer = [];
+
+		info("*** TYPE PROCESSING ***");
+	
+		this._reverse(rootPackage, library);
+
+		info("*** FEATURE PROCESSING ***");
+
+		this._processBuffer(rootPackage);
 		
-		params.push(object);
-		info(this._indent(indent) + template, params);
-
-		if (this._ids[object.__id__]) {
-			info(this._indent(indent + 1) + "#LOOP#");
-		}
-		else {
-			this._ids[object.__id__] = object;
-			for (var ai = 0; ai < attributes.length; ai++) {
-				
-				var property = attributes[ai];
-				var value = property.get(object);
-				
-				var params = {
-					name: property.name.replace(/^_+/, ""),
-					_private: property.private,
-					aggregation: property.aggregation,
-					type: property.type,
-					isCollection: value && property.type.isClass && value.instanceOf(Core.Types.Collection)
-				};
-				params.elementType = params.isCollection ? property.elementType : null;
-				params.typeName = params.isCollection ? Core.Output.getString(params.type) + "<" + Core.Output.getString(params.elementType) + ">" : Core.Output.getString(params.type);
-				params.template = (params._private ? "-" : "") + (property.derived ? "/" : "") + params.name + " [" + params.typeName + "]";
-
-				if (params.isCollection) {
-					if (value.instanceOf(Core.Types.Map)) {
-						if (value.isEmpty()) {
-							info(this._indent(indent + 1) + "$ = {}", [params.template]);
-						}
-						else {
-							info(this._indent(indent + 1) + "$ = {", [params.template]);
-							value.forEach(function(value, key) {
-								this._expand("$ = $", [key], value, indent + 1, params.aggregation);
-							});
-							info(this._indent(indent + 1) + "}");
-						}
-					}
-					else {
-						if (value.isEmpty()) {
-							info(this._indent(indent + 1) + "$ = []", [params.template]);
-						}
-						else {
-							info(this._indent(indent + 1) + "$ = [", [params.template]);
-							value.forEach(function(value, index) {
-								this._expand("$", [], value, indent + 1, params.aggregation);
-							});
-							info(this._indent(indent + 1) + "]");
-						}
-					}
-				}
-				else {
-					this._expand("$ = $", [params.template], value, indent, params.aggregation);
-				}
-				
-			}
-		}
-		info(this._indent(indent) + "}");
 	},
 	
-	reverse: function(rootPackage, library) {
+	_reverse: function(rootPackage, library) {
 		
 		var t = library.split("@");
 		var qualifiedName = t[0];
@@ -179,7 +83,7 @@ Ea.Helper = {
 				
 			}
 			if (library)
-				Ea.Helper.reverse(rootPackage, library);
+				this._reverse(rootPackage, library);
 		}
 	},
 	
@@ -259,7 +163,7 @@ Ea.Helper = {
 				
 			}
 			if (properties) {
-				this._insertClassProperties(root, qualifiedName, ast, singleton, properties);
+				this._bufferClassProperties(root, qualifiedName, ast, singleton, properties);
 			}
 		}
 	},
@@ -307,35 +211,49 @@ Ea.Helper = {
 				}
 				_class.update();
 				
+				if (!baseClass && qualifiedName != "Core.Types.Object")
+					baseClass = "Core.Types.Object";
+				
 				if (baseClass) {
 					baseClass = this._findType(root, baseClass).type;
-					_class.getConnectors().filter("").first();
-					var generalization = _class.getConnectors().filter("this.instanceOf(Ea.Connector.Generalization)").first();
+					var generalization = _class.getConnectors().filter(Ea.Connector.Generalization).first();
 					if (!generalization)
 						_class.createConnector("", Ea.Connector.Generalization, baseClass);
 				}
 
 				if (methods)
-					this._insertClassProperties(root, qualifiedName, ast, _class, methods);
+					this._bufferClassProperties(root, qualifiedName, ast, _class, methods);
 				if (staticMethods)
-					this._insertClassProperties(root, qualifiedName, ast, _class, staticMethods, true);
+					this._bufferClassProperties(root, qualifiedName, ast, _class, staticMethods, true);
 				
 			}
 		}
 	},
 
+	_bufferClassProperties: function(root, qualifiedName, ast, _class, properties, _static) {
+		this._buffer.push({
+			qualifiedName: qualifiedName,
+			ast: ast,
+			_class: _class,
+			properties: properties,
+			_static: _static
+		});
+	},
+	
+	_processBuffer: function(root) {
+		for (var b = 0; b < this._buffer.length; b++) {
+			var buffered = this._buffer[b];
+			this._insertClassProperties(root, buffered.qualifiedName, buffered.ast, buffered._class, buffered.properties, buffered._static);
+		}
+	},
+	
 	_insertClassProperties: function(root, qualifiedName, ast, _class, properties, _static) {
 		for (var prp = 0; prp < properties.length; prp++) {
 			var property = properties[prp];
 			if (property.value.type == "FunctionExpression") {
 				
-				info("    method:$", [property.key.name]);
-				
-				var method = _class.getMethods().filter("this.getName() == '" + property.key.name + "'").first();
-				if (!method) {
-					info("    * method changed");
-					method = _class.createMethod(property.key.name);
-				}
+				var _private = property.key.name.charAt(0) == "_";
+				var notes = "";
 				
 				var commentsBefore = property.key.commentsBefore ? property.key.commentsBefore.pop() : "";
 				var doc = this._parseDoc(commentsBefore);
@@ -345,11 +263,45 @@ Ea.Helper = {
 					if (doc.type && doc.type.length != 0) {
 						type = doc.type[0].type;
 					}
-					method.setNotes(doc.comment);
 					if (doc["private"])
-						method.setVisibility("Private");
+						_private = true;
+					notes = doc.comment;
 				}
-				method._setReturnType(type);
+				if (_private)
+					continue;
+
+				info("method:$.$", [qualifiedName, property.key.name]);
+				
+				var method = _class.getMethods().filter("this.getName() == '" + property.key.name + "'").first();
+				if (!method) {
+					info("* method changed");
+					method = _class.createMethod(property.key.name);
+				}
+				
+				method.setNotes(notes);
+				if (_private)
+					method.setVisibility("Private");
+				
+				var multiplicityLower = 1;
+				var multiplicityUpper = 1;
+				if (type.indexOf("<") != -1) {
+					type = type.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
+						multiplicityLower = 0;
+						multiplicityUpper = "*";
+						return elementType;
+					});
+				}
+				if (type.indexOf(".") != -1) {
+					info("return>>>1:$", [type]);
+					type = this._findType(root, type).type;
+					info("return>>>2:$", [type]);
+					method._setClassifier(type);
+					method._setReturnType(type.getName());
+				}
+				else {
+					method._setReturnType(type);
+					
+				}
 				if (_static) {
 					method.setStatic(true);
 				}
@@ -360,48 +312,43 @@ Ea.Helper = {
 			else if (property.value.type == "CallExpression" && 
 					property.value.callee.type == "Identifier" && property.value.callee.name == "property") {
 
-				info("    property:$", [property.key.name]);
-				
-				var attribute = _class.getAttributes().filter("this.getName() == '" + property.key.name + "'").first();
-				if (!attribute) {
-					info("    * property changed");
-					attribute = _class.createAttribute(property.key.name);
-				}
-				
+				var propertyName = property.key.name.substr(1);
+				var _private = false;
+
 				var commentsBefore = property.key.commentsBefore ? property.key.commentsBefore.pop() : "";
-				var doc = this._parseDoc(commentsBefore);
-				var type = "String";
+				var doc = this._parseDoc(commentsBefore) || {};
+
+				if (doc["private"])
+					_private = true;
+				
+				if (_private)
+					continue;
+				
+				info("property:$.$", [qualifiedName, propertyName]);
+				
 				var multiplicityLower = 1;
 				var multiplicityUpper = 1;
-				if (doc) {
-					attribute.setNotes(doc.comment);
-					if (doc.type && doc.type.length != 0) {
-						type = doc.type[0].type;
-						if (type.indexOf("<") != -1) {
-							type = type.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
-								multiplicityLower = 0;
-								multiplicityUpper = "*";
-								return elementType;
-							});
-						}
-						attribute.setLower(multiplicityLower);
-						attribute.setUpper(multiplicityUpper);
+				var type = "String";
+
+				if (doc.type && doc.type.length != 0) {
+					type = doc.type[0].type;
+					if (type.indexOf("<") != -1) {
+						type = type.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
+							multiplicityLower = 0;
+							multiplicityUpper = "*";
+							return elementType;
+						});
 					}
-					if (doc["private"])
-						attribute.setVisibility("Private");
-					if (doc["derived"])
-						attribute.setDerived(true);
 				}
+
 				if (type.indexOf(".") != -1) {
-					info(">>>1:$", [type]);
+					//info(">>>1:$", [type]);
 					type = this._findType(root, type).type;
-					info(">>>2:$", [type]);
-					attribute._setClassifier(type);
-					attribute._setPrimitiveType(type.getName());
+					//info(">>>2:$", [type]);
 					
-					var association = _class.getConnectors().filter("this.instanceOf(Ea.Connector.Association) && this.getSupplierEnd().getRole() == '" + property.key.name + "'").first();
+					var association = _class.getConnectors().filter("this.instanceOf(Ea.Connector.Association) && this.getSupplierEnd().getRole() == '" + propertyName + "'").first();
 					if (!association) {
-						info("    * association changed");
+						info("* association changed");
 						association = _class.createConnector("", Ea.Connector.Association, type);
 					}
 					var clientEnd = association.getClientEnd();
@@ -416,16 +363,35 @@ Ea.Helper = {
 						supplierEnd.setMultiplicity(multiplicityLower + ".." + multiplicityUpper);
 					else
 						supplierEnd.setMultiplicity("");
-					supplierEnd.setRole(property.key.name);
-					if (doc["private"])
+					supplierEnd.setRole(propertyName);
+					supplierEnd.setNotes(doc.comment || "");
+					
+					if (_private)
 						supplierEnd.setVisibility("Private");
 					supplierEnd.update();
 				}
 				else {
+					var attribute = _class.getAttributes().filter("this.getName() == '" + propertyName + "'").first();
+					if (!attribute) {
+						info("* property changed");
+						attribute = _class.createAttribute(propertyName);
+					}
+					if (_private)
+						attribute.setVisibility("Private");
+					attribute.setNotes(doc.comment || "");
+
 					attribute._setPrimitiveType(type);
+					if (doc["derived"])
+						attribute.setDerived(true);
+					attribute.setStereotype("property");
+					
+					// TODO: manage changes to [1..1]
+					if (multiplicityLower != 1 || multiplicityUpper != 1) {
+						attribute.setLower(multiplicityLower);
+						attribute.setUpper(multiplicityUpper);
+					}
+					attribute.update();
 				}
-				attribute.setStereotype("property");
-				attribute.update();
 			}
 		}
 	},
@@ -446,14 +412,46 @@ Ea.Helper = {
 			var paramName = property.value.params[prm].name;
 			param = params[paramName] || {};
 			
-			info("      param:$", [paramName]);
+			info("  param:$", [paramName]);
 			var parameter = method.getParameters().filter("this.getName() == '" + paramName + "'").first();
 			if (!parameter) {
-				info("      * param changed");
+				info("  * param changed");
 				parameter = method.createParameter(paramName);
 			}
 			
-			parameter._setPrimitiveType(param.type || "any");
+			var type = param.type || "any";
+			var multiplicityLower = 1;
+			if (type.charAt(0) == "?") {
+				multiplicityLower = 0;
+				type = type.substr(1);
+			}
+			if (type.indexOf("|") != -1) {
+				info("!!!!!!!!!!!!!!!! $", [type]);
+			}
+			var multiplicityUpper = 1;
+			if (type.indexOf("<") != -1) {
+				type = type.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
+					multiplicityLower = 0;
+					multiplicityUpper = "*";
+					return elementType;
+				});
+			}
+			if (type.indexOf(".") != -1) {
+				info("param>>>1:$", [type]);
+				try {
+					type = this._findType(root, type).type;
+					info("param>>>2:$", [type]);
+					parameter._setClassifier(type);
+					parameter._setPrimitiveType(type.getName());
+				}
+				catch (exception) {
+					info("param!!!3:$", [type]);
+				}
+			}
+			else {
+				parameter._setPrimitiveType(type);
+				
+			}
 			parameter.setNotes(param.comment || "");
 			parameter.update();
 		}
@@ -467,7 +465,9 @@ Ea.Helper = {
 
 		if (!comment || comment.charAt(0) != "*")
 			return null;
-		var doc = {};
+		var doc = {
+			
+		};
 		if (comment.indexOf("@") == -1) {
 			doc.comment = clean(comment);
 			comment = "";
@@ -494,82 +494,3 @@ Ea.Helper = {
 	}
 	
 };
-
-Ea.Helper.Target = extend(Core.Target.AbstractTarget, /** @lends Ea.Helper.Target# */ {
-	
-	_name: null,
-	
-	create: function(name, debug) {
-		_super.create(debug);
-		this._name = name;
-		Ea.getDefaultApplication().getRepository().showOutput(this._name);
-		Ea.getDefaultApplication().getRepository().clearOutput(this._name);
-	},
-	
-	/**
-	 * @memberOf Ea.Helper.Target#
-	 */
-	write: function(message) {
-		if (this._type == Core.Target.Type.TREE)
-			message = message.replace(/\|/g, "      |").replace(/\-/g, "—").replace(/\+/g, "[•]");
-		Ea.getDefaultApplication().getRepository().writeOutput(this._name, message);
-	}
-});
-
-Ea.Helper.Log = define(/** @lends Ea.Helper.Log# */{
-	
-	_path: null,
-	
-	create: function(element) {
-		_super.create();
-		this._path = [];
-		var parent = element.getParent();
-		if (parent) {
-			var parentPath = Ea.Helper.Log.getLog(parent).getPath();
-			for (var p = 0; p < parentPath.length; p++) {
-				this._path.push(parentPath[p]);
-			}
-		}
-		this._path.push(element);
-	},
-	
-	/**
-	 * @memberOf Ea.Helper.Log#
-	 */
-	getPath: function() {
-		return this._path;
-	},
-	
-	log: function() {
-		
-		var path = this.getPath();
-		var _tab = function(count, string) {
-			var gen = "";
-			for (var i = 0; i < count; i++)
-				gen = gen + string;
-			return gen;
-		};
-
-		if (path.length > 0) {
-			for (var p = 0; p < path.length; p++) {
-				if (!Ea.Helper.Log._current || p >= Ea.Helper.Log._current.length || Ea.Helper.Log._current[p] != path[p]) {
-					var element = path[p];
-					var string = (element.instanceOf(Ea.Package._Base) ? "+" : "") + " " + element;
-					_treeLogger(_tab(p, "|") + "-" + string);
-				}
-			}
-			Ea.Helper.Log._current = path;
-		}
-	}
-},
-{
-	_current: null,
-	
-	_logs: {},
-
-	getLog: function(element) {
-		if (!Ea.Helper.Log._logs[element.getGuid()])
-			Ea.Helper.Log._logs[element.getGuid()] = new Ea.Helper.Log(element);
-		return Ea.Helper.Log._logs[element.getGuid()];
-	}
-});

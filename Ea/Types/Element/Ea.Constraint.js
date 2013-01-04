@@ -23,7 +23,7 @@ Ea.Constraint._Base = extend(Ea.Types.Named, {},
 		objectType: 11
 	},
 	
-	getType: function(source) {
+	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 
@@ -42,5 +42,5 @@ Ea.Constraint._Base = extend(Ea.Types.Named, {},
 	 * @type {Ea.Element._Base}
 	 * @private
 	 */
-	_parent: property({api: "ParentID", referenceBy: "id"})
+	__parent: property({api: "ParentID", referenceBy: "id"})
 });

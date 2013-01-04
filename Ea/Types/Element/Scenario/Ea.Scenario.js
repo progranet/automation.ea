@@ -52,7 +52,7 @@ Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 		objectType: 10
 	},
 
-	getType: function(source) {
+	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 

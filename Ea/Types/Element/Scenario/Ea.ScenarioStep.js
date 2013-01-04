@@ -35,8 +35,8 @@ Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 		objectType: 54
 	},
 	
-	getType: function(source) {
-		var typeName = Ea.ScenarioStep.StepType[this._type.get(source)];
+	determineType: function(source) {
+		var typeName = Ea.ScenarioStep.StepType[this.__type.get(source)];
 		var type = this.namespace[typeName] || this._createType(typeName);
 		return type;
 	},
@@ -57,7 +57,7 @@ Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 	/**
 	 * @private
 	 */
-	_type: property({api: "StepType"}),
+	__type: property({api: "StepType"}),
 	
 	/**
 	 * @type {Ea.Element.UseCase}

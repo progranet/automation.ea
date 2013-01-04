@@ -30,7 +30,7 @@ Ea.Properties._Base = extend(Ea.Collection.Map, {
 		objectType: 48
 	},
 
-	getType: function() {
+	determineType: function(source) {
 		return Ea.Properties._Base;
 	}
 });

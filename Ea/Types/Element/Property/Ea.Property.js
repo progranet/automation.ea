@@ -32,8 +32,8 @@ Ea.Property._Base = extend(Ea.Types.Named, {},
 		objectType: 49
 	},
 
-	getType: function(source) {
-		var typeName = Ea.Property.PropertyType[this._type.get(source)];
+	determineType: function(source) {
+		var typeName = Ea.Property.PropertyType[this.__type.get(source)];
 		var type = this.namespace[typeName] || this._createType(typeName);
 		return type;
 	},
@@ -41,7 +41,7 @@ Ea.Property._Base = extend(Ea.Types.Named, {},
 	/**
 	 * @private
 	 */
-	_type: property({api: "Type"}),
+	__type: property({api: "Type"}),
 	
 	/**
 	 * @private
@@ -55,7 +55,7 @@ Ea.Property._Base = extend(Ea.Types.Named, {},
 Ea.Property.Enum = extend(Ea.Property._Base, {},
 {
 	/**
-	 * @type {Ea.DataTypes.List}
+	 * @type {Ea._Base.DataTypes.List}
 	 * @separator ;
 	 */
 	_validation: property({api: "Validation"})

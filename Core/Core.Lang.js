@@ -41,7 +41,7 @@ Core.Lang = {
 	 * @type {Class}
 	 */
 	define: function(namespace, name, properties, staticProperties) {
-		return Core.Lang.extend(namespace, name, null, properties, staticProperties);
+		return Core.Lang.extend(namespace, name, Core.Types.Object, properties, staticProperties);
 	},
 	
 	/**
@@ -60,11 +60,13 @@ Core.Lang = {
 		if (typeof(namespace) != "string")
 			namespace = namespace.qualifiedName;
 		
-		if (superClass === undefined) {
-			throw new Error("Undefined super class for " + namespace + "." + name);
+		if (!superClass) {
+			if (namespace != "Core.Types" || name != "Object")
+				throw new Error("Undefined super class for " + namespace + "." + name);
+			superClass = null;
 		}
 		
-		superClass = superClass || Core.Types.Object;
+		//superClass = superClass || Core.Types.Object;
 		properties = properties || {};
 		if (!properties.create) {
 			var args = Core.parse(superClass.prototype.create).joinedArguments;
@@ -73,14 +75,17 @@ Core.Lang = {
 		
 		var _class = Core.Lang._define(namespace, name, superClass, properties, staticProperties);
 		
-		for (var propertyName in superClass.prototype) {
-			var property = superClass.prototype[propertyName];
-			if(!properties[propertyName]) {
-				properties[propertyName] = property;
+		if (superClass) {
+			for (var propertyName in superClass.prototype) {
+				var property = superClass.prototype[propertyName];
+				if(!properties[propertyName]) {
+					properties[propertyName] = property;
+				}
+				else if (typeof property == "function" && propertyName.indexOf(".") == -1) {
+					properties["" + superClass.qualifiedName + "." + propertyName + ""] = property;
+				}
 			}
-			else if (typeof property == "function" && propertyName.indexOf(".") == -1) {
-				properties["" + superClass.qualifiedName + "." + propertyName + ""] = property;
-			}
+			superClass._subClass.push(_class);
 		}
 		
 		if (Core.isNative(properties.toString))
@@ -88,7 +93,6 @@ Core.Lang = {
 				return this._toString();
 			};
 		
-		if (superClass) superClass._subClass.push(_class);
 		return _class;
 	},
 	

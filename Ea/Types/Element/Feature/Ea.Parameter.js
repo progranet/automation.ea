@@ -62,13 +62,13 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	_position: property({api: "Position"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Map}
+	 * @type {Ea._Base.DataTypes.Map}
 	 * @private
 	 */
 	_style: property({api: "Style"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Map}
+	 * @type {Ea._Base.DataTypes.Map}
 	 * @private
 	 */
 	_styleEx: property({api: "StyleEx"}),
@@ -77,13 +77,13 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	 * @type {Ea.Types.Namespace}
 	 * @derived
 	 */
-	__parent: property(),
+	_parent: property(),
 
 	/**
 	 * @type {Ea.Method._Base}
 	 * @private
 	 */
-	_parent: property({api: "OperationID", referenceBy: "id"}),
+	__parent: property({api: "OperationID", referenceBy: "id"}),
 
 	/**
 	 * @type {Ea.Collection.Map<Ea.ParameterTag._Base>}

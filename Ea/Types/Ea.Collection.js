@@ -66,7 +66,7 @@ Ea.Collection._Base = extend(Core.Types.Collection, {
 		objectType: 3
 	},
 
-	getType: function() {
+	determineType: function(source) {
 		return Ea.Collection._Base;
 	},
 	
@@ -91,7 +91,7 @@ Ea.Collection.Map = extend(Core.Types.Map, {
 	}
 },
 {
-	getType: function() {
+	determineType: function(source) {
 		return Ea.Collection.Map;
 	},
 	

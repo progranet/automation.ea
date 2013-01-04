@@ -137,7 +137,7 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 		objectType: 8
 	},
 
-	getType: function(source) {
+	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	},
 	
@@ -160,12 +160,12 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	_stereotype: property({api: "Stereotype"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Map}
+	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_style: property({api: "ExtendedStyle"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Map}
+	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_styleEx: property({api: "StyleEx"}),
 	
@@ -193,13 +193,13 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	 * @type {Ea.Types.Namespace}
 	 * @derived
 	 */
-	__parent: property(),
+	_parent: property(),
 
 	/**
 	 * @type {Ea.Element._Base}
 	 * @private
 	 */
-	_parent: property({api: "ParentID", referenceBy: "id"}),
+	__parent: property({api: "ParentID", referenceBy: "id"}),
 	
 	/**
 	 * @type {Ea.Package._Base}
@@ -264,12 +264,12 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	_version: property({api: "Version"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Date}
+	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_created: property({api: "CreatedDate"}),
 	
 	/**
-	 * @type {Ea.DataTypes.Date}
+	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_modified: property({api: "ModifiedDate"}),
 	
@@ -282,7 +282,7 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 
 include("Ea.SwimlaneDef@Ea.Types.Diagram");
 
-Ea.View = extend(Ea.Types.Any, {
+Ea.Diagram.View = extend(Ea.Types.Any, {
 	
 	_dimension: null,
 
@@ -300,13 +300,13 @@ Ea.View = extend(Ea.Types.Any, {
 	 * @type {Ea.Types.Namespace}
 	 * @derived
 	 */
-	__parent: property(),
+	_parent: property(),
 
 	/**
 	 * @type {Ea.Diagram._Base}
 	 * @private
 	 */
-	_parent: property({api: "DiagramID", referenceBy: "id"})
+	__parent: property({api: "DiagramID", referenceBy: "id"})
 });
 
 include("Ea.DiagramLink@Ea.Types.Diagram");

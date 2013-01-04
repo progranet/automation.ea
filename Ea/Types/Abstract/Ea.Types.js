@@ -71,7 +71,7 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	 * @param {Object} source
 	 * @type {Class}
 	 */
-	getType: function(source) {
+	determineType: function(source) {
 		return this.namespace._Base;
 	},
 	
@@ -99,7 +99,7 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	 * Initializes EA Class
 	 */
 	initialize: function() {
-		Ea.Class.registerClass(this);
+		Ea._Base.Class.registerClass(this);
 	}
 });
 
@@ -163,7 +163,7 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 	 * @type {Ea.Types.Namespace}
 	 * @derived
 	 */
-	__parent: property(),
+	_parent: property(),
 	
 	/**
 	 * @derived

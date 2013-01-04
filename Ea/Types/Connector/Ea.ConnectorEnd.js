@@ -35,9 +35,9 @@ Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {
 
 	_role: property({api: "Role"}),
 	
-	_roleNote: property({api: "RoleNote"}),
+	_notes: property({api: "RoleNote"}),
 	
-	_roleType: property({api: "RoleType"}),
+	_type: property({api: "RoleType"}),
 	
 	_stereotype: property({api: "Stereotype"}),
 	

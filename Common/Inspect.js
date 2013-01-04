@@ -52,7 +52,7 @@ Inspect = {
 			target = new Sys.IO.FileTarget(this.params.output);
 			Core.Log.registerTarget("info", target);
 		}
-		Ea.Helper.inspect(object);
+		Ea._Base.Helper.inspect(object);
 		if (target) {
 			target.close();
 		}
