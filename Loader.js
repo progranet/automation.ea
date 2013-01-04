@@ -93,11 +93,19 @@ _load = function(library) {
 			break;
 		}
 	}
+	
 	if (!file)
 		throw new Error("Library not found: " + library);
-	
 	var source = file.ReadAll();
-	
+
+	/*var builded = false;
+	var root = _scriptRoot[0];;
+	var url = "https://raw.github.com/progranet/automation.ea/master/" + _package.replace(/\\/g, "/") + qualifiedName  + ".js";
+	winHttpReq.Open("GET", url, false);
+	winHttpReq.Send();
+	var source = winHttpReq.ResponseText;
+	//WriteOutput("Loader", "result:" + result, undefined);*/
+
 	return {
 		source: source,
 		path: root + _package,
@@ -413,6 +421,8 @@ ClearOutput("Loader");
 //EnsureOutputVisible("Loader");
 
 fileSystem = new ActiveXObject("Scripting.FileSystemObject");
+winHttpReq = new ActiveXObject("WinHttp.WinHttpRequest.5.1");
+
 External = {};
 
 _included = {};
