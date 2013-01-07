@@ -14,15 +14,15 @@
    limitations under the License.
 */
 
-Ea.Transition = {};
+Ea.Transition = {
+		meta: {
+			api: "Transition",
+			objectType: 44
+		}
+};
 
 Ea.Transition._Base = extend(Ea.Types.Any, {},
 {
-	meta: {
-		api: "Transition",
-		objectType: 44
-	},
-	
 	_notes: property({api: "Notes"}),
 	
 	_state: property({api: "TxState"}),

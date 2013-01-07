@@ -14,16 +14,16 @@
    limitations under the License.
 */
 
-Ea.Requirement = {};
+Ea.Requirement = {
+		meta: {
+			//id: "RequirementID",
+			api: "Requirement",
+			objectType: 9
+		}
+};
 
 Ea.Requirement._Base = extend(Ea.Types.Named, {},
 {
-	meta: {
-		//id: "RequirementID",
-		api: "Requirement",
-		objectType: 9
-	},
-
 	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	},

@@ -15,6 +15,11 @@
 */
 
 Ea.ConnectorEnd = {
+	meta: {
+		api: "ConnectorEnd",
+		objectType: 22
+	},
+
 	Aggregation: {
 		0: "none",
 		1: "shared",
@@ -23,16 +28,21 @@ Ea.ConnectorEnd = {
 };
 
 Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {
+	
 	getAggregation: function() {
 		return Ea.ConnectorEnd.Aggregation[this._getAggregation()];
+	},
+	
+	setAggregation: function(kind) {
+		for (var i in Ea.ConnectorEnd.Aggregation) {
+			if (Ea.ConnectorEnd.Aggregation[i] == kind)
+				return this._setAggregation(i);
+		}
+		throw new Error("Unknown aggregation kind: " + kind + " for ConnectorEnd: " + this);
 	}
+	
 },
 {
-	meta: {
-		api: "ConnectorEnd",
-		objectType: 22
-	},
-
 	_role: property({api: "Role"}),
 	
 	_notes: property({api: "RoleNote"}),

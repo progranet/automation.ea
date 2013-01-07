@@ -14,15 +14,15 @@
    limitations under the License.
 */
 
-Ea.AttributeConstraint = {};
+Ea.AttributeConstraint = {
+		meta: {
+			api: "AttributeConstraint",
+			objectType: 33
+		}
+};
 
 Ea.AttributeConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
 {
-	meta: {
-		api: "AttributeConstraint",
-		objectType: 33
-	},
-
 	/**
 	 * @type {Ea.Attribute._Base}
 	 * @private

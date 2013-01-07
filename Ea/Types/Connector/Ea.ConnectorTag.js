@@ -14,17 +14,17 @@
    limitations under the License.
 */
 
-Ea.ConnectorTag = {};
+Ea.ConnectorTag = {
+		meta: {
+			//id: "TagID",
+			//guid: "TagGUID",
+			api: "ConnectorTag",
+			objectType: 36
+		}
+};
 
 Ea.ConnectorTag._Base = extend(Ea.Tag._Feature, {},
 {
-	meta: {
-		//id: "TagID",
-		//guid: "TagGUID",
-		api: "ConnectorTag",
-		objectType: 36
-	},
-	
 	/**
 	 * @type {Ea.Connector._Base}
 	 * @private

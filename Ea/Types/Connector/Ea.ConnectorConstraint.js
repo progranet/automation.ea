@@ -14,15 +14,15 @@
    limitations under the License.
 */
 
-Ea.ConnectorConstraint = {};
-
-Ea.ConnectorConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
-{
+Ea.ConnectorConstraint = {
 	meta: {
 		api: "ConnectorConstraint",
 		objectType: 37
-	},
-	
+	}
+};
+
+Ea.ConnectorConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
+{
 	/**
 	 * @type {Ea.Connector._Base}
 	 * @private

@@ -16,7 +16,14 @@
 
 include("Ea.ConnectorEnd@Ea.Types.Connector");
 
-Ea.Connector = {};
+Ea.Connector = {
+	meta: {
+		id: "ConnectorID",
+		guid: "ConnectorGUID",
+		api: "Connector",
+		objectType: 7
+	}	
+};
 
 Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	
@@ -71,13 +78,6 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	}
 },
 {
-	meta: {
-		id: "ConnectorID",
-		guid: "ConnectorGUID",
-		api: "Connector",
-		objectType: 7
-	},
-	
 	/**
 	 * @type {Number}
 	 */

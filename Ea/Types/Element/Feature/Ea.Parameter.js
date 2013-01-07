@@ -14,7 +14,13 @@
    limitations under the License.
 */
 
-Ea.Parameter = {};
+Ea.Parameter = {
+		meta: {
+			//guid: "ParameterGUID",
+			api: "Parameter",
+			objectType: 25
+		}
+};
 
 Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	getParent: function() {
@@ -22,12 +28,6 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	}
 },
 {
-	meta: {
-		//guid: "ParameterGUID",
-		api: "Parameter",
-		objectType: 25
-	},
-
 	_guid: property({api: "ParameterGUID"}),
 	
 	_alias: property({api: "Alias"}),

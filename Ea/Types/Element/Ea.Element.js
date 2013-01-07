@@ -17,7 +17,14 @@
 /**
  * @namespace
  */
-Ea.Element = {};
+Ea.Element = {
+		meta: {
+			id: "ElementID",
+			guid: "ElementGUID",
+			api: "Element",
+			objectType: 4
+		}
+};
 
 Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 
@@ -107,13 +114,6 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	}
 },
 {
-	meta: {
-		id: "ElementID",
-		guid: "ElementGUID",
-		api: "Element",
-		objectType: 4
-	},
-	
 	_subTypes: {
 		Event: {
 			0: "SendSignalAction",	// Send event
@@ -466,13 +466,13 @@ Ea.Element.Classifier = extend(Ea.Element.Type, {
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Attribute.Attribute>}
-	 * @aggregation composite
 	 * @private
 	 */
 	__attributes: property({api: "Attributes"}),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Attribute.Attribute>}
+	 * @aggregation composite
 	 * @derived
 	 */
 	_attributes: property(),
@@ -510,7 +510,7 @@ Ea.Element.DataType = extend(Ea.Element.Classifier);
 Ea.Element.Enumeration = extend(Ea.Element.DataType, {
 	
 	getLiterals: function() {
-		var literals = this._getLiterals().filter("this.getStereotype() == 'enum'");
+		var literals = this._getAttributes().filter("this.getStereotype() == 'enum'");
 		return literals;
 	}
 	
@@ -521,12 +521,6 @@ Ea.Element.Enumeration = extend(Ea.Element.DataType, {
 	/**
 	 * @type {Ea.Collection._Base<Ea.Attribute.EnumerationLiteral>}
 	 * @aggregation composite
-	 * @private
-	 */
-	__literals: property({api: "Attributes"}),
-	
-	/**
-	 * @type {Ea.Collection._Base<Ea.Attribute.EnumerationLiteral>}
 	 * @derived
 	 */
 	_literals: property()

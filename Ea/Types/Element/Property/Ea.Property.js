@@ -15,6 +15,11 @@
 */
 
 Ea.Property = {
+	meta: {
+		api: "Property",
+		objectType: 49
+	},
+
 	PropertyType: {
 		0: "String",
 		1: "Integer",
@@ -27,11 +32,6 @@ Ea.Property = {
 
 Ea.Property._Base = extend(Ea.Types.Named, {},
 {
-	meta: {
-		api: "Property",
-		objectType: 49
-	},
-
 	determineType: function(source) {
 		var typeName = Ea.Property.PropertyType[this.__type.get(source)];
 		var type = this.namespace[typeName] || this._createType(typeName);

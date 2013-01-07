@@ -14,17 +14,17 @@
    limitations under the License.
 */
 
-Ea.MethodTag = {};
+Ea.MethodTag = {
+		meta: {
+			//id: "TagID",
+			//guid: "TagGUID",
+			api: "MethodTag",
+			objectType: 36
+		}
+};
 
 Ea.MethodTag._Base = extend(Ea.Tag._Feature, {},
 {
-	meta: {
-		//id: "TagID",
-		//guid: "TagGUID",
-		api: "MethodTag",
-		objectType: 36
-	},
-
 	/**
 	 * @type {Ea.Method._Base}
 	 * @private

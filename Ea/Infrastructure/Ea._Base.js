@@ -230,6 +230,6 @@ Ea._Base.ContextReference = define({
 });
 
 
-include("Ea._Base.Class@Ea.Base");
-include("Ea._Base.DataTypes@Ea.Base");
-include("Ea._Base.Helper@Ea.Base");
+include("Ea._Base.Class@Ea.Infrastructure");
+include("Ea._Base.DataTypes@Ea.Infrastructure");
+include("Ea._Base.Helper@Ea.Infrastructure");

@@ -14,9 +14,6 @@
    limitations under the License.
 */
 
-/**
- * @namespace
- */
 Ea._Base.Class = {
 
 	_types: {},
@@ -34,8 +31,9 @@ Ea._Base.Class = {
 			attributes: []
 		};
 		
-		if (_class.meta && _class.meta.objectType)
-			Ea._objectTypes[_class.meta.objectType] = _class;
+		var meta = _class.namespace.meta;
+		if (meta && meta.objectType)
+			Ea._objectTypes[meta.objectType] = _class;
 	},
 	
 	/**
@@ -119,21 +117,20 @@ Ea._Base.Class = {
 	}	
 };
 
-Ea._Base.Class._Attribute = define(/** @lends Ea._Base.Class._Attribute# */{
+Ea._Base.Class._Attribute = define({
 
 	owner: null,
 	name: null,
 	qualifiedName: null,
 
-	/**
-	 * @constructs
-	 * @memberOf Ea._Base.Class._Attribute#
-	 */
 	create: function(params) {
 		_super.create();
 		Core.merge(this, params);
 	},
 	
+	/**
+	 * 
+	 */
 	initialize: function(_class, propertyName, properties) {
 		this.owner = _class;
 		this.name = propertyName;
@@ -194,7 +191,7 @@ Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._B
 	
 	prepare: function() {
 		_super.prepare();
-		if (this.type.isClass && this.type.isSubclassOf(Ea.Types.Any)) {
+		if (this.type.isClass && (this.type.isSubclassOf(Core.Types.Collection) || this.type.isSubclassOf(Ea.Types.Any))) {
 			this._getBy = this.referenceBy ? ("getBy" + this.referenceBy.substr(0, 1).toUpperCase() + this.referenceBy.substr(1).toLowerCase()) : "get";
 		}
 	},
@@ -218,25 +215,20 @@ Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._B
 	},
 	
 	_init: function(source) {
-		
 		var apiValue = this._getApiValue(source);
-		
+		var value = null;
 		if (this.type.isClass) {
-			if (this.type.isSubclassOf(Core.Types.Collection)) {
-				var collection = source.application.getRepository().getCollection(this.type, apiValue, this);
-				source.value[this.name] = collection;
-				return;
+			if (this.type.isSubclassOf(Core.Types.Collection) || this.type.isSubclassOf(Ea.Types.Any)) {
+				value = apiValue ? source.application._repository[this._getBy](this.type, apiValue, this) : null;
 			}
-			if (this.type.isSubclassOf(Ea.Types.Any)) {
-				var proxy = apiValue ? source.application.getRepository()[this._getBy](this.type, apiValue) : null;
-				source.value[this.name] = proxy;
-				return;
+			else {
+				value = this.type.create(apiValue, this);
 			}
-			var value = this.type.create(apiValue, this);
-			source.value[this.name] = value;
-			return;
 		}
-		source.value[this.name] = (apiValue == null ? null : new this.type(apiValue).valueOf());
+		else {
+			value = new this.type(apiValue).valueOf();
+		}
+		source.value[this.name] = value;
 	},
 	
 	_getApiValue: function(source) {

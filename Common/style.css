@@ -1,0 +1,106 @@
+* {
+	font-family: Calibri;
+	font-size: 11pt;
+}
+
+p, ul, li {
+	font-family: Calibri;
+	font-size: 11pt;
+}
+
+ul, li {
+	margin-top: 0px;
+	padding-top: 0px;
+}
+
+table {
+	border: 0px;
+    border-spacing: 0;
+	border-collapse: collapse;
+	margin: 0px;
+}
+
+td, th {
+	border: 1px solid black;
+	padding: 0px;
+}
+
+td.list {
+	border: 0px;
+}
+
+th {
+	background-color: #C6D9F1
+}
+
+a:link {     
+	text-decoration: none;
+	color: blue; 
+}
+
+a:visited {
+	color: blue;
+}
+
+a:hover {
+	text-decoration: underline; 
+	color: red;
+}
+
+.spacer {
+	width: 100%;
+	height: 20px;
+}
+
+.package-plain {
+	font-weight: bold;
+	font-size: 12pt;
+}
+
+.cell-th {
+	margin: 2px;
+	margin-left: 5px;
+	margin-right: 5px;
+	text-align: left;
+}
+
+.cell-th-span {
+	margin: 5px;
+}
+
+.cell-td {
+	margin: 2px;
+	margin-left: 5px;
+	margin-right: 5px;
+	text-align: left;
+}
+
+.cell-td-span, .actor-id {
+	margin: 5px;
+}
+
+.actor-id {
+	color: silver;
+	padding: 20px;
+}
+
+.cell-th-span-inner {
+	color: #243F60;
+}
+
+.diagram-image-block {
+	text-align: center;
+}
+
+.diagram-image-img {
+	text-align: center;
+}
+
+.diagram-name-block {
+	text-align: center;
+}
+
+.diagram-name-span {
+	text-align: center;
+	margin: 0px;
+}

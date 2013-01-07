@@ -17,7 +17,12 @@
 /**
  * @namespace
  */
-Ea.Project = {};
+Ea.Project = {
+		meta: {
+			api: "Project",
+			objectType: 1
+		}		
+};
 
 Ea.Project._Base = extend(Ea.Types.Any, /** @lends Ea.Project._Base# */ {
 	
@@ -54,10 +59,4 @@ Ea.Project._Base = extend(Ea.Types.Any, /** @lends Ea.Project._Base# */ {
 		this._source.api.LoadProject(path);
 	}
 	
-},
-{
-	meta: {
-		api: "Project",
-		objectType: 1
-	}
 });

@@ -14,17 +14,17 @@
    limitations under the License.
 */
 
-Ea.TaggedValue = {};
+Ea.TaggedValue = {
+		meta: {
+			//id: "PropertyID",
+			//guid: "PropertyGUID",
+			api: "TaggedValue",
+			objectType: 12
+		}
+};
 
 Ea.TaggedValue._Base = extend(Ea.Tag._Base, {},
 {
-	meta: {
-		//id: "PropertyID",
-		//guid: "PropertyGUID",
-		api: "TaggedValue",
-		objectType: 12
-	},
-	
 	_notes: property({api: "Notes"}),
 	
 	/**

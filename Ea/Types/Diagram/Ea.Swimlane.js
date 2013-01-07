@@ -14,14 +14,14 @@
    limitations under the License.
 */
 
-Ea.Swimlane = {};
+Ea.Swimlane = {
+		meta: {
+			api: "Swimlane",
+			objectType: 52
+		}
+};
 
 Ea.Swimlane._Base = extend(Ea.Types.Any, {}, {
-	
-	meta: {
-		api: "Swimlane",
-		objectType: 52
-	},
 	
 	/**
 	 * @type {Number}

@@ -14,7 +14,13 @@
    limitations under the License.
 */
 
-Ea.DiagramObject = {};
+Ea.DiagramObject = {
+		meta: {
+			//id: "InstanceID",
+			api: "DiagramObject",
+			objectType: 19
+		}
+};
 
 Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 
@@ -44,12 +50,6 @@ Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 	}
 },
 {
-	meta: {
-		//id: "InstanceID",
-		api: "DiagramObject",
-		objectType: 19
-	},
-	
 	/**
 	 * @type {Number}
 	 */

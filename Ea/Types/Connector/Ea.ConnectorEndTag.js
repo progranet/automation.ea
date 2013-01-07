@@ -14,13 +14,13 @@
    limitations under the License.
 */
 
-Ea.ConnectorEndTag = {};
+Ea.ConnectorEndTag = {
+		meta: {
+			//guid: "PropertyGUID",
+			api: "RoleTag",
+			objectType: 41
+		}
 
-Ea.ConnectorEndTag._Base = extend(Ea.Tag._Extended, {},
-{
-	meta: {
-		//guid: "PropertyGUID",
-		api: "RoleTag",
-		objectType: 41
-	}
-});
+};
+
+Ea.ConnectorEndTag._Base = extend(Ea.Tag._Extended);

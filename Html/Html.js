@@ -36,7 +36,7 @@ Html = {
 		}
 	},
 	
-	_templateNamePattern: new RegExp("^<\\!--\\s*([\\w]+)\\s*-->\\s*$"),
+	_templateNamePattern: new RegExp("^<\\!--\\s*([\\w\\-]+)\\s*-->\\s*$"),
 	
 	/**
 	 * Initializes namespace

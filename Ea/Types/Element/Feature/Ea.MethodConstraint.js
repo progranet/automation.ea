@@ -14,15 +14,15 @@
    limitations under the License.
 */
 
-Ea.MethodConstraint = {};
+Ea.MethodConstraint = {
+		meta: {
+			api: "MethodConstraint",
+			objectType: 35
+		}
+};
 
 Ea.MethodConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
 {
-	meta: {
-		api: "MethodConstraint",
-		objectType: 35
-	},
-	
 	/**
 	 * @type {Ea.Method._Base}
 	 * @private

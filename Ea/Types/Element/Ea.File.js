@@ -14,15 +14,15 @@
    limitations under the License.
 */
 
-Ea.File = {};
+Ea.File = {
+		meta: {
+			api: "File",
+			objectType: 13
+		}		
+};
 
 Ea.File._Base = extend(Ea.Types.Named, {},
 {
-	meta: {
-		api: "File",
-		objectType: 13
-	},
-
 	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	},

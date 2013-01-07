@@ -14,15 +14,15 @@
    limitations under the License.
 */
 
-Ea.CustomProperty = {};
+Ea.CustomProperty = {
+		meta: {
+			api: "CustomProperty",
+			objectType: 42
+		}
+};
 
 Ea.CustomProperty._Base = extend(Ea.Types.Named, {},
 {
-	meta: {
-		api: "CustomProperty",
-		objectType: 42
-	},
-	
 	_value: property({api: "Value"})
 
 });

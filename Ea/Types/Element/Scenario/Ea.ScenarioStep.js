@@ -15,6 +15,11 @@
 */
 
 Ea.ScenarioStep = {
+	meta: {
+		api: "ScenarioStep",
+		objectType: 54
+	},
+	
 	StepType: {
 		0: "System",
 		1: "Actor"
@@ -30,11 +35,6 @@ Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 	
 },
 {
-	meta: {
-		api: "ScenarioStep",
-		objectType: 54
-	},
-	
 	determineType: function(source) {
 		var typeName = Ea.ScenarioStep.StepType[this.__type.get(source)];
 		var type = this.namespace[typeName] || this._createType(typeName);

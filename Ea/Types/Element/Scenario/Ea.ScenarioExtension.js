@@ -14,7 +14,13 @@
    limitations under the License.
 */
 
-Ea.ScenarioExtension = {};
+Ea.ScenarioExtension = {
+		meta: {
+			guid: "ExtensionGUID",
+			api: "ScenarioExtension",
+			objectType: 55
+		}
+};
 
 Ea.ScenarioExtension._Base = extend(Ea.Types.Any, {
 	
@@ -23,12 +29,6 @@ Ea.ScenarioExtension._Base = extend(Ea.Types.Any, {
 	}
 },
 {
-	meta: {
-		guid: "ExtensionGUID",
-		api: "ScenarioExtension",
-		objectType: 55
-	},
-	
 	_guid: property({api: "ExtensionGUID"}),
 	
 	_pos: property({api: "Pos"}),

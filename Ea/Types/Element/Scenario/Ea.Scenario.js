@@ -14,7 +14,13 @@
    limitations under the License.
 */
 
-Ea.Scenario = {};
+Ea.Scenario = {
+		meta: {
+			guid: "ScenarioGUID",
+			api: "Scenario",
+			objectType: 10
+		}
+};
 
 Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 	
@@ -46,12 +52,6 @@ Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 	}
 },
 {
-	meta: {
-		guid: "ScenarioGUID",
-		api: "Scenario",
-		objectType: 10
-	},
-
 	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	},

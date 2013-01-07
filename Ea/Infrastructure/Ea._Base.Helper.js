@@ -20,7 +20,7 @@
 Ea._Base.Helper = {
 		
 	params: {
-		indent: "      "
+	
 	},
 	
 	/**
@@ -39,97 +39,7 @@ Ea._Base.Helper = {
 		if (!type)
 			throw new Error("Undefined type" + (_type ? " [" + _type + "]" : ""));
 		return type;
-	},
-	
-	inspect: function(object) {
-		this._inspect(object, 0, "$ = {", []);
-	},
-	
-	_ids: {},
-	
-	_indent: function(number) {
-		var indent = "";
-		for (var i = 0; i < number; i++) {
-			indent = indent + this.params.indent;
-		}
-		return indent;
-	},
-
-	_expand: function(template, params, value, indent, aggregation) {
-		if (Ea.Types.Any.isInstance(value)) {
-			if (aggregation == "composite" || aggregation == "shared") {
-				this._inspect(value, indent + 1, template + " = {", params);
-				return;
-			}
-			template = template + " = {...}";
-		}
-		params.push(value);
-		info(this._indent(indent + 1) + template, params);
-	},
-	
-	_inspect: function(object, indent, template, params) {
-		
-		var type = object._class;
-		var attributes = Ea._Base.Class.getAttributes(type);
-		
-		params.push(object);
-		info(this._indent(indent) + template, params);
-
-		if (this._ids[object.__id__]) {
-			info(this._indent(indent + 1) + "#LOOP#");
-		}
-		else {
-			this._ids[object.__id__] = object;
-			for (var ai = 0; ai < attributes.length; ai++) {
-				
-				var property = attributes[ai];
-				var value = property.get(object);
-				
-				var params = {
-					name: property.name.replace(/^_+/, ""),
-					_private: property.private,
-					aggregation: property.aggregation,
-					type: property.type,
-					isCollection: value && property.type.isClass && value.instanceOf(Core.Types.Collection)
-				};
-				params.elementType = params.isCollection ? property.elementType : null;
-				params.typeName = params.isCollection ? Core.Output.getString(params.type) + "<" + Core.Output.getString(params.elementType) + ">" : Core.Output.getString(params.type);
-				params.template = (params._private ? "-" : "") + (property.derived ? "/" : "") + params.name + " [" + params.typeName + "]";
-
-				if (params.isCollection) {
-					if (value.instanceOf(Core.Types.Map)) {
-						if (value.isEmpty()) {
-							info(this._indent(indent + 1) + "$ = {}", [params.template]);
-						}
-						else {
-							info(this._indent(indent + 1) + "$ = {", [params.template]);
-							value.forEach(function(value, key) {
-								this._expand("$ = $", [key], value, indent + 1, params.aggregation);
-							});
-							info(this._indent(indent + 1) + "}");
-						}
-					}
-					else {
-						if (value.isEmpty()) {
-							info(this._indent(indent + 1) + "$ = []", [params.template]);
-						}
-						else {
-							info(this._indent(indent + 1) + "$ = [", [params.template]);
-							value.forEach(function(value, index) {
-								this._expand("$", [], value, indent + 1, params.aggregation);
-							});
-							info(this._indent(indent + 1) + "]");
-						}
-					}
-				}
-				else {
-					this._expand("$ = $", [params.template], value, indent, params.aggregation);
-				}
-				
-			}
-		}
-		info(this._indent(indent) + "}");
-	}
+	}	
 	
 };
 

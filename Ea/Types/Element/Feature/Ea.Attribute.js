@@ -17,17 +17,17 @@
 /**
  * @namespace
  */
-Ea.Attribute = {};
+Ea.Attribute = {
+		meta: {
+			id: "AttributeID",
+			guid: "AttributeGUID",
+			api: "Attribute",
+			objectType: 23
+		}
+};
 
 Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 {
-	meta: {
-		id: "AttributeID",
-		guid: "AttributeGUID",
-		api: "Attribute",
-		objectType: 23
-	},
-	
 	/**
 	 * @type {Number}
 	 */

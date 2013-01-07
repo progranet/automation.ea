@@ -17,7 +17,14 @@
 /**
  * @namespace
  */
-Ea.Package = {};
+Ea.Package = {
+		meta: {
+			id: "PackageID",
+			guid: "PackageGUID",
+			api: "Package",
+			objectType: 5
+		}
+};
 
 Ea.Package._Base = extend(Ea.Types.Namespace, {
 	
@@ -42,13 +49,6 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	
 },
 {
-	meta: {
-		id: "PackageID",
-		guid: "PackageGUID",
-		api: "Package",
-		objectType: 5
-	},
-	
 	determineType: function(source) {
 		if (this._model.get(source))
 			type = Ea.Package.Model;

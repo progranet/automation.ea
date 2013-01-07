@@ -19,6 +19,10 @@
  */
 Ea.Application = {
 		
+	meta: {
+		api: "App"
+	},
+
 		
 	/**
 	 * Creates new EA application
@@ -57,10 +61,6 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 	}
 },
 {
-	meta: {
-		api: "App"
-	},
-
 	/**
 	 * @type {Ea.Project._Base}
 	 */

@@ -15,6 +15,13 @@
 */
 
 Ea.Diagram = {
+	meta: {
+		id: "DiagramID",
+		guid: "DiagramGUID",
+		api: "Diagram",
+		objectType: 8
+	},
+
 	Margin: {
 		LEFT: 25,
 		TOP: 35,
@@ -130,13 +137,6 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	}
 },
 {
-	meta: {
-		id: "DiagramID",
-		guid: "DiagramGUID",
-		api: "Diagram",
-		objectType: 8
-	},
-
 	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	},

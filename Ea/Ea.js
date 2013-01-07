@@ -19,9 +19,17 @@
  */
 Ea = {
 	
+	/**
+	 * @const
+	 * @type {Number}
+	 */
 	OBJECT_TYPES_NUMBER: 100,
 	
 	_application: null,
+	
+	initialize: function() {
+		Ea._Base.Class.prepareClasses();
+	},
 	
 	/**
 	 * Returns default EA application if initialized
@@ -31,10 +39,6 @@ Ea = {
 	 */
 	getDefaultApplication: function() {
 		return this._application;
-	},
-	
-	initialize: function() {
-		Ea._Base.Class.prepareClasses();
 	},
 	
 	/**
@@ -102,7 +106,7 @@ Ea = {
 	}
 };
 
-include("Ea._Base@Ea.Base");
+include("Ea._Base@Ea.Infrastructure");
 
 include("Ea.Types@Ea.Types.Abstract");
 

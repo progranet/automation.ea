@@ -14,7 +14,13 @@
    limitations under the License.
 */
 
-Ea.DiagramLink = {};
+Ea.DiagramLink = {
+		meta: {
+			//id: "InstanceID",
+			api: "DiagramLink",
+			objectType: 20
+		}
+};
 
 Ea.DiagramLink._Base = extend(Ea.Diagram.View, {
 
@@ -41,12 +47,6 @@ Ea.DiagramLink._Base = extend(Ea.Diagram.View, {
 	}
 },
 {
-	meta: {
-		//id: "InstanceID",
-		api: "DiagramLink",
-		objectType: 20
-	},
-	
 	/**
 	 * @type {Number}
 	 */

@@ -14,7 +14,14 @@
    limitations under the License.
 */
 
-Ea.Method = {};
+Ea.Method = {
+		meta: {
+			id: "MethodID",
+			guid: "MethodGUID",
+			api: "Method",
+			objectType: 24		
+		}
+};
 
 Ea.Method._Base = extend(Ea.TypedElement.Feature, {
 	_getPrimitiveType: function() {
@@ -23,13 +30,6 @@ Ea.Method._Base = extend(Ea.TypedElement.Feature, {
 	}
 },
 {
-	meta: {
-		id: "MethodID",
-		guid: "MethodGUID",
-		api: "Method",
-		objectType: 24		
-	},
-
 	/**
 	 * @type {Number}
 	 */

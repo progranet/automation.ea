@@ -14,7 +14,11 @@
    limitations under the License.
 */
 
-Ea.Properties = {};
+Ea.Properties = {
+		meta: {
+			objectType: 48
+		}
+};
 
 Ea.Properties._Base = extend(Ea.Collection.Map, {
 	_init: function(params) {
@@ -26,10 +30,6 @@ Ea.Properties._Base = extend(Ea.Collection.Map, {
 	}
 },
 {
-	meta: {
-		objectType: 48
-	},
-
 	determineType: function(source) {
 		return Ea.Properties._Base;
 	}

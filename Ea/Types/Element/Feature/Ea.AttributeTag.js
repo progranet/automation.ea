@@ -14,17 +14,17 @@
    limitations under the License.
 */
 
-Ea.AttributeTag = {};
+Ea.AttributeTag = {
+		meta: {
+			//id: "TagID",
+			//guid: "TagGUID",
+			api: "AttributeTag",
+			objectType: 34
+		}
+};
 
 Ea.AttributeTag._Base = extend(Ea.Tag._Feature, {},
 {
-	meta: {
-		//id: "TagID",
-		//guid: "TagGUID",
-		api: "AttributeTag",
-		objectType: 34
-	},
-	
 	/**
 	 * @type {Ea.Attribute._Base}
 	 * @private

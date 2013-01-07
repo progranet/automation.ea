@@ -14,15 +14,15 @@
    limitations under the License.
 */
 
-Ea.Constraint = {};
+Ea.Constraint = {
+		meta: {
+			api: "Constraint",
+			objectType: 11
+		}
+};
 
 Ea.Constraint._Base = extend(Ea.Types.Named, {},
 {
-	meta: {
-		api: "Constraint",
-		objectType: 11
-	},
-	
 	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	},

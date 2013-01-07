@@ -14,7 +14,12 @@
    limitations under the License.
 */
 
-Ea.Swimlanes = {};
+Ea.Swimlanes = {
+		meta: {
+			objectType: 51
+		}
+
+};
 
 Ea.Swimlanes._Base = extend(Ea.Collection.Map, {
 	_init: function(params) {
@@ -28,11 +33,8 @@ Ea.Swimlanes._Base = extend(Ea.Collection.Map, {
 {
 	determineType: function(source) {
 		return Ea.Swimlanes._Base;
-	},
-	
-	meta: {
-		objectType: 51
 	}
+	
 });
 
 include("Ea.Swimlane@Ea.Types.Diagram");

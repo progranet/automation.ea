@@ -15,6 +15,11 @@
 */
 
 Ea.SwimlaneDef = {
+	meta: {
+		api: "SwimlaneDef",
+		objectType: 50
+	},
+
 	SwimlaneOrientation: {
 		0: "Vertical",
 		1: "Horizontal"
@@ -29,11 +34,6 @@ Ea.SwimlaneDef._Base = extend(Ea.Types.Any, {
 	
 },
 {
-	meta: {
-		api: "SwimlaneDef",
-		objectType: 50
-	},
-
 	/**
 	 * @type {Boolean}
 	 */

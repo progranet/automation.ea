@@ -14,13 +14,13 @@
    limitations under the License.
 */
 
-Ea.ParameterTag = {};
+Ea.ParameterTag = {
+		meta: {
+			//guid: "PropertyGUID",
+			api: "ParameterTag",
+			objectType: 56
+		}
 
-Ea.ParameterTag._Base = extend(Ea.Tag._Extended, {},
-{
-	meta: {
-		//guid: "PropertyGUID",
-		api: "ParameterTag",
-		objectType: 56
-	}
-});
+};
+
+Ea.ParameterTag._Base = extend(Ea.Tag._Extended);

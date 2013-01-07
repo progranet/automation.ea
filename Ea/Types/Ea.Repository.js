@@ -18,6 +18,12 @@
  * @namespace
  */
 Ea.Repository = {
+
+	meta: {
+		api: "Repository",
+		objectType: 2
+	},
+	
 	Syntax: {
 		JetDB: {
 			
@@ -49,9 +55,11 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 		this._cacheId = new Array(Ea.OBJECT_TYPES_NUMBER);
 		this._cacheGuid = new Array(Ea.OBJECT_TYPES_NUMBER);
 		this._cacheStats = new Array(Ea.OBJECT_TYPES_NUMBER + 1);
-		for (var ot = 0; ot < Ea.OBJECT_TYPES_NUMBER; ot++) {
-			this._cacheId[ot] = [];
-			this._cacheGuid[ot] = {};
+		for (var ot = 0; ot <= Ea.OBJECT_TYPES_NUMBER; ot++) {
+			if (ot != Ea.OBJECT_TYPES_NUMBER) {
+				this._cacheId[ot] = [];
+				this._cacheGuid[ot] = {};
+			}
 			this._cacheStats[ot] = {
 					cwi: 0,
 					cwg: 0,
@@ -67,20 +75,6 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 					trggg: 0
 				};
 		}
-		this._cacheStats[Ea.OBJECT_TYPES_NUMBER] = {
-				cwi: 0,
-				cwg: 0,
-				cri: 0,
-				crgi: 0,
-				crg: 0,
-				crgg: 0,
-				tr: 0,
-				trg: 0,
-				trgi: 0,
-				trgg: 0,
-				trgig: 0,
-				trggg: 0
-			};
 
 	},
 	
@@ -115,11 +109,6 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 		info("cache stats: $", [JSON.stringify(stats, null, '\t')]);
 	},
 	
-	getCollection: function(type, api, params) {
-		var proxy = Ea._Base.Class.createProxy(this._source.application, type, api, params);
-		return proxy;
-	},
-	
 	/**
 	 * Returns proxy object for specified EA API object
 	 * 
@@ -129,22 +118,23 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 * @type {Ea.Types.Any}
 	 */
 	get: function(type, api, params) {
-		this._cacheStats[type.meta.objectType].trg++;
-		if (type.meta.id) {
-			this._cacheStats[type.meta.objectType].trgig++;
-			var id = api[type.meta.id];
-			var proxy = this._cacheId[type.meta.objectType][id];
+		var meta = type.namespace.meta;
+		this._cacheStats[meta.objectType].trg++;
+		if (meta.id) {
+			this._cacheStats[meta.objectType].trgig++;
+			var id = api[meta.id];
+			var proxy = this._cacheId[meta.objectType][id];
 			if (proxy) {
-				this._cacheStats[type.meta.objectType].crgi++;
+				this._cacheStats[meta.objectType].crgi++;
 				return proxy;
 			}
 		}
-		else if (type.meta.guid) {
-			this._cacheStats[type.meta.objectType].trggg++;
-			var guid = api[type.meta.guid];
-			var proxy = this._cacheGuid[type.meta.objectType][guid];
+		else if (meta.guid) {
+			this._cacheStats[meta.objectType].trggg++;
+			var guid = api[meta.guid];
+			var proxy = this._cacheGuid[meta.objectType][guid];
 			if (proxy) {
-				this._cacheStats[type.meta.objectType].crgg++;
+				this._cacheStats[meta.objectType].crgg++;
 				return proxy;
 			}
 		}
@@ -154,13 +144,14 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	getById: function(type, id) {
 		if (!id || id == 0)
 			return null;
-		this._cacheStats[type.meta.objectType].trgi++;
-		var proxy = this._cacheId[type.meta.objectType][id];
+		var meta = type.namespace.meta;
+		this._cacheStats[meta.objectType].trgi++;
+		var proxy = this._cacheId[meta.objectType][id];
 		if (proxy) {
-			this._cacheStats[type.meta.objectType].cri++;
+			this._cacheStats[meta.objectType].cri++;
 			return proxy;
 		}
-		var method = "Get" + type.meta.api + "ByID";
+		var method = "Get" + meta.api + "ByID";
 		var api;
 		// EA ElementID integrity problem
 		try {
@@ -174,13 +165,14 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	},
 	
 	getByGuid: function(type, guid) {
-		this._cacheStats[type.meta.objectType].trgg++;
-		var proxy = this._cacheGuid[type.meta.objectType][guid];
+		var meta = type.namespace.meta;
+		this._cacheStats[meta.objectType].trgg++;
+		var proxy = this._cacheGuid[meta.objectType][guid];
 		if (proxy) {
-			this._cacheStats[type.meta.objectType].crg++;
+			this._cacheStats[meta.objectType].crg++;
 			return proxy;
 		}
-		var method = "Get" + type.meta.api + "ByGuid";
+		var method = "Get" + meta.api + "ByGuid";
 		var api = this._source.api[method](guid);
 		if (!api) {
 			warn("$ not found by Guid = $", [type, guid]);
@@ -190,14 +182,15 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	},
 
 	_get: function(type, api, params) {
+		var meta = type.namespace.meta;
 		var proxy = Ea._Base.Class.createProxy(this._source.application, type, api, params);
-		if (type.meta.id) {
-			this._cacheId[type.meta.objectType][api[type.meta.id]] = proxy;
-			this._cacheStats[type.meta.objectType].cwi++;
+		if (meta.id) {
+			this._cacheId[meta.objectType][api[meta.id]] = proxy;
+			this._cacheStats[meta.objectType].cwi++;
 		}
-		if (type.meta.guid) {
-			this._cacheGuid[type.meta.objectType][api[type.meta.guid]] = proxy;
-			this._cacheStats[type.meta.objectType].cwg++;
+		if (meta.guid) {
+			this._cacheGuid[meta.objectType][api[meta.guid]] = proxy;
+			this._cacheStats[meta.objectType].cwg++;
 		}
 		return proxy;
 	},
@@ -336,11 +329,6 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	}
 },
 {
-	meta: {
-		api: "Repository",
-		objectType: 2
-	},
-	
 	_projectGuid: property({api: "ProjectGUID"}),
 
 	/**
