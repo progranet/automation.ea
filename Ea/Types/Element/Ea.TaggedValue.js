@@ -23,7 +23,13 @@ Ea.TaggedValue = {
 		}
 };
 
-Ea.TaggedValue._Base = extend(Ea.Tag._Base, {},
+Ea.TaggedValue._Base = extend(Ea.Tag._Base, {
+
+	getParent: function() {
+		return this._getParent();
+	}
+
+},
 {
 	_notes: property({api: "Notes"}),
 	

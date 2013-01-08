@@ -93,6 +93,11 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	
 	_stereotype: property({api: "Stereotype"}),
 	
+	/**
+	 * @type {Ea._Base.DataTypes.List}
+	 */
+	_stereotypes: property({api: "StereotypeEx"}),
+
 	_direction: property({api: "Direction"}),
 
 	/**

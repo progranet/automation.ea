@@ -227,6 +227,12 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	_requirements: property({api: "Requirements"}),
 	
 	/**
+	 * @type {Ea.Collection._Base<Ea.Issue._Base>}
+	 * @aggregation composite
+	 */
+	_issues: property({api: "Issues"}),
+	
+	/**
 	 * @type {Ea.Collection._Base<Ea.Element._Base>}
 	 * @aggregation shared
 	 */
@@ -728,6 +734,7 @@ include("Ea.Method@Ea.Types.Element.Feature");
 
 include("Ea.File@Ea.Types.Element");
 include("Ea.Requirement@Ea.Types.Element");
+include("Ea.Issue@Ea.Types.Element");
 
 include("Ea.TaggedValue@Ea.Types.Element");
 include("Ea.Properties@Ea.Types.Element.Property");
