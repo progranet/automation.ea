@@ -21,7 +21,6 @@ Ea.Element = {
 		meta: {
 			id: "ElementID",
 			guid: "ElementGUID",
-			api: "Element",
 			objectType: 4
 		}
 };
@@ -42,7 +41,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 		return linkedDiagram;
 	},
 	
-	_getRelationships: function() {
+	_getRelationships: function(filter) {
 		var relationships = new Core.Types.Collection();
 		this.getConnectors().forEach(function(connector) {
 			var client = (connector.getClient() == this);
@@ -60,7 +59,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 				}));		
 			}
 		});
-		return relationships;
+		return relationships.filter(filter);
 	},
 	
 	getRelationships: function(relation, filter) {
@@ -83,12 +82,12 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 		return relations;
 	},
 	
-	getCustomReferences: function() {
+	getCustomReferences: function(filter) {
 		var customReferences = this._source.application.getRepository().getCustomReferences(this);
-		return customReferences;
+		return customReferences.filter(filter);
 	},
 	
-	getContextReferences: function() {
+	getContextReferences: function(filter) {
 		var contextReferences = new Core.Types.Collection();
 		this.getCustomReferences().forEach(function(reference) {
 			contextReferences.add(new Ea._Base.ContextReference(reference.getNotes() || "", reference.getSupplier(), ""));
@@ -99,7 +98,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 			var notes = relationship.getConnector().getName();
 			contextReferences.add(new Ea._Base.ContextReference(notes, supplier, connection));
 		});
-		return contextReferences;
+		return contextReferences.filter(filter);
 	},
 
 	findDiagrams: function() {
@@ -195,21 +194,21 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	
 	/**
 	 * @type {Ea.Collection.Map<Ea.TaggedValue._Base>}
-	 * @qualifier this.getName()
+	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
 	_tags: property({api: "TaggedValues"}),
 	
 	/**
 	 * @type {Ea.Collection.Map<Ea.CustomProperty._Base>}
-	 * @qualifier this.getName()
+	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
 	_customProperties: property({api: "CustomProperties"}),
 	
 	/**
 	 * @type {Ea.Properties._Base<Ea.Property._Base>}
-	 * @qualifier this.getName()
+	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
 	_properties: property({api: "Properties"}),
@@ -439,19 +438,19 @@ Ea.Element.Classifier = extend(Ea.Element.Type, {
 		return basicScenario;
 	},
 	
-	getScenarioExtensions: function() {
+	getScenarioExtensions: function(filter) {
 		var basic = this.getBasicScenario();
 		var scenarioExtensions = new Core.Types.Collection();
 		if (basic)
 			basic.getSteps().forEach(function(step) {
 				scenarioExtensions.addAll(step._getExtensions());
 			});
-		return scenarioExtensions;
+		return scenarioExtensions.filter(filter);
 	},
 	
-	getAttributes: function() {
+	getAttributes: function(filter) {
 		var attributes = this._getAttributes().filter("this.getStereotype() != 'enum'");
-		return attributes;
+		return attributes.filter(filter);
 	},
 	
 	createAttribute: function(name, type) {
@@ -515,9 +514,9 @@ Ea.Element.DataType = extend(Ea.Element.Classifier);
 
 Ea.Element.Enumeration = extend(Ea.Element.DataType, {
 	
-	getLiterals: function() {
+	getLiterals: function(filter) {
 		var literals = this._getAttributes().filter("this.getStereotype() == 'enum'");
-		return literals;
+		return literals.filter(filter);
 	}
 	
 },

@@ -16,7 +16,6 @@
 
 Ea.Issue = {
 		meta: {
-			api: "Issue",
 			objectType: 16
 		}
 };

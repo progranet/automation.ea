@@ -16,7 +16,6 @@
 
 Ea.File = {
 		meta: {
-			api: "File",
 			objectType: 13
 		}		
 };

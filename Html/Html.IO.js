@@ -42,8 +42,9 @@ Html.IO.File = extend(Sys.IO.File, /** @lends Html.IO.File# */ {
 	 */
 	write: function(template, params) {
 		if (typeof template == "string") {
-			info(template);
+			//info("templateName:$", [template]);
 			template = Html.templates[template];
+			//info("template:$", [template]);
 		}
 		_super.write(template.generate(params));
 	}

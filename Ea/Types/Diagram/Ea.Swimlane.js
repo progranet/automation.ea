@@ -16,7 +16,6 @@
 
 Ea.Swimlane = {
 		meta: {
-			api: "Swimlane",
 			objectType: 52
 		}
 };

@@ -16,7 +16,6 @@
 
 Ea.MethodConstraint = {
 		meta: {
-			api: "MethodConstraint",
 			objectType: 35
 		}
 };

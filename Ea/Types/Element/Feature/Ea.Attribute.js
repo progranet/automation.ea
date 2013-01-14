@@ -21,7 +21,6 @@ Ea.Attribute = {
 		meta: {
 			id: "AttributeID",
 			guid: "AttributeGUID",
-			api: "Attribute",
 			objectType: 23
 		}
 };
@@ -43,7 +42,7 @@ Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 	
 	/**
 	 * @type {Ea.Collection.Map<Ea.AttributeTag._Base>}
-	 * @qualifier this.getName()
+	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
 	_tags: property({api: "TaggedValues"}),

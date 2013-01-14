@@ -18,7 +18,6 @@ Ea.Method = {
 		meta: {
 			id: "MethodID",
 			guid: "MethodGUID",
-			api: "Method",
 			objectType: 24		
 		}
 };
@@ -90,7 +89,7 @@ Ea.Method._Base = extend(Ea.TypedElement.Feature, {
 	
 	/**
 	 * @type {Ea.Collection.Map<Ea.MethodTag._Base>}
-	 * @qualifier this.getName()
+	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
 	_tags: property({api: "TaggedValues"}),

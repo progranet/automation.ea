@@ -16,7 +16,6 @@
 
 Ea.CustomProperty = {
 		meta: {
-			api: "CustomProperty",
 			objectType: 42
 		}
 };

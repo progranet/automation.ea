@@ -21,16 +21,15 @@ Ea.Package = {
 		meta: {
 			id: "PackageID",
 			guid: "PackageGUID",
-			api: "Package",
 			objectType: 5
 		}
 };
 
 Ea.Package._Base = extend(Ea.Types.Namespace, {
 	
-	getElements: function() {
+	getElements: function(filter) {
 		var elements = this._getElements().filter("this._getParent() == null");
-		return elements;
+		return elements.filter(filter);
 	},
 	
 	createElement: function(name, type) {
@@ -38,9 +37,9 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 		return element;
 	},
 	
-	getDiagrams: function() {
+	getDiagrams: function(filter) {
 		var diagrams = this._getDiagrams().filter("this._getParent() == null");
-		return diagrams;
+		return diagrams.filter(filter);
 	},
 	
 	getParent: function() {

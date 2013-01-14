@@ -18,7 +18,6 @@ Ea.TaggedValue = {
 		meta: {
 			//id: "PropertyID",
 			//guid: "PropertyGUID",
-			api: "TaggedValue",
 			objectType: 12
 		}
 };

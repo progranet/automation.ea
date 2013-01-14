@@ -18,7 +18,6 @@ Ea.MethodTag = {
 		meta: {
 			//id: "TagID",
 			//guid: "TagGUID",
-			api: "MethodTag",
 			objectType: 36
 		}
 };

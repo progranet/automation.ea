@@ -17,7 +17,6 @@
 Ea.ScenarioExtension = {
 		meta: {
 			guid: "ExtensionGUID",
-			api: "ScenarioExtension",
 			objectType: 55
 		}
 };

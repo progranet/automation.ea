@@ -16,7 +16,6 @@
 
 Ea.Constraint = {
 		meta: {
-			api: "Constraint",
 			objectType: 11
 		}
 };

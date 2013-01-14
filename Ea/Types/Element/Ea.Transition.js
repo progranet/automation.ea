@@ -16,7 +16,6 @@
 
 Ea.Transition = {
 		meta: {
-			api: "Transition",
 			objectType: 44
 		}
 };

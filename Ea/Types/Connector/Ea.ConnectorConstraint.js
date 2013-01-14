@@ -16,7 +16,6 @@
 
 Ea.ConnectorConstraint = {
 	meta: {
-		api: "ConnectorConstraint",
 		objectType: 37
 	}
 };

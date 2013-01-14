@@ -17,7 +17,6 @@
 Ea.Requirement = {
 		meta: {
 			//id: "RequirementID",
-			api: "Requirement",
 			objectType: 9
 		}
 };

@@ -45,7 +45,7 @@ Ea.Collection._Base = extend(Core.Types.Collection, {
 	
 	_create: function(name, type, element) {
 		type = type || this._elementType;
-		var elementTypeName = type.elementType || type.namespace.meta.api;
+		var elementTypeName = type.elementType || type.namespace.name;
 		var api = this._source.api.AddNew(name, elementTypeName);
 		if (element) {
 			api.SupplierID = element.getId();;

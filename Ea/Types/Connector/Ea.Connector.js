@@ -20,7 +20,6 @@ Ea.Connector = {
 	meta: {
 		id: "ConnectorID",
 		guid: "ConnectorGUID",
-		api: "Connector",
 		objectType: 7
 	}	
 };
@@ -207,7 +206,7 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 
 	/**
 	 * @type {Ea.Collection.Map<Ea.ConnectorTag._Base>}
-	 * @qualifier this.getName()
+	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
 	_tags: property({api: "TaggedValues"}),
@@ -220,14 +219,14 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 
 	/**
 	 * @type {Ea.Collection.Map<Ea.CustomProperty._Base>}
-	 * @qualifier this.getName()
+	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
 	_customProperties: property({api: "CustomProperties"}),
 
 	/**
 	 * @type {Ea.Properties._Base<Ea.Property._Base>}
-	 * @qualifier this.getName()
+	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
 	_properties: property({api: "Properties"}),

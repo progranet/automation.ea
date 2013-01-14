@@ -16,7 +16,6 @@
 
 Ea.ScenarioStep = {
 	meta: {
-		api: "ScenarioStep",
 		objectType: 54
 	},
 	
@@ -49,7 +48,7 @@ Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.ScenarioExtension._Base>}
-	 * @qualifier this.getLevel()
+	 * @qualifier {String} level
 	 * @private
 	 */
 	_extensions: property({api: "Extensions"}),

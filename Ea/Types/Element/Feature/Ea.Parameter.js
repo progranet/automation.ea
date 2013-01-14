@@ -17,7 +17,6 @@
 Ea.Parameter = {
 		meta: {
 			//guid: "ParameterGUID",
-			api: "Parameter",
 			objectType: 25
 		}
 };
@@ -87,7 +86,7 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 
 	/**
 	 * @type {Ea.Collection.Map<Ea.ParameterTag._Base>}
-	 * @qualifier this.getName()
+	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
 	_tags: property({api: "TaggedValues"})

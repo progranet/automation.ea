@@ -19,10 +19,7 @@
  */
 Ea.Application = {
 		
-	meta: {
-		api: "App"
-	},
-
+	meta: {},
 		
 	/**
 	 * Creates new EA application

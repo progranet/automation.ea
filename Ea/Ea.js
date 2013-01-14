@@ -32,16 +32,6 @@ Ea = {
 	},
 	
 	/**
-	 * Returns default EA application if initialized
-	 * 
-	 * @memberOf Ea
-	 * @type {Ea.Application._Base}
-	 */
-	getDefaultApplication: function() {
-		return this._application;
-	},
-	
-	/**
 	 * Initializes default EA application
 	 * 
 	 * @param {Core.Target.AbstractTarget} targetClass Target for logger mechanizm
@@ -51,7 +41,7 @@ Ea = {
 	initializeDefaultApplication: function(targetClass, params) {
 		if (!this._application) {
 			this._application = Ea.Application.createApplication(params);
-			this._initializeLogs(targetClass || Ea._Base.Helper.Target);
+			this._initializeLogs(targetClass || Ea._Base.Helper.Target, this._application.getRepository());
 		}
 		else {
 			warn("Default application already initialized");
@@ -63,11 +53,11 @@ Ea = {
 	 * @private
 	 * @param {Core.Target.AbstractTarget} targetClass
 	 */
-	_initializeLogs: function(targetClass) {
+	_initializeLogs: function(targetClass, repository) {
 		
-		var systemTarget = new targetClass("System", Core.Target.Type.DEBUG);
-		var scriptTarget = new targetClass("Script", Core.Target.Type.INFO);
-		var treeTarget = new targetClass("Script", Core.Target.Type.TREE);
+		var systemTarget = new targetClass(Core.Target.Type.DEBUG, {name: "System", repository: repository});
+		var scriptTarget = new targetClass(Core.Target.Type.INFO, {name: "Script", repository: repository});
+		var treeTarget = new targetClass(Core.Target.Type.TREE, {name: "Script", repository: repository});
 		var blindTarget = new Core.Target.AbstractTarget(Core.Target.Type.BLIND);
 		
 		Core.Log.registerTarget("info", scriptTarget);

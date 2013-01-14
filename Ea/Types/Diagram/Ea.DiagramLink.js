@@ -17,7 +17,6 @@
 Ea.DiagramLink = {
 		meta: {
 			//id: "InstanceID",
-			api: "DiagramLink",
 			objectType: 20
 		}
 };

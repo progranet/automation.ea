@@ -16,7 +16,6 @@
 
 Ea.ConnectorEnd = {
 	meta: {
-		api: "ConnectorEnd",
 		objectType: 22
 	},
 
@@ -109,7 +108,7 @@ Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {
 
 	/**
 	 * @type {Ea.Collection.Map<Ea.ConnectorEndTag._Base>}
-	 * @qualifier this.getName()
+	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
 	_tags: property({api: "TaggedValues"})

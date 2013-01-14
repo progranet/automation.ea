@@ -56,18 +56,19 @@ Documentation = {
 		this.namespaces.write("html-head", {title: "namespaces", stylesheet: this.params.styleSheet});
 		this.namespaces.write("namespaces-head");
 		
-		for (var l = 0; l < this.params.libs.length; l++) {
-			var lib = this.params.libs[l];
-			this._documentPackage(root, null);
-		}
+		this.documentModel(root, null);
 		
 		this.namespaces.write("namespaces-foot");
 		this.namespaces.write("html-foot");
 		this.namespaces.close();
 		
-		//application.getRepository().cacheInfo();		
+		//application.getRepository().cacheInfo();
 		
 		info("=== FINISHED ===");
+	},
+	
+	documentModel: function(_package, parentName) {
+		this._documentPackage(_package, parentName);
 	},
 	
 	_documentPackage: function(_package, parentName) {
@@ -88,7 +89,10 @@ Documentation = {
 		var classes = _package.getElements().filter(Ea.Element.Class);
 		classes.forEach(function(_class) {
 			
-			classFile.write("classes-class", {_class: _class, qualifiedName: (qualifiedName == "." ? "" : qualifiedName) + _class.getName()});
+			classFile.write("classes-class", {
+				_class: _class, 
+				qualifiedName: (qualifiedName == "." ? "" : qualifiedName + ".") + _class.getName()
+			});
 			
 			//this._documentClass(_class, qualifiedName);
 		});
@@ -440,6 +444,8 @@ Documentation = {
 					supplierEnd.setNotes(doc.comment || "");
 					if (doc["derived"])
 						supplierEnd.setDerived(true);
+					if (doc["qualifier"])
+						supplierEnd.setQualifier(doc["qualifier"][0].comment + ":" + doc["qualifier"][0].type);
 					if (_private)
 						supplierEnd.setVisibility("Private");
 

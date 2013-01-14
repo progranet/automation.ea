@@ -17,7 +17,6 @@
 Ea.ConnectorEndTag = {
 		meta: {
 			//guid: "PropertyGUID",
-			api: "RoleTag",
 			objectType: 41
 		}
 

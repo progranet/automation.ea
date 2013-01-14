@@ -17,7 +17,6 @@
 Ea.Scenario = {
 		meta: {
 			guid: "ScenarioGUID",
-			api: "Scenario",
 			objectType: 10
 		}
 };
@@ -64,7 +63,7 @@ Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.ScenarioStep._Base>}
-	 * @qualifier this.getPos()
+	 * @qualifier {String} pos
 	 * @aggregation composite
 	 */
 	_steps: property({api: "Steps"}),

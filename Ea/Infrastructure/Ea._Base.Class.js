@@ -333,7 +333,6 @@ Ea._Base.Class.DerivedAttribute = extend(Ea._Base.Class._Attribute, /** @lends E
 		}
 		
 		properties[name + "$inner"] = accessor;
-		//Core.enrichMethod(properties, name + "$inner", this.qualifiedName + "$inner", false);
 		this._accesors[kind] = name + "$inner";
 		
 		properties[name] = new Function("return this._class." + this.name + "." + kind + "(this, arguments);");
@@ -342,14 +341,18 @@ Ea._Base.Class.DerivedAttribute = extend(Ea._Base.Class._Attribute, /** @lends E
 
 	_get: function(object, params) {
 		var source = object._source;
-		if (!source.application.cacheProperties || !(this.name in source.value))
-			this._init(object, params);
+		params = params || [];
+		// if there's any arguments passed to getter (such as filter for collection type properties) cache is omitted
+		if (params.length != 0 || !source.application.cacheProperties || !(this.name in source.value))
+			return this._init(object, params);
 		var value = source.value[this.name];
 		return value;
 	},
 	
 	_init: function(object, params) {
-		var value = object._source.value[this.name] = object[this._accesors["get"]].apply(object, params || []);
+		var value = object[this._accesors["get"]].apply(object, params);
+		if (params.length == 0)
+			object._source.value[this.name] = value;
 		return value;
 	},
 	

@@ -19,7 +19,6 @@
  */
 Ea.Project = {
 		meta: {
-			api: "Project",
 			objectType: 1
 		}		
 };

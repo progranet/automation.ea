@@ -46,12 +46,15 @@ Ea._Base.Helper = {
 Ea._Base.Helper.Target = extend(Core.Target.AbstractTarget, /** @lends Ea._Base.Helper.Target# */ {
 	
 	_name: null,
+	_repository: null,
 	
-	create: function(name, debug) {
+	create: function(debug, params) {
 		_super.create(debug);
-		this._name = name;
-		Ea.getDefaultApplication().getRepository().showOutput(this._name);
-		Ea.getDefaultApplication().getRepository().clearOutput(this._name);
+		params = params || {};
+		this._name = params.name;
+		this._repository = params.repository;
+		this._repository.showOutput(this._name);
+		this._repository.clearOutput(this._name);
 	},
 	
 	/**
@@ -60,7 +63,7 @@ Ea._Base.Helper.Target = extend(Core.Target.AbstractTarget, /** @lends Ea._Base.
 	write: function(message) {
 		if (this._type == Core.Target.Type.TREE)
 			message = message.replace(/\|/g, "      |").replace(/\-/g, "—").replace(/\+/g, "[•]");
-		Ea.getDefaultApplication().getRepository().writeOutput(this._name, message);
+		this._repository.writeOutput(this._name, message);
 	}
 });
 

@@ -340,7 +340,15 @@ var ea = function(name, context) {
 					"kind": "init"
 				});
 			});
-			tag = tag.replace(/^\s*qualifier\s+(.+)\s*/g, function(whole, qualifier) {
+			WriteOutput("Loader", "TAG:" + tag, undefined);
+			tag = tag.replace(/^\s*qualifier\s+(\{(.+)\}\s+)?([a-zA-Z0-9_$]+)\s*/g, function(whole, _type, type, qualifier) {
+				
+				WriteOutput("Loader", "QUALIFIER:" + type + "/" + qualifier, undefined);
+
+				var qualifierFn = "this.get" + qualifier.charAt(0).toUpperCase() + qualifier.substr(1) + "()";
+				
+				WriteOutput("Loader", "QUALIFIER FN:" + qualifierFn, undefined);
+				
 				ast.value.arguments[0].properties.push({
 					"type": "Property",
 					"key": {
@@ -349,15 +357,15 @@ var ea = function(name, context) {
 					},
 					"value": {
 						"type": "Literal",
-						"value": qualifier,
-						"raw": "'" + qualifier + "'"
+						"value": qualifierFn,
+						"raw": "'" + qualifierFn + "'"
 					},
 					"kind": "init"
 				});
 			});
 		}
 		
-		WriteOutput("Loader", "" + context.qualifiedName + "." + this.key.name + " = " + JSON.stringify(this) + ";", undefined);
+		//WriteOutput("Loader", "" + context.qualifiedName + "." + this.key.name + " = " + JSON.stringify(this) + ";", undefined);
 	
 		return true;
 	}

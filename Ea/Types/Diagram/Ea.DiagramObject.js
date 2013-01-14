@@ -17,7 +17,6 @@
 Ea.DiagramObject = {
 		meta: {
 			//id: "InstanceID",
-			api: "DiagramObject",
 			objectType: 19
 		}
 };

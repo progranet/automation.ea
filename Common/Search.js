@@ -94,7 +94,7 @@ Search = {
 	
 	processElement: function(element) {
 		Ea.log(element);
-		this.found.addAll(element.getElements(this.params.filter));
+		this.found.addAll(element.getElements().filter(this.params.filter));
 		if (this.params.drill) {
 			element.getElements().forEach(function(element) {
 				this.processElement(element);

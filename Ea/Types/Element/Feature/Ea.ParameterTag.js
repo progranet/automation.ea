@@ -17,7 +17,6 @@
 Ea.ParameterTag = {
 		meta: {
 			//guid: "PropertyGUID",
-			api: "ParameterTag",
 			objectType: 56
 		}
 

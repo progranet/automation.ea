@@ -16,7 +16,6 @@
 
 Ea.SwimlaneDef = {
 	meta: {
-		api: "SwimlaneDef",
 		objectType: 50
 	},
 
@@ -86,7 +85,7 @@ Ea.SwimlaneDef._Base = extend(Ea.Types.Any, {
 	
 	/**
 	 * @type {Ea.Swimlanes._Base<Ea.Swimlane._Base>}
-	 * @qualifier this.getTitle()
+	 * @qualifier {String} title
 	 * @aggregation composite
 	 */
 	_swimlanes: property({api: "Swimlanes"})

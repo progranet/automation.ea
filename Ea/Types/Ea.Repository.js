@@ -20,13 +20,14 @@
 Ea.Repository = {
 
 	meta: {
-		api: "Repository",
 		objectType: 2
 	},
 	
 	Syntax: {
 		JetDB: {
-			
+			Tables: {
+				
+			}
 		},
 		Oracle: {
 			
@@ -151,7 +152,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 			this._cacheStats[meta.objectType].cri++;
 			return proxy;
 		}
-		var method = "Get" + meta.api + "ByID";
+		var method = "Get" + type.namespace.name + "ByID";
 		var api;
 		// EA ElementID integrity problem
 		try {
@@ -172,7 +173,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 			this._cacheStats[meta.objectType].crg++;
 			return proxy;
 		}
-		var method = "Get" + meta.api + "ByGuid";
+		var method = "Get" + type.namespace.name + "ByGuid";
 		var api = this._source.api[method](guid);
 		if (!api) {
 			warn("$ not found by Guid = $", [type, guid]);

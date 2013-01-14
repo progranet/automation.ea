@@ -16,7 +16,6 @@
 
 Ea.AttributeConstraint = {
 		meta: {
-			api: "AttributeConstraint",
 			objectType: 33
 		}
 };

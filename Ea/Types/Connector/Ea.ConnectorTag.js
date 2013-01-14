@@ -18,7 +18,6 @@ Ea.ConnectorTag = {
 		meta: {
 			//id: "TagID",
 			//guid: "TagGUID",
-			api: "ConnectorTag",
 			objectType: 36
 		}
 };

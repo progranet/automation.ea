@@ -18,7 +18,6 @@ Ea.Diagram = {
 	meta: {
 		id: "DiagramID",
 		guid: "DiagramGUID",
-		api: "Diagram",
 		objectType: 8
 	},
 
@@ -54,8 +53,8 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 		return true;
 	},
 	
-	getSwimlanes: function() {
-		return this.getSwimlaneDef().getSwimlanes();
+	getSwimlanes: function(filter) {
+		return this.getSwimlaneDef().getSwimlanes().filter(filter);
 	},
 	
 	getDimension: function() {
@@ -131,9 +130,9 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 		return this._elements.filter(filter);
 	},
 	
-	getConnectorViews: function() {
+	getConnectorViews: function(filter) {
 		var connectorViews = this._getConnectorViews().filter("this.getId() != 0");
-		return connectorViews;
+		return connectorViews.filter(filter);
 	}
 },
 {

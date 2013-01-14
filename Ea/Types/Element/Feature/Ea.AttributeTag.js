@@ -18,7 +18,6 @@ Ea.AttributeTag = {
 		meta: {
 			//id: "TagID",
 			//guid: "TagGUID",
-			api: "AttributeTag",
 			objectType: 34
 		}
 };
