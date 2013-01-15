@@ -51,6 +51,14 @@ Ea._Base.DataTypes.List = extend(Ea._Base.DataTypes.DataType, {
 		}
 	},
 	
+	contains: function(element){
+		for (var i = 0; i < this._value.length; i++) {
+			if (this._value[i] == element)
+				return true;
+		}		
+		return false;
+	},
+
 	valueOf: function() {
 		return this._value;
 	},

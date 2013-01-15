@@ -360,7 +360,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	_path: property({api: "ConnectionString"}),
 	
 	/**
-	 * @type {Ea.Collection._Base<Ea.Package._Base>}
+	 * @type {Ea.Collection._Base<Ea.Package.Model>}
 	 * @aggregation composite
 	 */
 	_models: property({api: "Models"})

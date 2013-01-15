@@ -121,7 +121,7 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 
 	/**
 	 * @type {Ea.Element._Base}
-	 * @aggregation shared
+	 * @aggregation composite
 	 */
 	_element: property({api: "Element"}),
 	

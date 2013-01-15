@@ -233,7 +233,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Element._Base>}
-	 * @aggregation shared
+	 * @aggregation composite
 	 */
 	_embedded: property({api: "EmbeddedElements"}),
 	
