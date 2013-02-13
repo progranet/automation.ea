@@ -200,6 +200,12 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	_tags: property({api: "TaggedValues"}),
 	
 	/**
+	 * @type {Ea.Collection._Base<Ea.TaggedValue._Base>}
+	 * @aggregation composite
+	 */
+	_tagsCollection: property({api: "TaggedValues"}),
+	
+	/**
 	 * @type {Ea.Collection.Map<Ea.CustomProperty._Base>}
 	 * @qualifier {String} name
 	 * @aggregation composite

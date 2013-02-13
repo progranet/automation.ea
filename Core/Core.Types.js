@@ -183,13 +183,46 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * Checks if this collection contains element
 	 * 
 	 * @param {Core.Types.Object} element
+	 * @type {Boolean}
 	 */
 	contains: function(element) {
+		return this.find(element) !== -1;
+	},
+	
+	/**
+	 * Finds specified element in this collection and returns its index or -1 if element was not found.
+	 * 
+	 * @param {Core.Types.Object} element
+	 * @type {Number}
+	 */
+	find: function(element) {
 		for (var i = 0; i < this._size; i++) {
 			if (this._table[i].equals(element))
-				return true;
+				return i;
 		}
-		return false;
+		return -1;
+	},
+	
+	/**
+	 * Removes specified element from this collection
+	 * 
+	 * @param {Core.Type.Object} element
+	 * @type {Boolean}
+	 */
+	remove: function(element) {
+		if (!element || !Core.Types.Object.isInstance(element))
+			throw new Error("No element specified or unexpected element type");
+		if (!this._remove(element))
+			return false;
+		var index = this.find(element);
+		if (index === -1) {
+			debug("Element does not exists in collection: $ (object.__id__ = $)", [element, element.__id__]);
+			return false;
+		}
+		this._table.splice(index, 1);
+		this._size--;
+		this._removed(element);
+		return true;
 	},
 	
 	/**
@@ -202,7 +235,21 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	/**
 	 * @private
 	 */
+	_remove: function(element) {
+		return true;
+	},
+	
+	/**
+	 * @private
+	 */
 	_added: function(element) {
+		
+	},
+	
+	/**
+	 * @private
+	 */
+	_removed: function(element) {
 		
 	},
 	
@@ -213,21 +260,48 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * @param {Core.Types.Collection} collection
 	 */
 	addAll: function(collection) {
-		if (!collection) return;
-		if (!Core.Types.Collection.isInstance(collection))
-			throw new Error("Unknown collection type: " + collection);
+		if (!collection || !Core.Types.Collection.isInstance(collection))
+			throw new Error("No collection specitied or unknown collection type: " + collection);
 		collection.addAllTo(this);
 	},
 	
 	/**
-	 * Adds all elements this collection to specified collection
+	 * Adds all elements of this collection to specified collection
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @param {Core.Types.Collection} collection
 	 */
 	addAllTo: function(collection) {
+		if (!collection || !Core.Types.Collection.isInstance(collection))
+			throw new Error("No collection specitied or unknown collection type: " + collection);
 		for (var i = 0; i < this._size; i++) {
 			collection.add(this._table[i]);
+		}
+	},
+	
+	/**
+	 * Removes all elements of specified collection from this collection
+	 * 
+	 * @memberOf Core.Types.Collection#
+	 * @param {Core.Types.Collection} collection
+	 */
+	removeAll: function(collection) {
+		if (!collection || !Core.Types.Collection.isInstance(collection))
+			throw new Error("No collection specitied or unknown collection type: " + collection);
+		collection.removeAllFrom(this);
+	},
+	
+	/**
+	 * Removes all elements of this collection from specified collection
+	 * 
+	 * @memberOf Core.Types.Collection#
+	 * @param {Core.Types.Collection} collection
+	 */
+	removeAllFrom: function(collection) {
+		if (!collection || !Core.Types.Collection.isInstance(collection))
+			throw new Error("No collection specitied or unknown collection type: " + collection);
+		for (var i = 0; i < this._size; i++) {
+			collection.remove(this._table[i]);
 		}
 	},
 	
@@ -343,6 +417,20 @@ Core.Types.Map = extend(Core.Types.Collection, {
 			debug("Key already exisis in map: " + key);
 		}
 		this._map[key] = element;
+	},
+	
+	/**
+	 * @private
+	 */
+	_removed: function(element) {
+		var key = this._keyFn.call(element);
+		if (!key) {
+			throw new Error("Key not found for: " + element + ", according to key definition: " + this._keyDef);
+		}
+		if (!this._map[key]) {
+			debug("Key does not exisis in map: " + key);
+		}
+		delete this._map[key];
 	},
 	
 	/**

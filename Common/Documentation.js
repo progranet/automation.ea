@@ -169,7 +169,6 @@ Documentation = {
 		var namespace = root;
 		for (var ni = 0; ni < array.length; ni++) {
 			var _name = array[ni];
-			// TODO nie dzia³a filtrowanie:
 			var filter = "this.getName() == '" + _name + "'";
 			namespace = namespace.getPackages().filter(filter).first();
 		}
