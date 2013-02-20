@@ -154,7 +154,9 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	create: function(params) {
 		params = params || {};
 		this._table = [];
-		this.addAll(params.collection);
+		
+		if (params.collection)
+			this.addAll(params.collection);
 	},
 	
 	/**
@@ -261,7 +263,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 */
 	addAll: function(collection) {
 		if (!collection || !Core.Types.Collection.isInstance(collection))
-			throw new Error("No collection specitied or unknown collection type: " + collection);
+			throw new Error("No collection specified or unknown collection type: " + collection);
 		collection.addAllTo(this);
 	},
 	
@@ -273,7 +275,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 */
 	addAllTo: function(collection) {
 		if (!collection || !Core.Types.Collection.isInstance(collection))
-			throw new Error("No collection specitied or unknown collection type: " + collection);
+			throw new Error("No collection specified or unknown collection type: " + collection);
 		for (var i = 0; i < this._size; i++) {
 			collection.add(this._table[i]);
 		}
@@ -287,7 +289,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 */
 	removeAll: function(collection) {
 		if (!collection || !Core.Types.Collection.isInstance(collection))
-			throw new Error("No collection specitied or unknown collection type: " + collection);
+			throw new Error("No collection specified or unknown collection type: " + collection);
 		collection.removeAllFrom(this);
 	},
 	
@@ -299,7 +301,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 */
 	removeAllFrom: function(collection) {
 		if (!collection || !Core.Types.Collection.isInstance(collection))
-			throw new Error("No collection specitied or unknown collection type: " + collection);
+			throw new Error("No collection specified or unknown collection type: " + collection);
 		for (var i = 0; i < this._size; i++) {
 			collection.remove(this._table[i]);
 		}
