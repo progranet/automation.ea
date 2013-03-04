@@ -69,13 +69,15 @@ Word = {
 	
 	wordApp: null,
 
-	initialize: function() {
-		this.wordApp = new ActiveXObject("Word.Application");
-	},
-	
 	htmlToDoc: function(params) {
+		
 		info("Converting output to Office document");
+		
+		if (!this.wordApp)
+			this.wordApp = new ActiveXObject("Word.Application");
+		
 		var template = this.wordApp.Documents.Open(Sys.IO.getPath(params.template, params.context), Word.WdOpenFormat.wdOpenFormatTemplate, true);
+		
 		try {
 			for (var mark in params.embeds) {
 				info("Embedding chapter [$] in template", [params.embeds[mark]]);
@@ -89,8 +91,6 @@ Word = {
 			info("Saving template to output path");
 			template.SaveAs(params.outputRoot + params.outputFile, params.format || Word.WdSaveFormat.wdFormatDocumentDefault);
 			template.Close();
-			if (!params.dontQuit)
-				this.quit();
 		}
 		catch(e) {
 			template.Close(Word.WdSaveOptions.wdDoNotSaveChanges);
@@ -98,8 +98,13 @@ Word = {
 		}
 	},
 	
-	quit: function() {
+	closeWord: function() {
 		this.wordApp.Quit();
+		this.wordApp = null;
+	},
+	
+	finalize: function() {
+		this.closeWord();
 	},
 	
 	_embed: function(wordApp, outputRoot, file, embedTo) {
