@@ -24,6 +24,7 @@ Ea._Base = {
 Ea._Base.PrimitiveType = extend(Core.Types.Named, {},
 {
 	_primitiveTypes: {},
+	
 	getPrimitiveType: function(name) {
 		if (!name)
 			return null;
@@ -229,6 +230,21 @@ Ea._Base.ContextReference = define({
 	}
 });
 
+Ea._Base.Source = define({
+	
+	created: null,
+	_transient: null,
+	api: null,
+	application: null,
+	value: null,
+	
+	create: function(application, api) {
+		this.api = api;
+		this.application = application;
+		this.value = {};
+	}
+	
+});
 
 include("Ea._Base.Class@Ea.Infrastructure");
 include("Ea._Base.DataTypes@Ea.Infrastructure");

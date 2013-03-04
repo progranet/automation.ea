@@ -57,22 +57,30 @@ Sys.IO = {
 	},
 	
 	/**
+	 * @deprecated Use Sys.IO.copyFile instead
+	 * @param {String} filePath
+	 * @param {String} folderPath
+	 * @param {?Object} namespace Namespace containing file
+	 */
+	copy: function(filePath, folderPath, namespace) {
+		this.copyFile(filePath, folderPath, namespace);
+	},
+
+	/**
 	 * Makes a copy of specified file in script space to specified folder 
 	 * 
 	 * @see Sys.IO.getPath
-	 * @memberOf Sys.IO
 	 * @param {String} filePath
 	 * @param {String} folderPath
-	 * @param {?Object} context Namespace containing file
+	 * @param {?Object} namespace Namespace containing file
 	 */
-	copy: function(filePath, folderPath, context) {
-		Sys.IO._fileSystem.CopyFile(this.getPath(filePath, context), folderPath);
+	copyFile: function(filePath, folderPath, namespace) {
+		Sys.IO._fileSystem.CopyFile(this.getPath(filePath, namespace), folderPath);
 	},
 	
 	/**
 	 * Creates a folder on specified path
 	 * 
-	 * @memberOf Sys.IO
 	 * @param {String} path
 	 */
 	createFolder: function(path) {
@@ -82,7 +90,7 @@ Sys.IO = {
 	},
 	
 	/**
-	 * Returns absolute path to the file in script space
+	 * Returns absolute path to the file in namespace
 	 * 
 	 * @memberOf Sys.IO
 	 * @param {String} file
@@ -94,30 +102,6 @@ Sys.IO = {
 	},
 	
 	/**
-	 * Returns creation date for specified file
-	 * 
-	 * @memberOf Sys.IO
-	 * @param {String} filePath
-	 * @type {Date}
-	 */
-	getCreated: function(filePath) {
-		if (!Sys.IO._fileSystem.FileExists(filePath)) return null;
-		return new Date(Sys.IO._fileSystem.GetFile(filePath).DateCreated);
-	},
-
-	/**
-	 * Returns last modification date for specified file
-	 * 
-	 * @memberOf Sys.IO
-	 * @param {String} filePath
-	 * @type {Date}
-	 */
-	getModified: function(filePath) {
-		if (!Sys.IO._fileSystem.FileExists(filePath)) return null;
-		return new Date(Sys.IO._fileSystem.GetFile(filePath).DateLastModified);
-	},
-	
-	/**
 	 * Checks if specified file exists in file system
 	 * 
 	 * @memberOf Sys.IO
@@ -126,34 +110,131 @@ Sys.IO = {
 	 */
 	fileExists: function(filePath) {
 		return Sys.IO._fileSystem.FileExists(filePath);
+	},
+	
+	getFolder: function(path) {
+		return new Sys.IO.Folder(Sys.IO._fileSystem.GetFolder(path));
 	}
 };
-	
-Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 
-	_file: null,
+Sys.IO._Element = define({
+	
+	_element: null,
 	_path: null,
-	_closed: false,
 	
 	/**
-	 * Creates a new file wrapper. According to parameters file will be opened (read mode) or created (write modes)
+	 * Returns complete path to this file system element
+	 * 
+	 * @type {String}
+	 */
+	getPath: function() {
+		return this._path;
+	},
+	
+	/**
+	 * Returns name of this file system element
+	 * 
+	 * @type {String}
+	 */
+	getName: function() {
+		return this._element.Name;
+	},
+	
+	/**
+	 * Returns size of this file system element
+	 * 
+	 * @type {Number}
+	 */
+	getSize: function() {
+		return this._element.Size;
+	},
+	
+	/**
+	 * Returns parent (folder) of this file system element
+	 * 
+	 * @type {Sys.IO.Folder}
+	 */
+	getParent: function() {
+		return new Sys.IO.Folder(this._element.ParentFolder);
+	},
+	
+	/**
+	 * Returns creation date for this file system element
+	 * 
+	 * @type {Date}
+	 */
+	getCreated: function() {
+		return new Date(this._element.DateCreated);
+	},
+
+	/**
+	 * Returns last modification date for this file system element
+	 * 
+	 * @type {Date}
+	 */
+	getModified: function() {
+		return new Date(this._element.DateLastModified);
+	},
+	
+	/**
+	 * Returns date when this file system element was last accessed
+	 * 
+	 * @type {Date}
+	 */
+	getAccessed: function() {
+		return new Date(this._element.DateLastAccessed);
+	}
+});
+	
+Sys.IO.File = extend(Sys.IO._Element, {
+
+	_stream: null,
+	_state: null,
+	
+	/**
+	 * Constructs a file wrapper in file system.
+	 * If there is mode specified file will be opened or created.
 	 * 
 	 * @constructs
-	 * @param {String} file
-	 * @param {?Sys.IO.Mode} mode File wrapper creation mode (default Sys.IO.Mode.WRITE)
+	 * @param {any} file File path or Windows file system File object
+	 * @param {?Sys.IO.Mode} mode File wrapper creation mode
 	 * @param {?Sys.IO.Unicode} unicode File unicode mode (default Sys.IO.Unicode.ASCII)
 	 * @param {?Object} namespace Namespace containing file
 	 */
 	create: function(file, mode, unicode, namespace) {
-		mode = mode || Sys.IO.Mode.WRITE;
-		unicode = unicode || Sys.IO.Unicode.ASCII;
-		file = Sys.IO.getPath(file, namespace);
+		if (typeof file == "string") {
+			this._path = Sys.IO.getPath(file, namespace);
+			if (mode != Sys.IO.Mode.WRITE) {
+				this._element = Sys.IO._fileSystem.GetFile(this._path);
+			}
+		}
+		else {
+			this._element = file;
+			this._path = file.Path;
+		}
+		this._state = Sys.IO.File.State.NONE;
+		if (mode)
+			this.open(mode, unicode);
+	},
+	
+	/**
+	 * Opens file or creates it according to specified parameters
+	 * 
+	 * @param {Sys.IO.Mode} mode File wrapper creation mode
+	 * @param {?Sys.IO.Unicode} unicode File unicode mode (default Sys.IO.Unicode.ASCII)
+	 */
+	open: function(mode, unicode) {
+		
+		if (this._state != Sys.IO.File.State.NONE)
+			throw new Error("File cannot by opened: " + this._path);
+		
 		if (mode == Sys.IO.Mode.WRITE) {
-			this._file = Sys.IO._fileSystem.CreateTextFile(file, true, unicode);
+			this._stream = Sys.IO._fileSystem.CreateTextFile(this._path, true, unicode || Sys.IO.Unicode.ASCII);
 		}
-		else if (mode = Sys.IO.Mode.READ) {
-			this._file = Sys.IO._fileSystem.OpenTextFile(file, mode, false, Sys.IO.Unicode.DEFAULT);
+		else {
+			this._stream = this._element.OpenAsTextStream(mode, Sys.IO.Unicode.DEFAULT);
 		}
+		this._state = Sys.IO.File.State.OPEN;
 		Sys.IO._files.push(this);
 	},
 	
@@ -164,7 +245,7 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	 * @param {String} text
 	 */
 	write: function(text) {
-		this._file.Write(text);
+		this._stream.Write(text);
 	},
 	
 	/**
@@ -174,7 +255,7 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	 * @param {String} text
 	 */
 	writeLine: function(text) {
-		this._file.WriteLine(text);
+		this._stream.WriteLine(text);
 	},
 	
 	/**
@@ -184,7 +265,7 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	 * @type {String}
 	 */
 	readLine: function() {
-		return this._file.ReadLine();
+		return this._stream.ReadLine();
 	},
 	
 	/**
@@ -194,7 +275,7 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	 * @type {String}
 	 */
 	readAll: function() {
-		return this._file.ReadAll();
+		return this._stream.ReadAll();
 	},
 	
 	/**
@@ -204,7 +285,7 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	 * @type {Boolean}
 	 */
 	atEnd: function() {
-		return this._file.AtEndOfStream;
+		return this._stream.AtEndOfStream;
 	},
 	
 	/**
@@ -213,50 +294,69 @@ Sys.IO.File = define(/** @lends Sys.IO.File# */ {
 	 * @memberOf Sys.IO.File#
 	 */
 	close: function() {
-		if (this._closed) {
-			debug("file already closed: " + this._path);
+		if (this._state != Sys.IO.File.State.OPEN) {
+			debug("file is not open: " + this._path);
 			return;
 		}
-		this._file.Close();
-		this._closed = true;
+		this._stream.Close();
+		this._state = Sys.IO.File.State.CLOSED;
+	}
+	
+},
+{
+	State: {
+		NONE: 0,
+		OPEN: 1,
+		CLOSED: 2
 	}
 });
 
-Sys.IO.FileTarget = extend(Core.Target.AbstractTarget, /** @lends Sys.IO.FileTarget# */ {
-	
-	_path: null,
-	_file: null,
+Sys.IO.Folder = extend(Sys.IO._Element, {
 	
 	/**
-	 * Creates new file target
+	 * Constructs Sys.IO.Folder
 	 * 
-	 * @constructs
-	 * @extends Core.Target.AbstractTarget
-	 * @param {String} path Target file path
-	 * @param {Number} type Specifies type of target as one of {@link Core.Target.Type}
+	 * @param {any} folder Path to folder or Windows file system Folder object
+	 * @param {?Object} namespace
 	 */
-	create: function(path, type) {
-		_super.create(type);
-		this._path = path;
-		this._file = new Sys.IO.File(this._path, Sys.IO.Mode.WRITE);
+	create: function(folder, namespace) {
+		if (typeof folder == "string") {
+			this._path = Sys.IO.getPath(folder, namespace);
+			this._element = Sys.IO._fileSystem.GetFolder(this._path);
+		}
+		else {
+			this._element = folder;
+			this._path = folder.Path;
+		}
 	},
 	
 	/**
-	 * Writes specified message to target file
+	 * Returns collection of this folder's subfolders
 	 * 
-	 * @memberOf Sys.IO.FileTarget#
-	 * @param {String} message
+	 * @type {Core.Types.Collection<Sys.IO.Folder>}
 	 */
-	write: function(message) {
-		this._file.writeLine(message);
+	getFolders: function() {
+		var foldersCollection = new Enumerator(this._element.SubFolders);
+		var folders = new Core.Types.Collection();
+		for (foldersCollection.moveFirst(); !foldersCollection.atEnd(); foldersCollection.moveNext()) {
+			folder = new Sys.IO.Folder(foldersCollection.item());
+			folders.add(folder);
+		}
+		return folders;
 	},
 	
 	/**
-	 * Closes target file
+	 * Returns collection of this folder's files
 	 * 
-	 * @memberOf Sys.IO.FileTarget#
+	 * @type {Core.Types.Collection<Sys.IO.File>}
 	 */
-	close: function() {
-		this._file.close();
+	getFiles: function() {
+		var filesCollection = new Enumerator(this._element.Files);
+		var files = new Core.Types.Collection();
+		for (filesCollection.moveFirst(); !filesCollection.atEnd(); filesCollection.moveNext()) {
+			file = new Sys.IO.File(filesCollection.item());
+			files.add(file);
+		}
+		return files;
 	}
 });

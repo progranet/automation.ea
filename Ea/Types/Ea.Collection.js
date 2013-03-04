@@ -20,82 +20,278 @@ Ea.Collection = {
 		}
 };
 
-Ea.Collection._Base = extend(Core.Types.Collection, {
+Ea.Collection._Base = extend(Ea.Types.Any, {
 	
 	_elementType: null,
-	//_index: null,
+	_index: null,
+	_size: 0,
+	_table: null,
 	
-	create: function(source, params) {
-		_super.create(params);
-		this._source = source;
+	/**
+	 * Constructs Ea.Collection._Base
+	 * 
+	 * @param {Object} params params.elementType specify class of elements in this collecion
+	 */
+	create: function(params) {
+		_super.create();
+		this._table = [];
 		this._elementType = params.elementType;
-		//this._index = {};
-		this._init(params);
+		this._index = {};
 	},
-	
-	_init: function(params) {
-		var repository = this._source.application.getRepository();
+
+	_init: function() {
+		var application = this._source.application;
 		for (var e = 0; e < this._source.api.Count; e++) {
-			var element = repository.get(this._elementType, this._source.api.GetAt(e));
-			this.add(element);
-			/*if (this.add(element))
-				this._index[element.__id__] = e;*/
+			var element = application.get(this._elementType, this._source.api.GetAt(e));
+			this._add(element);
 		}
 	},
 	
-	_create: function(name, type, element) {
+	add: function(element) {
+		throw new Error("Collection is not modifiable");
+	},
+	
+	remove: function(element) {
+		throw new Error("Collection is not modifiable");
+	},
+	
+	addAll: function(collection) {
+		throw new Error("Collection is not modifiable");
+	},
+	
+	removeAll: function(collection) {
+		throw new Error("Collection is not modifiable");
+	},
+	
+	_add: function(element) {
+		this._table.push(element);
+		this._size++;
+		this._index[element.__id__] = e;
+		this._added(element);
+	},
+	
+	_added: function(element) {
+		
+	},
+	
+	_create: function(name, type) {
 		type = type || this._elementType;
-		var elementTypeName = type.elementType || type.namespace.name;
+		var elementTypeName =  type.determineEaType(); //type.elementType || type.namespace.name;
 		var api = this._source.api.AddNew(name, elementTypeName);
-		if (element) {
-			api.SupplierID = element.getId();;
-		}
-		api.Update();
-		this._source.api.Refresh();
-		var element = this._source.application.getRepository().get(type, api);
-		//this.add(element);
+		var element = this._source.application.createProxy(type, api);
 		return element;
 	},
 
 	_delete: function(element) {
-		//var api = element._source.api;
-		//var index = this._index[element.__id__];
+		var index = this._index[element.__id__];
 		this._source.api.Delete(index);
+	},
+	
+	/**
+	 * Refreshes collection after modification
+	 */
+	refresh: function() {
 		this._source.api.Refresh();
-		//this.remove(element);
+	},
+	
+	_isCollection: function(collection) {
+		return (collection && Core.Lang.isClass(collection._class) && collection._class.getCollectionType());
+	},
+	
+	/**
+	 * Adds all elements of this collection to specified collection
+	 * 
+	 * @param {Core.Types.Collection} collection
+	 */
+	addAllTo: function(collection) {
+		if (!this._isCollection(collection))
+			throw new Error("No collection specified or unknown collection type: " + collection);
+		for (var i = 0; i < this._size; i++) {
+			collection.add(this._table[i]);
+		}
+	},
+	
+	/**
+	 * Removes all elements of this collection from specified collection
+	 * 
+	 * @param {Core.Types.Collection} collection
+	 */
+	removeAllFrom: function(collection) {
+		if (!this._isCollection(collection))
+			throw new Error("No collection specified or unknown collection type: " + collection);
+		for (var i = 0; i < this._size; i++) {
+			collection.remove(this._table[i]);
+		}
+	},
+
+	/**
+	 * Collection iterator.
+	 * 
+	 * @param {Object} context
+	 * @param {Function} fn
+	 */
+	forEach: function(context, fn) {
+		for (var i = 0; i < this._size; i++) {
+			if (fn.call(context, this._table[i], i)) break;
+		}
+	},
+	
+	/**
+	 * Returns collection's size.
+	 * 
+	 * @type {Number}
+	 */
+	getSize: function() {
+		return this._size;
+	},
+	
+	/**
+	 * Checks if this collection is empty
+	 * 
+	 * @type {Boolean}
+	 */
+	isEmpty: function() {
+		return this._size == 0;
+	},
+	
+	/**
+	 * Checks if this collection is not empty
+	 * 
+	 * @type {Boolean}
+	 */
+	notEmpty: function() {
+		return this._size != 0;
+	},
+	
+	/**
+	 * Returns first element of this collection
+	 * 
+	 * @type {Object}
+	 */
+	first: function() {
+		return (this._size == 0 ? null : this._table[0]);
+	},
+	
+	/**
+	 * Returns new collection containing elements from this collection matching specified filter
+	 * @see Core.Types.Filter
+	 * 
+	 * @param {Core.Types.Filter} filter
+	 * @type {Core.Types.Collection}
+	 */
+	filter: function(filter) {
+		if (!filter) return this;
+		var filtered = new Core.Types.Collection();
+		filter = Core.Types.Filter.ensure(filter);
+		for (var i = 0; i < this._size; i++) {
+			var element = this._table[i];
+			if (filter.check(element))
+				filtered.add(element);
+		}
+		return filtered;
 	}
 },
 {
+	/**
+	 * Determines the class of collection based on source attributes values
+	 * 
+	 * @param {Ea._Base.Source} source
+	 * @type {Class}
+	 */
 	determineType: function(source) {
 		return Ea.Collection._Base;
 	},
 	
+	/**
+	 * Processes original property value
+	 * 
+	 * @param {Ea.Collection._Base} value
+	 * @param {Array} params Parameters (arguments) passed to getter. In this case params[0] specify collection filter
+	 * @type {Core.Types.Collection}
+	 */
 	processValue: function(value, params) {
 		return value.filter(params[0]);
-	}
+	},
+	
+	_collectionType: "collection"
 });
 
-Ea.Collection.Map = extend(Core.Types.Map, {
-	create: function(source, params) {
+Ea.Collection.Map = extend(Ea.Collection._Base, {
+	
+	_keyDef: null,
+	_keyFn: null,
+	_map: null,
+	
+	/**
+	 * Constructs Ea.Collection.Map
+	 * 
+	 * @param {Object} params params.elementType specify class of elements in this collecion
+	 */
+	create: function(params) {
 		_super.create(params);
-		this._source = source;
-		this._elementType = params.elementType;
-		this._init(params);
+		params = params || {};
+		this._keyDef = params.key;
+		this._keyFn = new Function("return " + this._keyDef + ";");
+		this._map = {};
 	},
-	_init: function(params) {
-		var repository = this._source.application.getRepository();
-		for (var e = 0; e < this._source.api.Count; e++) {
-			var element = repository.get(params.elementType, this._source.api.GetAt(e));
-			this.add(element);
+	
+	_added: function(element) {
+		var key = this._keyFn.call(element);
+		if (!key) {
+			throw new Error("Key not found for: " + element + ", according to key definition: " + this._keyDef);
+		}
+		if (this._map[key]) {
+			debug("Key already exisis in map: " + key);
+		}
+		this._map[key] = element;
+	},
+	
+	/**
+	 * Returns an element for specified key
+	 * 
+	 * @param {Object} key
+	 * @type {Object}
+	 */
+	get: function(key) {
+		return key in this._map ? this._map[key] : undefined;
+	},
+	
+	/**
+	 * Returns full set of elements in this map regarding that multiple elements can match same key key definition.
+	 * 
+	 * @type {Core.Types.Collection}
+	 */
+	asSet: function() {
+		var set = new Core.Types.Collection();
+		for (var i = 0; i < this._size; i++) {
+			set.add(this._table[i]);
+		}
+		return set;
+	},
+
+	/**
+	 * Map iterator.
+	 * 
+	 * @param {Object} context
+	 * @param {Function} fn
+	 */
+	forEach: function(context, fn) {
+		for (var key in this._map) {
+			if (fn.call(context, this._map[key], key)) break;
 		}
 	}
+	
 },
 {
+	/**
+	 * Determines the class of map based on source attributes values
+	 * 
+	 * @param {Ea._Base.Source} source
+	 * @type {Class}
+	 */
 	determineType: function(source) {
 		return Ea.Collection.Map;
 	},
 	
-	processValue: function(value, params) {
-		return value.filter(params[0]);
-	}
+	_collectionType: "map"
 });

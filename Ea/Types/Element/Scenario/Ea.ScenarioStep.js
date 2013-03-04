@@ -51,7 +51,7 @@ Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 	 * @qualifier {String} level
 	 * @private
 	 */
-	_extensions: property({api: "Extensions"}),
+	_extension: property({api: "Extensions"}),
 	
 	/**
 	 * @private

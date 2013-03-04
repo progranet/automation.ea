@@ -27,16 +27,16 @@ Search = {
 	found: new Core.Types.Collection(),
 	application: null,
 
-	execute: function() {
+	execute: function(params) {
 
-		this.application = Ea.initializeDefaultApplication();
+		this.application = Ea.initializeDefaultApplication(params);
 
 		info("=== START ===");
 		
 		var _package = this.application.getRepository().getSelectedPackage();
 		
 		if (this.params.file) {
-			this.file = new Sys.IO.File(this.params.file);
+			this.file = new Sys.IO.File(this.params.file, Sys.IO.Mode.WRITE);
 		}
 		
 		this.processElement(_package);
@@ -89,7 +89,7 @@ Search = {
 		this.out("</Rows>");
 		this.out("</ReportViewData>");
 
-		this.application.getRepository().search("", "", "", this.xml);
+		this.application.getRepository().renderSearchResults(this.xml);
 	},
 	
 	processElement: function(element) {

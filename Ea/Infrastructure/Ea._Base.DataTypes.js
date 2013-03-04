@@ -211,11 +211,11 @@ Ea._Base.DataTypes.Appearance = extend(Ea._Base.DataTypes.DataType, {
 	
 	create: function(source) {
 		_super.create(source);
-		this._backColor = new Ea._Base.DataTypes.Color(source.Backcolor);
-		this._fontColor = new Ea._Base.DataTypes.Color(source.Fontcolor);
-		this._borderColor = new Ea._Base.DataTypes.Color(source.Bordercolor);
-		this._borderStyle = source.BorderStyle;
-		this._borderWidth = source.BorderWidth;
+		this._backColor = new Ea._Base.DataTypes.Color(source.backColor);
+		this._fontColor = new Ea._Base.DataTypes.Color(source.fontColor);
+		this._borderColor = new Ea._Base.DataTypes.Color(source.borderColor);
+		this._borderStyle = source.borderStyle;
+		this._borderWidth = source.borderWidth;
 	},
 	
 	valueOf: function() {
@@ -274,8 +274,13 @@ Ea._Base.DataTypes.Color = extend(Ea._Base.DataTypes.DataType, {
 	},
 	
 	valueOf: function() {
+		if (this._default)
+			return {
+				"default": true
+			};
+			
 		return {
-			_default: this._default,
+			"default": false,
 			red: this._red,
 			green: this._green,
 			blue: this._blue

@@ -340,7 +340,7 @@ var ea = function(name, context) {
 					"kind": "init"
 				});
 			});
-			WriteOutput("Loader", "TAG:" + tag, undefined);
+			//WriteOutput("Loader", "TAG:" + tag, undefined);
 			tag = tag.replace(/^\s*qualifier\s+(\{(.+)\}\s+)?([a-zA-Z0-9_$]+)\s*/g, function(whole, _type, type, qualifier) {
 				
 				WriteOutput("Loader", "QUALIFIER:" + type + "/" + qualifier, undefined);

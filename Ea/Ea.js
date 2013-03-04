@@ -34,14 +34,15 @@ Ea = {
 	/**
 	 * Initializes default EA application
 	 * 
-	 * @param {Core.Target.AbstractTarget} targetClass Target for logger mechanizm
+	 * @param {Core.Target.AbstractTarget} targetClass Target for logger mechanism
 	 * @param {Object} params
 	 * @type {Ea.Application._Base}
 	 */
-	initializeDefaultApplication: function(targetClass, params) {
+	initializeDefaultApplication: function(params) {
+		params = params || {};
 		if (!this._application) {
 			this._application = Ea.Application.createApplication(params);
-			this._initializeLogs(targetClass || Ea._Base.Helper.Target, this._application.getRepository());
+			this._initializeLogs(params.targetClass || Ea._Base.Helper.Target, this._application.getRepository());
 		}
 		else {
 			warn("Default application already initialized");

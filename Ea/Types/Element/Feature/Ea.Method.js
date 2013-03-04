@@ -23,9 +23,15 @@ Ea.Method = {
 };
 
 Ea.Method._Base = extend(Ea.TypedElement.Feature, {
+	
 	_getPrimitiveType: function() {
 		var returnType = this._getReturnType();
 		return returnType == "void" ? null : returnType;
+	},
+	
+	_setPrimitiveType: function(typeName) {
+		typeName = typeName || "void";
+		this._setReturnType(typeName);
 	}
 },
 {
@@ -85,26 +91,26 @@ Ea.Method._Base = extend(Ea.TypedElement.Feature, {
 	 * @type {Ea.Collection._Base<Ea.Parameter._Base>}
 	 * @aggregation composite
 	 */
-	_parameters: property({api: "Parameters"}),
+	_parameter: property({api: "Parameters"}),
 	
 	/**
 	 * @type {Ea.Collection.Map<Ea.MethodTag._Base>}
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_tags: property({api: "TaggedValues"}),
+	_tag: property({api: "TaggedValues"}),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.MethodConstraint._Base>}
 	 * @aggregation composite
 	 */
-	_preConditions: property({api: "PreConditions"}),
+	_preCondition: property({api: "PreConditions"}),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.MethodConstraint._Base>}
 	 * @aggregation composite
 	 */
-	_postConditions: property({api: "PostConditions"}),
+	_postCondition: property({api: "PostConditions"}),
 	
 	/**
 	 * @type {Ea.Element.Type}

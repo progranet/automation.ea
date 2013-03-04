@@ -24,30 +24,7 @@ Ea.Scenario = {
 Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 	
 	getContext: function() {
-		
-		var rows = this._source.application.getRepository().findByQuery("t_objectscenarios", "ea_guid", "\"" + this.getGuid() + "\"");
-		var row = rows[0];
-		
-		var dom = new ActiveXObject("MSXML2.DOMDocument");
-		dom.validateOnParse = false;
-		dom.async = false;
-		
-		var xml = row["XMLContent"];
-		var parsed = dom.loadXML(xml);
-
-		var context = {};
-
-		if (!parsed) {
-			warn("Error while XML parsing scenario content: " + xml + " " + this.getGuid());
-		}
-		else {
-			var nodes = dom.selectNodes("//path/context/item");
-			for (var ni = 0; ni < nodes.length; ni++) {
-				var node = nodes[ni];
-				context[node.getAttribute("oldname")] = this._source.application.getRepository().getByGuid(Ea.Element._Base, node.getAttribute("guid"));
-			}
-		}
-		return context;
+		return this._source.application.getRepository().getScenarioContext(this);
 	}
 },
 {
@@ -66,7 +43,7 @@ Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 	 * @qualifier {String} pos
 	 * @aggregation composite
 	 */
-	_steps: property({api: "Steps"}),
+	_step: property({api: "Steps"}),
 	
 	/**
 	 * @type {Object}

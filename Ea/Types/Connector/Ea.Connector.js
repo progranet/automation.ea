@@ -35,30 +35,56 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 			return "";
 		});
 		var features = {
-			clientAttribute: direction.client ? this._source.application.getRepository().getByGuid(Ea.Attribute._Base, direction.client) : null,
-			clientMethod: direction.client ? this._source.application.getRepository().getByGuid(Ea.Method._Base, direction.client) : null,
-			supplierAttribute: direction.supplier ? this._source.application.getRepository().getByGuid(Ea.Attribute._Base, direction.supplier) : null,
-			supplierMethod: direction.supplier ? this._source.application.getRepository().getByGuid(Ea.Method._Base, direction.supplier) : null
+			clientAttribute: direction.client ? this._source.application.getByGuid(Ea.Attribute._Base, direction.client) : null,
+			clientMethod: direction.client ? this._source.application.getByGuid(Ea.Method._Base, direction.client) : null,
+			supplierAttribute: direction.supplier ? this._source.application.getByGuid(Ea.Attribute._Base, direction.supplier) : null,
+			supplierMethod: direction.supplier ? this._source.application.getByGuid(Ea.Method._Base, direction.supplier) : null
 		};
 		return features;
 	},
 	
+	/**
+	 * Returns attribute linked to client end 
+	 * 
+	 * @type {Ea.Attribute._Base}
+	 */
 	getClientAttribute: function() {
 		return this._getFeatures().clientAttribute;
 	},
 	
+	/**
+	 * Returns method linked to client end 
+	 * 
+	 * @type {Ea.Method._Base}
+	 */
 	getClientMethod: function() {
 		return this._getFeatures().clientMethod;
 	},
 	
+	/**
+	 * Returns attribute linked to supplier end 
+	 * 
+	 * @type {Ea.Attribute._Base}
+	 */
 	getSupplierAttribute: function() {
 		return this._getFeatures().supplierAttribute;
 	},
 	
+	/**
+	 * Returns method linked to supplier end 
+	 * 
+	 * @type {Ea.Method._Base}
+	 */
 	getSupplierMethod: function() {
 		return this._getFeatures().supplierMethod;
 	},
 	
+	/**
+	 * Determines relation name for this relation type according to relation direction
+	 * 
+	 * @param {Boolean} client Specifies whether this end is client's end
+	 * @type {String}
+	 */
 	getRelation: function(client) {
 		return client ? "links from" : "links to";
 	},
@@ -209,84 +235,141 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_tags: property({api: "TaggedValues"}),
+	_tag: property({api: "TaggedValues"}),
 
 	/**
 	 * @type {Ea.Collection._Base<Ea.ConnectorConstraint._Base>}
 	 * @aggregation composite
 	 */
-	_constraints: property({api: "Constraints"}),
+	_constraint: property({api: "Constraints"}),
 
 	/**
 	 * @type {Ea.Collection.Map<Ea.CustomProperty._Base>}
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_customProperties: property({api: "CustomProperties"}),
+	_customProperty: property({api: "CustomProperties"}),
 
 	/**
 	 * @type {Ea.Properties._Base<Ea.Property._Base>}
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_properties: property({api: "Properties"}),
+	_property: property({api: "Properties"}),
 
+	/**
+	 * Determines EA API Connector type name on creating API object
+	 * 
+	 * @type {String}
+	 */
+	determineEaType: function() {
+		return this.name;
+	},
+
+	/**
+	 * Recognizes class of EA Connector from source
+	 * 
+	 * @param {Object} source
+	 * @type {Class}
+	 */
 	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	}
 });
 
-Ea.Connector.Association = extend(Ea.Connector._Base, {}, {
-	elementType: "Association"
-	
-});
+Ea.Connector.Association = extend(Ea.Connector._Base, {});
 
 Ea.Connector.Aggregation = extend(Ea.Connector._Base, {
+	/**
+	 * Determines relation name for this relation type according to relation direction
+	 * 
+	 * @param {Boolean} client Specifies whether this end is client's end
+	 * @type {String}
+	 */
 	getRelation: function(client) {
 		return client ? "composed of" : "part of";
 	}
 });
 
 Ea.Connector.ControlFlow = extend(Ea.Connector._Base, {
+	/**
+	 * Determines relation name for this relation type according to relation direction
+	 * 
+	 * @param {Boolean} client Specifies whether this end is client's end
+	 * @type {String}
+	 */
 	getRelation: function(client) {
 		return client ? "transition from" : "transition to";
 	}
 });
 
 Ea.Connector.ObjectFlow = extend(Ea.Connector._Base, {
+	/**
+	 * Determines relation name for this relation type according to relation direction
+	 * 
+	 * @param {Boolean} client Specifies whether this end is client's end
+	 * @type {String}
+	 */
 	getRelation: function(client) {
 		return client ? "transition from" : "transition to";
 	}
 });
 
 Ea.Connector.StateFlow = extend(Ea.Connector._Base, {
+	/**
+	 * Determines relation name for this relation type according to relation direction
+	 * 
+	 * @param {Boolean} client Specifies whether this end is client's end
+	 * @type {String}
+	 */
 	getRelation: function(client) {
 		return client ? "transition from" : "transition to";
 	}
 });
 
 Ea.Connector.Dependency = extend(Ea.Connector._Base, {
+	/**
+	 * Determines relation name for this relation type according to relation direction
+	 * 
+	 * @param {Boolean} client Specifies whether this end is client's end
+	 * @type {String}
+	 */
 	getRelation: function(client) {
 		return client ? "needed by" : "depends on";
 	}
 });
 
 Ea.Connector.Generalization = extend(Ea.Connector._Base, {
+	/**
+	 * Determines relation name for this relation type according to relation direction
+	 * 
+	 * @param {Boolean} client Specifies whether this end is client's end
+	 * @type {String}
+	 */
 	getRelation: function(client) {
 		return client ? "supertype of" : "subtype of";
 	}
-}, {
-	elementType: "Generalization"
-	
 });
 
 Ea.Connector.Nesting = extend(Ea.Connector._Base, {
+	/**
+	 * Determines relation name for this relation type according to relation direction
+	 * 
+	 * @param {Boolean} client Specifies whether this end is client's end
+	 * @type {String}
+	 */
 	getRelation: function(client) {
 		return client ? "owns" : "owned by";
 	}
 });
 
 Ea.Connector.Realisation = extend(Ea.Connector._Base, {
+	/**
+	 * Determines relation name for this relation type according to relation direction
+	 * 
+	 * @param {Boolean} client Specifies whether this end is client's end
+	 * @type {String}
+	 */
 	getRelation: function(client) {
 		return client ? "realized by" : "implements";
 	}

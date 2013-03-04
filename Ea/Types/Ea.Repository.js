@@ -14,6 +14,10 @@
    limitations under the License.
 */
 
+include("DataAccess@DataAccess");
+include("DataAccess.Jet@DataAccess");
+include("DataAccess.Oracle@DataAccess");
+
 /**
  * @namespace
  */
@@ -21,183 +25,30 @@ Ea.Repository = {
 
 	meta: {
 		objectType: 2
-	},
-	
-	Syntax: {
-		JetDB: {
-			Tables: {
-				
-			}
-		},
-		Oracle: {
-			
-		}
 	}
 };
 
-Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
+			
+Ea.Repository._Base = extend(Ea.Types.Any, {
 	
-	_cacheId: null,
-	_cacheGuid: null,
-	_cacheStats: null,
-	
-	_syntax: null,
+	_provider: null,
 	
 	/**
-	 * @constructs
-	 * @param source
-	 * @param params
-	 */
-	create: function(source, params) {
-		_super.create(source);
-		params = params || {};
-		this._syntax = params.syntax || Ea.Repository.Syntax.JetDB;
-		
-		this._cacheId = new Array(Ea.OBJECT_TYPES_NUMBER);
-		this._cacheGuid = new Array(Ea.OBJECT_TYPES_NUMBER);
-		this._cacheStats = new Array(Ea.OBJECT_TYPES_NUMBER + 1);
-		for (var ot = 0; ot <= Ea.OBJECT_TYPES_NUMBER; ot++) {
-			if (ot != Ea.OBJECT_TYPES_NUMBER) {
-				this._cacheId[ot] = [];
-				this._cacheGuid[ot] = {};
-			}
-			this._cacheStats[ot] = {
-					cwi: 0,
-					cwg: 0,
-					cri: 0,
-					crgi: 0,
-					crg: 0,
-					crgg: 0,
-					tr: 0,
-					trg: 0,
-					trgi: 0,
-					trgg: 0,
-					trgig: 0,
-					trggg: 0
-				};
-		}
-
-	},
-	
-	/**
-	 * @memberOf Ea.Repository._Base#
-	 */
-	cacheInfo: function() {
-		var stats = {};
-		var g = this._cacheStats[Ea.OBJECT_TYPES_NUMBER];
-		for (var ot = 0; ot <= Ea.OBJECT_TYPES_NUMBER; ot++) {
-			var type = Ea._objectTypes[ot];
-			if (!type && ot != Ea.OBJECT_TYPES_NUMBER)
-				continue;
-			var s = this._cacheStats[ot];
-			stats[ot != Ea.OBJECT_TYPES_NUMBER ? type.namespace : "TOTAL"] = {
-					"total read from get": s.trg,
-					"total read by id from get": s.trgig,
-					"total read by guid from get": s.trggg,
-					"total read by id": s.trgi,
-					"total read by guid": s.trgg,
-					"cache read by id": s.cri,
-					"cache read by id from get": s.crgi,
-					"cache read by guid": s.crg,
-					"cache read by guid from get": s.crgg,
-					"cache white by id": s.cwi,
-					"cache white by guid": s.cwg
-				};
-			for (var n in g) {
-				g[n] = (ot != Ea.OBJECT_TYPES_NUMBER) ? (g[n] + s[n]) : 0;
-			}
-		}
-		info("cache stats: $", [JSON.stringify(stats, null, '\t')]);
-	},
-	
-	/**
-	 * Returns proxy object for specified EA API object
+	 * Constructs Ea.Repository._Base
 	 * 
-	 * @param {Class} type
-	 * @param {Object} api
 	 * @param {Object} params
-	 * @type {Ea.Types.Any}
 	 */
-	get: function(type, api, params) {
-		var meta = type.namespace.meta;
-		this._cacheStats[meta.objectType].trg++;
-		if (meta.id) {
-			this._cacheStats[meta.objectType].trgig++;
-			var id = api[meta.id];
-			var proxy = this._cacheId[meta.objectType][id];
-			if (proxy) {
-				this._cacheStats[meta.objectType].crgi++;
-				return proxy;
-			}
-		}
-		else if (meta.guid) {
-			this._cacheStats[meta.objectType].trggg++;
-			var guid = api[meta.guid];
-			var proxy = this._cacheGuid[meta.objectType][guid];
-			if (proxy) {
-				this._cacheStats[meta.objectType].crgg++;
-				return proxy;
-			}
-		}
-		return this._get(type, api, params);
+	create: function(params) {
+		_super.create();
+		params = params || {};
+		this._provider = DataAccess.getProvider(params.provider || "Jet");
 	},
 	
-	getById: function(type, id) {
-		if (!id || id == 0)
-			return null;
-		var meta = type.namespace.meta;
-		this._cacheStats[meta.objectType].trgi++;
-		var proxy = this._cacheId[meta.objectType][id];
-		if (proxy) {
-			this._cacheStats[meta.objectType].cri++;
-			return proxy;
-		}
-		var method = "Get" + type.namespace.name + "ByID";
-		var api;
-		// EA ElementID integrity problem
-		try {
-			api = this._source.api[method](id);
-		}
-		catch (e) {
-			warn("$ not found by Id = $", [type, id]);
-			return null;
-		}
-		return this._get(type, api);
-	},
-	
-	getByGuid: function(type, guid) {
-		var meta = type.namespace.meta;
-		this._cacheStats[meta.objectType].trgg++;
-		var proxy = this._cacheGuid[meta.objectType][guid];
-		if (proxy) {
-			this._cacheStats[meta.objectType].crg++;
-			return proxy;
-		}
-		var method = "Get" + type.namespace.name + "ByGuid";
-		var api = this._source.api[method](guid);
-		if (!api) {
-			warn("$ not found by Guid = $", [type, guid]);
-			return null;
-		}
-		return this._get(type, api);
-	},
-
-	_get: function(type, api, params) {
-		var meta = type.namespace.meta;
-		var proxy = Ea._Base.Class.createProxy(this._source.application, type, api, params);
-		if (meta.id) {
-			this._cacheId[meta.objectType][api[meta.id]] = proxy;
-			this._cacheStats[meta.objectType].cwi++;
-		}
-		if (meta.guid) {
-			this._cacheGuid[meta.objectType][api[meta.guid]] = proxy;
-			this._cacheStats[meta.objectType].cwg++;
-		}
-		return proxy;
-	},
-	
-	findByQuery: function(table, key, value) {
-		var sql = "select * from " + table + " where " + key + " = " + value;
+	_findByQuery: function(table, key, value) {
+		
+		//var sql = "select * from " + table + " where " + key + " = " + value;
+		var sql = this._provider.getSelect(table) + " " + this._provider.getExpression(table, key, value);
+		
 		var xml = this._source.api.SQLQuery(sql);
 		
 		var dom = new ActiveXObject("MSXML2.DOMDocument");
@@ -226,27 +77,51 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 		return rows;
 	},
 	
+	/**
+	 * Finds objects matching specified criteria in underlying database.
+	 * Output collection contains objects selected from [table] matching [key] == [value] condition.
+	 * 
+	 * @param {Class} type Type of searched objects
+	 * @param {String} table Table name where search to
+	 * @param {String} key Name of column in table to search by
+	 * @param {String} value Value which key must match
+	 * @param {String} identity Name of column containing identity (id values) of searched objects
+	 * @type {Core.Types.Collection}
+	 */
 	getByQuery: function(type, table, key, value, identity) {
+		identity = this._provider.getColumn(table, identity);
 		var collection = new Core.Types.Collection();
-		var rows = this.findByQuery(table, key, value);
+		var rows = this._findByQuery(table, key, value);
 		for (var ri = 0; ri < rows.length; ri++) {
 			var row = rows[ri];
 			var id = row[identity];
-			var proxy = this.getById(type, id);
+			var proxy = this._source.application.getById(type, id);
 			collection.add(proxy);
 		}
 		return collection;
 	},
 	
+	/**
+	 * Returns collection of element's custom references
+	 * 
+	 * @param {Ea.Element._Base} element
+	 * @type {Core.Types.Collection<Ea._Base.CustomReference>}
+	 */
 	getCustomReferences: function(element) {
 		var collection = new Core.Types.Collection();
-		var rows = this.findByQuery("t_xref", "Client", "\"" + element.getGuid() + "\"");
+		var rows = this._findByQuery("XRef", "clientGuid", element.getGuid());
+		var columns = {
+			type: this._provider.getColumn("XRef", "type"),
+			name: this._provider.getColumn("XRef", "name"),
+			supplierGuid: this._provider.getColumn("XRef", "supplierGuid"),
+			description: this._provider.getColumn("XRef", "description")
+		};
 		for (var ri = 0; ri < rows.length; ri++) {
 			var row = rows[ri];
-			if (row["Type"] == "reference" && row["Name"] == "Element") {
-				var supplier = this.getByGuid(Ea.Element._Base, row["Supplier"]);
+			if (row[columns.type] == "reference" && row[columns.name] == "Element") {
+				var supplier = this._source.application.getByGuid(Ea.Element._Base, row[columns.supplierGuid]);
 				if (supplier) {
-					var reference = new Ea._Base.CustomReference(row["Description"], supplier);
+					var reference = new Ea._Base.CustomReference(row[columns.description], supplier);
 					collection.add(reference);
 				}
 			}
@@ -260,7 +135,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 * @type {Ea.Package._Base}
 	 */
 	getSelectedPackage: function() {
-		return this.get(Ea.Package._Base, this._source.api.GetTreeSelectedPackage());
+		return this._source.application.get(Ea.Package._Base, this._source.api.GetTreeSelectedPackage());
 	},
 	
 	/**
@@ -283,34 +158,70 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 */
 	getSelectedObject: function() {
 		var api = this._source.api.GetTreeSelectedObject();
-		var object = this.get(this.getSelectedType(), api);
+		var object = this._source.application.get(this.getSelectedType(), api);
 		return object;
 	},
 	
+	/**
+	 * Closes specified diagram
+	 * 
+	 * @param {Ea.Diagram._Base} diagram
+	 */
 	closeDiagram: function(diagram) {
 		this._source.api.CloseDiagram(diagram.getId());
 	},
 	
-	search: function(name, term, options, data) {
-		this._source.api.RunModelSearch(name, term, options, data);
+	/**
+	 * Renders search results in Model Search EA view
+	 * 
+	 * @param {String} data XML in EA ReportViewData format
+	 */
+	renderSearchResults: function(data) {
+		this._source.api.RunModelSearch("", "", "", data);
 	},
 	
+	/**
+	 * Shows output view of specified name
+	 * 
+	 * @param {String} name
+	 */
 	showOutput: function(name) {
 		this._source.api.EnsureOutputVisible(name);
 	},
 	
+	/**
+	 * Clears output view of specified name
+	 * 
+	 * @param {String} name
+	 */
 	clearOutput: function(name) {
 		this._source.api.ClearOutput(name);
 	},
 	
+	/**
+	 * Writes message to output view of specified name
+	 * 
+	 * @param {String} name
+	 * @param {String} message
+	 */
 	writeOutput: function(name, message) {
 		this._source.api.WriteOutput(name, message, undefined);
 	},
 	
+	/**
+	 * Creates output view of specified name
+	 * 
+	 * @param {String} name
+	 */
 	createOutput: function(name) {
 		this._source.api.CreateOutputTab(name);
 	},
 	
+	/**
+	 * Closes output view of specified name
+	 * 
+	 * @param {String} name
+	 */
 	closeOutput: function(name) {
 		this._source.api.RemoveOutputTab(name);
 	},
@@ -325,8 +236,76 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 		return this._source.api.OpenFile(path);
 	},
 	
+	/**
+	 * Closes current repository file or database connection
+	 */
 	close: function() {
 		this._source.api.CloseFile();
+	},
+	
+	/**
+	 * Returns proxy object for specified type and guid
+	 * 
+	 * @deprecated Use Ea.Application.getByGuid() instead
+	 * @param {Class} type
+	 * @param {String} guid
+	 * @type {Ea.Types.Any}
+	 */
+	getByGuid: function(type, guid) {
+		return this._source.application.getByGuid(type, guid);
+	},
+	
+	/**
+	 * Returns specified scenario's context elements
+	 * 
+	 * @param {Ea.Scenario._Base} scenario
+	 * @type {Object}
+	 */
+	getScenarioContext: function(scenario) {
+		
+		var rows = this._findByQuery("Scenario", "guid", scenario.getGuid());
+		var row = rows[0];
+		
+		var dom = new ActiveXObject("MSXML2.DOMDocument");
+		dom.validateOnParse = false;
+		dom.async = false;
+		
+		var xml = row[this._provider.getColumn("Scenario", "content")];
+		var parsed = dom.loadXML(xml);
+
+		var context = {};
+
+		if (!parsed) {
+			warn("Error while XML parsing scenario content: " + xml + " " + scenario.getGuid());
+		}
+		else {
+			var nodes = dom.selectNodes("//path/context/item");
+			for (var ni = 0; ni < nodes.length; ni++) {
+				var node = nodes[ni];
+				context[node.getAttribute("oldname")] = this._source.application.getByGuid(Ea.Element._Base, node.getAttribute("guid"));
+			}
+		}
+		return context;
+	},
+	
+	/**
+	 * Returns appearance of specified element
+	 * 
+	 * @param {Ea.Element._Base} element
+	 * @type {Ea._Base.DataTypes.Appearance}
+	 */
+	getElementAppearance: function(element) {
+		var rows = this._source.application.getRepository()._findByQuery("Element", "id", element.getId());
+		var row = rows[0];
+		var source = {
+			backColor: row[this._provider.getColumn("Element", "backColor")],
+			fontColor: row[this._provider.getColumn("Element", "fontColor")],
+			borderColor: row[this._provider.getColumn("Element", "borderColor")],
+			borderStyle: row[this._provider.getColumn("Element", "borderStyle")],
+			borderWidth: row[this._provider.getColumn("Element", "borderWidth")]
+		};
+		appearance = new Ea._Base.DataTypes.Appearance(source);
+		return appearance;
 	}
 },
 {
@@ -363,6 +342,6 @@ Ea.Repository._Base = extend(Ea.Types.Any, /** @lends Ea.Repository._Base# */ {
 	 * @type {Ea.Collection._Base<Ea.Package.Model>}
 	 * @aggregation composite
 	 */
-	_models: property({api: "Models"})
+	_model: property({api: "Models"})
 	
 });

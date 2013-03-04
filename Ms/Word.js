@@ -66,30 +66,40 @@ Word = {
 		wdPromptToSaveChanges: -2,
 		wdSaveChanges: -1
 	},
+	
+	wordApp: null,
 
+	initialize: function() {
+		this.wordApp = new ActiveXObject("Word.Application");
+	},
+	
 	htmlToDoc: function(params) {
 		info("Converting output to Office document");
-		var wordApp = new ActiveXObject("Word.Application");
+		var template = this.wordApp.Documents.Open(Sys.IO.getPath(params.template, params.context), Word.WdOpenFormat.wdOpenFormatTemplate, true);
 		try {
-			var template = wordApp.Documents.Open(Sys.IO.getPath(params.template, params.context), Word.WdOpenFormat.wdOpenFormatAuto, true);
 			for (var mark in params.embeds) {
 				info("Embedding chapter [$] in template", [params.embeds[mark]]);
 				//debug("Embedding chapter [$] in template", [params.embeds[mark]]);
 				var embedTo = template.ActiveWindow.Selection;
 				//debug("Searching for bookmark [$] in template", [mark]);
 				embedTo.GoTo(-1, 0, 0, mark);
-				this._embed(wordApp, params.outputRoot, params.embeds[mark], embedTo);
+				this._embed(this.wordApp, params.outputRoot, params.embeds[mark], embedTo);
 			}
 			
 			info("Saving template to output path");
 			template.SaveAs(params.outputRoot + params.outputFile, params.format || Word.WdSaveFormat.wdFormatDocumentDefault);
 			template.Close();
+			if (!params.dontQuit)
+				this.quit();
 		}
 		catch(e) {
-			wordApp.Quit(Word.WdSaveOptions.wdDoNotSaveChanges);
+			template.Close(Word.WdSaveOptions.wdDoNotSaveChanges);
 			throw e;
 		}
-		wordApp.Quit();
+	},
+	
+	quit: function() {
+		this.wordApp.Quit();
 	},
 	
 	_embed: function(wordApp, outputRoot, file, embedTo) {

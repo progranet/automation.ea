@@ -29,7 +29,7 @@ Ea._Base.Helper = {
 	 * @type {Boolean}
 	 */
 	isCollectionType: function(type) {
-		return Core.Lang.isClass(type) && (type == Core.Types.Collection || type.isSubclassOf(Core.Types.Collection));
+		return Core.Lang.isClass(type) && type.getCollectionType();
 	},
 	
 	typeEval: function(type) {

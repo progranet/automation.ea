@@ -37,7 +37,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 		if (!id || !(id = (new Number(id)).valueOf()))
 			linkedDiagram = null;
 		else
-			linkedDiagram = this._source.application.getRepository().getById(Ea.Diagram._Base, id);
+			linkedDiagram = this._source.application.getById(Ea.Diagram._Base, id);
 		return linkedDiagram;
 	},
 	
@@ -65,7 +65,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	getRelationships: function(relation, filter) {
 		var relations = new Core.Types.Collection();
 		this._getRelationships().forEach(function(relationship) {
-			if (!relation || (typeof relation == "string" && relation == relationship.getRelation()) || (relation.isClass && relation.isSubclassOf(Ea.Connector._Base) && relationship.getConnector().instanceOf(relation))) {
+			if (!relation || (typeof relation == "string" && relation == relationship.getRelation()) || (relation.isClass && relation.conformsTo(Ea.Connector._Base) && relationship.getConnector().instanceOf(relation))) {
 				var related = relationship.getTo();
 				if (related.match(filter))
 					relations.add(relationship);
@@ -102,14 +102,11 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	},
 
 	findDiagrams: function() {
-		return this._source.application.getRepository().getByQuery(Ea.Diagram._Base, "t_diagramobjects", "Object_ID", this.getId(), "Diagram_ID");
+		return this._source.application.getRepository().getByQuery(Ea.Diagram._Base, "DiagramObject", "elementId", this.getId(), "parentId");
 	},
 	
 	getAppearance: function() {
-		var rows = this._source.application.getRepository().findByQuery("t_object", "Object_ID", this.getId());
-		var row = rows[0];
-		appearance = new Ea._Base.DataTypes.Appearance(row);
-		return appearance;
+		return this._source.application.getRepository().getElementAppearance(this);
 	}
 },
 {
@@ -136,6 +133,12 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 		}
 	},
 	
+	/**
+	 * Recognizes class of EA Element from source
+	 * 
+	 * @param {Object} source
+	 * @type {Class}
+	 */
 	determineType: function(source) {
 		
 		var typeName = this.__type.get(source).replace(/\s/g,"");
@@ -163,6 +166,15 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 		return type;
 	},
 	
+	/**
+	 * Determines EA API Element type name on creating API object
+	 * 
+	 * @type {String}
+	 */
+	determineEaType: function() {
+		return this.eaType;
+	},
+
 	/**
 	 * @type {Number}
 	 */
@@ -197,57 +209,51 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_tags: property({api: "TaggedValues"}),
-	
-	/**
-	 * @type {Ea.Collection._Base<Ea.TaggedValue._Base>}
-	 * @aggregation composite
-	 */
-	_tagsCollection: property({api: "TaggedValues"}),
+	_tag: property({api: "TaggedValues"}),
 	
 	/**
 	 * @type {Ea.Collection.Map<Ea.CustomProperty._Base>}
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_customProperties: property({api: "CustomProperties"}),
+	_customProperty: property({api: "CustomProperties"}),
 	
 	/**
 	 * @type {Ea.Properties._Base<Ea.Property._Base>}
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_properties: property({api: "Properties"}),
+	_property: property({api: "Properties"}),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Constraint._Base>}
 	 * @aggregation composite
 	 */
-	_constraints: property({api: "Constraints"}),
+	_constraint: property({api: "Constraints"}),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Requirement._Base>}
 	 * @aggregation composite
 	 */
-	_requirements: property({api: "Requirements"}),
+	_requirement: property({api: "Requirements"}),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Issue._Base>}
 	 * @aggregation composite
 	 */
-	_issues: property({api: "Issues"}),
+	_issue: property({api: "Issues"}),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Element._Base>}
 	 * @aggregation composite
 	 */
-	_embedded: property({api: "EmbeddedElements"}),
+	_embeddedElement: property({api: "EmbeddedElements"}),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Transition._Base>}
 	 * @aggregation composite
 	 */
-	_transitions: property({api: "StateTransitions"}),
+	_transition: property({api: "StateTransitions"}),
 	
 	_status: property({api: "Status"}),
 	
@@ -289,19 +295,19 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @derived
 	 * @private
 	 */
-	_relationships: property(),
+	_relationship: property(),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Element._Base>}
 	 * @aggregation composite
 	 */
-	_elements: property({api: "Elements"}),
+	_element: property({api: "Elements"}),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Diagram._Base>}
 	 * @aggregation composite
 	 */
-	_diagrams: property({api: "Diagrams"}),
+	_diagram: property({api: "Diagrams"}),
 	
 	/**
 	 * @type {Ea._Base.DataTypes.List}
@@ -312,13 +318,13 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Collection._Base<Ea.Connector._Base>}
 	 * @aggregation shared
 	 */
-	_connectors: property({api: "Connectors"}),
+	_connector: property({api: "Connectors"}),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.File._Base>}
 	 * @aggregation composite
 	 */
-	_files: property({api: "Files"}),
+	_file: property({api: "Files"}),
 	
 	/**
 	 * @type {Ea.Types.Namespace}
@@ -383,13 +389,13 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Core.Types.Collection<Ea.Element._Base>}
 	 * @derived
 	 */
-	_customReferences: property(),
+	_customReference: property(),
 	
 	/**
 	 * @type {Core.Types.Collection<Ea._Base.ContextReference>}
 	 * @derived
 	 */
-	_contextReferences: property(),
+	_contextReference: property(),
 	
 	/**
 	 * @type {Ea._Base.DataTypes.Appearance}
@@ -402,11 +408,11 @@ Ea.Element.PackageableElement = extend(Ea.Element._Base);
 
 Ea.Element.Package = extend(Ea.Element.PackageableElement, {
 	getPackage: function() {
-		return this._source.application.getRepository().getByGuid(Ea.Package._Base, this.getGuid());
+		return this._source.application.getByGuid(Ea.Package._Base, this.getGuid());
 	}
 },
 {
-	elementType: "Package", // see t_objecttypes table
+	eaType: "Package", // see t_objecttypes table
 	
 	/**
 	 * @type {Ea.Package._Base}
@@ -461,6 +467,10 @@ Ea.Element.Classifier = extend(Ea.Element.Type, {
 	
 	createAttribute: function(name, type) {
 		return this._createAttribute(name, type);
+	},
+	
+	deleteAttribute: function(attribute) {
+		return this._deleteAttribute(attribute);
 	}
 },
 {
@@ -479,27 +489,27 @@ Ea.Element.Classifier = extend(Ea.Element.Type, {
 	 * @type {Ea.Collection._Base<Ea.Attribute.Attribute>}
 	 * @private
 	 */
-	__attributes: property({api: "Attributes"}),
+	__attribute: property({api: "Attributes"}),
 	
 	/**
-	 * @type {Ea.Collection._Base<Ea.Attribute.Attribute>}
+	 * @type {Core.Types.Collection<Ea.Attribute.Attribute>}
 	 * @aggregation composite
 	 * @derived
 	 */
-	_attributes: property(),
+	_attribute: property(),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Method._Base>}
 	 * @aggregation composite
 	 */
-	_methods: property({api: "Methods"}),
+	_method: property({api: "Methods"}),
 
 	/* don't use EA API: Element.Scenarios directly - it returns faked scenarios (not used in scenario extensions)! */
 	/**
 	 * @type {Ea.Collection._Base<Ea.Scenario._Base>}
 	 * @private
 	 */
-	_scenarios: property({api: "Scenarios"}),
+	__scenario: property({api: "Scenarios"}),
 	
 	/**
 	 * @type {Ea.Scenario.BasicPath}
@@ -513,7 +523,7 @@ Ea.Element.Classifier = extend(Ea.Element.Type, {
 	 * @aggregation composite
 	 * @derived
 	 */
-	_scenarioExtensions: property()
+	_scenarioExtension: property()
 });
 
 Ea.Element.DataType = extend(Ea.Element.Classifier);
@@ -527,21 +537,21 @@ Ea.Element.Enumeration = extend(Ea.Element.DataType, {
 	
 },
 {
-	elementType: "Enumeration",
+	eaType: "Enumeration",
 
 	/**
-	 * @type {Ea.Collection._Base<Ea.Attribute.EnumerationLiteral>}
+	 * @type {Core.Types.Collection<Ea.Attribute.EnumerationLiteral>}
 	 * @aggregation composite
 	 * @derived
 	 */
-	_literals: property()
+	_literal: property()
 });
 
 Ea.Element.PrimitiveType = extend(Ea.Element.DataType);
 
 Ea.Element.Class = extend(Ea.Element.Classifier, {}, {
 
-	elementType: "Class"
+	eaType: "Class"
 	
 });
 
@@ -550,7 +560,7 @@ Ea.Element.Metaclass = extend(Ea.Element.Class);
 Ea.Element.AssociationClass = extend(Ea.Element.Class, {
 	getAssociation: function() {
 		var associationId = Number(this._getMiscData3()).valueOf();
-		var association = this._source.application.getRepository().getById(Ea.Connector._Base, associationId);
+		var association = this._source.application.getById(Ea.Connector._Base, associationId);
 		if (!association)
 			warn("Association no longer exists [id = " + associationId + "] for association class guid = " + this.getGuid());
 		return association;
@@ -565,18 +575,18 @@ Ea.Element.AssociationClass = extend(Ea.Element.Class, {
 });
 
 Ea.Element.Interface = extend(Ea.Element.Classifier, {}, {
-	elementType: "Interface"	
+	eaType: "Interface"	
 });
 
 Ea.Element.BehavioredClassifier = extend(Ea.Element.Classifier);
 
 Ea.Element.Actor = extend(Ea.Element.BehavioredClassifier, {}, {
-	elementType: "Actor"
+	eaType: "Actor"
 });
 
 Ea.Element.UseCase = extend(Ea.Element.BehavioredClassifier, {},
 {
-	elementType: "UseCase",
+	eaType: "UseCase",
 	
 	/**
 	 * @type {Ea._Base.DataTypes.List}
@@ -588,12 +598,12 @@ Ea.Element.Behavior = extend(Ea.Element.Class);
 
 Ea.Element.Activity = extend(Ea.Element.Behavior, {}, {
 	
-	elementType: "Activity"
+	eaType: "Activity"
 	
 });
 
 Ea.Element.Action = extend(Ea.Element._Base, {}, {
-	elementType: "Action"
+	eaType: "Action"
 	
 });
 Ea.Element.AcceptEventAction = extend(Ea.Element.Action);
@@ -611,7 +621,7 @@ Ea.Element.CallOperationAction = extend(Ea.Element.CallAction);
 
 Ea.Element.State = extend(Ea.Element._Base, {}, {
 	
-	elementType: "State"
+	eaType: "State"
 	
 });
 
@@ -660,7 +670,7 @@ Ea.Element.Constraint = extend(Ea.Element._Base, {
 		// TODO: parse 'idref1=264627;idref2=264626;'
 	}
 }, {
-	elementType: "Constraint"
+	eaType: "Constraint"
 });
 
 /*
@@ -671,13 +681,13 @@ Ea.Element.Meaning = extend(Ea.Element.Class);
 
 Ea.Element.Requirement = extend(Ea.Element._Base, {}, {
 	
-	elementType: "Requirement"
+	eaType: "Requirement"
 	
 });
 
 Ea.Element.Artifact = extend(Ea.Element._Base, {}, {
 	
-	elementType: "Artifact"
+	eaType: "Artifact"
 	
 });
 
@@ -691,7 +701,7 @@ Ea.Element.Note = extend(Ea.Element._Base, {
 	}
 },
 {
-	elementType: "Note"
+	eaType: "Note"
 });
 
 Ea.Element.ConnectorNote = extend(Ea.Element.Note);
@@ -702,11 +712,11 @@ Ea.Element.Text = extend(Ea.Element._Base, {
 	getDiagram: function() {
 		var link = this._getMiscData0();
 		if (link == null) return null;
-		return this._source.application.getRepository().getById(Ea.Diagram._Base, link);
+		return this._source.application.getById(Ea.Diagram._Base, link);
 	}
 },
 {
-	elementType: "Text"
+	eaType: "Text"
 });
 
 Ea.Element.Object = extend(Ea.Element._Base, {
@@ -717,7 +727,7 @@ Ea.Element.Object = extend(Ea.Element._Base, {
 	}
 },
 {
-	elementType: "Object",
+	eaType: "Object",
 	
 	/**
 	 * @type {Ea.Element.Classifier}

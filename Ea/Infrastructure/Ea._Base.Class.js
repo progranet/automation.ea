@@ -64,7 +64,7 @@ Ea._Base.Class = {
 	 */
 	getAttributes: function(_class) {
 		var attributes = [];
-		if (_class._super == Ea.Types.Any || _class._super.isSubclassOf(Ea.Types.Any)) {
+		if (_class._super.conformsTo(Ea.Types.Any)) {
 			attributes = attributes.concat(this.getAttributes(_class._super));
 		}
 		attributes = attributes.concat(this.getOwnedAttributes(_class));
@@ -90,31 +90,11 @@ Ea._Base.Class = {
 	 * @param {Object} params Parameters of property such as type, visibility
 	 */
 	property: function(params) {
-		if (params.derived) {
+		if (params.derived)
 			return new Ea._Base.Class.DerivedAttribute(params);
-		}
 		return new Ea._Base.Class.ApiAttribute(params);
-	},
+	}
 	
-	/**
-	 * Creates abstraction layer proxy object for specified EA API object
-	 * 
-	 * @param {Object} application
-	 * @param {Class} baseType
-	 * @param {Object} api
-	 * @param {Object} params
-	 * @type {Ea.Types.Any}
-	 */
-	createProxy: function(application, baseType, api, params) {
-		var source = {
-			api: api,
-			application: application,
-			value: {}
-		};
-		var type = baseType.determineType({_source: source});
-		var proxy = new type(source, params);
-		return proxy;
-	}	
 };
 
 Ea._Base.Class._Attribute = define({
@@ -135,18 +115,20 @@ Ea._Base.Class._Attribute = define({
 		this.owner = _class;
 		this.name = propertyName;
 		this.qualifiedName = this.owner.qualifiedName + "." + this.name;
-
+		
+		var collection = this.elementType != null;
 		var accesorName = this.name.replace(/^_+/g, "");
 		accesorName = accesorName.substring(0,1).toUpperCase() + accesorName.substring(1);
+		var getterName = collection ? accesorName.replace(/y$/, "ie") + "s" : accesorName;
 		
 		var prefix = this.type == "Boolean" ? "is" : "get";
-		var getter = (this.private ? "_" : "") + prefix + accesorName;
+		var getter = (this.private ? "_" : "") + prefix + getterName;
 		this._createAccessor("get", getter, properties);
 		
-		if (this.elementType) {
-			var adder = (this.private ? "_" : "") + "create" + accesorName.substr(0, accesorName.length - 1);
+		if (collection) {
+			var adder = (this.private ? "_" : "") + "create" + accesorName;
 			this._createAccessor("add", adder, properties);
-			var remover = (this.private ? "_" : "") + "delete" + accesorName.substr(0, accesorName.length - 1);
+			var remover = (this.private ? "_" : "") + "delete" + accesorName;
 			this._createAccessor("remove", remover, properties);
 		}
 		else {
@@ -182,16 +164,29 @@ Ea._Base.Class._Attribute = define({
 	
 	remove: function(object, params) {
 		return this._remove(object, params);
+	},
+	
+	refresh: function(object) {
+		var source = object._source;
+		
+		if (!(this.name in source.value))
+			return false;
+		
+		delete source.value[this.name];
+		return true;
 	}
 });
 
 Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._Base.Class.ApiAttribute# */{
 	
 	_getBy: null,
+	_isEaType: null,
 	
 	prepare: function() {
 		_super.prepare();
-		if (this.type.isClass && (this.type.isSubclassOf(Core.Types.Collection) || this.type.isSubclassOf(Ea.Types.Any))) {
+		
+		this._isEaType = this.type.isClass && this.type.conformsTo(Ea.Types.Any);
+		if (this._isEaType) {
 			this._getBy = this.referenceBy ? ("getBy" + this.referenceBy.substr(0, 1).toUpperCase() + this.referenceBy.substr(1).toLowerCase()) : "get";
 		}
 	},
@@ -205,7 +200,7 @@ Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._B
 	
 	_get: function(object, params) {
 		var source = object._source;
-		if (!source.application.cacheProperties || !(this.name in source.value))
+		if (!(this.name in source.value))
 			this._init(source);
 		var value = source.value[this.name];
 		if (this.type.isClass && "processValue" in this.type) {
@@ -217,13 +212,11 @@ Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._B
 	_init: function(source) {
 		var apiValue = this._getApiValue(source);
 		var value = null;
-		if (this.type.isClass) {
-			if (this.type.isSubclassOf(Core.Types.Collection) || this.type.isSubclassOf(Ea.Types.Any)) {
-				value = apiValue ? source.application._repository[this._getBy](this.type, apiValue, this) : null;
-			}
-			else {
-				value = this.type.create(apiValue, this);
-			}
+		if (this._isEaType) {
+			value = apiValue ? source.application[this._getBy](this.type, apiValue, this) : null;
+		}
+		else if (this.type.isClass) {
+			value = this.type.create(apiValue, this);
 		}
 		else {
 			value = new this.type(apiValue).valueOf();
@@ -261,27 +254,27 @@ Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._B
 			throw new Error("Setting value for " + this.qualifiedName + " threw exception:\r\n" + error.message);
 		}
 		delete source.value[this.name];
+		return object;
 	},
 	
 	_setApiValue: function(source, value) {
+		if (this._isEaType) {
+			switch (this.referenceBy) {
+			case "guid":
+				source.api[this.api] = value ? value.getGuid() : null;
+				break;
+			case "id":
+				source.api[this.api] = value ? value.getId() : null;
+				break;
+			default:
+				source.api[this.api] = value ? value._source.api : null;
+			}
+			if (source._transient) {
+				source._transient.push(value);
+			}
+			return;
+		}
 		if (this.type.isClass) {
-			if (this.type.isSubclassOf(Core.Types.Collection)) {
-
-				return;
-			}
-			if (this.type.isSubclassOf(Ea.Types.Any)) {
-				switch (this.referenceBy) {
-				case "guid":
-					source.api[this.api] = value ? value.getGuid() : null;
-					break;
-				case "id":
-					source.api[this.api] = value ? value.getId() : null;
-					break;
-				default:
-					source.api[this.api] = value ? value._source.api : null;
-				}
-				return;
-			}
 			// TODO: better solution based on data types
 			source.api[this.api] = value;
 			return;
@@ -296,22 +289,33 @@ Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._B
 		var source = object._source;
 		var name = params[0];
 		var type = params[1];
-		var element = params[2];
-		if (!(this.name in source.value)){
+		if (!(this.name in source.value)) {
 			object._class[this.name].get(object);
 		}
-		var added = source.value[this.name]._create(name, type, element);
-		delete source.value[this.name];
-		this._get(object);
+		var collection = source.value[this.name];
+		var added = collection._create(name, type);
+		added._source._transient = [];
+		added._source._transient.push(object);
+		added._source.creator = {
+			object: object,
+			property: this,
+			collection: collection
+		};
+
 		return added;
 	},
 	
 	_remove: function(object, params) {
 		var source = object._source;
 		var element = params[0];
-		source.value[this.name]._delete(element);
+		var collection = source.value[this.name];
+		collection._delete(element);
+		
+		collection.refresh();
+		source.application.wipe(element);
+
 		delete source.value[this.name];
-		// TODO: remove from repository cache
+		this._get(object);
 	}
 });
 
@@ -343,7 +347,7 @@ Ea._Base.Class.DerivedAttribute = extend(Ea._Base.Class._Attribute, /** @lends E
 		var source = object._source;
 		params = params || [];
 		// if there's any arguments passed to getter (such as filter for collection type properties) cache is omitted
-		if (params.length != 0 || !source.application.cacheProperties || !(this.name in source.value))
+		if (params.length != 0 || !(this.name in source.value))
 			return this._init(object, params);
 		var value = source.value[this.name];
 		return value;
@@ -359,6 +363,7 @@ Ea._Base.Class.DerivedAttribute = extend(Ea._Base.Class._Attribute, /** @lends E
 	_set: function(object, params) {
 		object[this._accesors["set"]].apply(object, params || []);
 		delete object._source.value[this.name];
+		return object;
 	},
 	
 	_add: function(object, params) {
@@ -369,7 +374,8 @@ Ea._Base.Class.DerivedAttribute = extend(Ea._Base.Class._Attribute, /** @lends E
 	},
 	
 	_remove: function(object, params) {
-		//return object[this._accesors["remove"]].apply(object, params || []);
+		object[this._accesors["remove"]].apply(object, params || []);
+		delete object._source.value[this.name];
+		this._get(object);
 	}
 });
-

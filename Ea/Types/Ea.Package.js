@@ -27,27 +27,57 @@ Ea.Package = {
 
 Ea.Package._Base = extend(Ea.Types.Namespace, {
 	
+	/**
+	 * Returns all elements in this package
+	 * 
+	 * @param {Core.Types.Filter} filter Optional output collection filter
+	 * @type {Core.Types.Collection}
+	 */
 	getElements: function(filter) {
 		var elements = this._getElements().filter("this._getParent() == null");
 		return elements.filter(filter);
 	},
 	
+	/**
+	 * Creates new element in this package
+	 * 
+	 * @param {String} name
+	 * @param {Class} type
+	 * @type {Ea.Types.Any}
+	 */
 	createElement: function(name, type) {
 		var element = this._createElement(name, type);
 		return element;
 	},
 	
+	/**
+	 * Returns all diagrams in this package
+	 * 
+	 * @param {Core.Types.Filter} filter Optional output collection filter
+	 * @type {Core.Types.Collection}
+	 */
 	getDiagrams: function(filter) {
 		var diagrams = this._getDiagrams().filter("this._getParent() == null");
 		return diagrams.filter(filter);
 	},
 	
+	/**
+	 * Returns parent of this package - nesting package
+	 * 
+	 * @type {Ea.Types.Namespace}
+	 */
 	getParent: function() {
 		return this._getParent();
 	}
 	
 },
 {
+	/**
+	 * Determines the class of package based on source attributes values
+	 * 
+	 * @param {Ea._Base.Source} source
+	 * @type {Class}
+	 */
 	determineType: function(source) {
 		if (this._model.get(source))
 			type = Ea.Package.Model;
@@ -123,7 +153,7 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	 * @type {Ea.Element._Base}
 	 * @aggregation composite
 	 */
-	_element: property({api: "Element"}),
+	___element: property({api: "Element"}),
 	
 	/**
 	 * @type {Ea.Package._Base}
@@ -142,32 +172,32 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	 * @aggregation composite
 	 * @private
 	 */
-	__elements: property({api: "Elements"}),
+	__element: property({api: "Elements"}),
 	
 	/**
-	 * @type {Ea.Collection._Base<Ea.Element._Base>}
+	 * @type {Core.Types.Collection<Ea.Element._Base>}
 	 * @derived
 	 */
-	_elements: property(),
+	_element: property(),
 
 	/**
 	 * @type {Ea.Collection._Base<Ea.Diagram._Base>}
 	 * @aggregation composite
 	 * @private
 	 */
-	__diagrams: property({api: "Diagrams"}),
+	__diagram: property({api: "Diagrams"}),
 	
 	/**
-	 * @type {Ea.Collection._Base<Ea.Diagram._Base>}
+	 * @type {Core.Types.Collection<Ea.Diagram._Base>}
 	 * @derived
 	 */
-	_diagrams: property(),
+	_diagram: property(),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.Package._Base>}
 	 * @aggregation composite
 	 */
-	_packages: property({api: "Packages"})
+	_package: property({api: "Packages"})
 });
 
 Ea.Package.Package = extend(Ea.Package._Base);

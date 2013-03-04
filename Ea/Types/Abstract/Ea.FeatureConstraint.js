@@ -18,6 +18,13 @@ Ea.FeatureConstraint = {};
 
 Ea.FeatureConstraint._Base = extend(Ea.Types.Named, {},
 {
+
+	/**
+	 * Determines the class of FeatureConstraint based on source attributes values
+	 * 
+	 * @param {Ea._Base.Source} source
+	 * @type {Class}
+	 */
 	determineType: function(source) {
 		return this._deriveType(source, this._type);
 	},

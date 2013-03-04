@@ -28,11 +28,7 @@ Ea.Application = {
 	 * @type {Ea.Application._Base}
 	 */
 	createApplication: function(params) {
-		params = params || {};
-		var applicationApi = params.path ? new ActiveXObject("EA.App") : App;
-		var application = Ea._Base.Class.createProxy(null, Ea.Application._Base, applicationApi, params);
-		if (params.path)
-			application.getRepository().open(params.path);
+		var application = new Ea.Application._Base(params);
 		return application;
 	}
 };
@@ -40,17 +36,286 @@ Ea.Application = {
 Ea.Application._Base = extend(Ea.Types.Any, {
 	
 	_repository: null,
-	cacheProperties: null,
+	_cacheId: null,
+	_cacheGuid: null,
+	_cacheStats: null,
 	
-	create: function(source, params) {
-		source.application = this;
-		_super.create(source);
-		this.cacheProperties = params.cacheProperties === undefined ? true : params.cacheProperties;
-		this._repository = Ea._Base.Class.createProxy(this, Ea.Repository._Base, this._source.api.Repository, params);
+	/**
+	 * Constructs Ea.Application._Base
+	 * 
+	 * @param {Object} params Specifying params.path allows for automatically open repository file or connection path
+	 */
+	create: function(params) {
+		
+		_super.create();
+		
+		params = params || {};
+
+		var api = params.path ? new ActiveXObject("EA.App") : App;
+		this._source = new Ea._Base.Source(this, api);
+		
+		this._cacheId = new Array(Ea.OBJECT_TYPES_NUMBER);
+		this._cacheGuid = new Array(Ea.OBJECT_TYPES_NUMBER);
+		this._cacheStats = new Array(Ea.OBJECT_TYPES_NUMBER + 1);
+		for (var ot = 0; ot <= Ea.OBJECT_TYPES_NUMBER; ot++) {
+			if (ot != Ea.OBJECT_TYPES_NUMBER) {
+				this._cacheId[ot] = [];
+				this._cacheGuid[ot] = {};
+			}
+			this._cacheStats[ot] = {
+					cwi: 0,
+					cwg: 0,
+					cri: 0,
+					crgi: 0,
+					crg: 0,
+					crgg: 0,
+					
+					tr: 0,
+					trg: 0,
+					trgi: 0,
+					trgg: 0,
+					trgig: 0,
+					trggg: 0,
+					
+					tw: 0,
+					twi: 0,
+					twg: 0,
+					cwi: 0,
+					cwg: 0
+				};
+		}
+		
+		this._repository = this.wrapProxy(Ea.Repository._Base, this._source.api.Repository, params);
+		if (params.path)
+			this._repository.open(params.path);
+		
 	},
 	
 	/**
+	 * Creates proxy object for newly created EA API object
+	 * 
+	 * @param {Class} baseType
+	 * @param {Object} api
+	 * @type {Ea.Types.Any}
+	 */
+	createProxy: function(baseType, api) {
+		var source = new Ea._Base.Source(this, api);
+		var proxy = new baseType();
+		proxy._source = source;
+		return proxy;
+	},
+	
+	/**
+	 * Wraps specified EA API object in proxy
+	 * 
+	 * @param {Class} baseType
+	 * @param {Object} api
+	 * @param {Object} params
+	 * @type {Ea.Types.Any}
+	 */
+	wrapProxy: function(baseType, api, params) {
+		var source = new Ea._Base.Source(this, api);
+		var type = baseType.determineType({_source: source});
+		var proxy = new type(params);
+		proxy._source = source;
+		proxy._init();
+		this._cache(proxy);
+		return proxy;
+	},
+	
+	/**
+	 * Provides information about cache utilization
+	 * 
 	 * @memberOf Ea.Application._Base#
+	 */
+	cacheInfo: function() {
+		var stats = {};
+		var g = this._cacheStats[Ea.OBJECT_TYPES_NUMBER];
+		for (var ot = 0; ot <= Ea.OBJECT_TYPES_NUMBER; ot++) {
+			var type = Ea._objectTypes[ot];
+			if (!type && ot != Ea.OBJECT_TYPES_NUMBER)
+				continue;
+			var s = this._cacheStats[ot];
+			stats[ot != Ea.OBJECT_TYPES_NUMBER ? type.namespace : "TOTAL"] = {
+					"total read from get": s.trg,
+					"total read by id from get": s.trgig,
+					"total read by guid from get": s.trggg,
+					"total read by id": s.trgi,
+					"total read by guid": s.trgg,
+					"cache read by id": s.cri,
+					"cache read by id from get": s.crgi,
+					"cache read by guid": s.crg,
+					"cache read by guid from get": s.crgg,
+					"cache white by id": s.cwi,
+					"cache white by guid": s.cwg
+				};
+			for (var n in g) {
+				g[n] = (ot != Ea.OBJECT_TYPES_NUMBER) ? (g[n] + s[n]) : 0;
+			}
+		}
+		info("cache stats: $", [JSON.stringify(stats, null, '\t')]);
+	},
+	
+	/**
+	 * Wipes proxy object from caches
+	 * 
+	 * @param {Ea.Types.Any} object
+	 */
+	wipe: function(object) {
+		var type = object._class;
+		var meta = type.namespace.meta;
+		this._cacheStats[meta.objectType].tw++;
+		if (meta.id) {
+			this._cacheStats[meta.objectType].twi++;
+			var id = object.getId();
+			var proxy = this._cacheId[meta.objectType][id];
+			if (proxy) {
+				this._cacheStats[meta.objectType].cwi++;
+				delete this._cacheId[meta.objectType][id];
+			}
+		}
+		if (meta.guid) {
+			this._cacheStats[meta.objectType].twg++;
+			var guid = object.getGuid();
+			var proxy = this._cacheGuid[meta.objectType][guid];
+			if (proxy) {
+				this._cacheStats[meta.objectType].cwg++;
+				delete this._cacheId[meta.objectType][guid];
+			}
+		}
+	},
+	
+	/**
+	 * Returns proxy object for specified type and EA API object
+	 * 
+	 * @param {Class} type
+	 * @param {Object} api
+	 * @param {Object} params
+	 * @type {Ea.Types.Any}
+	 */
+	get: function(type, api, params) {
+		var meta = type.namespace.meta;
+		this._cacheStats[meta.objectType].trg++;
+		if (meta.id) {
+			this._cacheStats[meta.objectType].trgig++;
+			var id = api[meta.id];
+			var proxy = this._cacheId[meta.objectType][id];
+			if (proxy) {
+				this._cacheStats[meta.objectType].crgi++;
+				return proxy;
+			}
+		}
+		else if (meta.guid) {
+			this._cacheStats[meta.objectType].trggg++;
+			var guid = api[meta.guid];
+			var proxy = this._cacheGuid[meta.objectType][guid];
+			if (proxy) {
+				this._cacheStats[meta.objectType].crgg++;
+				return proxy;
+			}
+		}
+		return this.wrapProxy(type, api, params);
+	},
+	
+	/**
+	 * Returns proxy object for specified type and id
+	 * 
+	 * @param {Class} type
+	 * @param {Number} id
+	 * @type {Ea.Types.Any}
+	 */
+	getById: function(type, id) {
+		if (!id || id == 0)
+			return null;
+		var meta = type.namespace.meta;
+		this._cacheStats[meta.objectType].trgi++;
+		var proxy = this._cacheId[meta.objectType][id];
+		if (proxy) {
+			this._cacheStats[meta.objectType].cri++;
+			return proxy;
+		}
+		var method = "Get" + type.namespace.name + "ByID";
+		var api;
+		// EA ElementID integrity problem
+		try {
+			api = this._repository._source.api[method](id);
+		}
+		catch (e) {
+			warn("$ not found by Id = $", [type, id]);
+			return null;
+		}
+		return this.wrapProxy(type, api);
+	},
+	
+	/**
+	 * Returns proxy object for specified type and guid
+	 * 
+	 * @param {Class} type
+	 * @param {String} guid
+	 * @type {Ea.Types.Any}
+	 */
+	getByGuid: function(type, guid) {
+		var meta = type.namespace.meta;
+		this._cacheStats[meta.objectType].trgg++;
+		var proxy = this._cacheGuid[meta.objectType][guid];
+		if (proxy) {
+			this._cacheStats[meta.objectType].crg++;
+			return proxy;
+		}
+		var method = "Get" + type.namespace.name + "ByGuid";
+		var api = this._repository._source.api[method](guid);
+		if (!api) {
+			warn("$ not found by Guid = $", [type, guid]);
+			return null;
+		}
+		return this.wrapProxy(type, api);
+	},
+	
+	_cache: function(object) {
+		var meta = object._class.namespace.meta;
+		var api = object._source.api;
+		if (meta.id) {
+			this._cacheId[meta.objectType][api[meta.id]] = object;
+			this._cacheStats[meta.objectType].cwi++;
+		}
+		if (meta.guid) {
+			this._cacheGuid[meta.objectType][api[meta.guid]] = object;
+			this._cacheStats[meta.objectType].cwg++;
+		}
+		return object;
+	},
+
+	/**
+	 * Caches new proxy object
+	 * 
+	 * @param {Ea.Types.Any} object
+	 */
+	cache: function(object) {
+		
+		if (!object._source._transient)
+			return;
+		
+		if (object._source.creator) {
+			object._source.creator.collection.refresh();
+			delete object._source.creator;
+		}
+				
+		for (var ti = 0; ti < object._source._transient.length; ti++) {
+			var _transient = object._source._transient[ti];
+			var properties = Ea._Base.Class.getAttributes(_transient._class);
+			for (var ai = 0; ai < properties.length; ai++) {
+				var property = properties[ai];
+				property.refresh(_transient);
+			}
+		}
+		delete object._source._transient;
+		
+		return this._cache(object);
+	},
+	
+	/**
+	 * Returns repository for this application
+	 * 
 	 * @type {Ea.Repository._Base}
 	 */
 	getRepository: function() {

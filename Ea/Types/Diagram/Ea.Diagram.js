@@ -43,7 +43,7 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	
 	save: function(path, reuse) {
 		/*
-		var fileDate = Sys.IO.getCreated(path);
+		var fileDate = new Sys.IO.File(path).getCreated();
 		if (!reuse || (!fileDate || fileDate.valueOf() <= this.getModified())) {
 
 		}
@@ -67,16 +67,11 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 		};
 		var views = new Core.Types.Collection();
 		
-		//Session.Output("1:" + this.getElementViews().getSize());
 		views.addAll(this.getElementViews());
-		//Session.Output("2:" + this.getConnectorViews().getSize());
 		views.addAll(this.getConnectorViews());
 
-		//Session.Output("3:" + views._class);
 		views.forEach(function(view) {
-			//Session.Output("4:" + "!");
 			var viewDimension = view.getDimension();
-			//Session.Output("5:" + viewDimension);
 			if (viewDimension) {
 				dimension.left = dimension.left !== undefined ? Math.min(dimension.left, viewDimension.left) : viewDimension.left;
 				dimension.top = dimension.top !== undefined ? Math.min(dimension.top, viewDimension.top) : viewDimension.top;
@@ -172,20 +167,20 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	 * @type {Ea.Collection._Base<Ea.DiagramObject._Base>}
 	 * @aggregation composite
 	 */
-	_elementViews: property({api: "DiagramObjects"}),
+	_elementView: property({api: "DiagramObjects"}),
 	
 	/**
 	 * @type {Ea.Collection._Base<Ea.DiagramLink._Base>}
 	 * @private
 	 */
-	__connectorViews: property({api: "DiagramLinks"}),
+	__connectorView: property({api: "DiagramLinks"}),
 	
 	/**
-	 * @type {Ea.Collection._Base<Ea.DiagramLink._Base>}
+	 * @type {Core.Types.Collection<Ea.DiagramLink._Base>}
 	 * @aggregation composite
 	 * @derived
 	 */
-	_connectorViews: property(),
+	_connectorView: property(),
 		// collection filtered because of EA returns virtual connector views for Ea.Connector.Sequence with [id = 0]
 	
 	/**
@@ -213,10 +208,10 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	_swimlaneDef: property({api: "SwimlaneDef"}),
 	
 	/**
-	 * @type {Ea.Swimlanes._Base<Ea.Swimlane._Base>}
+	 * @type {Core.Types.Collection<Ea.Swimlane._Base>}
 	 * @derived
 	 */
-	_swimlanes: property(),
+	_swimlane: property(),
 
 	/**
 	 * @type {Boolean}
@@ -256,7 +251,7 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	/**
 	 * @type {Ea.Collection._Base<Ea.Element._Base>}
 	 */
-	_selectedElements: property({api: "SelectedObjects"}),
+	_selectedElement: property({api: "SelectedObjects"}),
 	
 	_author: property({api: "Author"}),
 	

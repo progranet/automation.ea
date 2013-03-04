@@ -88,7 +88,7 @@ Ea.SwimlaneDef._Base = extend(Ea.Types.Any, {
 	 * @qualifier {String} title
 	 * @aggregation composite
 	 */
-	_swimlanes: property({api: "Swimlanes"})
+	_swimlane: property({api: "Swimlanes"})
 });
 
 include("Ea.Swimlanes@Ea.Types.Diagram");

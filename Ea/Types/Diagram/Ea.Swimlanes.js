@@ -18,17 +18,18 @@ Ea.Swimlanes = {
 		meta: {
 			objectType: 51
 		}
-
 };
 
 Ea.Swimlanes._Base = extend(Ea.Collection.Map, {
-	_init: function(params) {
-		var repository = this._source.application.getRepository();
+	
+	_init: function() {
+		var application = this._source.application;
 		for (var e = 0; e < this._source.api.Count; e++) {
-			var element = repository.get(params.elementType, this._source.api.Items(e));
-			this.add(element);
+			var element = application.get(this._elementType, this._source.api.Items(e));
+			this._add(element);
 		}
 	}
+
 },
 {
 	determineType: function(source) {

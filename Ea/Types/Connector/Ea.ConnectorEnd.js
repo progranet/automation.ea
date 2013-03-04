@@ -19,6 +19,11 @@ Ea.ConnectorEnd = {
 		objectType: 22
 	},
 
+	/**
+	 * Enumeration specifying aggregation kinds
+	 * 
+	 * @enum {String}
+	 */
 	Aggregation: {
 		0: "none",
 		1: "shared",
@@ -28,10 +33,20 @@ Ea.ConnectorEnd = {
 
 Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {
 	
+	/**
+	 * Returns aggregation kind
+	 * 
+	 * @type {Ea.ConnectorEnd.Aggregation}
+	 */
 	getAggregation: function() {
 		return Ea.ConnectorEnd.Aggregation[this._getAggregation()];
 	},
 	
+	/**
+	 * Sets aggregation kind
+	 * 
+	 * @param {Ea.ConnectorEnd.Aggregation}
+	 */
 	setAggregation: function(kind) {
 		for (var i in Ea.ConnectorEnd.Aggregation) {
 			if (Ea.ConnectorEnd.Aggregation[i] == kind)
@@ -111,7 +126,8 @@ Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_tags: property({api: "TaggedValues"})
+	_tag: property({api: "TaggedValues"})
+
 });
 
 include("Ea.ConnectorEndTag@Ea.Types.Connector");

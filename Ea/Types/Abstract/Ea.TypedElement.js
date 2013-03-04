@@ -17,17 +17,13 @@
 /**
  * @namespace
  */
-Ea.TypedElement = {
-		
-};
+Ea.TypedElement = {};
 
-/**
- * @constructor
- * @extends Ea.Types.Namespace
- */
 Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 
 	/**
+	 * Returns type of typed element
+	 * 
 	 * @memberOf Ea.TypedElement#
 	 * @type {Core.Types.Object}
 	 */
@@ -38,6 +34,18 @@ Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 			type = Ea._Base.PrimitiveType.getPrimitiveType(name);
 		}
 		return type;
+	},
+	
+	/**
+	 * Sets type of typed element
+	 * 
+	 * @param {Class} type
+	 */
+	setType: function(type) {
+		if (type.instanceOf(Ea.Types.Any)) {
+			this._setClassifier(type);
+		}
+		this._setPrimitiveType(type.getName());
 	},
 	
 	_toString: function() {
@@ -53,6 +61,12 @@ Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 });
 
 Ea.TypedElement.Feature = extend(Ea.TypedElement._Base, {
+	
+	/**
+	 * Returns parent of this element
+	 * 
+	 * @type {Ea.Types.Namespace}
+	 */
 	getParent: function() {
 		return this._getParent();
 	}

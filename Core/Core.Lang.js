@@ -138,14 +138,24 @@ Core.Lang = {
 		if (!_class.namespace._classes)
 			_class.namespace._classes = {};
 		_class.namespace._classes[name] = _class;
+		
 		_class.isClass = true;
+		_class._collectionType = null;
+		_class.getCollectionType = function() {
+			return this._collectionType;
+		};
+
 		_class._super = _super;
 		_class.isSubclassOf = function(ofClass) {
-			if (!ofClass) throw new Error(_class.qualifiedName + ".isSubclassOf(<<undefined>>)");
-			return (_class._super != null) && ((_super === ofClass || _super.isSubclassOf(ofClass)));
+			if (!ofClass)
+				throw new Error(_class.qualifiedName + ".isSubclassOf(<<undefined>>)");
+			return (_super != null) && _super.conformsTo(ofClass);
+		};
+		_class.conformsTo = function(toClass) {
+			return _class === toClass || this.isSubclassOf(toClass);
 		};
 		_class.isInstance = function(object) {
-			return object && object._class && object._class.isClass && (object._class === _class || object._class.isSubclassOf(_class));
+			return object && object._class && object._class.isClass && object._class.conformsTo(_class);
 		};
 		_class._subClass = [];
 		

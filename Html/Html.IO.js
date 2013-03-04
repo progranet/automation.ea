@@ -30,7 +30,7 @@ Html.IO.File = extend(Sys.IO.File, /** @lends Html.IO.File# */ {
 	 * @param {String} path
 	 */
 	create: function(path) {
-		_super.create(path);
+		_super.create(path, Sys.IO.Mode.WRITE);
 	},
 	
 	/**

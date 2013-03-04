@@ -45,7 +45,7 @@ Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_tags: property({api: "TaggedValues"}),
+	_tag: property({api: "TaggedValues"}),
 	
 	/**
 	 * @type {Number}
@@ -75,7 +75,7 @@ Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {},
 	 * @type {Ea.Collection._Base<Ea.AttributeConstraint._Base>}
 	 * @aggregation composite
 	 */
-	_constraints: property({api: "Constraints"}),
+	_constraint: property({api: "Constraints"}),
 	
 	/**
 	 * @private

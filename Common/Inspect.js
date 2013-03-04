@@ -16,7 +16,7 @@
 
 
 include("Sys@Sys");
-include("Sys.IO@Sys");
+include("Sys.Utils@Sys");
 include("Ea@Ea");
 include("Browser@Ms.IExplorer");
 
@@ -38,9 +38,9 @@ Inspect = {
 		Ea.initializeLogs(Browser.Target);
 	},*/
 	
-	execute: function() {
+	execute: function(params) {
 		
-		var application = Ea.initializeDefaultApplication();
+		var application = Ea.initializeDefaultApplication(params);
 
 		/*this.ie = new ActiveXObject("InternetExplorer.Application");
 		this.ie.Visible = true;
@@ -50,7 +50,7 @@ Inspect = {
 		
 		var target = null;
 		if (this.params.output) {
-			target = new Sys.IO.FileTarget(this.params.output);
+			target = new Sys.Utils.FileTarget(this.params.output);
 			Core.Log.registerTarget("info", target);
 		}
 		this.inspect(object);
@@ -88,7 +88,7 @@ Inspect = {
 	_inspect: function(object, indent, template, params) {
 		
 		var type = object._class;
-		var attributes = Ea._Base.Class.getAttributes(type);
+		var properties = Ea._Base.Class.getAttributes(type);
 		
 		params.push(object);
 		info(this._indent(indent) + template, params);
@@ -98,9 +98,9 @@ Inspect = {
 		}
 		else {
 			this._ids[object.__id__] = object;
-			for (var ai = 0; ai < attributes.length; ai++) {
+			for (var ai = 0; ai < properties.length; ai++) {
 				
-				var property = attributes[ai];
+				var property = properties[ai];
 				var value = property.get(object);
 				
 				var params = {
@@ -108,14 +108,14 @@ Inspect = {
 					_private: property.private,
 					aggregation: property.aggregation,
 					type: property.type,
-					isCollection: value && property.type.isClass && value.instanceOf(Core.Types.Collection)
+					collectionType: (value && property.type.isClass) ? property.type.getCollectionType() : null //value.instanceOf(Core.Types.Collection)
 				};
-				params.elementType = params.isCollection ? property.elementType : null;
-				params.typeName = params.isCollection ? Core.Output.getString(params.type) + "<" + Core.Output.getString(params.elementType) + ">" : Core.Output.getString(params.type);
+				params.elementType = params.collectionType ? property.elementType : null;
+				params.typeName = params.collectionType ? Core.Output.getString(params.type) + "<" + Core.Output.getString(params.elementType) + ">" : Core.Output.getString(params.type);
 				params.template = (params._private ? "-" : "") + (property.derived ? "/" : "") + params.name + " [" + params.typeName + "]";
 
-				if (params.isCollection) {
-					if (value.instanceOf(Core.Types.Map)) {
+				if (params.collectionType) {
+					if (params.collectionType == "map") {
 						if (value.isEmpty()) {
 							info(this._indent(indent + 1) + "$ = {}", [params.template]);
 						}

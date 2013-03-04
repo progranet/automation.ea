@@ -62,7 +62,7 @@ Documentation = {
 		this.namespaces.write("html-foot");
 		this.namespaces.close();
 		
-		//application.getRepository().cacheInfo();
+		//application.cacheInfo();
 		
 		info("=== FINISHED ===");
 	},
@@ -162,42 +162,57 @@ Documentation = {
 		}
 	},
 	
-	_findOwner: function(root, qualifiedName) {
+	_findOwner: function(namespace, qualifiedName) {
+
+		if (!qualifiedName)
+			return namespace;
 		
 		var array = qualifiedName.split(".");
-		var name = array.pop();
-		var namespace = root;
-		for (var ni = 0; ni < array.length; ni++) {
-			var _name = array[ni];
-			var filter = "this.getName() == '" + _name + "'";
-			namespace = namespace.getPackages().filter(filter).first();
-		}
-		return {
-			namespace: namespace,
-			name: name
-		};
+		var name = array.shift();
+		var _namespace = namespace.getPackages().filter("this.getName() == '" + name + "'").first();
+		if (!_namespace)
+			throw new Error("Package not found in model: " + namespace.getQualifiedName() + "." + name);
+
+		return this._findOwner(_namespace, array.join("."));
 	},
 	
 	_findPackage: function(root, qualifiedName) {
-		var found = this._findOwner(root, qualifiedName);
-		found._package = found.namespace.getPackages().filter("this.getName() == '" + found.name + "'").first();
-		return found;
+		var array = qualifiedName.split(".");
+		var name = array.pop();
+
+		var namespace = this._findOwner(root, array.join("."));
+		var element = namespace.getPackages().filter("this.getName() == '" + name + "'").first();
+		
+		return {
+			namespace: namespace,
+			name: name,
+			element: element
+		};
 	},
 	
 	_findType: function(root, qualifiedName) {
-		var found = this._findOwner(root, qualifiedName);
-		found.type = found.namespace.getElements().filter("this.getName() == '" + found.name + "'").first();
-		return found;
+		var array = qualifiedName.split(".");
+		var name = array.pop();
+
+		var namespace = this._findOwner(root, array.join("."));
+		var element = namespace.getElements().filter("this.getName() == '" + name + "'").first();
+		
+		return {
+			namespace: namespace,
+			name: name,
+			element: element
+		};
 	},
 	
 	_insertPackage: function(root, qualifiedName, ast) {
 		
 		info("package:$", [qualifiedName]);
 		var found = this._findPackage(root, qualifiedName);
-		var _package = found._package;
+		var _package = found.element;
 		if (!_package) {
 			info("* package changed");
 			_package = found.namespace.createPackage(found.name);
+			_package.update();
 		}
 		
 		_package.getElement().setAlias(qualifiedName);
@@ -211,16 +226,16 @@ Documentation = {
 	
 	_insertSingleton: function(root, qualifiedName, ast) {
 
-		info("  singleton:$", [qualifiedName]);
+		info("  namespace:$", [qualifiedName]);
 
 		var found = this._findType(root, qualifiedName);
-		var singleton = found.type;
-		if (!singleton) {
-			info("  * singleton changed");
-			singleton = found.namespace.createElement(found.name, Ea.Element.Class);
+		var namespace = found.element;
+		if (!namespace) {
+			info("  * namespace changed");
+			namespace = found.namespace.createElement(found.name, Ea.Element.Class);
 		}
-		singleton.setStereotype("singleton");
-		singleton.update();
+		namespace.setStereotype("namespace");
+		namespace.update();
 		
 		for (var b = 0; b < ast.body.length; b++) {
 			var expression = ast.body[b];
@@ -237,7 +252,7 @@ Documentation = {
 				
 			}
 			if (properties) {
-				this._bufferClassProperties(root, qualifiedName, ast, singleton, properties);
+				this._bufferClassProperties(root, qualifiedName, ast, namespace, properties);
 			}
 		}
 	},
@@ -278,21 +293,24 @@ Documentation = {
 				
 				var found = this._findType(root, qualifiedName);
 				
-				var _class = found.type;
+				var _class = found.element;
 				if (!_class) {
 					info("  * class changed");
 					_class = found.namespace.createElement(found.name, Ea.Element.Class);
 				}
+				_class.setAlias(qualifiedName);
 				_class.update();
 				
-				if (!baseClass && qualifiedName != "Core.Types.Object")
-					baseClass = "Core.Types.Object";
-				
-				if (baseClass) {
-					baseClass = this._findType(root, baseClass).type;
+				if (qualifiedName != "Core.Types.Object") {
+					var _baseClass = baseClass;
+					var found = this._findType(root, baseClass || "Core.Types.Object");
+					baseClass = found.element;
 					var generalization = _class.getConnectors().filter(Ea.Connector.Generalization).first();
-					if (!generalization)
-						_class.createConnector("", Ea.Connector.Generalization, baseClass);
+					if (!generalization) {
+						generalization = _class.createConnector("", Ea.Connector.Generalization);
+						generalization.setSupplier(baseClass);
+						generalization.update();
+					}
 				}
 
 				if (methods)
@@ -331,11 +349,11 @@ Documentation = {
 				
 				var commentsBefore = property.key.commentsBefore ? property.key.commentsBefore.pop() : "";
 				var doc = this._parseDoc(commentsBefore);
-				var type = "any";
+				var typeName = "any";
 				if (doc) {
-					type = "void";
+					typeName = "void";
 					if (doc.type && doc.type.length != 0) {
-						type = doc.type[0].type;
+						typeName = doc.type[0].type;
 					}
 					if (doc["private"])
 						_private = true;
@@ -358,24 +376,17 @@ Documentation = {
 				
 				var multiplicityLower = 1;
 				var multiplicityUpper = 1;
-				if (type.indexOf("<") != -1) {
-					type = type.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
+				if (typeName.indexOf("<") != -1) {
+					typeName = typeName.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
 						multiplicityLower = 0;
 						multiplicityUpper = "*";
 						return elementType;
 					});
 				}
-				if (type.indexOf(".") != -1) {
-					//info("return>>>1:$", [type]);
-					type = this._findType(root, type).type;
-					//info("return>>>2:$", [type]);
-					method._setClassifier(type);
-					method._setReturnType(type.getName());
-				}
-				else {
-					method._setReturnType(type);
-					
-				}
+				
+				var type = this._findType(root, typeName).element || Ea._Base.PrimitiveType.getPrimitiveType(typeName);
+				method.setType(type);
+
 				if (_static) {
 					method.setStatic(true);
 				}
@@ -402,12 +413,12 @@ Documentation = {
 				
 				var multiplicityLower = 1;
 				var multiplicityUpper = 1;
-				var type = "String";
+				var typeName = "String";
 
 				if (doc.type && doc.type.length != 0) {
-					type = doc.type[0].type;
-					if (type.indexOf("<") != -1) {
-						type = type.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
+					typeName = doc.type[0].type;
+					if (typeName.indexOf("<") != -1) {
+						typeName = typeName.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
 							multiplicityLower = 0;
 							multiplicityUpper = "*";
 							return elementType;
@@ -415,15 +426,16 @@ Documentation = {
 					}
 				}
 
-				if (type.indexOf(".") != -1) {
-					//info(">>>1:$", [type]);
-					type = this._findType(root, type).type;
-					//info(">>>2:$", [type]);
+				var type = this._findType(root, typeName).element;
+				
+				if (type) {
 					
 					var association = _class.getConnectors().filter("this.instanceOf(Ea.Connector.Association) && this.getSupplierEnd().getRole() == '" + propertyName + "'").first();
 					if (!association) {
 						info("* association changed");
-						association = _class.createConnector("", Ea.Connector.Association, type);
+						association = _class.createConnector("", Ea.Connector.Association);
+						association.setSupplier(type);
+						association.update();
 					}
 					var clientEnd = association.getClientEnd();
 					clientEnd.setNavigability("Non-Navigable");
@@ -451,6 +463,9 @@ Documentation = {
 					supplierEnd.update();
 				}
 				else {
+					
+					type = Ea._Base.PrimitiveType.getPrimitiveType(typeName);
+					
 					var attribute = _class.getAttributes().filter("this.getName() == '" + propertyName + "'").first();
 					if (!attribute) {
 						info("* property changed");
@@ -460,7 +475,8 @@ Documentation = {
 						attribute.setVisibility("Private");
 					attribute.setNotes(doc.comment || "");
 
-					attribute._setPrimitiveType(type);
+					//attribute._setPrimitiveType(type);
+					attribute.setType(type);
 					if (doc["derived"])
 						attribute.setDerived(true);
 					attribute.setStereotype("property");
@@ -499,39 +515,27 @@ Documentation = {
 				parameter = method.createParameter(paramName);
 			}
 			
-			var type = param.type || "any";
+			var typeName = param.type || "any";
 			var multiplicityLower = 1;
-			if (type.charAt(0) == "?") {
+			if (typeName.charAt(0) == "?") {
 				multiplicityLower = 0;
-				type = type.substr(1);
+				typeName = typeName.substr(1);
 			}
-			if (type.indexOf("|") != -1) {
-				info("!!!!!!!!!!!!!!!! $", [type]);
+			if (typeName.indexOf("|") != -1) {
+				info("!!!!!!!!!!!!!!!! $", [typeName]);
 			}
 			var multiplicityUpper = 1;
-			if (type.indexOf("<") != -1) {
-				type = type.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
+			if (typeName.indexOf("<") != -1) {
+				typeName = typeName.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
 					multiplicityLower = 0;
 					multiplicityUpper = "*";
 					return elementType;
 				});
 			}
-			if (type.indexOf(".") != -1) {
-				//info("param>>>1:$", [type]);
-				try {
-					type = this._findType(root, type).type;
-					//info("param>>>2:$", [type]);
-					parameter._setClassifier(type);
-					parameter._setPrimitiveType(type.getName());
-				}
-				catch (exception) {
-					//info("param!!!3:$", [type]);
-				}
-			}
-			else {
-				parameter._setPrimitiveType(type);
-				
-			}
+			
+			var type = this._findType(root, typeName).element || Ea._Base.PrimitiveType.getPrimitiveType(typeName);
+			parameter.setType(type);
+
 			parameter.setNotes(param.comment || "");
 			parameter.update();
 		}

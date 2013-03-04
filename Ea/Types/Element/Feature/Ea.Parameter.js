@@ -89,7 +89,7 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_tags: property({api: "TaggedValues"})
+	_tag: property({api: "TaggedValues"})
 
 });
 

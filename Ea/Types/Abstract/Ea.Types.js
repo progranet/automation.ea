@@ -19,20 +19,10 @@
  */
 Ea.Types = {};
 
-Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
+Ea.Types.Any = define({
 	
-	_source: null,
-	
-	/**
-	 * Creates new abstraction layer wrapper for Enterprise Architect API object
-	 * 
-	 * @constructs
-	 * @extends Core.Types.Object
-	 * @param {Object} api EA API object
-	 */
-	create: function(source) {
-		_super.create();
-		this._source = source;
+	_init: function() {
+		
 	},
 	
 	/**
@@ -45,6 +35,11 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 		return this._source.application.getProject().guidToXml(this.getGuid());
 	},
 	
+	/**
+	 * Returns description of this object
+	 * 
+	 * @type {String}
+	 */
 	toString: function() {
 		return this._toString();
 	},
@@ -57,9 +52,12 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 		return "[" + this._class + "]";
 	},
 	
+	/**
+	 * Updates this object after its state change
+	 */
 	update: function() {
-		var api = this._source.api;
-		api.Update();
+		this._source.api.Update();
+		this._source.application.cache(this);
 	}
 	
 }, 
@@ -73,6 +71,15 @@ Ea.Types.Any = define(/** @lends Ea.Types.Any# */{
 	 */
 	determineType: function(source) {
 		return this.namespace._Base;
+	},
+	
+	/**
+	 * Determines EA API type name on creating API object
+	 * 
+	 * @type {String}
+	 */
+	determineEaType: function() {
+		return this.namespace.name;
 	},
 	
 	/**
@@ -135,7 +142,7 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 	
 	_ensure: function(type, ea) {
 		if (typeof ea == "string" && this.isGuid(ea))
-			ea = this._source.application.getRepository().getByGuid(type, ea);
+			ea = this._source.application.getByGuid(type, ea);
 		return ea;
 	},
 	
