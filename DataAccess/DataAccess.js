@@ -39,6 +39,21 @@ DataAccess._Provider = extend(Core.Types.Named, {
 
 	_tables: null,
 	
+	create: function(name) {
+		_super.create(name);
+		var tables = this._getTables();
+		this._tables = tables;
+		for (var tableName in tables) {
+			var table = tables[tableName];
+			table.nativeColumns = {};
+			for (var abstractName in table.columns) {
+				var column = table.columns[abstractName];
+				column.name = abstractName;
+				table.nativeColumns[column.native] = column;
+			}
+		}
+	},
+	
 	getSelect: function(table) {
 		throw new Error("Not implemented method");
 	},
@@ -47,7 +62,19 @@ DataAccess._Provider = extend(Core.Types.Named, {
 		throw new Error("Not implemented method");
 	},
 
-	getColumn: function(table, column) {
-		throw new Error("Not implemented method");
+	_getTables: function() {
+		throw new Error("Provider._getTables method not implemented for data access provider: " + this.getName());
+	},
+	
+	getColumnByNative: function(table, nativeName) {
+		return this._tables[table].nativeColumns[nativeName];
+	},
+	
+	getColumn: function(table, columnName) {
+		return this._tables[table].columns[columnName];
+	},
+
+	getTable: function(tableName) {
+		return this._tables[tableName].meta;
 	}
 });

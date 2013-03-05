@@ -14,144 +14,162 @@
    limitations under the License.
 */
 
-DataAccess.Jet = {
-	initialize: function() {
-		DataAccess.registerProviderClass("Jet", this.Provider);
-	}
-};
+DataAccess.Jet = {};
 
 DataAccess.Jet.Provider = extend(DataAccess._Provider, {
 	
+	_getTables: function() {
+		return this._class._tables;
+	},
+	
+	getSelect: function(table) {
+		var sql = "select * from " + this.getTable(table).native + " where";
+		return sql;
+	},
+	
+	getExpression: function(table, key, value, operator) {
+		var column = this.getColumn(table, key);
+		var type = column.type;
+		if (type == String)
+			value = "\"" + value + "\"";
+		
+		// TODO: other operators
+		var expression = column.native + " = " + value;
+			
+		return expression;
+	}	
+},
+{
 	_tables: {
 		Element: {
 			meta: {
 				id: "Object_ID",
 				guid: "ea_guid",
-				name: "t_object"
+				native: "t_object"
 			},
 			columns: {
 				id: {
-					name: "Object_ID",
+					native: "Object_ID",
 					type: Number
 				},
 				guid: {
-					name: "ea_guid",
+					native: "ea_guid",
 					type: String
 				},
-				name: {
-					name: "Name",
+				native: {
+					native: "Name",
 					type: String
 				},
 				alias: {
-					name: "Alias",
+					native: "Alias",
 					type: String
 				},
 				author: {
-					name: "Author",
+					native: "Author",
 					type: String
 				},
 				version: {
-					name: "Version",
+					native: "Version",
 					type: String
 				},
 				notes: {
-					name: "Note",
+					native: "Note",
 					type: String
 				},
 				packageId: {
-					name: "Package_ID",
+					native: "Package_ID",
 					type: Number
 				},
 				stereotype: {
-					name: "Stereotype",
+					native: "Stereotype",
 					type: String
 				},
 				complexity: {
-					name: "Complexity",
+					native: "Complexity",
 					type: String
 				},
 				effort: {
-					name: "Effort",
+					native: "Effort",
 					type: String
 				},
 				created: {
-					name: "CreatedDate",
+					native: "CreatedDate",
 					type: Date
 				},
 				modified: {
-					name: "ModifiedDate",
+					native: "ModifiedDate",
 					type: Date
 				},
 				status: {
-					name: "Status",
+					native: "Status",
 					type: String
 				},
 				_abstract: {
-					name: "Abstract",
+					native: "Abstract",
 					type: String
 				},
 				visibility: {
-					name: "Visibility",
+					native: "Visibility",
 					type: String
 				},
 				persistence: {
-					name: "Persistence",
+					native: "Persistence",
 					type: String
 				},
 				cardinality: {
-					name: "Cardinality",
+					native: "Cardinality",
 					type: String
 				},
 				phase: {
-					name: "Phase",
+					native: "Phase",
 					type: String
 				},
 				scope: {
-					name: "Scope",
+					native: "Scope",
 					type: String
 				},
 				classifierId: {
-					name: "Classifier",
+					native: "Classifier",
 					type: Number
 				},
 				parentId: {
-					name: "ParentID",
+					native: "ParentID",
 					type: Number
 				},
 				runState: {
-					name: "RunState",
+					native: "RunState",
 					type: String
 				},
 				classifierGuid: {
-					name: "Classifier_guid",
+					native: "Classifier_guid",
 					type: String
 				},
 				position: {
-					name: "TPos",
+					native: "TPos",
 					type: Number
 				},
 				multiplicity: {
-					name: "Multiplicity",
+					native: "Multiplicity",
 					type: String
 				},
 				backColor: {
-					name: "Backcolor",
+					native: "Backcolor",
 					type: Number
 				},
 				fontColor: {
-					name: "Fontcolor",
+					native: "Fontcolor",
 					type: Number
 				},
 				borderColor: {
-					name: "Bordercolor",
+					native: "Bordercolor",
 					type: Number
 				},
 				borderStyle: {
-					name: "BorderStyle",
+					native: "BorderStyle",
 					type: Number
 				},
 				borderWidth: {
-					name: "BorderWidth",
+					native: "BorderWidth",
 					type: Number
 				}
 			}
@@ -159,35 +177,35 @@ DataAccess.Jet.Provider = extend(DataAccess._Provider, {
 		XRef: {
 			meta: {
 				guid: "XrefID",
-				name: "t_xref"
+				native: "t_xref"
 			},
 			columns: {
 				guid: {
-					name: "XrefID",
+					native: "XrefID",
 					type: String
 				},
-				name: {
-					name: "Name",
+				native: {
+					native: "Name",
 					type: String
 				},
 				type: {
-					name: "Type",
+					native: "Type",
 					type: String
 				},
 				description: {
-					name: "Description",
+					native: "Description",
 					type: String
 				},
 				clientGuid: {
-					name: "Client",
+					native: "Client",
 					type: String
 				},
 				supplierGuid: {
-					name: "Supplier",
+					native: "Supplier",
 					type: String
 				},
 				link: {
-					name: "Link",
+					native: "Link",
 					type: String
 				}
 			}
@@ -195,31 +213,31 @@ DataAccess.Jet.Provider = extend(DataAccess._Provider, {
 		Scenario: {
 			meta: {
 				guid: "ea_guid",
-				name: "t_objectscenarios"
+				native: "t_objectscenarios"
 			},
 			columns: {
 				guid: {
-					name: "ea_guid",
+					native: "ea_guid",
 					type: String
 				},
 				elementId: {
-					name: "Object_ID",
+					native: "Object_ID",
 					type: Number
 				},
-				name: {
-					name: "Scenario",
+				native: {
+					native: "Scenario",
 					type: String
 				},
 				type: {
-					name: "ScenarioType",
+					native: "ScenarioType",
 					type: String
 				},
 				notes: {
-					name: "Notes",
+					native: "Notes",
 					type: String
 				},
 				content: {
-					name: "XMLContent",
+					native: "XMLContent",
 					type: String
 				}
 			}
@@ -227,47 +245,24 @@ DataAccess.Jet.Provider = extend(DataAccess._Provider, {
 		DiagramObject: {
 			meta: {
 				id: "Instance_ID",
-				name: "t_diagramobjects"
+				native: "t_diagramobjects"
 			},
 			columns: {
 				id: {
-					name: "Instance_ID",
+					native: "Instance_ID",
 					type: Number
 				},
 				elementId: {
-					name: "Object_ID",
+					native: "Object_ID",
 					type: Number
 				},
 				parentId: {
-					name: "Diagram_ID",
+					native: "Diagram_ID",
 					type: Number
 				}
 			}
 		}
-	},
-	
-	getSelect: function(table) {
-		table = this._tables[table].meta.name;
-		var sql = "select * from " + table + " where";
-		return sql;
-	},
-	
-	getExpression: function(table, key, value, operator) {
-		var column = this._tables[table].columns[key];
-		key = column.name;
-		var type = column.type;
-		if (type == String)
-			value = "\"" + value + "\"";
-		
-		// TODO: other operators
-		var expression = key + " = " + value;
-			
-		return expression;
-	},
-	
-	getColumn: function(table, column) {
-		column = this._tables[table].columns[column].name;
-		return column;
 	}
+	
 });
 

@@ -14,144 +14,162 @@
    limitations under the License.
 */
 
-DataAccess.Oracle = {
-	initialize: function() {
-		DataAccess.registerProviderClass("Oracle", this.Provider);
-	}
-};
+DataAccess.Oracle = {};
 
 DataAccess.Oracle.Provider = extend(DataAccess._Provider, {
 	
+	_getTables: function() {
+		return this._class._tables;
+	},
+	
+	getSelect: function(table) {
+		var sql = "SELECT * FROM " + this.getTable(table).native + " WHERE";
+		return sql;
+	},
+	
+	getExpression: function(table, key, value, operator) {
+		var column = this.getColumn(table, key);
+		var type = column.type;
+		if (type == String)
+			value = "\"" + value + "\"";
+		
+		// TODO: other operators
+		var expression = column.native + " = " + value;
+			
+		return expression;
+	}
+},
+{
 	_tables: {
 		Element: {
 			meta: {
 				id: "OBJECT_ID",
 				guid: "EA_GUID",
-				name: "T_OBJECT"
+				native: "T_OBJECT"
 			},
 			columns: {
 				id: {
-					name: "OBJECT_ID",
+					native: "OBJECT_ID",
 					type: Number
 				},
 				guid: {
-					name: "EA_GUID",
+					native: "EA_GUID",
 					type: String
 				},
-				name: {
-					name: "NAME",
+				native: {
+					native: "NAME",
 					type: String
 				},
 				alias: {
-					name: "ALIAS",
+					native: "ALIAS",
 					type: String
 				},
 				author: {
-					name: "AUTHOR",
+					native: "AUTHOR",
 					type: String
 				},
 				version: {
-					name: "VERSION",
+					native: "VERSION",
 					type: String
 				},
 				notes: {
-					name: "NOTE",
+					native: "NOTE",
 					type: String
 				},
 				packageId: {
-					name: "PACKAGE_ID",
+					native: "PACKAGE_ID",
 					type: Number
 				},
 				stereotype: {
-					name: "STEREOTYPE",
+					native: "STEREOTYPE",
 					type: String
 				},
 				complexity: {
-					name: "COMPLEXITY",
+					native: "COMPLEXITY",
 					type: String
 				},
 				effort: {
-					name: "EFFORT",
+					native: "EFFORT",
 					type: String
 				},
 				created: {
-					name: "CREATEDDATE",
+					native: "CREATEDDATE",
 					type: Date
 				},
 				modified: {
-					name: "MODIFIEDDATE",
+					native: "MODIFIEDDATE",
 					type: Date
 				},
 				status: {
-					name: "STATUS",
+					native: "STATUS",
 					type: String
 				},
 				_abstract: {
-					name: "ABSTRACT",
+					native: "ABSTRACT",
 					type: String
 				},
 				visibility: {
-					name: "VISIBILITY",
+					native: "VISIBILITY",
 					type: String
 				},
 				persistence: {
-					name: "PERSISTENCE",
+					native: "PERSISTENCE",
 					type: String
 				},
 				cardinality: {
-					name: "CARDINALITY",
+					native: "CARDINALITY",
 					type: String
 				},
 				phase: {
-					name: "PHASE",
+					native: "PHASE",
 					type: String
 				},
 				scope: {
-					name: "SCOPE",
+					native: "SCOPE",
 					type: String
 				},
 				classifierId: {
-					name: "CLASSIFIER",
+					native: "CLASSIFIER",
 					type: Number
 				},
 				parentId: {
-					name: "PARENTID",
+					native: "PARENTID",
 					type: Number
 				},
 				runState: {
-					name: "RUNSTATE",
+					native: "RUNSTATE",
 					type: String
 				},
 				classifierGuid: {
-					name: "CLASSIFIER_GUID",
+					native: "CLASSIFIER_GUID",
 					type: String
 				},
 				position: {
-					name: "TPOS",
+					native: "TPOS",
 					type: Number
 				},
 				multiplicity: {
-					name: "MULTIPLICITY",
+					native: "MULTIPLICITY",
 					type: String
 				},
 				backColor: {
-					name: "BACKCOLOR",
+					native: "BACKCOLOR",
 					type: Number
 				},
 				fontColor: {
-					name: "FONTCOLOR",
+					native: "FONTCOLOR",
 					type: Number
 				},
 				borderColor: {
-					name: "BORDERCOLOR",
+					native: "BORDERCOLOR",
 					type: Number
 				},
 				borderStyle: {
-					name: "BORDERSTYLE",
+					native: "BORDERSTYLE",
 					type: Number
 				},
 				borderWidth: {
-					name: "BORDERWIDTH",
+					native: "BORDERWIDTH",
 					type: Number
 				}
 			}
@@ -159,35 +177,35 @@ DataAccess.Oracle.Provider = extend(DataAccess._Provider, {
 		XRef: {
 			meta: {
 				guid: "XREFID",
-				name: "T_XREF"
+				native: "T_XREF"
 			},
 			columns: {
 				guid: {
-					name: "XREFID",
+					native: "XREFID",
 					type: String
 				},
-				name: {
-					name: "NAME",
+				native: {
+					native: "NAME",
 					type: String
 				},
 				type: {
-					name: "TYPE",
+					native: "TYPE",
 					type: String
 				},
 				description: {
-					name: "DESCRIPTION",
+					native: "DESCRIPTION",
 					type: String
 				},
 				clientGuid: {
-					name: "CLIENT",
+					native: "CLIENT",
 					type: String
 				},
 				supplierGuid: {
-					name: "SUPPLIER",
+					native: "SUPPLIER",
 					type: String
 				},
 				link: {
-					name: "LINK",
+					native: "LINK",
 					type: String
 				}
 			}
@@ -195,31 +213,31 @@ DataAccess.Oracle.Provider = extend(DataAccess._Provider, {
 		Scenario: {
 			meta: {
 				guid: "EA_GUID",
-				name: "T_OBJECTSCENARIOS"
+				native: "T_OBJECTSCENARIOS"
 			},
 			columns: {
 				guid: {
-					name: "EA_GUID",
+					native: "EA_GUID",
 					type: String
 				},
 				elementId: {
-					name: "OBJECT_ID",
+					native: "OBJECT_ID",
 					type: Number
 				},
-				name: {
-					name: "SCENARIO",
+				native: {
+					native: "SCENARIO",
 					type: String
 				},
 				type: {
-					name: "SCENARIOTYPE",
+					native: "SCENARIOTYPE",
 					type: String
 				},
 				notes: {
-					name: "NOTES",
+					native: "NOTES",
 					type: String
 				},
 				content: {
-					name: "XMLCONTENT",
+					native: "XMLCONTENT",
 					type: String
 				}
 			}
@@ -227,47 +245,23 @@ DataAccess.Oracle.Provider = extend(DataAccess._Provider, {
 		DiagramObject: {
 			meta: {
 				id: "INSTANCE_ID",
-				name: "T_DIAGRAMOBJECTS"
+				native: "T_DIAGRAMOBJECTS"
 			},
 			columns: {
 				id: {
-					name: "INSTANCE_ID",
+					native: "INSTANCE_ID",
 					type: Number
 				},
 				elementId: {
-					name: "OBJECT_ID",
+					native: "OBJECT_ID",
 					type: Number
 				},
 				parentId: {
-					name: "DIAGRAM_ID",
+					native: "DIAGRAM_ID",
 					type: Number
 				}
 			}
 		}
-	},
-	
-	getSelect: function(table) {
-		table = this._tables[table].meta.name;
-		var sql = "SELECT * FROM " + table + " WHERE";
-		return sql;
-	},
-	
-	getExpression: function(table, key, value, operator) {
-		var column = this._tables[table].columns[key];
-		key = column.name;
-		var type = column.type;
-		if (type == String)
-			value = "\"" + value + "\"";
-		
-		// TODO: other operators
-		var expression = key + " = " + value;
-			
-		return expression;
-	},
-	
-	getColumn: function(table, column) {
-		column = this._tables[table].columns[column].name;
-		return column;
-	}
+	}	
 });
 

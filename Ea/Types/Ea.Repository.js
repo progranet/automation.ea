@@ -25,6 +25,11 @@ Ea.Repository = {
 
 	meta: {
 		objectType: 2
+	},
+	
+	initialize: function() {
+		DataAccess.registerProviderClass("Jet", DataAccess.Jet.Provider);
+		DataAccess.registerProviderClass("Oracle", DataAccess.Oracle.Provider);
 	}
 };
 
@@ -69,7 +74,9 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 			var cs = node.childNodes;
 			for (var ci = 0; ci < cs.length; ci++) {
 				var c = cs[ci];
-				row[c.nodeName] = c.text;
+				var column = this._provider.getColumnByNative(table, c.nodeName);
+				if (column)
+					row[column.name] = c.text;
 			}
 			rows.push(row);
 		}
@@ -89,7 +96,6 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	 * @type {Core.Types.Collection}
 	 */
 	getByQuery: function(type, table, key, value, identity) {
-		identity = this._provider.getColumn(table, identity);
 		var collection = new Core.Types.Collection();
 		var rows = this._findByQuery(table, key, value);
 		for (var ri = 0; ri < rows.length; ri++) {
@@ -110,18 +116,12 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	getCustomReferences: function(element) {
 		var collection = new Core.Types.Collection();
 		var rows = this._findByQuery("XRef", "clientGuid", element.getGuid());
-		var columns = {
-			type: this._provider.getColumn("XRef", "type"),
-			name: this._provider.getColumn("XRef", "name"),
-			supplierGuid: this._provider.getColumn("XRef", "supplierGuid"),
-			description: this._provider.getColumn("XRef", "description")
-		};
 		for (var ri = 0; ri < rows.length; ri++) {
 			var row = rows[ri];
-			if (row[columns.type] == "reference" && row[columns.name] == "Element") {
-				var supplier = this._source.application.getByGuid(Ea.Element._Base, row[columns.supplierGuid]);
+			if (row.type == "reference" && row.name == "Element") {
+				var supplier = this._source.application.getByGuid(Ea.Element._Base, row.supplierGuid);
 				if (supplier) {
-					var reference = new Ea._Base.CustomReference(row[columns.description], supplier);
+					var reference = new Ea._Base.CustomReference(row.description, supplier);
 					collection.add(reference);
 				}
 			}
@@ -270,7 +270,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 		dom.validateOnParse = false;
 		dom.async = false;
 		
-		var xml = row[this._provider.getColumn("Scenario", "content")];
+		var xml = row.content;
 		var parsed = dom.loadXML(xml);
 
 		var context = {};
@@ -295,16 +295,9 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	 * @type {Ea._Base.DataTypes.Appearance}
 	 */
 	getElementAppearance: function(element) {
-		var rows = this._source.application.getRepository()._findByQuery("Element", "id", element.getId());
+		var rows = this._findByQuery("Element", "id", element.getId());
 		var row = rows[0];
-		var source = {
-			backColor: row[this._provider.getColumn("Element", "backColor")],
-			fontColor: row[this._provider.getColumn("Element", "fontColor")],
-			borderColor: row[this._provider.getColumn("Element", "borderColor")],
-			borderStyle: row[this._provider.getColumn("Element", "borderStyle")],
-			borderWidth: row[this._provider.getColumn("Element", "borderWidth")]
-		};
-		appearance = new Ea._Base.DataTypes.Appearance(source);
+		var appearance = new Ea._Base.DataTypes.Appearance(row);
 		return appearance;
 	}
 },
