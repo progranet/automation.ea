@@ -20,17 +20,19 @@
 DataAccess = {
 	
 	_providers: {},
+	_providerClasses: {},
 		
 	getProvider: function(name) {
 		var provider = this._providers[name];
+		if (!provider && this._providerClasses[name])
+			provider = this._providers[name] = new this._providerClasses[name](name);
 		if (provider)
 			return provider;
 		throw new Error("No such data access provider: " + name);
 	},
 	
 	registerProviderClass: function(name, providerClass) {
-		var provider = new providerClass(name);
-		this._providers[name] = provider;
+		this._providerClasses[name] = providerClass;
 	}
 		
 };

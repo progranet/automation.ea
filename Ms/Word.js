@@ -99,7 +99,8 @@ Word = {
 	},
 	
 	closeWord: function() {
-		this.wordApp.Quit();
+		if (this.wordApp)
+			this.wordApp.Quit();
 		this.wordApp = null;
 	},
 	

@@ -60,7 +60,36 @@ Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 	}
 });
 
-Ea.Attribute.EnumerationLiteral = extend(Ea.Attribute._Base);
+Ea.Attribute.EnumerationLiteral = extend(Ea.Attribute._Base, {
+
+	/**
+	 * Returns null
+	 * 
+	 * @type {Object}
+	 */
+	getType: function() {
+		return null;
+	},
+	
+	/**
+	 * Throws exception
+	 * 
+	 * @param {Class} type
+	 */
+	setType: function(type) {
+		throw new Error("Cannot set type od enumeration literal");
+	},
+	
+	_toString: function() {
+		return this.getName() + " [" + this._class  + "]";
+	}
+},{
+	/**
+	 * @type {Core.Types.Object}
+	 * @derived
+	 */
+	_type: property()
+});
 
 Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {}, 
 {

@@ -346,7 +346,7 @@ Ea._Base.Class.DerivedAttribute = extend(Ea._Base.Class._Attribute, /** @lends E
 	_get: function(object, params) {
 		var source = object._source;
 		params = params || [];
-		// if there's any arguments passed to getter (such as filter for collection type properties) cache is omitted
+		// if any arguments are passed to method (such as filter for collection) cache is omitted
 		if (params.length != 0 || !(this.name in source.value))
 			return this._init(object, params);
 		var value = source.value[this.name];
