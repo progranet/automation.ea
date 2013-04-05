@@ -19,7 +19,7 @@ Ea.SwimlaneDef = {
 		objectType: 50
 	},
 
-	SwimlaneOrientation: {
+	Orientation: {
 		0: "Vertical",
 		1: "Horizontal"
 	}
@@ -28,62 +28,91 @@ Ea.SwimlaneDef = {
 Ea.SwimlaneDef._Base = extend(Ea.Types.Any, {
 	
 	getOrientation: function() {
-		return Ea.SwimlaneDef.SwimlaneOrientation[this._getOrientation()];
-	}
+		return Ea.SwimlaneDef.Orientation[this._getOrientation()];
+	},
 	
+	setOrientation: function(orientation) {
+		for (var i in Ea.SwimlaneDef.Orientation) {
+			if (Ea.SwimlaneDef.Orientation[i] == orientation)
+				return this._setOrientation(i);
+		}
+		throw new Error("Unknown orientation: " + orientation + " for swimlane definition: " + this);
+	}
 },
 {
 	/**
+	 * Swimlane definition bold switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_bold: property({api: "Bold"}),
 	
 	/**
+	 * Swimlane definition hide classifier switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_hideClassifier: property({api: "HideClassifier"}),
 	
 	/**
+	 * Swimlane definition hide names switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_hideNames: property({api: "HideNames"}),
 	
 	/**
+	 * Swimlane definition locked switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_locked: property({api: "Locked"}),
 	
 	/**
+	 * Swimlane definition font color
+	 * 
 	 * @type {Number}
 	 */
 	_fontColor: property({api: "FontColor"}),
 	
 	/**
+	 * Swimlane definition line color
+	 * 
 	 * @type {Number}
 	 */
 	_lineColor: property({api: "LineColor"}),
 	
 	/**
+	 * Swimlane definition line width
+	 * 
 	 * @type {Number}
 	 */
 	_lineWidth: property({api: "LineWidth"}),
 	
 	/**
+	 * Swimlane definition orientation
+	 * 
 	 * @private
 	 */
 	__orientation: property({api: "Orientation"}),
 	
 	/**
+	 * Swimlane definition orientation
+	 * 
 	 * @derived
 	 */
 	_orientation: property(),
 	
 	/**
+	 * Swimlane definition show in title bar switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_showInTitleBar: property({api: "ShowInTitleBar"}),
 	
 	/**
+	 * Swimlane definition swimlanes collection
+	 * 
 	 * @type {Ea.Swimlanes._Base<Ea.Swimlane._Base>}
 	 * @qualifier {String} title
 	 * @aggregation composite

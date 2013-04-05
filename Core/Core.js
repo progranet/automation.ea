@@ -27,7 +27,7 @@ Core = {
 	 * @param {String} propertyName
 	 * @type {Boolean}
 	 */
-	isFunction: function(property, propertyName) {
+	isMethod: function(property, propertyName) {
 		return typeof property == "function" && !/^[A-Z]/.test(propertyName.replace(/^_+/, "")) && !this.isNative(property);
 	},
 	
@@ -112,7 +112,7 @@ Core = {
 	 */
 	enrichNamespace: function(namespace) {
 		for (var propertyName in namespace) {
-			if (this.isFunction(namespace[propertyName], propertyName))
+			if (this.isMethod(namespace[propertyName], propertyName))
 				this.enrichMethod(namespace, propertyName, namespace.qualifiedName + "." + propertyName, true);
 		};
 	},

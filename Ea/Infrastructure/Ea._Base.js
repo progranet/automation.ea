@@ -174,7 +174,7 @@ Ea._Base.Relationship = define({
 	}
 });
 
-Ea._Base.CustomReference = define(/** @lends Ea._Base.CustomReference# */{
+Ea._Base.CustomReference = define({
 	_notes: null,
 	_supplier: null,
 	
@@ -189,9 +189,6 @@ Ea._Base.CustomReference = define(/** @lends Ea._Base.CustomReference# */{
 		this._supplier = supplier;
 	},
 	
-	/**
-	 * @memberOf Ea._Base.CustomReference#
-	 */
 	getNotes: function() {
 		return this._notes;
 	},
@@ -246,6 +243,40 @@ Ea._Base.Source = define({
 	
 });
 
+Ea._Base.AbstractStereotype = define({
+	
+	getName: function() {
+		throw new Error("Abstract method");
+	}
+	
+});
+
+Ea._Base.Stereotype = extend(Ea._Base.AbstractStereotype, {
+	
+	_value: null,
+	
+	create: function(params) {
+		_super.create();
+		this._value = {
+			name: params.Name,
+			qualifiedName: params.FQName
+		};
+	},
+	
+	getName: function() {
+		return this._value.name;
+	},
+
+	getQualifiedName: function() {
+		return this._value.qualifiedName;
+	},
+
+	_toString: function() {
+		return Core.Output.getString(this._value);
+	}
+	
+});
+
 include("Ea._Base.Class@Ea.Infrastructure");
 include("Ea._Base.DataTypes@Ea.Infrastructure");
-include("Ea._Base.Helper@Ea.Infrastructure");
+include("Ea._Base.Utils@Ea.Infrastructure");

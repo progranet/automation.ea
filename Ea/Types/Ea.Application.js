@@ -29,6 +29,8 @@ Ea.Application = {
 	 */
 	createApplication: function(params) {
 		var application = new Ea.Application._Base(params);
+		// initializes caches with all stereotypes available in project
+		application.getRepository().getProjectStereotypes();
 		return application;
 	}
 };
@@ -88,7 +90,6 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 		this._repository = this.wrapProxy(Ea.Repository._Base, this._source.api.Repository, params);
 		if (params.path)
 			this._repository.open(params.path);
-		
 	},
 	
 	/**
@@ -324,11 +325,16 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 },
 {
 	/**
+	 * Application associated project
+	 * 
+	 * @readOnly
 	 * @type {Ea.Project._Base}
 	 */
 	_project: property({api: "Project"}),
 
 	/**
+	 * Application visibility switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_visible: property({api: "Visible"})

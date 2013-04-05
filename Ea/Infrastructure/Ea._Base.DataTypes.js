@@ -17,46 +17,16 @@
 /**
  * @namespace
  */
-Ea._Base.DataTypes = {
-
-};
+Ea._Base.DataTypes = {};
 
 Ea._Base.DataTypes.DataType = define({
 	
 	_source: null,
+	_value: null,
 	
 	create: function(source) {
 		_super.create();
 		this._source = source;
-	}
-},
-{
-	create: function(source, params) {
-		return new this(source, params);
-	}
-});
-
-Ea._Base.DataTypes.List = extend(Ea._Base.DataTypes.DataType, {
-	
-	_value: null,
-	
-	create: function(source, params) {
-		_super.create(source);
-		this._value = source ? source.split(params.separator || ",") : [];
-	},
-	
-	forEach: function(fn) {
-		for (var i = 0; i < this._value.length; i++) {
-			fn(this._value[i], i);
-		}
-	},
-	
-	contains: function(element){
-		for (var i = 0; i < this._value.length; i++) {
-			if (this._value[i] == element)
-				return true;
-		}		
-		return false;
 	},
 
 	valueOf: function() {
@@ -68,21 +38,47 @@ Ea._Base.DataTypes.List = extend(Ea._Base.DataTypes.DataType, {
 	}
 });
 
+Ea._Base.DataTypes.List = extend(Ea._Base.DataTypes.DataType, {
+	
+	_separator: null,
+	
+	create: function(source, params) {
+		_super.create(source);
+		this._separator = params.separator || ";";
+		this._value = source ? source.split(this._separator) : [];
+	},
+	
+	getArray: function() {
+		return this._value;
+	},
+	
+	valueOf: function() {
+		var value = "";
+		for (var i = 0; i < this._value.length; i++) {
+			var element = this._value[i];
+			if (element != "")
+				value = value + element + this._separator;
+		}
+		return value;
+	}
+});
+
 Ea._Base.DataTypes.Map = extend(Ea._Base.DataTypes.DataType, {
 	
-	_value: null,
+	_separator: null,
+	_assigment: null,
 	
-	create: function(source) {
+	create: function(source, params) {
 		_super.create(source);
-		var separator = ";";
-		var assigment = "=";
+		this._separator = params.separator || ";";
+		this._assigment = params.assigment || "=";
 		this._value = {};
 		if (source) {
-			var tab = source.split(separator);
+			var tab = source.split(this._separator);
 			for (var t = 0; t < tab.length; t++) {
 				var value = tab[t];
 				if (value) {
-					value = value.split(assigment);
+					value = value.split(this._assigment);
 					this._value[value[0]] = value[1];
 				}
 			}
@@ -93,45 +89,147 @@ Ea._Base.DataTypes.Map = extend(Ea._Base.DataTypes.DataType, {
 		return this._value[key];
 	},
 	
-	forEach: function(fn) {
-		for (var key in this._value) {
-			fn(this._value[key], key);
-		}
+	set: function(key, value) {
+		this._value[key] = value;
 	},
 	
-	valueOf: function() {
+	getMap: function() {
 		return this._value;
 	},
 	
-	_toString: function() {
-		return Core.Output.getString(this._value);
+	valueOf: function() {
+		var value = "";
+		var i = 0;
+		for (var key in this._value) {
+			value = value + (0 != i++ ? this._separator : "") + key + this._assigment + this._value[key];
+		}
+		return value;
+	}
+});
+
+Ea._Base.DataTypes.ObjectList = extend(Ea._Base.DataTypes.DataType, {
+	
+	_name: null,
+	
+	create: function(source) {
+		_super.create(source);
+		this._value = [];
+		if (source) {
+			this._name = source.substr(1, source.indexOf(";") - 1);
+			var strings = source.split("@END" + this._name + ";");
+			for (var s = 0; s < strings.length; s++) {
+				var string = strings[s];
+				if (!string)
+					continue;
+				string = string.substr(this._name.length + 1, string.length - (this._name.length + 2));
+				//info("string:$", [string]);
+				var object = {};
+				while(string) {
+					var name = string.substr(1, string.indexOf("=") - 1);
+					string = string.substr(name.length + 2);
+					//info(" name:$|string:$", [name, string]);
+					
+					string.replace(/(;[a-z_0-9]+=.*|)$/i, function(whole, _string) {
+						var value = string.substr(0, string.length - _string.length);
+						object[name] = value;
+						string = _string;
+					});
+					
+				}
+				this._value.push(object);
+			}
+		}
+	},
+
+	getList: function() {
+		return this._value;
+	}
+
+});
+
+Ea._Base.DataTypes.ObjectMap = extend(Ea._Base.DataTypes.ObjectList, {
+	
+	_key: null,
+	_list: null,
+	
+	create: function(source, params) {
+		_super.create(source);
+		this._key = params.key;
+		this._list = this._value;
+		this._value = {};
+		for (var o = 0; o < this._list.length; o++) {
+			var object = this._list[o];
+			this._value[object[this._key]] = object;
+		}
+	},
+	
+	getList: function() {
+		return this._list;
+	},
+	
+	getMap: function() {
+		return this._value;
+	}
+
+});
+
+Ea._Base.DataTypes.Properties = extend(Ea._Base.DataTypes.DataType, {
+
+	create: function(source) {
+		_super.create(source);
+		this._value = {};
+		if (source) {
+			var strings = source.split("@ENDPROP;");
+			for (var s = 0; s < strings.length; s++) {
+				var string = strings[s];
+				if (!string)
+					continue;
+				var object = null;
+				string.replace(/@NAME=(.+)@ENDNAME;@TYPE=(.+)@ENDTYPE;@VALU=(.*)@ENDVALU;@PRMT=(.*)@ENDPRMT;/, function(whole, name, type, value, param) {
+					object = {
+						name: name,
+						type: type,
+						value: value,
+						param: param
+					};
+				});
+				if (object)
+					this._value[object.name] = object;
+			}
+		}
+	}
+});
+
+Ea._Base.DataTypes.Dimension = extend(Ea._Base.DataTypes.DataType, {
+	create: function(source) {
+		_super.create(source);
+		this._value = {
+			left: source.left,
+			right: source.right,
+			top: source.top,
+			bottom: source.bottom
+		};
 	}
 });
 
 Ea._Base.DataTypes.Date = extend(Ea._Base.DataTypes.DataType, {
 	
-	date: null,
-	
 	create: function(source) {
 		_super.create(source);
 		if (typeof source == "string") {
 			var d = this._class.re.exec(string);
-			this.date = new Date(d[1], new Number(d[2]) - 1, d[3], d[5], d[6], d[7]);
+			this._value = new Date(d[1], new Number(d[2]) - 1, d[3], d[5], d[6], d[7]);
 		}
 		else {
-			this.date = new Date(source);
+			this._value = new Date(source);
 		}
-	},
-	
-	valueOf: function() {
-		return this.date;
 	},
 	
 	_toString: function() {
 		var s = "";
-		s = s + this.date.getFullYear() + "-";
-		s = s + new String(this.date.getMonth() + 1).lpad("0", 2) + "-";
-		s = s + new String(this.date.getDate()).lpad("0", 2);
+		s = s + this._value.getFullYear() + "-";
+		s = s + new String(this._value.getMonth() + 1).lpad("0", 2) + "-";
+		s = s + new String(this._value.getDate()).lpad("0", 2);
 		return s;
 	}
 },
@@ -139,181 +237,75 @@ Ea._Base.DataTypes.Date = extend(Ea._Base.DataTypes.DataType, {
 	re: new RegExp("").compile(new RegExp("^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)( (\\d\\d):(\\d\\d):(\\d\\d))?$"))
 });
 
-Ea._Base.DataTypes.RunState = extend(Ea._Base.DataTypes.DataType, {
-	
-	_value: null,
-	
-	create: function(source) {
-		_super.create(source);
-		var rst = source.split("@ENDVAR;");
-		this._value = {};
-		for (var rsi = 0; rsi < rst.length; rsi++) {
-			var rs = rst[rsi];
-			if (rs.length > 0) {
-				rs = rs.substring(4).replace(/"/g, "'");
-				rs = rs.substring(0, rs.length - 1) + "\"";
-				rs = rs.replace(/;([^=]+)=/g, function($0, $1) {
-					return "\", " + $1.substring(0, 1).toLowerCase() + $1.substring(1) + ": \"";
-				});
-				rs = rs.substring(3).replace(/\n/g, "\\n").replace(/\r/g, "\\r");
-				eval("var rsot = {" + rs + "}");
-				this._value[rsot.variable] = rsot;
-			}
-		}
-	},
-	
-	valueOf: function() {
-		return this._value;
-	},
-	
-	_toString: function() {
-		return Core.Output.getString(this._value);
-	}
-});
-
-Ea._Base.DataTypes.Dimension = extend(Ea._Base.DataTypes.DataType, {
-	
-	left: null,
-	right: null,
-	top: null,
-	bottom: null,
-	
-	create: function(source) {
-		_super.create(source);
-		this.left = source.left;
-		this.right = source.right;
-		this.top = source.top;
-		this.bottom = source.bottom;
-	},
-
-	valueOf: function() {
-		return {
-			left: this.left,
-			top: this.top,
-			right: this.right,
-			bottom: this.bottom
-		};
-	},
-	
-	_toString: function() {
-		return Core.Output.getString(this.valueOf());
-	}
-});
-
-
 Ea._Base.DataTypes.Appearance = extend(Ea._Base.DataTypes.DataType, {
 	
-	_backColor: null,
-	_fontColor: null,
-	_borderColor: null,
-	_borderStyle: null,
-	_borderWidth: null,
-	
 	create: function(source) {
 		_super.create(source);
-		this._backColor = new Ea._Base.DataTypes.Color(source.backColor);
-		this._fontColor = new Ea._Base.DataTypes.Color(source.fontColor);
-		this._borderColor = new Ea._Base.DataTypes.Color(source.borderColor);
-		this._borderStyle = source.borderStyle;
-		this._borderWidth = source.borderWidth;
-	},
-	
-	valueOf: function() {
-		return {
-			backColor: this._backColor,
-			fontColor: this._fontColor,
-			borderColor: this._borderColor,
-			borderStyle: this._borderStyle,
-			borderWidth: this._borderWidth
+		this._value = {
+			backColor: new Ea._Base.DataTypes.Color(source.backColor),
+			fontColor: new Ea._Base.DataTypes.Color(source.fontColor),
+			borderColor: new Ea._Base.DataTypes.Color(source.borderColor),
+			borderStyle: source.borderStyle,
+			borderWidth: source.borderWidth
 		};
 	},
 	
 	getBackColor: function() {
-		return this._backColor;
+		return this._value.backColor;
 	},
 	
 	getFontColor: function() {
-		return this._fontColor;
+		return this._value.fontColor;
 	},
 	
 	getBorderColor: function() {
-		return this._borderColor;
+		return this._value.borderColor;
 	},
 	
 	getBorderStyle: function() {
-		return this._borderStyle;
+		return this._value.borderStyle;
 	},
 	
 	getBorderWidth: function() {
-		return this._borderWidth;
-	},
-	
-	_toString: function() {
-		return Core.Output.getString(this.valueOf());
+		return this._value.borderWidth;
 	}
-	
 });
 
 Ea._Base.DataTypes.Color = extend(Ea._Base.DataTypes.DataType, {
 	
-	_red: null,
-	_green: null,
-	_blue: null,
-	_default: false,
-	
 	create: function(rgb) {
 		_super.create(rgb);
-		if (rgb == -1) {
-			this._default = true;
-		}
-		else {
-			this._red = (rgb >> 16) & 0xFF;;
-			this._green = (rgb >> 8) & 0xFF;
-			this._blue = rgb & 0xFF;
-		}
-	},
-	
-	valueOf: function() {
-		if (this._default)
-			return {
-				"default": true
-			};
-			
-		return {
-			"default": false,
-			red: this._red,
-			green: this._green,
-			blue: this._blue
+		var _default = rgb == -1;
+		this._value = {
+			_default: _default,
+			red: _default ? null : (rgb >> 16) & 0xFF,
+			green: _default ? null : (rgb >> 8) & 0xFF,
+			blue: _default ? null : rgb & 0xFF
 		};
 	},
 	
 	isDefault: function() {
-		return this._default;
+		return this._value._default;
 	},
 	
 	getRed: function() {
-		return this._red;
+		return this._value.red;
 	},
 	
 	getGreen: function() {
-		return this._green;
+		return this._value.green;
 	},
 	
 	getBlue: function() {
-		return this._blue;
+		return this._value.blue;
 	},
 	
 	getHex: function() {
-		return new Number(this._source).toString(16);
+		return this.isDefault() ? null : new Number(this._source).toString(16);
 	},
 	
 	getColor: function() {
 		return this._source;
-	},
-	
-	_toString: function() {
-		return Core.Output.getString(this.valueOf());
 	}
-	
 });
 

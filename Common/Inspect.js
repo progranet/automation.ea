@@ -26,25 +26,9 @@ Inspect = {
 		indent: "      "
 	},
 	
-	/*fn: function() {
-		include("Browser@Ms.IExplorer", {
-			document: document
-		});
-		include("Report@Ksi", {
-			outputRoot: "C:\\Temp\\KSI\\3.5.12.wsh\\",
-			numer: 1
-		});
-		Ea.initializeApplication({path: openFileDialog.FileName});
-		Ea.initializeLogs(Browser.Target);
-	},*/
-	
 	execute: function(params) {
 		
 		var application = Ea.initializeDefaultApplication(params);
-
-		/*this.ie = new ActiveXObject("InternetExplorer.Application");
-		this.ie.Visible = true;
-		this.ie.Navigate("C:\\Temp\\KSI\\raport.js\\logs.html");*/
 
 		var object = this.params.object || application.getRepository().getSelectedObject();
 		
@@ -93,7 +77,7 @@ Inspect = {
 		params.push(object);
 		info(this._indent(indent) + template, params);
 
-		if (this._ids[object.__id__]) {
+		if (object.__id__ in this._ids) {
 			info(this._indent(indent + 1) + "#LOOP#");
 		}
 		else {
@@ -108,14 +92,13 @@ Inspect = {
 					_private: property.private,
 					aggregation: property.aggregation,
 					type: property.type,
-					collectionType: (value && property.type.isClass) ? property.type.getCollectionType() : null //value.instanceOf(Core.Types.Collection)
+					elementType: Core.Types.AbstractCollection.isAssignableFrom(property.type) ? property.elementType : null
 				};
-				params.elementType = params.collectionType ? property.elementType : null;
-				params.typeName = params.collectionType ? Core.Output.getString(params.type) + "<" + Core.Output.getString(params.elementType) + ">" : Core.Output.getString(params.type);
+				params.typeName = params.elementType ? Core.Output.getString(params.type) + "<" + Core.Output.getString(params.elementType) + ">" : Core.Output.getString(params.type);
 				params.template = (params._private ? "-" : "") + (property.derived ? "/" : "") + params.name + " [" + params.typeName + "]";
 
-				if (params.collectionType) {
-					if (params.collectionType == "map") {
+				if (params.elementType) {
+					if (Core.Types.AbstractMap.isAssignableFrom(property.type)) {
 						if (value.isEmpty()) {
 							info(this._indent(indent + 1) + "$ = {}", [params.template]);
 						}

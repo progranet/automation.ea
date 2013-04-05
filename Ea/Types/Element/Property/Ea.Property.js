@@ -38,15 +38,23 @@ Ea.Property._Base = extend(Ea.Types.Named, {},
 	},
 
 	/**
+	 * Property type
+	 * 
 	 * @private
+	 * @readOnly
 	 */
 	__type: property({api: "Type"}),
 	
 	/**
-	 * @private
+	 * Property validation specification
+	 * 
+	 * @readOnly
 	 */
-	__validation: property({api: "Validation"}),
+	_validation: property({api: "Validation"}),
 	
+	/**
+	 * Property value
+	 */
 	_value: property({api: "Value"})
 
 });
@@ -54,8 +62,11 @@ Ea.Property._Base = extend(Ea.Types.Named, {},
 Ea.Property.Enum = extend(Ea.Property._Base, {},
 {
 	/**
+	 * Property valid literal values list
+	 * 
+	 * @readOnly
 	 * @type {Ea._Base.DataTypes.List}
 	 * @separator ;
 	 */
-	_validation: property({api: "Validation"})
+	_literals: property({api: "Validation"})
 });

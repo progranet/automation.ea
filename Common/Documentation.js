@@ -234,7 +234,7 @@ Documentation = {
 			info("  * namespace changed");
 			namespace = found.namespace.createElement(found.name, Ea.Element.Class);
 		}
-		namespace.setStereotype("namespace");
+		namespace.setStereotype("utility");
 		namespace.update();
 		
 		for (var b = 0; b < ast.body.length; b++) {
@@ -302,14 +302,17 @@ Documentation = {
 				_class.update();
 				
 				if (qualifiedName != "Core.Types.Object") {
-					var _baseClass = baseClass;
-					var found = this._findType(root, baseClass || "Core.Types.Object");
-					baseClass = found.element;
-					var generalization = _class.getConnectors().filter(Ea.Connector.Generalization).first();
-					if (!generalization) {
-						generalization = _class.createConnector("", Ea.Connector.Generalization);
-						generalization.setSupplier(baseClass);
-						generalization.update();
+					baseClass = baseClass || "Core.Types.Object";
+					baseClass = baseClass.replace(/\s/g, "").replace(/^\[/, "").replace(/\]$/, "").split(",");
+					for (var bc = 0; bc < baseClass.length; bc++) {
+						var found = this._findType(root, baseClass[bc]);
+						var _baseClass = found.element;
+						var generalization = _class.getConnectors().filter("this.instanceOf(Ea.Connector.Generalization) && this.getSupplier().getAlias() == '" + baseClass[bc] + "'").first();
+						if (!generalization) {
+							generalization = _class.createConnector("", Ea.Connector.Generalization);
+							generalization.setSupplier(_baseClass);
+							generalization.update();
+						}
 					}
 				}
 
@@ -340,156 +343,291 @@ Documentation = {
 	},
 	
 	_insertClassProperties: function(root, qualifiedName, ast, _class, properties, _static) {
-		for (var prp = 0; prp < properties.length; prp++) {
-			var property = properties[prp];
-			if (property.value.type == "FunctionExpression") {
-				
-				var _private = property.key.name.charAt(0) == "_";
-				var notes = "";
-				
-				var commentsBefore = property.key.commentsBefore ? property.key.commentsBefore.pop() : "";
-				var doc = this._parseDoc(commentsBefore);
-				var typeName = "any";
-				if (doc) {
-					typeName = "void";
-					if (doc.type && doc.type.length != 0) {
-						typeName = doc.type[0].type;
-					}
-					if (doc["private"])
-						_private = true;
-					notes = doc.comment;
-				}
-				if (_private)
-					continue;
-
-				info("method:$.$", [qualifiedName, property.key.name]);
-				
-				var method = _class.getMethods().filter("this.getName() == '" + property.key.name + "'").first();
-				if (!method) {
-					info("* method changed");
-					method = _class.createMethod(property.key.name);
-				}
-				
-				method.setNotes(notes);
-				if (_private)
-					method.setVisibility("Private");
-				
-				var multiplicityLower = 1;
-				var multiplicityUpper = 1;
-				if (typeName.indexOf("<") != -1) {
-					typeName = typeName.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
-						multiplicityLower = 0;
-						multiplicityUpper = "*";
-						return elementType;
-					});
-				}
-				
-				var type = this._findType(root, typeName).element || Ea._Base.PrimitiveType.getPrimitiveType(typeName);
-				method.setType(type);
-
-				if (_static) {
-					method.setStatic(true);
-				}
-				method.update();
-				
-				this._insertParams(root, qualifiedName, ast, property, method, doc);
-			}
-			else if (property.value.type == "CallExpression" && 
+		
+		var accessors = {};
+		
+		for (var propertyIndex = 0; propertyIndex < properties.length; propertyIndex++) {
+			var property = properties[propertyIndex];
+			
+			if (property.value.type == "CallExpression" && 
 					property.value.callee.type == "Identifier" && property.value.callee.name == "property") {
-
-				var propertyName = property.key.name.substr(1);
-				var _private = false;
 
 				var commentsBefore = property.key.commentsBefore ? property.key.commentsBefore.pop() : "";
 				var doc = this._parseDoc(commentsBefore) || {};
 
-				if (doc["private"])
-					_private = true;
+				var p = {
+					_static: _static,
+					name: property.key.name.replace(/^_+/g, ""),
+					multiplicityLower: 1,
+					multiplicityUpper: 1,
+					collection: false,
+					_private: doc["private"] ? true : false,
+					derived: doc["derived"] ? true : false,
+					readOnly: doc["readOnly"] ? true: false
+				};
 				
-				if (_private)
+				if (p._private)
 					continue;
 				
-				info("property:$.$", [qualifiedName, propertyName]);
+				info("property:$.$", [qualifiedName, p.name]);
 				
-				var multiplicityLower = 1;
-				var multiplicityUpper = 1;
 				var typeName = "String";
 
 				if (doc.type && doc.type.length != 0) {
 					typeName = doc.type[0].type;
 					if (typeName.indexOf("<") != -1) {
 						typeName = typeName.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
-							multiplicityLower = 0;
-							multiplicityUpper = "*";
+							p.collection = true;
+							p.multiplicityLower = 0;
+							p.multiplicityUpper = "*";
 							return elementType;
 						});
 					}
 				}
+				var comments = (doc.comment || "").split(/\r\n/g);
+				var comment = "";
+				for (var c = 0; c < comments.length; c++) {
+					comment = comment + (c != 0 ? "\r\n" : "") + comments[c].replace(/^[\s*]*/, "").replace(/[\s]$/, "");
+				}
+				p.comment = comment;
 
 				var type = this._findType(root, typeName).element;
 				
 				if (type) {
-					
-					var association = _class.getConnectors().filter("this.instanceOf(Ea.Connector.Association) && this.getSupplierEnd().getRole() == '" + propertyName + "'").first();
-					if (!association) {
-						info("* association changed");
-						association = _class.createConnector("", Ea.Connector.Association);
-						association.setSupplier(type);
-						association.update();
-					}
-					var clientEnd = association.getClientEnd();
-					clientEnd.setNavigability("Non-Navigable");
-					clientEnd.setNavigable(false);
-					if (doc.aggregation)
-						clientEnd.setAggregation(doc.aggregation[0].comment);
-					clientEnd.update();
-					
-					var supplierEnd = association.getSupplierEnd();
-					supplierEnd.setNavigability("Navigable");
-					supplierEnd.setNavigable(true);
-					if (multiplicityLower != 1 || multiplicityUpper != 1)
-						supplierEnd.setMultiplicity(multiplicityLower + ".." + multiplicityUpper);
-					else
-						supplierEnd.setMultiplicity("");
-					supplierEnd.setRole(propertyName);
-					supplierEnd.setNotes(doc.comment || "");
-					if (doc["derived"])
-						supplierEnd.setDerived(true);
-					if (doc["qualifier"])
-						supplierEnd.setQualifier(doc["qualifier"][0].comment + ":" + doc["qualifier"][0].type);
-					if (_private)
-						supplierEnd.setVisibility("Private");
-
-					supplierEnd.update();
+					this._insertAssociation(root, qualifiedName, doc, _class, p, type);
 				}
 				else {
-					
 					type = Ea._Base.PrimitiveType.getPrimitiveType(typeName);
-					
-					var attribute = _class.getAttributes().filter("this.getName() == '" + propertyName + "'").first();
-					if (!attribute) {
-						info("* property changed");
-						attribute = _class.createAttribute(propertyName);
+					this._insertAttribute(root, qualifiedName, doc, _class, p, type);
+				}
+				
+				var accesorName = p.name.substring(0,1).toUpperCase() + p.name.substring(1);
+				var getterName = p.collection ? accesorName.replace(/y$/, "ie") + "s" : accesorName;
+				
+				var prefix = typeName == "Boolean" ? "is" : "get";
+				var getter = (p._private ? "_" : "") + prefix + getterName;
+				
+				var comment = doc.comment ? (doc.comment.substring(0,1).toLowerCase() + doc.comment.substring(1)).split(".")[0] : "";
+								
+				this._insertAccessor(_class, p, getter, (comment ? "Returns " + comment : ""), type, []);
+				accessors[getter] = true;
+				
+				if (!p.readOnly) {
+					if (p.collection) {
+						var adder = (p._private ? "_" : "") + "create" + accesorName;
+						this._insertAccessor(_class, p, adder, (comment ? "Creates new " + p.name + " and adds it to " + comment : ""), type, [{
+							name: "name",
+							type: Ea._Base.PrimitiveType.getPrimitiveType("String")
+						}, {
+							name: "type",
+							type: Ea._Base.PrimitiveType.getPrimitiveType("Class")
+						}]);
+						accessors[adder] = true;
+						var remover = (p._private ? "_" : "") + "delete" + accesorName;
+						this._insertAccessor(_class, p, remover, (comment ? "Deletes specified " + p.name + " and removes it from " + comment : ""), null, [{
+							name: p.name,
+							type: type
+						}]);
+						accessors[remover] = true;
 					}
-					if (_private)
-						attribute.setVisibility("Private");
-					attribute.setNotes(doc.comment || "");
-
-					//attribute._setPrimitiveType(type);
-					attribute.setType(type);
-					if (doc["derived"])
-						attribute.setDerived(true);
-					attribute.setStereotype("property");
-					
-					// TODO: manage changes to [1..1]
-					if (multiplicityLower != 1 || multiplicityUpper != 1) {
-						attribute.setLower(multiplicityLower);
-						attribute.setUpper(multiplicityUpper);
+					else {
+						
+						var setter = (p._private ? "_" : "") + "set" + accesorName;
+						this._insertAccessor(_class, p, setter, (comment ? "Sets " + comment : ""), null, [{
+							name: p.name,
+							type: type
+						}]);
+						accessors[setter] = true;
 					}
-					attribute.update();
 				}
 			}
+			
 		}
+
+		for (var propertyIndex = 0; propertyIndex < properties.length; propertyIndex++) {
+			
+			var property = properties[propertyIndex];
+			
+			if (property.value.type == "FunctionExpression") {
+
+				var propertyName = property.key.name;
+				if (!(propertyName in accessors))
+					this._insertMethod(root, qualifiedName, ast, _class, property, _static);
+			}
+			
+		}
+	},
+	
+	_insertAccessor: function(_class, p, name, comment, type, params) {
+		var method = _class.getMethods().filter("this.getName() == '" + name + "'").first();
+		if (!method) {
+			info("* accessor changed: $", [name]);
+			method = _class.createMethod(name);
+		}
+		if (p._private)
+			method.setVisibility("Private");
+		
+		method.setType(type);
+		method.setStereotype("accessor");
+		method.setNotes(comment);
+		method.update();
+
+		for (var prm = 0; prm < params.length; prm++) {
+
+			var param = params[prm];
+			
+			var parameter = method.getParameters().filter("this.getName() == '" + param.name + "'").first();
+			if (!parameter) {
+				info("  * accessor param changed: $, $", [name, param.name]);
+				parameter = method.createParameter(param.name);
+			}
+			parameter.setType(param.type);
+			parameter.update();
+		}
+	},
+	
+	_insertAttribute: function(root, qualifiedName, doc, _class, p, type) {
+		
+		var attribute = _class.getAttributes().filter("this.getName() == '" + p.name + "'").first();
+		if (!attribute) {
+			info("* property changed");
+			attribute = _class.createAttribute(p.name);
+		}
+		if (p._private)
+			attribute.setVisibility("Private");
+		
+		attribute.setNotes(p.comment);
+
+		//attribute._setPrimitiveType(type);
+		attribute.setType(type);
+		if (p.derived)
+			attribute.setDerived(true);
+		attribute.setStereotype("property");
+		
+		if (p.readOnly) {
+			attribute.setReadOnly(true);
+		}
+		
+		if (p.collection) {
+			attribute.setLower(p.multiplicityLower);
+			attribute.setUpper(p.multiplicityUpper);
+		}
+		else {
+			attribute.setLower("");
+			attribute.setUpper("");
+		}
+		attribute.update();
+	},
+	
+	_insertAssociation: function(root, qualifiedName, doc, _class, p, type) {
+		
+		var association = _class.getConnectors().filter("this.instanceOf(Ea.Connector.Association) && this.getSupplierEnd().getRole() == '" + p.name + "'").first();
+		
+		if (!association) {
+			info("* association changed");
+			association = _class.createConnector("", Ea.Connector.Association);
+			association.setSupplier(type);
+			association.update();
+		}
+		
+		var clientEnd = association.getClientEnd();
+		clientEnd.setNavigability("Non-Navigable");
+		clientEnd.setNavigable(false);
+		if (doc.aggregation)
+			clientEnd.setAggregation(doc.aggregation[0].comment);
+		clientEnd.update();
+		
+		var supplierEnd = association.getSupplierEnd();
+		supplierEnd.setNavigability("Navigable");
+		supplierEnd.setNavigable(true);
+		
+		var multiplicity;
+		if (p.collection) {
+			if (p.multiplicityLower == "0" && p.multiplicityUpper == "*")
+				multiplicity = "*";
+			else
+				multiplicity = p.multiplicityLower + ".." + p.multiplicityUpper;
+		}
+		else {
+			multiplicity = "1";
+		}
+		supplierEnd.setMultiplicity(multiplicity);
+		
+		supplierEnd.setRole(p.name);
+		supplierEnd.setNotes(p.comment.replace(/\r\n/g, " "));
+		if (p.readOnly)
+			supplierEnd.setConstraint("readOnly");
+		if (p.derived)
+			supplierEnd.setDerived(true);
+		if (doc["qualifier"])
+			supplierEnd.setQualifier(doc["qualifier"][0].comment + ":" + doc["qualifier"][0].type);
+		if (p._private)
+			supplierEnd.setVisibility("Private");
+
+		supplierEnd.update();
+	},
+	
+	_insertMethod: function(root, qualifiedName, ast, _class, property, _static) {
+		var _private = property.key.name.charAt(0) == "_";
+		var notes = "";
+		
+		var commentsBefore = property.key.commentsBefore ? property.key.commentsBefore.pop() : "";
+		var doc = this._parseDoc(commentsBefore);
+		var typeName = null;
+		if (doc) {
+			if (doc.type && doc.type.length != 0) {
+				typeName = doc.type[0].type;
+			}
+			if (doc["private"])
+				_private = true;
+			notes = doc.comment;
+		}
+		else {
+			typeName = "any";
+		}
+		if (_private)
+			return;
+
+		var name = property.key.name;
+		info("method:$.$", [qualifiedName, name]);
+		
+		var method = _class.getMethods().filter("this.getName() == '" + name + "'").first();
+		if (!method) {
+			info("* method changed");
+			method = _class.createMethod(name);
+		}
+		
+		if (name == "create")
+			method.setStereotype("create");
+		
+		method.setNotes(notes);
+		if (_private)
+			method.setVisibility("Private");
+		
+		//var multiplicityLower = 1;
+		//var multiplicityUpper = 1;
+		
+		if (typeName) {
+			if (typeName.indexOf("<") != -1) {
+				typeName = typeName.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
+					//multiplicityLower = 0;
+					//multiplicityUpper = "*";
+					return elementType;
+				});
+			}
+			var type = this._findType(root, typeName).element || Ea._Base.PrimitiveType.getPrimitiveType(typeName);
+			method.setType(type);
+		}
+		else {
+			method.setType(null);
+		}
+
+		if (_static) {
+			method.setStatic(true);
+		}
+		method.update();
+		
+		this._insertParams(root, qualifiedName, ast, property, method, doc);
 	},
 	
 	_insertParams: function(root, qualifiedName, ast, property, method, doc) {
@@ -516,19 +654,16 @@ Documentation = {
 			}
 			
 			var typeName = param.type || "any";
-			var multiplicityLower = 1;
+			//var multiplicityLower = 1;
 			if (typeName.charAt(0) == "?") {
-				multiplicityLower = 0;
+				//multiplicityLower = 0;
 				typeName = typeName.substr(1);
 			}
-			if (typeName.indexOf("|") != -1) {
-				info("!!!!!!!!!!!!!!!! $", [typeName]);
-			}
-			var multiplicityUpper = 1;
+			//var multiplicityUpper = 1;
 			if (typeName.indexOf("<") != -1) {
 				typeName = typeName.replace(/^(.*)<(.*)>$/, function(whole, collectionType, elementType) {
-					multiplicityLower = 0;
-					multiplicityUpper = "*";
+					//multiplicityLower = 0;
+					//multiplicityUpper = "*";
 					return elementType;
 				});
 			}

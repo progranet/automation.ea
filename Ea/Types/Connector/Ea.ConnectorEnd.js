@@ -33,95 +33,135 @@ Ea.ConnectorEnd = {
 
 Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {
 	
-	/**
-	 * Returns aggregation kind
-	 * 
-	 * @type {Ea.ConnectorEnd.Aggregation}
-	 */
 	getAggregation: function() {
 		return Ea.ConnectorEnd.Aggregation[this._getAggregation()];
 	},
 	
-	/**
-	 * Sets aggregation kind
-	 * 
-	 * @param {Ea.ConnectorEnd.Aggregation}
-	 */
-	setAggregation: function(kind) {
+	setAggregation: function(aggregation) {
 		for (var i in Ea.ConnectorEnd.Aggregation) {
-			if (Ea.ConnectorEnd.Aggregation[i] == kind)
+			if (Ea.ConnectorEnd.Aggregation[i] == aggregation)
 				return this._setAggregation(i);
 		}
-		throw new Error("Unknown aggregation kind: " + kind + " for ConnectorEnd: " + this);
+		throw new Error("Unknown aggregation kind: " + aggregation + " for ConnectorEnd: " + this);
 	}
 	
 },
 {
+	/**
+	 * Connector end role name
+	 */
 	_role: property({api: "Role"}),
 	
+	/**
+	 * Connector end notes
+	 */
 	_notes: property({api: "RoleNote"}),
 	
+	/**
+	 * Connector end type
+	 */
 	_type: property({api: "RoleType"}),
 	
+	/**
+	 * Connector end stereotype
+	 */
 	_stereotype: property({api: "Stereotype"}),
 	
+	/**
+	 * Connector end alias
+	 */
 	_alias: property({api: "Alias"}),
 
 	/**
+	 * Connector end derived switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_derived: property({api: "Derived"}),
 
 	/**
+	 * Connector end derived union switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_derivedUnion: property({api: "DerivedUnion"}),
 
 	/**
+	 * Connector end allow duplicates switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_allowDuplicates: property({api: "AllowDuplicates"}),
 
 	/**
+	 * Connector end owned by classifier swich value
+	 * 
 	 * @type {Boolean}
 	 */
 	_ownedByClassifier: property({api: "OwnedByClassifier"}),
 
 	/**
-	 * @type {Number}
+	 * Connector end aggregation value
+	 * 
 	 * @private
+	 * @type {Number}
 	 */
 	__aggregation: property({api: "Aggregation"}),
 
 	/**
+	 * Connector end aggregation literal
+	 * 
 	 * @derived
 	 */
 	_aggregation: property(),
 
 	/**
-	 * @type {Number}
+	 * Connector end ordered switch value
+	 * 
+	 * @type {Boolean}
 	 */
-	_ordering: property({api: "Ordering"}),
+	_ordered: property({api: "Ordering"}),
 
+	/**
+	 * Connector end constraint
+	 */
 	_constraint: property({api: "Constraint"}),
 	
+	/**
+	 * Connector end qualifier
+	 */
 	_qualifier: property({api: "Qualifier"}),
 	
+	/**
+	 * Connector end multiplicity
+	 */
 	_multiplicity: property({api: "Cardinality"}),
 	
+	/**
+	 * Connector end visibility
+	 */
 	_visibility: property({api: "Visibility"}),
 	
+	/**
+	 * Connector end changeability
+	 */
 	_changeability: property({api: "IsChangeable"}),
 	
+	/**
+	 * Connector end navigability
+	 */
 	_navigability: property({api: "Navigable"}),
 	
 	/**
+	 * Connector end navigable switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_navigable: property({api: "IsNavigable"}),
 	
-
 	/**
+	 * Connector end tags collection
+	 * 
 	 * @type {Ea.Collection.Map<Ea.ConnectorEndTag._Base>}
 	 * @qualifier {String} name
 	 * @aggregation composite

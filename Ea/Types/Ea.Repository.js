@@ -18,6 +18,8 @@ include("DataAccess@DataAccess");
 include("DataAccess.Jet@DataAccess");
 include("DataAccess.Oracle@DataAccess");
 
+include("Ea.Stereotype@Ea.Types");
+
 /**
  * @namespace
  */
@@ -30,6 +32,14 @@ Ea.Repository = {
 	initialize: function() {
 		DataAccess.registerProviderClass("Jet", DataAccess.Jet.Provider);
 		DataAccess.registerProviderClass("Oracle", DataAccess.Oracle.Provider);
+	},
+	
+	eaPrimitiveTypes: {
+		EABOOL00: Ea._Base.PrimitiveType.getPrimitiveType("Boolean"),
+		EAINT000: Ea._Base.PrimitiveType.getPrimitiveType("Integer"),
+		EAREAL00: Ea._Base.PrimitiveType.getPrimitiveType("Real"),
+		EASTRING: Ea._Base.PrimitiveType.getPrimitiveType("String"),
+		EAUNAT00: Ea._Base.PrimitiveType.getPrimitiveType("UnlimitedNatural")
 	}
 };
 
@@ -108,7 +118,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	},
 	
 	/**
-	 * Returns collection of element's custom references
+	 * Returns collection of element custom references
 	 * 
 	 * @param {Ea.Element._Base} element
 	 * @type {Core.Types.Collection<Ea._Base.CustomReference>}
@@ -129,6 +139,72 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 		return collection;
 	},
 	
+	/**
+	 * Returns stereotypes applied to object
+	 * 
+	 * @param {Ea.Types.Any} object
+	 * @type {Core.Types.Collection<Ea._Base.AbstractStereotype>}
+	 */
+	getStereotypes: function(object) {
+		var list = null;
+		var rows = this._findByQuery("XRef", "clientGuid", object.getGuid());
+		for (var ri = 0; ri < rows.length; ri++) {
+			var row = rows[ri];
+			if (row.name == "Stereotypes") {
+				list = new Ea._Base.DataTypes.ObjectList(row.description).getList();
+				break;
+			}
+		}
+
+		var stereotypes = new Core.Types.Collection();
+		if (list) {
+			for (var s = 0; s < list.length; s++) {
+				var stereotype = list[s];
+				if (stereotype.GUID) {
+					stereotypes.add(this._source.application.getByGuid(Ea.Stereotype._Base, stereotype.GUID));
+				}
+				else {
+					stereotypes.add(new Ea._Base.Stereotype(stereotype));
+				}
+			}
+		}
+		return stereotypes;
+	},
+	
+	getProjectStereotypes: function() {
+		//this._source.api[Ea.Repository._Base.__projectStereotype.api].Refresh();
+		this._getProjectStereotypes().refresh();
+		Ea.Repository._Base.__projectStereotype.refresh(this);
+		return this._getProjectStereotypes();
+	},
+
+	createProjectStereotype: function(name, type) {
+		return this._createProjectStereotype(name, type);
+	},
+
+	deleteProjectStereotype: function(stereotype) {
+		return this._deleteProjectStereotype(stereotype);
+	},
+
+	/**
+	 * Returns object properties
+	 * 
+	 * @param {Ea.Types.Any} object
+	 * @type {Ea._Base.DataTypes.Properties}
+	 */
+	getProperties: function(object) {
+		var properties = null;
+		var rows = this._findByQuery("XRef", "clientGuid", object.getGuid());
+		for (var ri = 0; ri < rows.length; ri++) {
+			var row = rows[ri];
+			if (row.name == "CustomProperties") {
+				properties = new Ea._Base.DataTypes.Properties(row.description);
+				break;
+			}
+		}
+		return properties;
+	},
+
 	/**
 	 * Returns selected package
 	 * 
@@ -244,6 +320,33 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	},
 	
 	/**
+	 * Advises EA that connector has changed
+	 * 
+	 * @param {Ea.Connector._Base} connector
+	 */
+	adviseConnectorChange: function(connector) {
+		this._source.api.AdviseConnectorChange(connector.getId());
+	},
+	
+	/**
+	 * Advises EA that element has changed
+	 * 
+	 * @param {Ea.Element._Base} element
+	 */
+	adviseElementChange: function(element) {
+		this._source.api.AdviseElementChange(element.getId());
+	},
+	
+	/**
+	 * Reloads diagram
+	 * 
+	 * @param {Ea.Diagram._Base} diagram
+	 */
+	reloadDiagram: function(diagram) {
+		this._source.api.ReloadDiagram(diagram.getId());
+	},
+	
+	/**
 	 * Returns proxy object for specified type and guid
 	 * 
 	 * @deprecated Use Ea.Application.getByGuid() instead
@@ -256,7 +359,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	},
 	
 	/**
-	 * Returns specified scenario's context elements
+	 * Returns specified scenario context elements
 	 * 
 	 * @param {Ea.Scenario._Base} scenario
 	 * @type {Object}
@@ -299,39 +402,114 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 		var row = rows[0];
 		var appearance = new Ea._Base.DataTypes.Appearance(row);
 		return appearance;
+	},
+
+	/**
+	 * Returns classifier related to specified element. Type of classifier must be specified, too.
+	 * 
+	 * @param {Ea.Element._Base} element
+	 * @param {Class} type
+	 * @type {Ea.Types.Any}
+	 */
+	getElementRelatedClassifier: function(element, type) {
+		var rows = this._findByQuery("Element", "id", element.getId());
+		var guid = rows[0].classifierGuid;
+		if (!guid)
+			return null;
+		return this._source.application.getByGuid(type, guid);
+	},
+	
+	/**
+	 * Returns type of typed element.
+	 * 
+	 * @param {Ea.Element.TypedElement} element
+	 * @type {Core.Types.Object}
+	 */
+	getTypedElementType: function(element) {
+		var rows = this._findByQuery("Element", "id", element.getId());
+		var guid = rows[0].classifierGuid;
+		if (!guid)
+			return null;
+		var type = this._source.application.getByGuid(Ea.Element._Base, guid);
+		if (!type) {
+			var typeId = guid.substr(1, 8);
+			type = Ea.Repository.eaPrimitiveTypes[typeId];
+			if (!type)
+				warn("Type not recognized for predefined EA primitive type guid: $", [guid]);
+		}
+		return type;
 	}
 },
 {
+	/**
+	 * Project guid
+	 * 
+	 * @readOnly
+	 */
 	_projectGuid: property({api: "ProjectGUID"}),
 
 	/**
+	 * Project batch append switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_batchAppend: property({api: "BatchAppend"}),
 	
 	/**
+	 * Project enable cache switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_enableCache: property({api: "EnableCache"}),
 	
 	/**
+	 * Project enable UI updates switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_enableUIUpdates: property({api: "EnableUIUpdates"}),
 	
 	/**
+	 * Project flag update switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_flagUpdate: property({api: "FlagUpdate"}),
 	
 	/**
+	 * Project security enabled switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_securityEnabled: property({api: "IsSecurityEnabled"}),
 	
+	/**
+	 * Project path
+	 * 
+	 * @readOnly
+	 */
 	_path: property({api: "ConnectionString"}),
 	
 	/**
+	 * All stereotypes available in project
+	 * 
+	 * @private
+	 * @type {Ea.Collection._Base<Ea.Stereotype._Base>}
+	 */
+	__projectStereotype: property({api: "Stereotypes"}),
+	
+	/**
+	 * All stereotypes available in project
+	 * 
+	 * @derived
+	 * @type {Ea.Collection._Base<Ea.Stereotype._Base>}
+	 * @aggregation composite
+	 */
+	_projectStereotype: property(),
+	
+	/**
+	 * Collection containing all project models.
+	 * 
 	 * @type {Ea.Collection._Base<Ea.Package.Model>}
 	 * @aggregation composite
 	 */

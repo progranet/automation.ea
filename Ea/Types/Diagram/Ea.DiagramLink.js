@@ -47,38 +47,55 @@ Ea.DiagramLink._Base = extend(Ea.Diagram.View, {
 },
 {
 	/**
+	 * Connector view id
+	 * 
+	 * @readOnly
 	 * @type {Number}
 	 */
 	_id: property({api: "InstanceID"}),
 	
 	/**
+	 * Connector view connector
+	 * 
 	 * @type {Ea.Connector._Base}
 	 */
 	_connector: property({api: "ConnectorID", referenceBy: "id"}),
 	
 	/**
+	 * Connector view path in diagram
+	 * 
 	 * @private
 	 */
 	_path: property({api: "Path"}),
 	
 	/**
+	 * Connector view hidden switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_hidden: property({api: "IsHidden"}),
 	
 	/**
+	 * Connector view geometry
+	 * 
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_geometry: property({api: "Geometry"}),
 	
 	/**
+	 * Connector view style
+	 * 
+	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_style: property({api: "Style"}),
 
 	/**
-	 * @type {Ea._Base.DataTypes.Dimension}
+	 * Connector view dimension
+	 * 
 	 * @derived
+	 * @readOnly
+	 * @type {Ea._Base.DataTypes.Dimension}
 	 */
 	_dimension: property()
 });

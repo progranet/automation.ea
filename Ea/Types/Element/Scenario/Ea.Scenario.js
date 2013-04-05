@@ -32,13 +32,24 @@ Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 		return this._deriveType(source, this._type);
 	},
 
-	_type: property({api: "Type"}),
-	
-	_notes: property({api: "Notes"}),
-
+	/**
+	 * Scenario guid
+	 */
 	_guid: property({api: "ScenarioGUID"}),
 	
 	/**
+	 * Scenario type
+	 */
+	_type: property({api: "Type"}),
+	
+	/**
+	 * Scenario notes
+	 */
+	_notes: property({api: "Notes"}),
+
+	/**
+	 * Scenario steps collection
+	 * 
 	 * @type {Ea.Collection._Base<Ea.ScenarioStep._Base>}
 	 * @qualifier {String} pos
 	 * @aggregation composite
@@ -46,8 +57,11 @@ Ea.Scenario._Base = extend(Ea.Types.Namespace, {
 	_step: property({api: "Steps"}),
 	
 	/**
-	 * @type {Object}
+	 * Scenario context model
+	 * 
 	 * @derived
+	 * @readOnly
+	 * @type {Object}
 	 */
 	_context: property()
 });

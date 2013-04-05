@@ -56,7 +56,7 @@ DataAccess.Jet.Provider = extend(DataAccess._Provider, {
 					native: "ea_guid",
 					type: String
 				},
-				native: {
+				name: {
 					native: "Name",
 					type: String
 				},
@@ -184,7 +184,7 @@ DataAccess.Jet.Provider = extend(DataAccess._Provider, {
 					native: "XrefID",
 					type: String
 				},
-				native: {
+				name: {
 					native: "Name",
 					type: String
 				},
@@ -224,7 +224,7 @@ DataAccess.Jet.Provider = extend(DataAccess._Provider, {
 					native: "Object_ID",
 					type: Number
 				},
-				native: {
+				name: {
 					native: "Scenario",
 					type: String
 				},

@@ -50,52 +50,73 @@ Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 },
 {
 	/**
+	 * Element view id
+	 * 
+	 * @readOnly
 	 * @type {Number}
 	 */
 	_id: property({api: "InstanceID"}),
 	
 	/**
+	 * Element view element
+	 * 
 	 * @type {Ea.Element._Base}
 	 */
 	_element: property({api: "ElementID", referenceBy: "id"}),
 	
 	/**
-	 * @type {Number}
+	 * Element view left coordinate
+	 * 
 	 * @private
+	 * @type {Number}
 	 */
 	_left: property({api: "Left"}),
 	
 	/**
-	 * @type {Number}
+	 * Element view top coordinate
+	 * 
 	 * @private
+	 * @type {Number}
 	 */
 	_top: property({api: "Top"}),
 	
 	/**
-	 * @type {Number}
+	 * Element view right coordinate
+	 * 
 	 * @private
+	 * @type {Number}
 	 */
 	_right: property({api: "Right"}),
 	
 	/**
-	 * @type {Number}
+	 * Element view bottom coordinate
+	 * 
 	 * @private
+	 * @type {Number}
 	 */
 	_bottom: property({api: "Bottom"}),
 	
 	/**
+	 * Element view style
+	 * 
+	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	_style: property({api: "Style"}),
+	_style: property({api: "Style"}), // TODO: http://www.sparxsystems.com/uml_tool_guide/sdk_for_enterprise_architect/diagramobjects.htm
 	
 	/**
+	 * Element view sequence number
+	 * 
 	 * @type {Number}
 	 */
 	_sequence: property({api: "Sequence"}),
 	
 	/**
-	 * @type {Ea._Base.DataTypes.Dimension}
+	 * Element view dimension
+	 * 
 	 * @derived
+	 * @readOnly
+	 * @type {Ea._Base.DataTypes.Dimension}
 	 */
 	_dimension: property()
 });

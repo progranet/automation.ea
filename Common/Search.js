@@ -95,13 +95,20 @@ Search = {
 	processElement: function(element) {
 		Ea.log(element);
 		this.found.addAll(element.getElements().filter(this.params.filter));
-		if (this.params.drill) {
-			element.getElements().forEach(function(element) {
+		if (!element.instanceOf(Ea.Package._Base)) {
+			this.found.addAll(element.getEmbeddedElements().filter(this.params.filter));
+		}
+		
+		element.getElements().forEach(function(element) {
+			this.processElement(element);
+		});
+		if (element.instanceOf(Ea.Package._Base)) {
+			element.getPackages().forEach(function(element) {
 				this.processElement(element);
 			});
 		}
-		if (element.instanceOf(Ea.Package._Base)) {
-			element.getPackages().forEach(function(element) {
+		else {
+			element.getEmbeddedElements().forEach(function(element) {
 				this.processElement(element);
 			});
 		}

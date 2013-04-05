@@ -22,14 +22,16 @@ Ea.Swimlanes = {
 
 Ea.Swimlanes._Base = extend(Ea.Collection.Map, {
 	
-	_init: function() {
-		var application = this._source.application;
-		for (var e = 0; e < this._source.api.Count; e++) {
-			var element = application.get(this._elementType, this._source.api.Items(e));
-			this._add(element);
-		}
+	/**
+	 * Returns element at specified index
+	 * 
+	 * @private
+	 * @param {Number} index
+	 * @type {Ea.Types.Any}
+	 */
+	_getAt: function(index) {
+		return this._source.api.Items(index);
 	}
-
 },
 {
 	determineType: function(source) {

@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 300 D&C
+   Copyright 2013 300 D&C
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,41 +14,44 @@
    limitations under the License.
 */
 
-Ea.Transition = {
+Ea.Stereotype = {
 		meta: {
-			objectType: 44
+			guid: "StereotypeGUID",
+			objectType: 29
 		}
 };
 
-Ea.Transition._Base = extend(Ea.Types.Any, {},
+Ea.Stereotype._Base = extend([Ea.Types.Named, Ea._Base.AbstractStereotype], {},
 {
 	/**
-	 * Transition notes
+	 * Stereotype guid
+	 */
+	_guid: property({api: "StereotypeGUID"}),
+	
+	/**
+	 * Stereotype notes
 	 */
 	_notes: property({api: "Notes"}),
 	
 	/**
-	 * Transition state
+	 * Name of type to witch stereotype applies to 
 	 */
-	_state: property({api: "TxState"}),
+	_appliesTo: property({api: "AppliesTo"}),
 	
 	/**
-	 * Transition time
+	 * Stereotype metafile path
 	 */
-	_time: property({api: "TxTime"}),
+	_metafilePath: property({api: "MetafileLoadPath"}),
 	
 	/**
-	 * Transition duration constraint
+	 * Stereotype style
 	 */
-	_durationConstraint: property({api: "DurationConstraint"}),
+	_style: property({api: "Style"}),
 	
 	/**
-	 * Transition time constraint
+	 * Stereotype visual style specification
+	 * 
+	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	_timeConstraint: property({api: "TimeConstraint"}),
-	
-	/**
-	 * Transition event
-	 */
-	_event: property({api: "Event"})
+	_visualType: property({api: "VisualType"})
 });

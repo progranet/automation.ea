@@ -24,7 +24,7 @@ DataAccess = {
 		
 	getProvider: function(name) {
 		var provider = this._providers[name];
-		if (!provider && this._providerClasses[name])
+		if (!provider && (name in this._providerClasses))
 			provider = this._providers[name] = new this._providerClasses[name](name);
 		if (provider)
 			return provider;

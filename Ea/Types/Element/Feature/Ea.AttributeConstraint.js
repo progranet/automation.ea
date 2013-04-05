@@ -23,8 +23,10 @@ Ea.AttributeConstraint = {
 Ea.AttributeConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
 {
 	/**
-	 * @type {Ea.Attribute._Base}
+	 * Attribute constraint parent attribute
+	 * 
 	 * @private
+	 * @type {Ea.Attribute._Base}
 	 */
 	__parent: property({api: "AttributeID", referenceBy: "id"})
 });

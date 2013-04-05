@@ -23,8 +23,10 @@ Ea.MethodConstraint = {
 Ea.MethodConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
 {
 	/**
-	 * @type {Ea.Method._Base}
+	 * Method constraint parent method
+	 * 
 	 * @private
+	 * @type {Ea.Method._Base}
 	 */
 	__parent: property({api: "MethodID", referenceBy: "id"})
 });

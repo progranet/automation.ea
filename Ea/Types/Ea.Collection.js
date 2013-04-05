@@ -20,7 +20,7 @@ Ea.Collection = {
 		}
 };
 
-Ea.Collection._Base = extend(Ea.Types.Any, {
+Ea.Collection._Base = extend([Ea.Types.Any, Core.Types.AbstractCollection], {
 	
 	_elementType: null,
 	_index: null,
@@ -30,7 +30,7 @@ Ea.Collection._Base = extend(Ea.Types.Any, {
 	/**
 	 * Constructs Ea.Collection._Base
 	 * 
-	 * @param {Object} params params.elementType specify class of elements in this collecion
+	 * @param {Object} params params.elementType specify class of elements in this collection
 	 */
 	create: function(params) {
 		_super.create();
@@ -41,26 +41,10 @@ Ea.Collection._Base = extend(Ea.Types.Any, {
 
 	_init: function() {
 		var application = this._source.application;
-		for (var e = 0; e < this._source.api.Count; e++) {
-			var element = application.get(this._elementType, this._source.api.GetAt(e));
+		for (var e = 0; e < this.getSize(); e++) {
+			var element = application.get(this._elementType, this._getAt(e));
 			this._add(element);
 		}
-	},
-	
-	add: function(element) {
-		throw new Error("Collection is not modifiable");
-	},
-	
-	remove: function(element) {
-		throw new Error("Collection is not modifiable");
-	},
-	
-	addAll: function(collection) {
-		throw new Error("Collection is not modifiable");
-	},
-	
-	removeAll: function(collection) {
-		throw new Error("Collection is not modifiable");
 	},
 	
 	_add: function(element) {
@@ -76,7 +60,7 @@ Ea.Collection._Base = extend(Ea.Types.Any, {
 	
 	_create: function(name, type) {
 		type = type || this._elementType;
-		var elementTypeName =  type.determineEaType(); //type.elementType || type.namespace.name;
+		var elementTypeName =  type.determineEaType();
 		var api = this._source.api.AddNew(name, elementTypeName);
 		var element = this._source.application.createProxy(type, api);
 		return element;
@@ -94,17 +78,13 @@ Ea.Collection._Base = extend(Ea.Types.Any, {
 		this._source.api.Refresh();
 	},
 	
-	_isCollection: function(collection) {
-		return (collection && Core.Lang.isClass(collection._class) && collection._class.getCollectionType());
-	},
-	
 	/**
 	 * Adds all elements of this collection to specified collection
 	 * 
 	 * @param {Core.Types.Collection} collection
 	 */
 	addAllTo: function(collection) {
-		if (!this._isCollection(collection))
+		if (!Core.Types.AbstractCollection.isInstance(collection))
 			throw new Error("No collection specified or unknown collection type: " + collection);
 		for (var i = 0; i < this._size; i++) {
 			collection.add(this._table[i]);
@@ -117,7 +97,7 @@ Ea.Collection._Base = extend(Ea.Types.Any, {
 	 * @param {Core.Types.Collection} collection
 	 */
 	removeAllFrom: function(collection) {
-		if (!this._isCollection(collection))
+		if (!Core.Types.AbstractCollection.isInstance(collection))
 			throw new Error("No collection specified or unknown collection type: " + collection);
 		for (var i = 0; i < this._size; i++) {
 			collection.remove(this._table[i]);
@@ -137,7 +117,7 @@ Ea.Collection._Base = extend(Ea.Types.Any, {
 	},
 	
 	/**
-	 * Returns collection's size.
+	 * Returns collection size.
 	 * 
 	 * @type {Number}
 	 */
@@ -189,6 +169,26 @@ Ea.Collection._Base = extend(Ea.Types.Any, {
 				filtered.add(element);
 		}
 		return filtered;
+	},
+	
+	/**
+	 * Returns size of collection
+	 * 
+	 * @type {Number}
+	 */
+	getSize: function() {
+		return this._source.api.Count;
+	},
+	
+	/**
+	 * Returns element at specified index
+	 * 
+	 * @private
+	 * @param {Number} index
+	 * @type {Ea.Types.Any}
+	 */
+	_getAt: function(index) {
+		return this._source.api.GetAt(index);
 	}
 },
 {
@@ -211,12 +211,10 @@ Ea.Collection._Base = extend(Ea.Types.Any, {
 	 */
 	processValue: function(value, params) {
 		return value.filter(params[0]);
-	},
-	
-	_collectionType: "collection"
+	}
 });
 
-Ea.Collection.Map = extend(Ea.Collection._Base, {
+Ea.Collection.Map = extend([Ea.Collection._Base, Core.Types.AbstractMap], {
 	
 	_keyDef: null,
 	_keyFn: null,
@@ -225,7 +223,7 @@ Ea.Collection.Map = extend(Ea.Collection._Base, {
 	/**
 	 * Constructs Ea.Collection.Map
 	 * 
-	 * @param {Object} params params.elementType specify class of elements in this collecion
+	 * @param {Object} params params.elementType specify class of elements in this collection
 	 */
 	create: function(params) {
 		_super.create(params);
@@ -240,7 +238,7 @@ Ea.Collection.Map = extend(Ea.Collection._Base, {
 		if (!key) {
 			throw new Error("Key not found for: " + element + ", according to key definition: " + this._keyDef);
 		}
-		if (this._map[key]) {
+		if (key in this._map) {
 			debug("Key already exisis in map: " + key);
 		}
 		this._map[key] = element;
@@ -291,7 +289,5 @@ Ea.Collection.Map = extend(Ea.Collection._Base, {
 	 */
 	determineType: function(source) {
 		return Ea.Collection.Map;
-	},
-	
-	_collectionType: "map"
+	}
 });

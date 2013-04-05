@@ -42,10 +42,19 @@ Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 	 * @param {Class} type
 	 */
 	setType: function(type) {
-		if (type.instanceOf(Ea.Types.Any)) {
+		if (type && type.instanceOf(Ea.Types.Any)) {
 			this._setClassifier(type);
 		}
-		this._setPrimitiveType(type.getName());
+		this._setPrimitiveType(type ? type.getName() : "");
+	},
+	
+	/**
+	 * Returns element stereotypes
+	 * 
+	 * @type {Core.Types.Collection<Ea._Base.AbstractStereotype>}
+	 */
+	getStereotypes: function() {
+		return this._source.application.getRepository().getStereotypes(this);
 	},
 	
 	_toString: function() {
@@ -54,8 +63,31 @@ Ea.TypedElement._Base = extend(Ea.Types.Namespace, {
 },
 {
 	/**
-	 * @type {Core.Types.Object}
+	 * Typed element stereotype
+	 */
+	_stereotype: property({api: "Stereotype"}),
+	
+	/**
+	 * Typed element stereotype names list
+	 * 
+	 * @type {Ea._Base.DataTypes.List}
+	 */
+	_stereotypesList: property({api: "StereotypeEx"}),
+
+	/**
+	 * Typed element stereotypes collection
+	 * 
 	 * @derived
+	 * @readOnly
+	 * @type {Core.Types.Collection<Ea._Base.AbstractStereotype>}
+	 */
+	__stereotype: property(),
+
+	/**
+	 * Typed element type
+	 * 
+	 * @derived
+	 * @type {Core.Types.Object}
 	 */
 	_type: property()
 });
@@ -69,24 +101,32 @@ Ea.TypedElement.Feature = extend(Ea.TypedElement._Base, {
 	 */
 	getParent: function() {
 		return this._getParent();
-	}
+	}	
 },
 {
+	/**
+	 * Feature alias
+	 */
 	_alias: property({api: "Style"}), // Not mistake, see http://www.sparxsystems.com/uml_tool_guide/sdk_for_enterprise_architect/attribute.htm
 	
-	_notes: property({api: "Notes"}),
-	
-	_stereotype: property({api: "Stereotype"}),
-	
 	/**
-	 * @type {Ea.Types.Namespace}
+	 * Feature notes
+	 */
+	_notes: property({api: "Notes"}),
+
+	/**
+	 * Feature parent
+	 * 
 	 * @derived
+	 * @readOnly
+	 * @type {Ea.Types.Namespace}
 	 */
 	_parent: property(),
 
 	/**
-	 * @type {Ea.Element.Type}
 	 * @private
+	 * @readOnly
+	 * @type {Ea.Element.Type}
 	 */
 	__parent: property({api: "ParentID", referenceBy: "id"})
 });

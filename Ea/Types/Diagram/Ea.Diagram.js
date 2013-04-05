@@ -27,6 +27,7 @@ Ea.Diagram = {
 		RIGHT: 35,
 		BOTTOM: 25
 	},
+	
 	MarginLanes: {
 		LEFT: 20,
 		TOP: 30,
@@ -39,6 +40,20 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 
 	getParent: function() {
 		return this._getParent() || this._getPackage();
+	},
+	
+	setParent: function(parent) {
+		if (parent.instanceOf(Ea.Package._Base)) {
+			this._setPackage(parent);
+			this._setParent(null);
+		}
+		else if (parent.instanceOf(Ea.Element._Base)) {
+			this._setPackage(parent._getPackage());
+			this._setParent(parent);
+		}
+		else {
+			throw new Error("Illegal parent type for Diagram: " + parent);
+		}
 	},
 	
 	save: function(path, reuse) {
@@ -71,8 +86,8 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 		views.addAll(this.getConnectorViews());
 
 		views.forEach(function(view) {
-			var viewDimension = view.getDimension();
-			if (viewDimension) {
+			if (view.getDimension()) {
+				var viewDimension = view.getDimension().valueOf();
 				dimension.left = dimension.left !== undefined ? Math.min(dimension.left, viewDimension.left) : viewDimension.left;
 				dimension.top = dimension.top !== undefined ? Math.min(dimension.top, viewDimension.top) : viewDimension.top;
 				dimension.right = Math.max(dimension.right, viewDimension.right);
@@ -128,6 +143,23 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	getConnectorViews: function(filter) {
 		var connectorViews = this._getConnectorViews().filter("this.getId() != 0");
 		return connectorViews.filter(filter);
+	},
+	
+	createConnectorView: function(name, type) {
+		return this._createConnectorView(name, type);
+	},
+	
+	deleteConnectorView: function(connectorView) {
+		return this._deleteConnectorView(connectorView);
+	},
+	
+	reload: function() {
+		this._source.application.getRepository().reloadDiagram(this);
+	},
+	
+	update: function() {
+		_super.update();
+		this.reload();
 	}
 },
 {
@@ -136,140 +168,215 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	},
 	
 	/**
+	 * Diagram id
+	 * 
+	 * @readOnly
 	 * @type {Number}
 	 */
 	_id: property({api: "DiagramID"}),
 	
+	/**
+	 * Diagram guid
+	 * 
+	 * @readOnly
+	 */
 	_guid: property({api: "DiagramGUID"}),
 	
+	/**
+	 * Diagram type
+	 * 
+	 * @readOnly
+	 */
 	_type: property({api: "Type"}),
 	
 	/**
+	 * Diagram meta type
+	 * 
 	 * @private
+	 * @readOnly
 	 */
 	_metaType: property({api: "MetaType"}),
 	
+	/**
+	 * Diagram notes
+	 */
 	_notes: property({api: "Notes"}),
 	
+	/**
+	 * Diagram stereotype
+	 */
 	_stereotype: property({api: "Stereotype"}),
 	
 	/**
+	 * Diagram style
+	 * 
+	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_style: property({api: "ExtendedStyle"}),
 	
 	/**
+	 * Diagram extended style
+	 * 
+	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_styleEx: property({api: "StyleEx"}),
 	
 	/**
+	 * Diagram element views collection
+	 * 
 	 * @type {Ea.Collection._Base<Ea.DiagramObject._Base>}
 	 * @aggregation composite
 	 */
 	_elementView: property({api: "DiagramObjects"}),
 	
 	/**
-	 * @type {Ea.Collection._Base<Ea.DiagramLink._Base>}
+	 * Diagram connector views collection
+	 * 
 	 * @private
+	 * @type {Ea.Collection._Base<Ea.DiagramLink._Base>}
 	 */
 	__connectorView: property({api: "DiagramLinks"}),
 	
 	/**
+	 * Diagram connector views collection
+	 * 
+	 * @derived
 	 * @type {Core.Types.Collection<Ea.DiagramLink._Base>}
 	 * @aggregation composite
-	 * @derived
 	 */
 	_connectorView: property(),
 		// collection filtered because of EA returns virtual connector views for Ea.Connector.Sequence with [id = 0]
 	
 	/**
-	 * @type {Ea.Types.Namespace}
+	 * Diagram parent
+	 * 
 	 * @derived
+	 * @type {Ea.Types.Namespace}
 	 */
 	_parent: property(),
 
 	/**
-	 * @type {Ea.Element._Base}
+	 * Diagram parent element
+	 * 
 	 * @private
+	 * @type {Ea.Element._Base}
 	 */
 	__parent: property({api: "ParentID", referenceBy: "id"}),
 	
 	/**
-	 * @type {Ea.Package._Base}
+	 * Diagram package
+	 * 
 	 * @private
+	 * @type {Ea.Package._Base}
 	 */
 	_package: property({api: "PackageID", referenceBy: "id"}),
 	
 	/**
+	 * Diagram swimlanes definition
+	 * 
 	 * @type {Ea.SwimlaneDef._Base}
 	 * @aggregation composite
 	 */
 	_swimlaneDef: property({api: "SwimlaneDef"}),
 	
 	/**
-	 * @type {Core.Types.Collection<Ea.Swimlane._Base>}
+	 * Diagram swimlanes
+	 * 
 	 * @derived
+	 * @readOnly
+	 * @type {Core.Types.Collection<Ea.Swimlane._Base>}
 	 */
 	_swimlane: property(),
 
 	/**
+	 * Diagram highlight imports switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_highlightImports: property({api: "HighlightImports"}),
 	
 	/**
+	 * Diagram show details switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_showDetails: property({api: "ShowDetails"}),
 	
 	/**
+	 * Diagram  show package contents switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_showPackageContents: property({api: "ShowPackageContents"}),
 	
 	/**
+	 * Diagram show private switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_showPrivate: property({api: "ShowPrivate"}),
 	
 	/**
+	 * Diagram show protected switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_showProtected: property({api: "ShowProtected"}),
 	
 	/**
+	 * Diagram show public switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_showPublic: property({api: "ShowPublic"}),
 
 	/**
+	 * Diagram selected connector
+	 * 
 	 * @type {Ea.Connector._Base}
 	 */
 	_selectedConnector: property({api: "SelectedConnector"}),
 	
 	/**
+	 * Diagram selected elements collection
+	 * 
+	 * @readOnly
 	 * @type {Ea.Collection._Base<Ea.Element._Base>}
 	 */
-	_selectedElement: property({api: "SelectedObjects"}),
+	_selectedElement: property({api: "SelectedObjects"}), // TODO: add/remove elements to collection (not the same as create/delete in this case)
 	
+	/**
+	 * Diagram author
+	 */
 	_author: property({api: "Author"}),
 	
+	/**
+	 * Diagram version
+	 */
 	_version: property({api: "Version"}),
 	
 	/**
+	 * Diagram creation date
+	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_created: property({api: "CreatedDate"}),
 	
 	/**
+	 * Diagram modification date
+	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_modified: property({api: "ModifiedDate"}),
 	
 	/**
-	 * @type {Object}
+	 * Diagram dimension
+	 * 
 	 * @derived
+	 * @readOnly
+	 * @type {Object}
 	 */
 	_dimension: property()
 });
@@ -283,24 +390,14 @@ Ea.Diagram.View = extend(Ea.Types.Any, {
 	left: null,
 	top: null,
 	right: null,
-	bottom: null,
-
-	getParent: function() {
-		return this._getParent();
-	}
-},
+	bottom: null},
 {
 	/**
-	 * @type {Ea.Types.Namespace}
-	 * @derived
-	 */
-	_parent: property(),
-
-	/**
+	 * View parent diagram
+	 * 
 	 * @type {Ea.Diagram._Base}
-	 * @private
 	 */
-	__parent: property({api: "DiagramID", referenceBy: "id"})
+	_parent: property({api: "DiagramID", referenceBy: "id"})
 });
 
 include("Ea.DiagramLink@Ea.Types.Diagram");

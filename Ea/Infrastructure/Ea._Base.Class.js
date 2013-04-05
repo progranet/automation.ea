@@ -20,7 +20,6 @@ Ea._Base.Class = {
 	
 	/**
 	 * @param {Class} _class
-	 * @memberOf Ea._Base.Class
 	 */
 	registerClass: function(_class) {
 		
@@ -42,8 +41,7 @@ Ea._Base.Class = {
 	registerAttribute: function(attribute) {
 		var _class = attribute.owner;
 		this.registerClass(_class);
-		var _classReflection = Ea._Base.Class._types[_class];
-		_classReflection.attributes.push(attribute);
+		this._types[_class].attributes.push(attribute);
 	},
 	
 	/**
@@ -64,8 +62,11 @@ Ea._Base.Class = {
 	 */
 	getAttributes: function(_class) {
 		var attributes = [];
-		if (_class._super.conformsTo(Ea.Types.Any)) {
-			attributes = attributes.concat(this.getAttributes(_class._super));
+		for (var s = 0; s < _class._super.length; s++) {
+			var _super = _class._super[s];
+			if (_super.conformsTo(Ea.Types.Any)) {
+				attributes = attributes.concat(this.getAttributes(_super));
+			}
 		}
 		attributes = attributes.concat(this.getOwnedAttributes(_class));
 		return attributes;
@@ -93,7 +94,22 @@ Ea._Base.Class = {
 		if (params.derived)
 			return new Ea._Base.Class.DerivedAttribute(params);
 		return new Ea._Base.Class.ApiAttribute(params);
-	}
+	},
+	
+	/**
+	 * Evaluates type name to type
+	 * 
+	 * @param {String} type
+	 * @type {Object}
+	 */
+	typeEval: function(type) {
+		var _type = type;
+		if (typeof type == "string")
+			type = eval(type);
+		if (!type)
+			throw new Error("Undefined type" + (_type ? " [" + _type + "]" : ""));
+		return type;
+	}	
 	
 };
 
@@ -125,15 +141,17 @@ Ea._Base.Class._Attribute = define({
 		var getter = (this.private ? "_" : "") + prefix + getterName;
 		this._createAccessor("get", getter, properties);
 		
-		if (collection) {
-			var adder = (this.private ? "_" : "") + "create" + accesorName;
-			this._createAccessor("add", adder, properties);
-			var remover = (this.private ? "_" : "") + "delete" + accesorName;
-			this._createAccessor("remove", remover, properties);
-		}
-		else {
-			var setter = (this.private ? "_" : "") + "set" + accesorName;
-			this._createAccessor("set", setter, properties);
+		if (!this.readOnly) {
+			if (collection) {
+				var adder = (this.private ? "_" : "") + "create" + accesorName;
+				this._createAccessor("add", adder, properties);
+				var remover = (this.private ? "_" : "") + "delete" + accesorName;
+				this._createAccessor("remove", remover, properties);
+			}
+			else {
+				var setter = (this.private ? "_" : "") + "set" + accesorName;
+				this._createAccessor("set", setter, properties);
+			}
 		}
 		
 		Ea._Base.Class.registerAttribute(this);
@@ -145,8 +163,8 @@ Ea._Base.Class._Attribute = define({
 		if (this._prepared)
 			throw new Error("Property " + this.qualifiedName + " already prepared");
 		
-		this.type = Ea._Base.Helper.typeEval(this.type || String);
-		this.elementType = Ea._Base.Helper.isCollectionType(this.type) ? Ea._Base.Helper.typeEval(this.elementType) : null;
+		this.type = Ea._Base.Class.typeEval(this.type || String);
+		this.elementType = Core.Types.AbstractCollection.isAssignableFrom(this.type) ? Ea._Base.Class.typeEval(this.elementType) : null;
 		this._prepared = true;
 	},
 	
@@ -177,17 +195,31 @@ Ea._Base.Class._Attribute = define({
 	}
 });
 
-Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._Base.Class.ApiAttribute# */{
+Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, {
 	
 	_getBy: null,
-	_isEaType: null,
+	
+	_isClass: null,
+	_isEaType: false,
+	_isDataType: false,
+	_isProcessed: false,
 	
 	prepare: function() {
 		_super.prepare();
 		
-		this._isEaType = this.type.isClass && this.type.conformsTo(Ea.Types.Any);
-		if (this._isEaType) {
-			this._getBy = this.referenceBy ? ("getBy" + this.referenceBy.substr(0, 1).toUpperCase() + this.referenceBy.substr(1).toLowerCase()) : "get";
+		this._isClass = this.type.isClass;
+		if (this._isClass) {
+			if (this.type.conformsTo(Ea.Types.Any)) {
+				this._isEaType = true;
+				this._getBy = this.referenceBy ? ("getBy" + this.referenceBy.substr(0, 1).toUpperCase() + this.referenceBy.substr(1).toLowerCase()) : "get";
+				this._isProcessed = "processValue" in this.type;
+			}
+			else if (this.type.conformsTo(Ea._Base.DataTypes.DataType)) {
+				this._isDataType = true;
+			}
+			else {
+				throw new Error("Illegal type " + this.type + " for " + this.qualifiedName);
+			}
 		}
 	},
 	
@@ -203,9 +235,8 @@ Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._B
 		if (!(this.name in source.value))
 			this._init(source);
 		var value = source.value[this.name];
-		if (this.type.isClass && "processValue" in this.type) {
+		if (this._isProcessed)
 			value = this.type.processValue(value, params || []);
-		}
 		return value;
 	},
 	
@@ -215,8 +246,8 @@ Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._B
 		if (this._isEaType) {
 			value = apiValue ? source.application[this._getBy](this.type, apiValue, this) : null;
 		}
-		else if (this.type.isClass) {
-			value = this.type.create(apiValue, this);
+		else if (this._isClass) {
+			value = new this.type(apiValue, this);
 		}
 		else {
 			value = new this.type(apiValue).valueOf();
@@ -274,11 +305,13 @@ Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._B
 			}
 			return;
 		}
-		if (this.type.isClass) {
-			// TODO: better solution based on data types
-			source.api[this.api] = value;
+		if (this._isDataType) {
+			if (!value)
+				throw new Error("Value of DataType: " + this.type + " cannot be null");
+			source.api[this.api] = value.valueOf();
 			return;
 		}
+		
 		if (this.index == null) {
 			source.api[this.api] = value;
 			return;
@@ -319,7 +352,7 @@ Ea._Base.Class.ApiAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._B
 	}
 });
 
-Ea._Base.Class.DerivedAttribute = extend(Ea._Base.Class._Attribute, /** @lends Ea._Base.Class.DerivedAttribute# */{
+Ea._Base.Class.DerivedAttribute = extend(Ea._Base.Class._Attribute, {
 	
 	_accesors: null,
 	
@@ -331,8 +364,8 @@ Ea._Base.Class.DerivedAttribute = extend(Ea._Base.Class._Attribute, /** @lends E
 	_createAccessor: function(kind, name, properties) {
 		var accessor = properties[name];
 		if (!accessor) {
-			if (kind == "get")
-				throw new Error("Getter not defined for derived property: " + this.owner.qualifiedName + "." + name);
+			//if (kind == "get")
+				throw new Error("Accessor not defined for derived property: " + this.owner.qualifiedName + "." + name);
 			return;
 		}
 		

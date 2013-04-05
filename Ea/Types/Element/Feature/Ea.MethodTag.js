@@ -25,8 +25,10 @@ Ea.MethodTag = {
 Ea.MethodTag._Base = extend(Ea.Tag._Feature, {},
 {
 	/**
-	 * @type {Ea.Method._Base}
+	 * Method tag parent method
+	 * 
 	 * @private
+	 * @type {Ea.Method._Base}
 	 */
 	__parent: property({api: "MethodID", referenceBy: "id"})
 });

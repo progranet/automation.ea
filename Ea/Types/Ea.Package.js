@@ -27,49 +27,39 @@ Ea.Package = {
 
 Ea.Package._Base = extend(Ea.Types.Namespace, {
 	
-	/**
-	 * Returns all elements in this package
-	 * 
-	 * @param {Core.Types.Filter} filter Optional output collection filter
-	 * @type {Core.Types.Collection}
-	 */
 	getElements: function(filter) {
 		var elements = this._getElements().filter("this._getParent() == null");
 		return elements.filter(filter);
 	},
 	
-	/**
-	 * Creates new element in this package
-	 * 
-	 * @param {String} name
-	 * @param {Class} type
-	 * @type {Ea.Types.Any}
-	 */
 	createElement: function(name, type) {
-		var element = this._createElement(name, type);
-		return element;
+		return this._createElement(name, type);
 	},
 	
-	/**
-	 * Returns all diagrams in this package
-	 * 
-	 * @param {Core.Types.Filter} filter Optional output collection filter
-	 * @type {Core.Types.Collection}
-	 */
+	deleteElement: function(element) {
+		return this._deleteElement(element);
+	},
+	
 	getDiagrams: function(filter) {
 		var diagrams = this._getDiagrams().filter("this._getParent() == null");
 		return diagrams.filter(filter);
 	},
 	
-	/**
-	 * Returns parent of this package - nesting package
-	 * 
-	 * @type {Ea.Types.Namespace}
-	 */
+	createDiagram: function(name, type) {
+		return this._createDiagram(name, type);
+	},
+	
+	deleteDiagram: function(elemediagramnt) {
+		return this._deleteDiagram(element);
+	},
+	
 	getParent: function() {
 		return this._getParent();
-	}
+	},
 	
+	setParent: function(parent) {
+		return this._setParent(parent);
+	}
 },
 {
 	/**
@@ -87,87 +77,142 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	},
 	
 	/**
+	 * Package id
+	 * 
+	 * @readOnly
 	 * @type {Number}
 	 */
 	_id: property({api: "PackageID"}),
 
+	/**
+	 * Package guid
+	 * 
+	 * @readOnly
+	 */
 	_guid: property({api: "PackageGUID"}),
 
+	/**
+	 * Package alias
+	 * 
+	 * @readOnly
+	 */
 	_alias: property({api: "Alias"}),
 	
+	/**
+	 * Package notes
+	 */
 	_notes: property({api: "Notes"}),
 	
 	/**
+	 * Package flag properties
+	 * 
+	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_flags: property({api: "Flags"}),
 
 	/**
+	 * Package controlled switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_controlled: property({api: "IsControlled"}),
 	
 	/**
+	 * Package namespace switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_namespace: property({api: "IsNamespace"}),
 	
 	/**
+	 * Package protected switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_protected: property({api: "IsProtected"}),
 	
 	/**
+	 * Package version controlled switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_versionControlled: property({api: "IsVersionControlled"}),
 	
+	/**
+	 * Package owner
+	 */
 	_owner: property({api: "Owner"}),
 	
+	/**
+	 * XML path of package.
+	 * Property is used in version control configurations.
+	 */
 	_xmlPath: property({api: "XMLPath"}),
 
 	/**
-	 * @type {Boolean}
+	 * Package model switch value
+	 * 
 	 * @private
+	 * @readOnly
+	 * @type {Boolean}
 	 */
 	_model: property({api: "IsModel"}),
 	
+	/**
+	 * Package version
+	 */
 	_version: property({api: "Version"}),
 	
 	/**
+	 * Package creation date
+	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_created: property({api: "Created"}),
 	
 	/**
+	 * Package modification date
+	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_modified: property({api: "Modified"}),
 	
 	/**
+	 * Package position in tree model of project browser
+	 * 
 	 * @type {Number}
 	 */
 	_position: property({api: "TreePos"}),
 
 	/**
+	 * Element corresponding to package.
+	 * This element is not visible in EA but it's holding almost all package properties .
+	 * 
 	 * @type {Ea.Element._Base}
 	 * @aggregation composite
 	 */
 	___element: property({api: "Element"}),
 	
 	/**
-	 * @type {Ea.Package._Base}
+	 * Package parent package
+	 * 
 	 * @private
+	 * @type {Ea.Package._Base}
 	 */
 	__parent: property({api: "ParentID", referenceBy: "id"}),
 	
 	/**
-	 * @type {Ea.Package._Base}
+	 * Package parent
+	 * 
 	 * @derived
+	 * @type {Ea.Package._Base}
 	 */
 	_parent: property(),
 	
 	/**
+	 * Package all elements
+	 * 
 	 * @type {Ea.Collection._Base<Ea.Element._Base>}
 	 * @aggregation composite
 	 * @private
@@ -175,25 +220,35 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	__element: property({api: "Elements"}),
 	
 	/**
-	 * @type {Core.Types.Collection<Ea.Element._Base>}
+	 * Package elements.
+	 * Collection is filtered to only elements owned by package without elements owned by sub-elements of package.
+	 * 
 	 * @derived
+	 * @type {Core.Types.Collection<Ea.Element._Base>}
 	 */
 	_element: property(),
 
 	/**
+	 * Package all diagrams
+	 * 
+	 * @private
 	 * @type {Ea.Collection._Base<Ea.Diagram._Base>}
 	 * @aggregation composite
-	 * @private
 	 */
 	__diagram: property({api: "Diagrams"}),
 	
 	/**
-	 * @type {Core.Types.Collection<Ea.Diagram._Base>}
+	 * Package diagrams.
+	 * Collection is filtered to only diagrams owned by package without diagrams owned by sub-elements of package.
+	 * 
 	 * @derived
+	 * @type {Core.Types.Collection<Ea.Diagram._Base>}
 	 */
 	_diagram: property(),
 	
 	/**
+	 * Package sub-packages
+	 * 
 	 * @type {Ea.Collection._Base<Ea.Package._Base>}
 	 * @aggregation composite
 	 */

@@ -17,33 +17,9 @@
 /**
  * @namespace
  */
-Ea._Base.Helper = {
-		
-	params: {
-	
-	},
-	
-	/**
-	 * @memberOf Ea._Base.Helper
-	 * @param type
-	 * @type {Boolean}
-	 */
-	isCollectionType: function(type) {
-		return Core.Lang.isClass(type) && type.getCollectionType();
-	},
-	
-	typeEval: function(type) {
-		var _type = type;
-		if (typeof type == "string")
-			type = eval(type);
-		if (!type)
-			throw new Error("Undefined type" + (_type ? " [" + _type + "]" : ""));
-		return type;
-	}	
-	
-};
+Ea._Base.Utils = {};
 
-Ea._Base.Helper.Target = extend(Core.Target.AbstractTarget, /** @lends Ea._Base.Helper.Target# */ {
+Ea._Base.Utils.Target = extend(Core.Target.AbstractTarget, {
 	
 	_name: null,
 	_repository: null,
@@ -58,7 +34,7 @@ Ea._Base.Helper.Target = extend(Core.Target.AbstractTarget, /** @lends Ea._Base.
 	},
 	
 	/**
-	 * @memberOf Ea._Base.Helper.Target#
+	 * @memberOf Ea._Base.Utils.Target#
 	 */
 	write: function(message) {
 		if (this._type == Core.Target.Type.TREE)
@@ -67,7 +43,7 @@ Ea._Base.Helper.Target = extend(Core.Target.AbstractTarget, /** @lends Ea._Base.
 	}
 });
 
-Ea._Base.Helper.Log = define(/** @lends Ea._Base.Helper.Log# */{
+Ea._Base.Utils.Log = define({
 	
 	_path: null,
 	
@@ -76,7 +52,7 @@ Ea._Base.Helper.Log = define(/** @lends Ea._Base.Helper.Log# */{
 		this._path = [];
 		var parent = element.getParent();
 		if (parent) {
-			var parentPath = Ea._Base.Helper.Log.getLog(parent).getPath();
+			var parentPath = Ea._Base.Utils.Log.getLog(parent).getPath();
 			for (var p = 0; p < parentPath.length; p++) {
 				this._path.push(parentPath[p]);
 			}
@@ -85,7 +61,7 @@ Ea._Base.Helper.Log = define(/** @lends Ea._Base.Helper.Log# */{
 	},
 	
 	/**
-	 * @memberOf Ea._Base.Helper.Log#
+	 * @memberOf Ea._Base.Utils.Log#
 	 */
 	getPath: function() {
 		return this._path;
@@ -103,13 +79,13 @@ Ea._Base.Helper.Log = define(/** @lends Ea._Base.Helper.Log# */{
 
 		if (path.length > 0) {
 			for (var p = 0; p < path.length; p++) {
-				if (!Ea._Base.Helper.Log._current || p >= Ea._Base.Helper.Log._current.length || Ea._Base.Helper.Log._current[p] != path[p]) {
+				if (!Ea._Base.Utils.Log._current || p >= Ea._Base.Utils.Log._current.length || Ea._Base.Utils.Log._current[p] != path[p]) {
 					var element = path[p];
 					var string = (element.instanceOf(Ea.Package._Base) ? "+" : "") + " " + element;
 					_treeLogger(_tab(p, "|") + "-" + string);
 				}
 			}
-			Ea._Base.Helper.Log._current = path;
+			Ea._Base.Utils.Log._current = path;
 		}
 	}
 },
@@ -119,8 +95,8 @@ Ea._Base.Helper.Log = define(/** @lends Ea._Base.Helper.Log# */{
 	_logs: {},
 
 	getLog: function(element) {
-		if (!Ea._Base.Helper.Log._logs[element.getGuid()])
-			Ea._Base.Helper.Log._logs[element.getGuid()] = new Ea._Base.Helper.Log(element);
-		return Ea._Base.Helper.Log._logs[element.getGuid()];
+		if (!(element.getGuid() in Ea._Base.Utils.Log._logs))
+			Ea._Base.Utils.Log._logs[element.getGuid()] = new Ea._Base.Utils.Log(element);
+		return Ea._Base.Utils.Log._logs[element.getGuid()];
 	}
 });

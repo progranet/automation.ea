@@ -91,7 +91,14 @@ Core.Types.Object = define(/** @lends Core.Types.Object# */ {
 	 */
 	_toString: function() {
 		return " [" + this._class + "]";
-	}
+	},
+	
+	/**
+	 * @type {String}
+	 */
+	toString: function() {
+		return this._toString();
+	}	
 },
 {
 	/**
@@ -139,7 +146,11 @@ Core.Types.Named = define(/** @lends Core.Types.Named# */{
 	}
 });
 
-Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
+Core.Types.AbstractCollection = define({
+	
+});
+
+Core.Types.Collection = extend(Core.Types.AbstractCollection, {
 
 	_size: 0,
 	_table: null,
@@ -254,10 +265,6 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 		
 	},
 	
-	_isCollection: function(collection) {
-		return (collection && Core.Lang.isClass(collection._class) && collection._class.getCollectionType());
-	},
-	
 	/**
 	 * Adds all elements of specified collection to this collection
 	 * 
@@ -265,7 +272,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * @param {Core.Types.Collection} collection
 	 */
 	addAll: function(collection) {
-		if (!this._isCollection(collection))
+		if (!Core.Types.AbstractCollection.isInstance(collection))
 			throw new Error("No collection specified or unknown collection type: " + collection);
 		collection.addAllTo(this);
 	},
@@ -277,7 +284,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * @param {Core.Types.Collection} collection
 	 */
 	addAllTo: function(collection) {
-		if (!this._isCollection(collection))
+		if (!Core.Types.AbstractCollection.isInstance(collection))
 			throw new Error("No collection specified or unknown collection type: " + collection);
 		for (var i = 0; i < this._size; i++) {
 			collection.add(this._table[i]);
@@ -291,7 +298,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * @param {Core.Types.Collection} collection
 	 */
 	removeAll: function(collection) {
-		if (!this._isCollection(collection))
+		if (!Core.Types.AbstractCollection.isInstance(collection))
 			throw new Error("No collection specified or unknown collection type: " + collection);
 		collection.removeAllFrom(this);
 	},
@@ -303,7 +310,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	 * @param {Core.Types.Collection} collection
 	 */
 	removeAllFrom: function(collection) {
-		if (!this._isCollection(collection))
+		if (!Core.Types.AbstractCollection.isInstance(collection))
 			throw new Error("No collection specified or unknown collection type: " + collection);
 		for (var i = 0; i < this._size; i++) {
 			collection.remove(this._table[i]);
@@ -324,7 +331,7 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 	},
 	
 	/**
-	 * Returns collection's size.
+	 * Returns collection size.
 	 * 
 	 * @memberOf Core.Types.Collection#
 	 * @type {Number}
@@ -382,16 +389,17 @@ Core.Types.Collection = define(/** @lends Core.Types.Collection# */{
 		}
 		return filtered;
 	}
-},
-{
-	_collectionType: "collection"
+});
+
+Core.Types.AbstractMap = extend(Core.Types.AbstractCollection, {
+	
 });
 
 /**
  * @class
  * @extends Core.Types.Collection
  */
-Core.Types.Map = extend(Core.Types.Collection, {
+Core.Types.Map = extend([Core.Types.Collection, Core.Types.AbstractMap], {
 	
 	_keyDef: null,
 	_keyFn: null,
@@ -421,7 +429,7 @@ Core.Types.Map = extend(Core.Types.Collection, {
 		if (!key) {
 			throw new Error("Key not found for: " + element + ", according to key definition: " + this._keyDef);
 		}
-		if (this._map[key]) {
+		if (key in this._map) {
 			debug("Key already exisis in map: " + key);
 		}
 		this._map[key] = element;
@@ -435,7 +443,7 @@ Core.Types.Map = extend(Core.Types.Collection, {
 		if (!key) {
 			throw new Error("Key not found for: " + element + ", according to key definition: " + this._keyDef);
 		}
-		if (!this._map[key]) {
+		if (!(key in this._map)) {
 			debug("Key does not exisis in map: " + key);
 		}
 		delete this._map[key];
@@ -477,12 +485,9 @@ Core.Types.Map = extend(Core.Types.Collection, {
 			if (fn.call(context, this._map[key], key)) break;
 		}
 	}
-},
-{
-	_collectionType: "map"
 });
 
-Core.Types.Filter = define(/** @lends Core.Types.Filter# */{
+Core.Types.Filter = define({
 	
 	_filter: null,
 

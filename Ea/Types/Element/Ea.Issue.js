@@ -33,38 +33,74 @@ Ea.Issue._Base = extend(Ea.Types.Named, {
 	},
 
 	/**
+	 * Issue report date
+	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_reported: property({api: "DateReported"}),
 
+	/**
+	 * Issue reporter
+	 */
 	_reporter: property({api: "Reporter"}),
 	
+	/**
+	 * Issue notes
+	 */
 	_notes: property({api: "Notes"}),
 	
 	/**
+	 * Issue resolve date
+	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
 	_resolved: property({api: "DateResolved"}),
 	
+	/**
+	 * Issue resolver
+	 */
 	_resolver: property({api: "Resolver"}),
 	
+	/**
+	 * Issue resolve notes
+	 */
 	_resolverNotes: property({api: "ResolverNotes"}),
 	
 	/**
+	 * Issue parent element
+	 * 
 	 * @type {Ea.Element._Base}
 	 * @private
 	 */
 	__parent: property({api: "ElementID", referenceBy: "id"}),
 
+	/**
+	 * Issue priority
+	 */
 	_priority: property({api: "Priority"}),
 
+	/**
+	 * Issue status
+	 */
 	_status: property({api: "Status"}),
 
+	/**
+	 * Issue severity
+	 */
 	_severity: property({api: "Severity"}),
 	
+	/**
+	 * Issue difficulty
+	 */
 	_difficulty: property({api: "Difficulty"}),
 	
+	/**
+	 * Issue version
+	 */
 	_version: property({api: "Version"}),
 	
+	/**
+	 * Issue type
+	 */
 	_type: property({api: "Type"})
 });

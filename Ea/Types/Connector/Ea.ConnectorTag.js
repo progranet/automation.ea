@@ -25,6 +25,8 @@ Ea.ConnectorTag = {
 Ea.ConnectorTag._Base = extend(Ea.Tag._Feature, {},
 {
 	/**
+	 * Connector tag parent
+	 * 
 	 * @type {Ea.Connector._Base}
 	 * @private
 	 */

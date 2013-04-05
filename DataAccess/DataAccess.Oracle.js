@@ -56,7 +56,7 @@ DataAccess.Oracle.Provider = extend(DataAccess._Provider, {
 					native: "EA_GUID",
 					type: String
 				},
-				native: {
+				name: {
 					native: "NAME",
 					type: String
 				},
@@ -184,7 +184,7 @@ DataAccess.Oracle.Provider = extend(DataAccess._Provider, {
 					native: "XREFID",
 					type: String
 				},
-				native: {
+				name: {
 					native: "NAME",
 					type: String
 				},
@@ -224,7 +224,7 @@ DataAccess.Oracle.Provider = extend(DataAccess._Provider, {
 					native: "OBJECT_ID",
 					type: Number
 				},
-				native: {
+				name: {
 					native: "SCENARIO",
 					type: String
 				},

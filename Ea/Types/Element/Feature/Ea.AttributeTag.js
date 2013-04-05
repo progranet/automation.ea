@@ -25,8 +25,10 @@ Ea.AttributeTag = {
 Ea.AttributeTag._Base = extend(Ea.Tag._Feature, {},
 {
 	/**
-	 * @type {Ea.Attribute._Base}
+	 * Attribute tag parent attribute
+	 * 
 	 * @private
+	 * @type {Ea.Attribute._Base}
 	 */
 	__parent: property({api: "AttributeID", referenceBy: "id"})
 });

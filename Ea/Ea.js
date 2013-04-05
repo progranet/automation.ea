@@ -42,7 +42,7 @@ Ea = {
 		params = params || {};
 		if (!this._application) {
 			this._application = Ea.Application.createApplication(params);
-			this._initializeLogs(params.targetClass || Ea._Base.Helper.Target, this._application.getRepository());
+			this._initializeLogs(params.targetClass || Ea._Base.Utils.Target, this._application.getRepository());
 		}
 		else {
 			warn("Default application already initialized");
@@ -93,7 +93,7 @@ Ea = {
 	 * @param {Ea.Types.Any} element
 	 */
 	log: function(element) {
-		Ea._Base.Helper.Log.getLog(element).log();
+		Ea._Base.Utils.Log.getLog(element).log();
 	}
 };
 

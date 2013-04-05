@@ -23,8 +23,10 @@ Ea.ConnectorConstraint = {
 Ea.ConnectorConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
 {
 	/**
-	 * @type {Ea.Connector._Base}
+	 * Connector constraint parent
+	 * 
 	 * @private
+	 * @type {Ea.Connector._Base}
 	 */
 	__parent: property({api: "ConnectorID", referenceBy: "id"})
 });

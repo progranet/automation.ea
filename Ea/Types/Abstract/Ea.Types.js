@@ -36,15 +36,6 @@ Ea.Types.Any = define({
 	},
 	
 	/**
-	 * Returns description of this object
-	 * 
-	 * @type {String}
-	 */
-	toString: function() {
-		return this._toString();
-	},
-	
-	/**
 	 * @private
 	 * @type {String}
 	 */
@@ -110,20 +101,14 @@ Ea.Types.Any = define({
 	}
 });
 
-/**
- * @constructor
- * @extends Ea.Types.Any
- */
 Ea.Types.Named = extend(Ea.Types.Any, {
 
-	/**
-	 * Returns namespace of this element
-	 * 
-	 * @memberOf Ea.Types.Named#
-	 * @type {Ea.Types.Namespace}
-	 */
 	getParent: function() {
 		return null;
+	},
+	
+	setParent: function(parent) {
+		// TODO: check for covering in specialization tree
 	},
 	
 	/**
@@ -164,22 +149,27 @@ Ea.Types.Named = extend(Ea.Types.Any, {
 	
 },
 {
+	/**
+	 * Object name
+	 */
 	_name: property({api: "Name"}),
 
 	/**
-	 * @type {Ea.Types.Namespace}
+	 * Object parent
+	 * 
+	 * @readOnly
 	 * @derived
+	 * @type {Ea.Types.Namespace}
 	 */
 	_parent: property(),
 	
 	/**
+	 * Object qualified name 
+	 * 
+	 * @readOnly
 	 * @derived
 	 */
 	_qualifiedName: property()
 });
 
-/**
- * @constructor
- * @extends Ea.Types.Named
- */
 Ea.Types.Namespace = extend(Ea.Types.Named);

@@ -30,16 +30,27 @@ Ea.TaggedValue._Base = extend(Ea.Tag._Base, {
 
 },
 {
-	_notes: property({api: "Notes"}),
-	
 	/**
+	 * Tag id
+	 * 
+	 * @readOnly
 	 * @type {Number}
 	 */
 	_id: property({api: "PropertyID"}),
 	
+	/**
+	 * Tag guid
+	 */
 	_guid: property({api: "PropertyGUID"}),
 	
 	/**
+	 * Tag notes
+	 */
+	_notes: property({api: "Notes"}),
+	
+	/**
+	 * Tag parent element
+	 * 
 	 * @type {Ea.Element._Base}
 	 * @private
 	 */

@@ -26,12 +26,24 @@ Ea.File._Base = extend(Ea.Types.Named, {},
 		return this._deriveType(source, this._type);
 	},
 
+	/**
+	 * File notes
+	 */
 	_notes: property({api: "Notes"}),
 	
-	_fileDate: property({api: "FileDate"}),
+	/**
+	 * File date
+	 */
+	_date: property({api: "FileDate"}),
 	
+	/**
+	 * File size
+	 */
 	_size: property({api: "Size"}),
 	
+	/**
+	 * File type
+	 */
 	_type: property({api: "Type"})
 });
 

@@ -239,7 +239,7 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	},
 	
 	/**
-	 * Writes specified text to this file.
+	 * Writes specified text to this file stream.
 	 * 
 	 * @memberOf Sys.IO.File#
 	 * @param {String} text
@@ -249,7 +249,7 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	},
 	
 	/**
-	 * Writes line to this file.
+	 * Writes line to this file stream.
 	 * 
 	 * @memberOf Sys.IO.File#
 	 * @param {String} text
@@ -259,7 +259,7 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	},
 	
 	/**
-	 * Reads line from this file.
+	 * Reads line from this file stream.
 	 * 
 	 * @memberOf Sys.IO.File#
 	 * @type {String}
@@ -279,7 +279,7 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	},
 	
 	/**
-	 * Checks if this file is at the end
+	 * Checks if this file stream is at the end
 	 * 
 	 * @memberOf Sys.IO.File#
 	 * @type {Boolean}
@@ -331,7 +331,7 @@ Sys.IO.Folder = extend(Sys.IO._Element, {
 	},
 	
 	/**
-	 * Returns collection of this folder's subfolders
+	 * Returns collection of this folder subfolders
 	 * 
 	 * @type {Core.Types.Collection<Sys.IO.Folder>}
 	 */
@@ -346,7 +346,7 @@ Sys.IO.Folder = extend(Sys.IO._Element, {
 	},
 	
 	/**
-	 * Returns collection of this folder's files
+	 * Returns collection of this folder files
 	 * 
 	 * @type {Core.Types.Collection<Sys.IO.File>}
 	 */

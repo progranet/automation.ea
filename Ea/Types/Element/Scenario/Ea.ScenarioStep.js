@@ -40,32 +40,55 @@ Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 		return type;
 	},
 
+	/**
+	 * Scenario step guid
+	 */
 	_guid: property({api: "StepGUID"}), // GUID is not unique for ScenarioStep!
 	
+	/**
+	 * Scenario step position in scenario steps
+	 */
 	_pos: property({api: "Pos"}),
 	
+	/**
+	 * Scenario step level
+	 * 
+	 * @readOnly
+	 */
 	_level: property({api: "Level"}),
 	
 	/**
+	 * Scenario extensions collection beginning at scenario step 
+	 * 
+	 * @private
 	 * @type {Ea.Collection._Base<Ea.ScenarioExtension._Base>}
 	 * @qualifier {String} level
-	 * @private
 	 */
 	_extension: property({api: "Extensions"}),
 	
 	/**
+	 * Scenario step type
+	 * 
 	 * @private
 	 */
 	__type: property({api: "StepType"}),
 	
 	/**
-	 * @type {Ea.Element.UseCase}
+	 * Scenario step linked element
+	 * 
 	 * @private
+	 * @type {Ea.Element.UseCase}
 	 */
 	_link: property({api: "Link", referenceBy: "guid"}),
 	
+	/**
+	 * Scenario step uses specification
+	 */
 	_uses: property({api: "Uses"}),
 	
+	/**
+	 * Scenario step results specification
+	 */
 	_results: property({api: "Results"})
 });
 

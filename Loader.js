@@ -280,6 +280,21 @@ var ea = function(name, context) {
 					});
 				}
 			});
+			tag = tag.replace(/^\s*readOnly/g, function(whole) {
+				ast.value.arguments[0].properties.push({
+					"type": "Property",
+					"key": {
+						"type": "Identifier",
+						"name": "readOnly"
+					},
+					"value": {
+						"type": "Literal",
+						"value": true,
+						"raw": "'true'"
+					},
+					"kind": "init"
+				});
+			});
 			tag = tag.replace(/^\s*private/g, function(whole) {
 				ast.value.arguments[0].properties.push({
 					"type": "Property",
@@ -325,7 +340,7 @@ var ea = function(name, context) {
 					"kind": "init"
 				});
 			});
-			tag = tag.replace(/^\s*separator\s+(.+)\s*/g, function(whole, separator) {
+			tag = tag.replace(/^\s*separator\s+([\S]+)/g, function(whole, separator) {
 				ast.value.arguments[0].properties.push({
 					"type": "Property",
 					"key": {
@@ -340,15 +355,23 @@ var ea = function(name, context) {
 					"kind": "init"
 				});
 			});
-			//WriteOutput("Loader", "TAG:" + tag, undefined);
+			tag = tag.replace(/^\s*assigment\s+([\S]+)/g, function(whole, assigment) {
+				ast.value.arguments[0].properties.push({
+					"type": "Property",
+					"key": {
+						"type": "Identifier",
+						"name": "assigment"
+					},
+					"value": {
+						"type": "Literal",
+						"value": assigment,
+						"raw": "'" + assigment + "'"
+					},
+					"kind": "init"
+				});
+			});
 			tag = tag.replace(/^\s*qualifier\s+(\{(.+)\}\s+)?([a-zA-Z0-9_$]+)\s*/g, function(whole, _type, type, qualifier) {
-				
-				WriteOutput("Loader", "QUALIFIER:" + type + "/" + qualifier, undefined);
-
 				var qualifierFn = "this.get" + qualifier.charAt(0).toUpperCase() + qualifier.substr(1) + "()";
-				
-				WriteOutput("Loader", "QUALIFIER FN:" + qualifierFn, undefined);
-				
 				ast.value.arguments[0].properties.push({
 					"type": "Property",
 					"key": {
@@ -363,6 +386,22 @@ var ea = function(name, context) {
 					"kind": "init"
 				});
 			});
+			tag = tag.replace(/^\s*key\s+([A-Za-z_0-9]+)\s*/g, function(whole, key) {
+				ast.value.arguments[0].properties.push({
+					"type": "Property",
+					"key": {
+						"type": "Identifier",
+						"name": "key"
+					},
+					"value": {
+						"type": "Literal",
+						"value": key,
+						"raw": "'" + key + "'"
+					},
+					"kind": "init"
+				});
+			});
+
 		}
 		
 		//WriteOutput("Loader", "" + context.qualifiedName + "." + this.key.name + " = " + JSON.stringify(this) + ";", undefined);

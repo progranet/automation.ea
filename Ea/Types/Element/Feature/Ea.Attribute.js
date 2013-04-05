@@ -28,19 +28,31 @@ Ea.Attribute = {
 Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 {
 	/**
+	 * Attribute id
+	 * 
+	 * @readOnly
 	 * @type {Number}
 	 */
 	_id: property({api: "AttributeID"}),
 	
+	/**
+	 * Attribute guid
+	 * 
+	 * @readOnly
+	 */
 	_guid: property({api: "AttributeGUID"}),
 	
 	/**
-	 * @type {Ea._Base.DataTypes.Map}
+	 * Attribute extended style
+	 * 
 	 * @private
+	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_styleEx: property({api: "StyleEx"}),
 	
 	/**
+	 * Attribute tags collection
+	 * 
 	 * @type {Ea.Collection.Map<Ea.AttributeTag._Base>}
 	 * @qualifier {String} name
 	 * @aggregation composite
@@ -48,6 +60,8 @@ Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 	_tag: property({api: "TaggedValues"}),
 	
 	/**
+	 * Attribute position in tree model of project browser. 
+	 * 
 	 * @type {Number}
 	 */
 	_position: property({api: "Pos"}),
@@ -83,10 +97,14 @@ Ea.Attribute.EnumerationLiteral = extend(Ea.Attribute._Base, {
 	_toString: function() {
 		return this.getName() + " [" + this._class  + "]";
 	}
-},{
+},
+{
 	/**
-	 * @type {Core.Types.Object}
+	 * Enumeration literal type.
+	 * Contains null.
+	 * 
 	 * @derived
+	 * @type {Core.Types.Object}
 	 */
 	_type: property()
 });
@@ -95,68 +113,114 @@ Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {},
 {
 
 	/**
-	 * @type {Ea.Element.Type}
+	 * Attribute classifier
+	 * 
 	 * @private
+	 * @type {Ea.Element.Type}
 	 */
 	_classifier: property({api: "ClassifierID", referenceBy: "id"}),
 	
 	/**
+	 * Attribute constraints collection
+	 * 
 	 * @type {Ea.Collection._Base<Ea.AttributeConstraint._Base>}
 	 * @aggregation composite
 	 */
 	_constraint: property({api: "Constraints"}),
 	
 	/**
+	 * Attribute data type
+	 * 
 	 * @private
 	 */
 	_primitiveType: property({api: "Type"}),
 	
+	
+	/**
+	 * Attribute default value
+	 */
 	_default: property({api: "Default"}),
 	
 	/**
+	 * Attribute collection switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_collection: property({api: "IsCollection"}),
 	
 	/**
+	 * Attribute read only switch value
+	 * 
 	 * @type {Boolean}
 	 */
-	_const: property({api: "IsConst"}),
+	_readOnly: property({api: "IsConst"}),
 	
 	/**
+	 * Attribute derived switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_derived: property({api: "IsDerived"}),
 	
 	/**
+	 * Attribute ordered switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_ordered: property({api: "IsOrdered"}),
 	
 	/**
+	 * Attribute static switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_static: property({api: "IsStatic"}),
 	
 	/**
+	 * Attribute allow duplicates switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_allowDuplicates: property({api: "AllowDuplicates"}),
 	
+	/**
+	 * Attribute length
+	 */
 	_length: property({api: "Length"}),
 	
+	/**
+	 * Attribute precision
+	 */
 	_precision: property({api: "Precision"}),
 	
+	/**
+	 * Attribute scale
+	 */
 	_scale: property({api: "Scale"}),
 	
+	/**
+	 * Attribute container
+	 */
 	_container: property({api: "Container"}),
 	
+	/**
+	 * Attribute containment
+	 */
 	_containment: property({api: "Containment"}),
 	
+	/**
+	 * Attribute multiplicity lower
+	 */
 	_lower: property({api: "LowerBound"}),
 	
+	/**
+	 * Attribute multiplicity upper
+	 */
 	_upper: property({api: "UpperBound"}),
 	
+	/**
+	 * Attribute visibility
+	 */
 	_visibility: property({api: "Visibility"})
 });
 

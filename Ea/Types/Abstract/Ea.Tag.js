@@ -19,37 +19,45 @@
  */
 Ea.Tag = {};
 
-/**
- * @class
- */
 Ea.Tag._Base = extend(Ea.Types.Named, {},
 {
+	/**
+	 * Tag value
+	 */
 	_value: property({api: "Value"})
 });
 
-/**
- * @class
- */
 Ea.Tag._Feature = extend(Ea.Tag._Base, {},
 {
 	_notes: property({api: "Notes"}),
 	
 	/**
+	 * Tag id
+	 * 
+	 * @readOnly
 	 * @type {Number}
 	 */
 	_id: property({api: "TagID"}),
 	
+	/**
+	 * Tag guid
+	 * 
+	 * @readOnly
+	 */
 	_guid: property({api: "TagGUID"})
 });
 
-/**
- * @class
- */
 Ea.Tag._Extended = extend(Ea.Tag._Base, {},
 {
+	/**
+	 * Tag guid
+	 * 
+	 * @readOnly
+	 */
 	_guid: property({api: "PropertyGUID"}),
 	
-	_name: property({api: "Tag"}),
-	
-	_value: property({api: "Value"})
+	/**
+	 * Tag name
+	 */
+	_name: property({api: "Tag"})
 });

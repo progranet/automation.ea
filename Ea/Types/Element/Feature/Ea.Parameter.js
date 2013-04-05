@@ -22,75 +22,178 @@ Ea.Parameter = {
 };
 
 Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
+	
 	getParent: function() {
 		return this._getParent();
+	},
+	
+	setParent: function(parent) {
+		return this._setParent(parent);
+	},
+	
+	getCustomProperties: function() {
+		return this._source.application.getRepository().getProperties(this);
+	},
+	
+	getLower: function() {
+		var properties = this.getCustomProperties();
+		return properties ? properties.valueOf().lower.value : 1;
+	},
+
+	getUpper: function() {
+		var properties = this.getCustomProperties();
+		return properties ? properties.valueOf().upper.value : 1;
+	},
+
+	isOrdered: function() {
+		var properties = this.getCustomProperties();
+		return properties ? properties.valueOf().isOrdered.value != 0 : false;
+	},
+
+	isUnique: function() {
+		var properties = this.getCustomProperties();
+		return properties ? properties.valueOf().isUnique.value != 0 : false;
 	}
 },
 {
+	/**
+	 * Parameter guid
+	 */
 	_guid: property({api: "ParameterGUID"}),
 	
+	/**
+	 * Parameter alias
+	 */
 	_alias: property({api: "Alias"}),
 	
+	/**
+	 * Parameter notes
+	 */
 	_notes: property({api: "Notes"}),
-	
-	_stereotype: property({api: "Stereotype"}),
 
 	/**
-	 * @type {Ea.Element.Type}
+	 * Parameter classifier
+	 * 
 	 * @private
+	 * @type {Ea.Element.Type}
 	 */
 	_classifier: property({api: "ClassifierID", referenceBy: "id"}),
 	
 	/**
+	 * Parameter data type
+	 * 
 	 * @private
 	 */
 	_primitiveType: property({api: "Type"}),
 	
+	/**
+	 * Parameter default value
+	 */
 	_default: property({api: "Default"}),
 	
 	/**
+	 * Parameter const switch value
+	 * 
 	 * @type {Boolean}
 	 */
 	_const: property({api: "IsConst"}),
 	
+	/**
+	 * Parameter kind
+	 */
 	_kind: property({api: "Kind"}),
 	
 	/**
+	 * Parameter position in list of method parameters
+	 * 
 	 * @type {Number}
 	 */
 	_position: property({api: "Position"}),
 	
 	/**
-	 * @type {Ea._Base.DataTypes.Map}
+	 * Parameter style
+	 * 
 	 * @private
+	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_style: property({api: "Style"}),
 	
 	/**
-	 * @type {Ea._Base.DataTypes.Map}
+	 * Parameter extended style
+	 * 
 	 * @private
+	 * @type {Ea._Base.DataTypes.Map}
 	 */
 	_styleEx: property({api: "StyleEx"}),
 
 	/**
-	 * @type {Ea.Types.Namespace}
+	 * Parameter parent
+	 * 
 	 * @derived
+	 * @type {Ea.Types.Namespace}
 	 */
 	_parent: property(),
 
 	/**
-	 * @type {Ea.Method._Base}
+	 * Parameter parent method
+	 * 
 	 * @private
+	 * @readOnly
+	 * @type {Ea.Method._Base}
 	 */
 	__parent: property({api: "OperationID", referenceBy: "id"}),
 
 	/**
+	 * Parameter tags collection
+	 * 
 	 * @type {Ea.Collection.Map<Ea.ParameterTag._Base>}
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_tag: property({api: "TaggedValues"})
-
+	_tag: property({api: "TaggedValues"}),
+	
+	/**
+	 * Parameter custom properties collection
+	 * 
+	 * @readOnly
+	 * @derived
+	 * @type {Ea._Base.DataTypes.Properties}
+	 */
+	_customProperties: property(),
+	
+	/**
+	 * Parameter multiplicity lower
+	 * 
+	 * @readOnly
+	 * @derived
+	 */
+	_lower: property(),
+	
+	/**
+	 * Parameter multiplicity upper
+	 * 
+	 * @readOnly
+	 * @derived
+	 */
+	_upper: property(),
+	
+	/**
+	 * Parameter ordered switch value
+	 * 
+	 * @readOnly
+	 * @derived
+	 * @type {Boolean}
+	 */
+	_ordered: property(),
+	
+	/**
+	 * Parameter unique switch value
+	 * 
+	 * @readOnly
+	 * @derived
+	 * @type {Boolean}
+	 */
+	_unique: property()
 });
 
 include("Ea.ParameterTag@Ea.Types.Element.Feature");

@@ -76,7 +76,7 @@ Word = {
 		if (!this.wordApp)
 			this.wordApp = new ActiveXObject("Word.Application");
 		
-		var template = this.wordApp.Documents.Open(Sys.IO.getPath(params.template, params.context), Word.WdOpenFormat.wdOpenFormatTemplate, true);
+		var template = this.wordApp.Documents.Open(Sys.IO.getPath(params.template, params.context), Word.WdOpenFormat.wdOpenFormatAuto, true);
 		
 		try {
 			for (var mark in params.embeds) {
