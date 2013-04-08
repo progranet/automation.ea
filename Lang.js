@@ -15,6 +15,20 @@
 */
 
 /**
+ * Returns first index of specified element in this array 
+ * 
+ * @memberOf Array#
+ * @param {Object} element
+ * @type {Number}
+ */
+Array.prototype.indexOf = function(element) {
+	for (var i = 0; i < this.length; i++) {
+		if (this[i] === element) return i;
+	}
+	return -1;
+};
+
+/**
  * Checks if array this contains specified element 
  * 
  * @memberOf Array#
@@ -22,10 +36,7 @@
  * @type {Boolean}
  */
 Array.prototype.contains = function(element) {
-	for (var i = 0; i < this.length; i++) {
-		if (this[i] === element) return true;
-	}
-	return false;
+	return this.indexOf(element) != -1;
 };
 
 /**

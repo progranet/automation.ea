@@ -159,13 +159,15 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 		var stereotypes = new Core.Types.Collection();
 		if (list) {
 			for (var s = 0; s < list.length; s++) {
-				var stereotype = list[s];
-				if (stereotype.GUID) {
-					stereotypes.add(this._source.application.getByGuid(Ea.Stereotype._Base, stereotype.GUID));
+				var stereotypeDefinition = list[s];
+				if (stereotypeDefinition.GUID) {
+					var stereotype = this._source.application.getByGuid(Ea.Stereotype._Base, stereotypeDefinition.GUID, true);
+					if (stereotype) {
+						stereotypes.add(stereotype);
+						continue;
+					}
 				}
-				else {
-					stereotypes.add(new Ea._Base.Stereotype(stereotype));
-				}
+				stereotypes.add(new Ea._Base.Stereotype(stereotypeDefinition));
 			}
 		}
 		return stereotypes;

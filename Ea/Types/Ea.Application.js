@@ -253,9 +253,10 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 	 * 
 	 * @param {Class} type
 	 * @param {String} guid
+	 * @param {Boolean} cacheOnly Specify that getter should operate on application cache only without calling EA API Repository.Get...ByGuid method
 	 * @type {Ea.Types.Any}
 	 */
-	getByGuid: function(type, guid) {
+	getByGuid: function(type, guid, cacheOnly) {
 		var meta = type.namespace.meta;
 		this._cacheStats[meta.objectType].trgg++;
 		var proxy = this._cacheGuid[meta.objectType][guid];
@@ -263,6 +264,8 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 			this._cacheStats[meta.objectType].crg++;
 			return proxy;
 		}
+		if (cacheOnly)
+			return null;
 		var method = "Get" + type.namespace.name + "ByGuid";
 		var api = this._repository._source.api[method](guid);
 		if (!api) {

@@ -259,7 +259,8 @@ Ea._Base.Stereotype = extend(Ea._Base.AbstractStereotype, {
 		_super.create();
 		this._value = {
 			name: params.Name,
-			qualifiedName: params.FQName
+			qualifiedName: params.FQName,
+			guid: params.GUID
 		};
 	},
 	
@@ -269,6 +270,10 @@ Ea._Base.Stereotype = extend(Ea._Base.AbstractStereotype, {
 
 	getQualifiedName: function() {
 		return this._value.qualifiedName;
+	},
+	
+	getGuid: function() {
+		return this._value.guid;
 	},
 
 	_toString: function() {
