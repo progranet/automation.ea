@@ -20,13 +20,30 @@ Ea.MethodConstraint = {
 		}
 };
 
-Ea.MethodConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
+Ea.MethodConstraint._Base = extend(Ea.FeatureConstraint._Base, {
+	
+	getNamespace: function() {
+		return this.getMethod();
+	},
+	
+	setNamespace: function(namespace) {
+		this.setMethod(namespace);
+	}
+}, 
+{},
 {
 	/**
-	 * Method constraint parent method
+	 * Named element namespace
 	 * 
-	 * @private
+	 * @derived
+	 * @type {Ea.Types.Namespace}
+	 */
+	namespace: {},
+
+	/**
+	 * Method constraint method
+	 * 
 	 * @type {Ea.Method._Base}
 	 */
-	__parent: property({api: "MethodID", referenceBy: "id"})
+	method: {api: "MethodID", referenceBy: "id"}
 });

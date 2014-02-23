@@ -22,7 +22,6 @@ Core = {
 	/**
 	 * Tests if specified property is a method 
 	 * 
-	 * @memberOf Core
 	 * @param {Object} property
 	 * @param {String} propertyName
 	 * @type {Boolean}
@@ -37,7 +36,6 @@ Core = {
 	/**
 	 * Returns parsed arguments of function   
 	 * 
-	 * @memberOf Core
 	 * @param {Function} fn
 	 * @type {Object}
 	 */
@@ -60,7 +58,6 @@ Core = {
 	/**
 	 * Tests if specified function is native 
 	 * 
-	 * @memberOf Core
 	 * @param {Function} fn
 	 * @type {Boolean}
 	 */
@@ -71,10 +68,12 @@ Core = {
 	_callbacksMethod: [],
 
 	/**
-	 * Registers method enrichment. All methods are passed to the registered callback function in order to enrich their source. 
+	 * Registers method enrichment callback function.
+	 * Enrichment is source code instrumentation where callback function is provided with meta information about method:
+	 *  - {String} source Source of method
+	 *  - {String} methodName name of method in namespace 
 	 * 
-	 * @memberOf Core
-	 * @param {Function} callback function(source, namespace, propertyName, qualifiedName, _static)
+	 * @param {Function} callback function(source, methodName)
 	 */
 	registerMethodEnrichment: function(callback) {
 		this._callbacksMethod.push(callback);
@@ -82,32 +81,35 @@ Core = {
 
 	/**
 	 * Enriches method with registered method enrichments.
+	 * Method is passed to all registered callback functions in order to enrich their source.
+	 * Enrichments is performed before method is assigned to namespace.
 	 * 
 	 * @see Core.registerMethodEnrichment
-	 * @memberOf Core
 	 * @param {Object} namespace
-	 * @param {String} propertyName
+	 * @param {String} methodName
 	 * @param {String} qualifiedName
 	 * @param {Boolean} _static
 	 */
-	enrichMethod: function(namespace, propertyName, qualifiedName, _static) {
-		var property = namespace[propertyName];
-		var source = property.toString();
-		for (var ci = 0; ci < this._callbacksMethod.length; ci++) {
-			var callback = this._callbacksMethod[ci];
-			source = callback(source, namespace, propertyName, qualifiedName, _static);
+	enrichMethod: function(namespace, methodName, qualifiedName, _static) {
+		var method = namespace[methodName];
+		if (!method._enriched) {
+			var source = method.toString();
+			for (var ci = 0; ci < this._callbacksMethod.length; ci++) {
+				var callback = this._callbacksMethod[ci];
+				source = callback(source, methodName);
+			}
+			eval("namespace[methodName] = " + source);
+			namespace[methodName].qualifiedName = qualifiedName;
+			namespace[methodName]._static = _static;
+			namespace[methodName]._enriched = true;
 		}
-		eval("namespace[propertyName] = " + source);
-		namespace[propertyName].qualifiedName = qualifiedName;
-		namespace[propertyName]._static = _static;
-		return namespace[propertyName];
+		return namespace[methodName];
 	},
 	
 	/**
-	 * Enriches all methods in namespace with registered method enrichments. 
+	 * Enriches all methods in namespace (utility) with registered method enrichments.
 	 * 
 	 * @see Core.enrichMethod
-	 * @memberOf Core
 	 * @param {Object} namespace
 	 */
 	enrichNamespace: function(namespace) {
@@ -120,20 +122,19 @@ Core = {
 	/**
 	 * Merges properties of specified object to (target) toObject.
 	 * 
-	 * @memberOf Core
 	 * @param {Object} toObject
 	 * @param {Object} object
 	 */
 	merge: function(toObject, object) {
 		for (var name in object) {
 			if (name in toObject)
-				throw new Error("Merge target object " + toObject + " already has property: " + name);
+				throw new Error("Merge target object " + toObject + " already has property: '" + name + "'");
 			toObject[name] = object[name];
 		}
 	}
 };
 
-include("Core.Helper@Core");
+include("Core.Utils@Core");
 include("Core.Log@Core");
 include("Core.Output@Core");
 include("Core.Lang@Core");

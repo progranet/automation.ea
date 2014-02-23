@@ -40,8 +40,6 @@ Html = {
 	
 	/**
 	 * Initializes namespace
-	 * 
-	 * @memberOf Html
 	 */
 	initialize: function() {
 		//eval(new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(scriptRoot + "Diff\\diff_match_patch_uncompressed.js", 1).ReadAll());
@@ -50,9 +48,8 @@ Html = {
 	/**
 	 * Loads HTML templates from specified file
 	 * 
-	 * @memberOf Html
 	 * @param {Sys.IO.File} file File reference or path to file (string)
-	 * @param {?Object} context Namespace containing templates file
+	 * @param {Object} context Namespace containing templates file
 	 */
 	loadTemplates: function(file, context) {
 		if (typeof file == "string") {
@@ -64,7 +61,7 @@ Html = {
 			var newTemplate = Html._templateNamePattern.exec(line);
 			if (newTemplate) {
 				if (templateName) {
-					Html.templates[templateName] = new Html.Template(templateName, template);
+					Html.templates[templateName] = new Html.Template(templateName, template.replace(/[\r\n]+$/, "").replace(/^[\r\n]+/, ""));
 				}
 				templateName = newTemplate[1];
 				template = "";
@@ -79,13 +76,11 @@ Html = {
 	}
 };
 
-Html.Template = extend(Core.Types.Named, /** @lends Html.Template# */ {
+Html.Template = extend(Core.Types.Named, {
 	
 	_template: null,
 
 	/**
-	 * @constructs
-	 * @extends Core.Types.Named
 	 * @param {String} name
 	 * @param {String} template
 	 */
@@ -97,7 +92,6 @@ Html.Template = extend(Core.Types.Named, /** @lends Html.Template# */ {
 	/**
 	 * Generates output using provided parameters
 	 * 
-	 * @memberOf Html.Template#
 	 * @param {Object} params
 	 * @type {String}
 	 */

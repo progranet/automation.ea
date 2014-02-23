@@ -15,72 +15,93 @@
 */
 
 Ea.DiagramLink = {
-		meta: {
-			//id: "InstanceID",
-			objectType: 20
-		}
+	meta: {
+		//id: "InstanceID",
+		objectType: 20
+	}
 };
 
 Ea.DiagramLink._Base = extend(Ea.Diagram.View, {
 
 	getDimension: function() {
 		var coords = this._getPath();
-		var dimension = null;
-		if (coords) {
-			dimension = new Ea._Base.DataTypes.Dimension({
-				right: 0,
-				bottom: 0
-			});
-			var coordst = coords.split(";");
-			for (var c = 0; c < coordst.length; c++) {
-				if (coordst[c]) {
-					var coord = coordst[c].split(":");
-					dimension.left = dimension.left !== undefined ? Math.min(dimension.left, coord[0]) : coord[0];
-					dimension.top = dimension.top !== undefined ? Math.min(dimension.top, -coord[1]) : -coord[1];
-					dimension.right = Math.max(dimension.right, coord[0]);
-					dimension.bottom = Math.max(dimension.bottom, -coord[1]);
-				}
+		if (!coords)
+			return null;
+		dimension = {
+			right: 0,
+			bottom: 0,
+			left: null,
+			top: null
+		};
+		var coordst = coords.split(";");
+		for (var c = 0; c < coordst.length; c++) {
+			if (coordst[c]) {
+				var coord = coordst[c].split(":");
+				dimension.left = dimension.left !== null ? Math.min(dimension.left, coord[0]) : coord[0];
+				dimension.top = dimension.top !== null ? Math.min(dimension.top, -coord[1]) : -coord[1];
+				dimension.right = Math.max(dimension.right, coord[0]);
+				dimension.bottom = Math.max(dimension.bottom, -coord[1]);
 			}
 		}
-		return dimension;
+		return new Ea._Base.DataTypes.Dimension({
+			right: dimension.right,
+			bottom: dimension.bottom,
+			left: dimension.left,
+			top: dimension.top
+		});
+	},
+	
+	getObject: function() {
+		return this.getConnector();
 	}
 },
+{},
 {
 	/**
-	 * Connector view id
+	 * Connector view id.
+	 * In some cases EA sets id to 0 (for example for messages in sequence diagrams) and not stores it in database.
 	 * 
 	 * @readOnly
 	 * @type {Number}
 	 */
-	_id: property({api: "InstanceID"}),
+	id: {api: "InstanceID"},
 	
 	/**
 	 * Connector view connector
 	 * 
 	 * @type {Ea.Connector._Base}
 	 */
-	_connector: property({api: "ConnectorID", referenceBy: "id"}),
+	connector: {api: "ConnectorID", referenceBy: "id"},
+	
+	/**
+	 * View object
+	 * 
+	 * @derived
+	 * @readOnly
+	 * @type {Ea.Types.Any}
+	 */
+	object: {},
 	
 	/**
 	 * Connector view path in diagram
 	 * 
 	 * @private
 	 */
-	_path: property({api: "Path"}),
+	_path: {api: "Path"},
 	
 	/**
 	 * Connector view hidden switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_hidden: property({api: "IsHidden"}),
+	hidden: {api: "IsHidden"},
 	
 	/**
 	 * Connector view geometry
 	 * 
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	_geometry: property({api: "Geometry"}),
+	geometry: {api: "Geometry"},
 	
 	/**
 	 * Connector view style
@@ -88,7 +109,7 @@ Ea.DiagramLink._Base = extend(Ea.Diagram.View, {
 	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	_style: property({api: "Style"}),
+	_style: {api: "Style"},
 
 	/**
 	 * Connector view dimension
@@ -97,5 +118,5 @@ Ea.DiagramLink._Base = extend(Ea.Diagram.View, {
 	 * @readOnly
 	 * @type {Ea._Base.DataTypes.Dimension}
 	 */
-	_dimension: property()
+	dimension: {}
 });

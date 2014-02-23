@@ -22,13 +22,30 @@ Ea.AttributeTag = {
 		}
 };
 
-Ea.AttributeTag._Base = extend(Ea.Tag._Feature, {},
+Ea.AttributeTag._Base = extend(Ea.Tag._Feature, {
+	
+	getNamespace: function() {
+		return this.getAttribute();
+	},
+	
+	setNamespace: function(namespace) {
+		this.setAttribute(namespace);
+	}
+},
+{},
 {
 	/**
-	 * Attribute tag parent attribute
+	 * Named element namespace
 	 * 
-	 * @private
+	 * @derived
+	 * @type {Ea.Types.Namespace}
+	 */
+	namespace: {},
+
+	/**
+	 * Attribute tag attribute
+	 * 
 	 * @type {Ea.Attribute._Base}
 	 */
-	__parent: property({api: "AttributeID", referenceBy: "id"})
+	attribute: {api: "AttributeID", referenceBy: "id"}
 });

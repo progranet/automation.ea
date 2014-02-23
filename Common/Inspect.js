@@ -71,9 +71,6 @@ Inspect = {
 	
 	_inspect: function(object, indent, template, params) {
 		
-		var type = object._class;
-		var properties = Ea._Base.Class.getAttributes(type);
-		
 		params.push(object);
 		info(this._indent(indent) + template, params);
 
@@ -82,54 +79,60 @@ Inspect = {
 		}
 		else {
 			this._ids[object.__id__] = object;
-			for (var ai = 0; ai < properties.length; ai++) {
+
+			var type = object._class;
+			
+			for (var propertyName in type._properties) {
 				
-				var property = properties[ai];
+				var property = type._properties[propertyName];
 				var value = property.get(object);
 				
-				var params = {
-					name: property.name.replace(/^_+/, ""),
-					_private: property.private,
-					aggregation: property.aggregation,
-					type: property.type,
-					elementType: Core.Types.AbstractCollection.isAssignableFrom(property.type) ? property.elementType : null
-				};
-				params.typeName = params.elementType ? Core.Output.getString(params.type) + "<" + Core.Output.getString(params.elementType) + ">" : Core.Output.getString(params.type);
-				params.template = (params._private ? "-" : "") + (property.derived ? "/" : "") + params.name + " [" + params.typeName + "]";
-
-				if (params.elementType) {
-					if (Core.Types.AbstractMap.isAssignableFrom(property.type)) {
-						if (value.isEmpty()) {
-							info(this._indent(indent + 1) + "$ = {}", [params.template]);
-						}
-						else {
-							info(this._indent(indent + 1) + "$ = {", [params.template]);
-							value.forEach(function(value, key) {
-								this._expand("$ = $", [key], value, indent + 1, params.aggregation);
-							});
-							info(this._indent(indent + 1) + "}");
-						}
-					}
-					else {
-						if (value.isEmpty()) {
-							info(this._indent(indent + 1) + "$ = []", [params.template]);
-						}
-						else {
-							info(this._indent(indent + 1) + "$ = [", [params.template]);
-							value.forEach(function(value, index) {
-								this._expand("$", [], value, indent + 1, params.aggregation);
-							});
-							info(this._indent(indent + 1) + "]");
-						}
-					}
-				}
-				else {
-					this._expand("$ = $", [params.template], value, indent, params.aggregation);
-				}
-				
+				this._inspectProperty(property, value, indent);
 			}
 		}
 		info(this._indent(indent) + "}");
+	},
+	
+	_inspectProperty: function(property, value, indent) {
+		var params = {
+			name: property.name.replace(/^_+/, ""),
+			_private: property.private,
+			aggregation: property.aggregation,
+			type: property.type,
+			elementType: Core.Types.AbstractCollection.isAssignableFrom(property.type) ? property.elementType : null
+		};
+		params.typeName = params.elementType ? Core.Output.getString(params.type) + "<" + Core.Output.getString(params.elementType) + ">" : Core.Output.getString(params.type);
+		params.template = (params._private ? "-" : "") + (property.derived ? "/" : "") + params.name + " [" + params.typeName + "]";
+
+		if (params.elementType) {
+			if (Core.Types.AbstractMap.isAssignableFrom(property.type)) {
+				if (value.isEmpty()) {
+					info(this._indent(indent + 1) + "$ = {}", [params.template]);
+				}
+				else {
+					info(this._indent(indent + 1) + "$ = {", [params.template]);
+					value.forEach(function(value, key) {
+						this._expand("$ = $", [key], value, indent + 1, params.aggregation);
+					});
+					info(this._indent(indent + 1) + "}");
+				}
+			}
+			else {
+				if (value.isEmpty()) {
+					info(this._indent(indent + 1) + "$ = []", [params.template]);
+				}
+				else {
+					info(this._indent(indent + 1) + "$ = [", [params.template]);
+					value.forEach(function(value, index) {
+						this._expand("$", [], value, indent + 1, params.aggregation);
+					});
+					info(this._indent(indent + 1) + "]");
+				}
+			}
+		}
+		else {
+			this._expand("$ = $", [params.template], value, indent, params.aggregation);
+		}
 	}
 	
 };

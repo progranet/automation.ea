@@ -21,37 +21,37 @@ Ea.Stereotype = {
 		}
 };
 
-Ea.Stereotype._Base = extend([Ea.Types.Named, Ea._Base.AbstractStereotype], {},
+Ea.Stereotype._Base = extend([Ea.Types.NamedElement, Ea._Base.AbstractStereotype], {}, {},
 {
 	/**
 	 * Stereotype guid
 	 */
-	_guid: property({api: "StereotypeGUID"}),
+	guid: {api: "StereotypeGUID"},
 	
 	/**
 	 * Stereotype notes
 	 */
-	_notes: property({api: "Notes"}),
+	notes: {api: "Notes"},
 	
 	/**
 	 * Name of type to witch stereotype applies to 
 	 */
-	_appliesTo: property({api: "AppliesTo"}),
+	appliesTo: {api: "AppliesTo"},
 	
 	/**
 	 * Stereotype metafile path
 	 */
-	_metafilePath: property({api: "MetafileLoadPath"}),
+	metafilePath: {api: "MetafileLoadPath"},
 	
 	/**
 	 * Stereotype style
 	 */
-	_style: property({api: "Style"}),
+	style: {api: "Style"},
 	
 	/**
 	 * Stereotype visual style specification
 	 * 
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	_visualType: property({api: "VisualType"})
+	visualType: {api: "VisualType"}
 });

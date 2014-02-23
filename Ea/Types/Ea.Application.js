@@ -49,12 +49,12 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 	 */
 	create: function(params) {
 		
-		_super.create();
+		_super.create(params);
 		
 		params = params || {};
 
 		var api = params.path ? new ActiveXObject("EA.App") : App;
-		this._source = new Ea._Base.Source(this, api);
+		this._source = new Ea._Base.Class.Source(this, api);
 		
 		this._cacheId = new Array(Ea.OBJECT_TYPES_NUMBER);
 		this._cacheGuid = new Array(Ea.OBJECT_TYPES_NUMBER);
@@ -93,51 +93,17 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 	},
 	
 	/**
-	 * Creates proxy object for newly created EA API object
-	 * 
-	 * @param {Class} baseType
-	 * @param {Object} api
-	 * @type {Ea.Types.Any}
-	 */
-	createProxy: function(baseType, api) {
-		var source = new Ea._Base.Source(this, api);
-		var proxy = new baseType();
-		proxy._source = source;
-		return proxy;
-	},
-	
-	/**
-	 * Wraps specified EA API object in proxy
-	 * 
-	 * @param {Class} baseType
-	 * @param {Object} api
-	 * @param {Object} params
-	 * @type {Ea.Types.Any}
-	 */
-	wrapProxy: function(baseType, api, params) {
-		var source = new Ea._Base.Source(this, api);
-		var type = baseType.determineType({_source: source});
-		var proxy = new type(params);
-		proxy._source = source;
-		proxy._init();
-		this._cache(proxy);
-		return proxy;
-	},
-	
-	/**
 	 * Provides information about cache utilization
-	 * 
-	 * @memberOf Ea.Application._Base#
 	 */
 	cacheInfo: function() {
 		var stats = {};
 		var g = this._cacheStats[Ea.OBJECT_TYPES_NUMBER];
-		for (var ot = 0; ot <= Ea.OBJECT_TYPES_NUMBER; ot++) {
-			var type = Ea._objectTypes[ot];
-			if (!type && ot != Ea.OBJECT_TYPES_NUMBER)
+		for (var objectType = 0; objectType <= Ea.OBJECT_TYPES_NUMBER; objectType++) {
+			var type = Ea._objectTypes[objectType];
+			if (!type && objectType != Ea.OBJECT_TYPES_NUMBER)
 				continue;
-			var s = this._cacheStats[ot];
-			stats[ot != Ea.OBJECT_TYPES_NUMBER ? type.namespace : "TOTAL"] = {
+			var s = this._cacheStats[objectType];
+			stats[objectType != Ea.OBJECT_TYPES_NUMBER ? type.namespace : "TOTAL"] = {
 					"total read from get": s.trg,
 					"total read by id from get": s.trgig,
 					"total read by guid from get": s.trggg,
@@ -151,7 +117,7 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 					"cache white by guid": s.cwg
 				};
 			for (var n in g) {
-				g[n] = (ot != Ea.OBJECT_TYPES_NUMBER) ? (g[n] + s[n]) : 0;
+				g[n] = (objectType != Ea.OBJECT_TYPES_NUMBER) ? (g[n] + s[n]) : 0;
 			}
 		}
 		info("cache stats: $", [JSON.stringify(stats, null, '\t')]);
@@ -189,9 +155,9 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 	/**
 	 * Returns proxy object for specified type and EA API object
 	 * 
-	 * @param {Class} type
+	 * @param {Core.Lang.Class} type
 	 * @param {Object} api
-	 * @param {Object} params
+	 * @param {Object} params Parameters forwarded to proxy constructor
 	 * @type {Ea.Types.Any}
 	 */
 	get: function(type, api, params) {
@@ -221,11 +187,12 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 	/**
 	 * Returns proxy object for specified type and id
 	 * 
-	 * @param {Class} type
+	 * @param {Core.Lang.Class} type
 	 * @param {Number} id
+	 * @param {Object} params Parameters forwarded to proxy constructor
 	 * @type {Ea.Types.Any}
 	 */
-	getById: function(type, id) {
+	getById: function(type, id, params) {
 		if (!id || id == 0)
 			return null;
 		var meta = type.namespace.meta;
@@ -245,18 +212,19 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 			warn("$ not found by Id = $", [type, id]);
 			return null;
 		}
-		return this.wrapProxy(type, api);
+		return this.wrapProxy(type, api, params);
 	},
 	
 	/**
 	 * Returns proxy object for specified type and guid
 	 * 
-	 * @param {Class} type
+	 * @param {Core.Lang.Class} type
 	 * @param {String} guid
+	 * @param {Object} params Parameters forwarded to proxy constructor
 	 * @param {Boolean} cacheOnly Specify that getter should operate on application cache only without calling EA API Repository.Get...ByGuid method
 	 * @type {Ea.Types.Any}
 	 */
-	getByGuid: function(type, guid, cacheOnly) {
+	getByGuid: function(type, guid, params, cacheOnly) {
 		var meta = type.namespace.meta;
 		this._cacheStats[meta.objectType].trgg++;
 		var proxy = this._cacheGuid[meta.objectType][guid];
@@ -272,7 +240,37 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 			warn("$ not found by Guid = $", [type, guid]);
 			return null;
 		}
-		return this.wrapProxy(type, api);
+		return this.wrapProxy(type, api, params);
+	},
+	
+	/**
+	 * Wraps specified EA API object in proxy
+	 * 
+	 * @param {Core.Lang.Class} baseType
+	 * @param {Object} api
+	 * @param {Object} params
+	 * @type {Ea.Types.Any}
+	 */
+	wrapProxy: function(baseType, api, params) {
+		var type = baseType.determineType(api);
+		var proxy = new type(params || {});
+		proxy._source = new Ea._Base.Class.Source(this, api);
+		proxy._init();
+		this._cache(proxy);
+		return proxy;
+	},
+	
+	/**
+	 * Creates proxy object for newly created EA API object
+	 * 
+	 * @param {Core.Lang.Class} baseType
+	 * @param {Object} api
+	 * @type {Ea.Types.Any}
+	 */
+	createProxy: function(baseType, api) {
+		var proxy = new baseType({});
+		proxy._source = new Ea._Base.Class.Source(this, api);
+		return proxy;
 	},
 	
 	_cache: function(object) {
@@ -306,9 +304,8 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 				
 		for (var ti = 0; ti < object._source._transient.length; ti++) {
 			var _transient = object._source._transient[ti];
-			var properties = Ea._Base.Class.getAttributes(_transient._class);
-			for (var ai = 0; ai < properties.length; ai++) {
-				var property = properties[ai];
+			for (var propertyName in _transient._class._properties) {
+				var property = _transient._class.getProperty(propertyName);
 				property.refresh(_transient);
 			}
 		}
@@ -325,22 +322,32 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 	getRepository: function() {
 		return this._repository;
 	}
-},
+}, 
+{},
 {
 	/**
-	 * Application associated project
+	 * Application project
 	 * 
 	 * @readOnly
 	 * @type {Ea.Project._Base}
 	 */
-	_project: property({api: "Project"}),
+	project: {api: "Project"},
+
+	/**
+	 * Application repository
+	 * 
+	 * @readOnly
+	 * @derived
+	 * @type {Ea.Repository._Base}
+	 */
+	repository: {},
 
 	/**
 	 * Application visibility switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_visible: property({api: "Visible"})
+	visible: {api: "Visible"}
 });
 
 include("Ea.Project@Ea.Types");

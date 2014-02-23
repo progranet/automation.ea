@@ -21,7 +21,9 @@ Ea._Base = {
 	
 };
 
-Ea._Base.PrimitiveType = extend(Core.Types.Named, {},
+Ea._Base.Type = extend(Core.Types.Named);
+
+Ea._Base.PrimitiveType = extend(Ea._Base.Type, {},
 {
 	_primitiveTypes: {},
 	
@@ -150,7 +152,7 @@ Ea._Base.Relationship = define({
 	},
 	
 	getMultiplicity: function() {
-		return this._toEnd.getCardinality();
+		return this._toEnd.getMultiplicity();
 	},
 	
 	isNavigable: function() {
@@ -179,7 +181,6 @@ Ea._Base.CustomReference = define({
 	_supplier: null,
 	
 	/**
-	 * @constructs
 	 * @param notes
 	 * @param supplier
 	 */
@@ -225,22 +226,6 @@ Ea._Base.ContextReference = define({
 	getConnection: function() {
 		return this._connection;
 	}
-});
-
-Ea._Base.Source = define({
-	
-	created: null,
-	_transient: null,
-	api: null,
-	application: null,
-	value: null,
-	
-	create: function(application, api) {
-		this.api = api;
-		this.application = application;
-		this.value = {};
-	}
-	
 });
 
 Ea._Base.AbstractStereotype = define({

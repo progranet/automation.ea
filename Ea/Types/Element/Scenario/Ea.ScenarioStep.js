@@ -25,7 +25,7 @@ Ea.ScenarioStep = {
 	}
 };
 
-Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
+Ea.ScenarioStep._Base = extend(Ea.Types.NamedElement, {
 	
 	getLink: function() {
 		
@@ -34,28 +34,30 @@ Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 	
 },
 {
-	determineType: function(source) {
-		var typeName = Ea.ScenarioStep.StepType[this.__type.get(source)];
+	determineType: function(api) {
+		var typeName = Ea.ScenarioStep.StepType[this.getProperty("_type").getApiValue(api)];
 		var type = this.namespace[typeName] || this._createType(typeName);
 		return type;
-	},
+	}
+},
+{
 
 	/**
 	 * Scenario step guid
 	 */
-	_guid: property({api: "StepGUID"}), // GUID is not unique for ScenarioStep!
+	guid: {api: "StepGUID"}, // GUID is not unique for ScenarioStep!
 	
 	/**
 	 * Scenario step position in scenario steps
 	 */
-	_pos: property({api: "Pos"}),
+	pos: {api: "Pos"},
 	
 	/**
 	 * Scenario step level
 	 * 
 	 * @readOnly
 	 */
-	_level: property({api: "Level"}),
+	level: {api: "Level"},
 	
 	/**
 	 * Scenario extensions collection beginning at scenario step 
@@ -64,14 +66,14 @@ Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 	 * @type {Ea.Collection._Base<Ea.ScenarioExtension._Base>}
 	 * @qualifier {String} level
 	 */
-	_extension: property({api: "Extensions"}),
+	_extensions: {api: "Extensions"},
 	
 	/**
 	 * Scenario step type
 	 * 
 	 * @private
 	 */
-	__type: property({api: "StepType"}),
+	_type: {api: "StepType"},
 	
 	/**
 	 * Scenario step linked element
@@ -79,17 +81,17 @@ Ea.ScenarioStep._Base = extend(Ea.Types.Named, {
 	 * @private
 	 * @type {Ea.Element.UseCase}
 	 */
-	_link: property({api: "Link", referenceBy: "guid"}),
+	link: {api: "Link", referenceBy: "guid"},
 	
 	/**
 	 * Scenario step uses specification
 	 */
-	_uses: property({api: "Uses"}),
+	uses: {api: "Uses"},
 	
 	/**
 	 * Scenario step results specification
 	 */
-	_results: property({api: "Results"})
+	results: {api: "Results"}
 });
 
 Ea.ScenarioStep.Actor = extend(Ea.ScenarioStep._Base);

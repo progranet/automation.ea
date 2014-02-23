@@ -17,7 +17,6 @@
 /**
  * Trims leading or trailing whitespace from this string
  * 
- * @memberOf String#
  * @type {String}
  */
 String.prototype.trim = function() {
@@ -27,7 +26,7 @@ String.prototype.trim = function() {
 /**
  * @namespace
  */
-Core.Helper = {
+Core.Utils = {
 	
 	/**
 	 * Returns array of names from map

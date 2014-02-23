@@ -22,7 +22,6 @@ Core.Target = {
 	/**
 	 * Enumeration of target types
 	 * 
-	 * @memberOf Core.Target
 	 * @enum {number}
 	 */
 	Type: {
@@ -33,15 +32,13 @@ Core.Target = {
 	}
 };
 
-Core.Target.AbstractTarget = define(/** @lends Core.Target.AbstractTarget# */{
+Core.Target.AbstractTarget = define({
 	
 	_type: null,
 	
 	/**
 	 * Core.Target.AbstractTarget constructor
 	 * 
-	 * @constructs
-	 * @extends Core.Types.Object
 	 * @param {Number} type Specifies type of target as one of {@link Core.Target.Type}
 	 */
 	create: function(type) {
@@ -52,7 +49,6 @@ Core.Target.AbstractTarget = define(/** @lends Core.Target.AbstractTarget# */{
 	/**
 	 * Writes specified message to this target
 	 * 
-	 * @memberOf Core.Target.AbstractTarget#
 	 * @param {String} message
 	 */
 	write: function(message) {
@@ -63,7 +59,6 @@ Core.Target.AbstractTarget = define(/** @lends Core.Target.AbstractTarget# */{
 	 * Determines if this target type is debug
 	 * 
 	 * @see Core.Target.Type
-	 * @memberOf Core.Target.AbstractTarget#
 	 * @type {Boolean}
 	 */
 	isDebug: function() {

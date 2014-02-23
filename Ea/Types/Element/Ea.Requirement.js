@@ -21,63 +21,65 @@ Ea.Requirement = {
 		}
 };
 
-Ea.Requirement._Base = extend(Ea.Types.Named, {},
+Ea.Requirement._Base = extend(Ea.Types.NamedElement, {},
 {
-	determineType: function(source) {
-		return this._deriveType(source, this._type);
-	},
-
+	determineType: function(api) {
+		return this._deriveType(api, this.getProperty("_type"));
+	}
+},
+{
 	/**
 	 * Requirement id
 	 * 
 	 * @readOnly
 	 * @type {Number}
 	 */
-	_id: property({api: "RequirementID"}),
+	id: {api: "RequirementID"},
 	
 	/**
 	 * Requirement modification date
 	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
-	_modified: property({api: "LastUpdate"}),
+	modified: {api: "LastUpdate"},
 	
 	/**
 	 * Requirement notes
 	 */
-	_notes: property({api: "Notes"}),
+	notes: {api: "Notes"},
 	
 	/**
 	 * Requirement priority
 	 */
-	_priority: property({api: "Priority"}),
+	priority: {api: "Priority"},
 	
 	/**
 	 * Requirement stability
 	 */
-	_stability: property({api: "Stability"}),
+	stability: {api: "Stability"},
 	
 	/**
 	 * Requirement status
 	 */
-	_status: property({api: "Status"}),
+	status: {api: "Status"},
 	
 	/**
 	 * Requirement difficulty
 	 */
-	_difficulty: property({api: "Difficulty"}),
+	difficulty: {api: "Difficulty"},
 	
 	/**
 	 * Requirement type
+	 * 
+	 * @private
 	 */
-	_type: property({api: "Type"}),
+	_type: {api: "Type"},
 	
 	/**
 	 * Requirement parent element
 	 * 
-	 * @private
 	 * @readOnly
 	 * @type {Ea.Element._Base}
 	 */
-	__parent: property({api: "ParentID", referenceBy: "id"})
+	parent: {api: "ParentID", referenceBy: "id"}
 });

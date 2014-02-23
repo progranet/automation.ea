@@ -17,8 +17,15 @@
 /**
  * @namespace
  */
-Core.Lang = {
 
+_meta = {
+	_class: null
+};
+
+Core.Lang = {
+		
+	_propertyListener: [],
+		
 	/**
 	 * Tests if specified type is a class
 	 * 
@@ -33,34 +40,34 @@ Core.Lang = {
 	/**
 	 * Defines new class extending Core.Lang.Object class
 	 * 
-	 * @memberOf Core.Lang
-	 * @param {Object} namespace
+	 * @param {String} namespace
 	 * @param {String} name
 	 * @param {Object} features
-	 * @param {?Object} staticFeatures
-	 * @param {?Object} properties
-	 * @type {Class}
+	 * @param {Object} staticFeatures
+	 * @param {Object} properties
+	 * @type {Core.Lang.Class}
 	 */
 	define: function(namespace, name, features, staticFeatures, properties) {
-		return Core.Lang.extend(namespace, name, Core.Types.Object, features, staticFeatures, properties);
+		if (namespace != "Core.Lang" || name != "Class")
+			return Core.Lang.extend(namespace, name, Core.Types.Object, features, staticFeatures, properties);
+		
+		var metaClass = new Function("this.create.apply(this, arguments);");
+		metaClass.prototype = features;
+		_meta._class = metaClass;
 	},
 	
 	/**
 	 * Defines new class extending specified super class
 	 * 
-	 * @memberOf Core.Lang
-	 * @param {Object} namespace
+	 * @param {String} namespace
 	 * @param {String} name
-	 * @param {Class} superClasses
+	 * @param {Core.Lang.Class} superClasses
 	 * @param {Object} features
-	 * @param {?Object} staticFeatures
-	 * @param {?Object} properties
-	 * @type {Class}
+	 * @param {Object} staticFeatures
+	 * @param {Object} properties
+	 * @type {Core.Lang.Class}
 	 */
 	extend: function(namespace, name, superClasses, features, staticFeatures, properties) {
-		
-		if (typeof(namespace) != "string")
-			namespace = namespace.qualifiedName;
 		
 		if (!superClasses) {
 			if (namespace != "Core.Types" || name != "Object")
@@ -72,18 +79,29 @@ Core.Lang = {
 				superClasses = [superClasses];
 		}
 		
-		//superClass = superClass || Core.Types.Object;
 		features = features || {};
 		if (!features.create) {
 			var args = Core.parse(superClasses[0].prototype.create).joinedArguments;
 			eval("features.create = function(" + args + ") {_super.create(" + args + ");}");
 		}
 		
-		var _class = Core.Lang._define(namespace, name, superClasses, features, staticFeatures, properties);
-		
-			
 		for (var s = 0; s < superClasses.length; s++) {
 			var superClass = superClasses[s];
+			
+			if (s == 0) {
+				for (var featureName in features) {
+					var feature = features[featureName];
+
+					if (Core.isMethod(feature, featureName)) {
+						var fn = feature.toString();
+						fn = fn.replace(/_super\.([a-zA-Z0-9_$]+)\((\)?)/g, function($0, $1, $2) {
+							var string = "this[\"" + superClass.qualifiedName + "." + $1 + "\"].call(this" + ($2 ? ")" : ", ");
+							return string;
+						});
+						fn = eval("features." + featureName + " = " + fn);
+					}
+				}
+			}
 			
 			var _fn = function(featureName) {
 				var feature = superClass.prototype[featureName];
@@ -108,132 +126,229 @@ Core.Lang = {
 				_fn("toString");
 			if (!Core.isNative(superClass.prototype.valueOf))
 				_fn("valueOf");
-
-			superClass._subClass.push(_class);
 		}
 		
-		return _class;
+		return (new _meta._class(superClasses, namespace, name, features, staticFeatures, properties))._class;
 	},
 	
 	/**
-	 * @private
+	 * Registers listener function that checks if provided property definition satisfies conditions for specified property class  
+	 * 
+	 * @param {Function} listener
+	 * @param {Core.Lang.Class} propertyClass
 	 */
-	_define: function(namespace, name, superClasses, features, staticFeatures, properties) {
-		
-		var _class = new Function("this.create.apply(this, arguments);");
+	registerPropertyListener: function(listener, propertyClass) {
+		this._propertyListener.push({
+			listener: listener, 
+			propertyClass: propertyClass
+		});
+	}
+};
 
-		var superClass = superClasses.length != 0 ? superClasses[0] : null;
-		for (var featureName in features) {
-			var feature = features[featureName];
-
-			if (Core.isMethod(feature, featureName)) {
-				var fn = feature.toString();
-				fn = fn.replace(/_super\.([a-zA-Z0-9_$]+)\((\)?)/g, function($0, $1, $2) {
-					var string = "this[\"" + superClass.qualifiedName + "." + $1 + "\"].call(this" + ($2 ? ")" : ", ");
-					return string;
-				});
-				fn = eval("features." + featureName + " = " + fn);
-				Core.enrichMethod(features, featureName, namespace + "." + name + "." + featureName, false);
-			}
-		}
-		Core.Lang._defineStatic(_class, superClasses, namespace, name, features, staticFeatures, properties);
-		
-		features._class = _class;
-		_class.prototype = features;
-		
-		return _class;
-	},
+Core.Lang.Class = define({
+	
 	
 	/**
-	 * @private
+	 * Creates new class
+	 * 
+	 * @param {Core.Lang.Class} superClasses
+	 * @param {String} namespace
+	 * @param {String} name
+	 * @param {Object} features Map of class instance features - attributes and methods
+	 * @param {Object} staticFeatures Map of class static features - attributes and methods
+	 * @param {Object} properties Map of class properties
 	 */
-	_defineStatic: function(_class, superClasses, namespace, name, features, staticFeatures, properties) {
+	create: function (superClasses, namespace, name, features, staticFeatures, properties) {
 		
-		_class.name = name;
-		_class.getName = function() {return name;};
-		_class.qualifiedName = namespace + "." + name;
-		_class.getQualifiedName = function() {return _class.qualifiedName;};
-		_class.namespace = eval(namespace);
-		if (!_class.namespace._classes)
-			_class.namespace._classes = {};
-		_class.namespace._classes[name] = _class;
+		this.name = name;
+		this.qualifiedName = namespace + "." + name;
+		this.namespace = eval(namespace);
+		this._super = superClasses;
+		this._subClass = [];
+		this._properties = {};
 		
-		_class.isClass = true;
-
-		_class._super = superClasses;
-		_class.isSubclassOf = function(ofClass) {
-			if (!ofClass)
-				throw new Error(_class.qualifiedName + ".isSubclassOf(<<undefined>>)");
-			for (var s = 0; s < superClasses.length; s++) {
-				var superClass = superClasses[s];
-				if (superClass.conformsTo(ofClass))
-					return true;
-			}
-			return false;
-		};
-		_class.conformsTo = function(toClass) {
-			return _class === toClass || _class.isSubclassOf(toClass);
-		};
-		_class.isInstance = function(object) {
-			return object && object._class && object._class.isClass && object._class.conformsTo(_class);
-		};
-
-		_class._subClass = [];
-		_class.isAssignableFrom = function(fromClass) {
-			if (!fromClass)
-				throw new Error(_class.qualifiedName + ".isAssignableFrom(<<undefined>>)");
-			if (!fromClass.isClass)
-				return false;
-			if (_class === fromClass)
-				return true;
-			for (var s = 0; s < _class._subClass.length; s++) {
-				var subClass = _class._subClass[s];
-				if (subClass === fromClass || subClass.isAssignableFrom(fromClass))
-					return true;
-			}
-			return false;
-		};
-		
-		_class.ensure = function(params) {
-			return _class.isInstance(params) ? params : new _class(params);
-		};
-		_class.toString = function() {
-			return _class.qualifiedName;
-		};
 		for (var featureName in staticFeatures) {
-			//if (!(featureName in _class)) {
-				var feature = staticFeatures[featureName];
-				_class[featureName] = feature;
-				if (Core.isMethod(feature, featureName)) {
-					Core.enrichMethod(_class, featureName, namespace + "." + name + "." + featureName, true);
-				}
-				if (feature && typeof(feature) == "object" && feature.initialize)
-					feature.initialize(_class, featureName, features);
-			/*}
-			else {
-				throw new Error("Static feature already exists: " + _class.qualifiedName + "." + featureName);
-			}*/
+			var feature = staticFeatures[featureName];
+			this[featureName] = feature;
+			if (Core.isMethod(feature, featureName)) {
+				Core.enrichMethod(this, featureName, namespace + "." + name + "." + featureName, true);
+			}
 		}
+		
 		for (var s = 0; s < superClasses.length; s++) {
 			var superClass = superClasses[s];
 			for (var featureName in superClass) {
-				if (!_class[featureName])
-					_class[featureName] = superClass[featureName];
+				if (!this[featureName])
+					this[featureName] = superClass[featureName];
 			}
 		}
-
-		/*_class._properties = {};
-		for (var propertyName in properties) {
-			_class._properties[propertyName] = properties[propertyName];
-		}
+		
 		for (var s = 0; s < superClasses.length; s++) {
 			var superClass = superClasses[s];
 			for (var propertyName in superClass._properties) {
-				_class._properties[propertyName] = _class._properties[propertyName] || superClass._properties[propertyName];
+				this._properties[propertyName] = superClass._properties[propertyName];
 			}
-		}*/
+		}
+		
+		for (var propertyName in properties) {
+			var property = properties[propertyName];
+			property.name = propertyName;
+			for (var l = 0; l < Core.Lang._propertyListener.length; l++) {
+				var listener = Core.Lang._propertyListener[l];
+				if (listener.listener(this, property)) {
+					this._properties[propertyName] = new listener.propertyClass(this, features, property);
+					break;
+				}
+			}
+		}
+		
+		for (var featureName in features) {
+			var feature = features[featureName];
+			if (Core.isMethod(feature, featureName)) {
+				Core.enrichMethod(features, featureName, this.qualifiedName + "." + featureName, false);
+			}
+		}
 		
 		// TODO: prevent class initialization before namespace is initialized by loader
-		_class.initialize();
+		this.initialize();
+		
+		var _class = new Function("this.create.apply(this, arguments);");
+
+		for (var propertyName in this) {
+			_class[propertyName] = this[propertyName];
+		}
+		_class.toString = this.toString;
+
+		features._class = _class;
+		_class.prototype = features;
+		
+		this._classTemplate = true;
+		
+		for (var s = 0; s < superClasses.length; s++) {
+			var superClass = superClasses[s];
+			superClass._subClass.push(_class);
+		}
+		
+		this._class = _class;
+		
+	},
+
+		
+	_class: null,
+	//prototype: null,
+	isClass: true,
+	
+	name: null,
+	
+	/**
+	 * Returns class name
+	 * 
+	 * @type {String}
+	 */
+	getName: function() {
+		return this.name;
+	},
+	
+	qualifiedName: null,
+	
+	/**
+	 * Returns class qualified name
+	 * 
+	 * @type {String}
+	 */
+	getQualifiedName: function() {
+		return this.qualifiedName;
+	},
+	
+	namespace: null,
+	
+	/**
+	 * Returns class namespace
+	 * 
+	 * @type {Object}
+	 */
+	getNamespace: function() {
+		return this.namespace;
+	},
+	
+	_super: null,
+	
+	_subClass: null,
+	
+	_properties: null,
+	
+	/**
+	 * Returns property by name
+	 * 
+	 * @param {String} name
+	 * @type {Object}
+	 */
+	getProperty: function(name) {
+		return this._properties[name];
+	},
+	
+	/**
+	 * Checks if this class is subclass of specified class
+	 * 
+	 * @param {Core.Lang.Class} ofClass
+	 * @type {Boolean}
+	 */
+	isSubclassOf: function(ofClass) {
+		if (!ofClass)
+			throw new Error(this.qualifiedName + ".isSubclassOf(<<undefined>>)");
+		for (var s = 0; s < this._super.length; s++) {
+			var superClass = this._super[s];
+			if (superClass.conformsTo(ofClass))
+				return true;
+		}
+		return false;
+	},
+	
+	/**
+	 * Checks if this class conforms to specified class
+	 * 
+	 * @param {Core.Lang.Class} toClass
+	 * @type {Boolean}
+	 */
+	conformsTo: function(toClass) {
+		return this === toClass || this.isSubclassOf(toClass);
+	},
+	
+	/**
+	 * Checks if specified object is instance of this class
+	 * 
+	 * @param {Object} object
+	 * @type {Boolean}
+	 */
+	isInstance: function(object) {
+		return object && object._class && Core.Lang.isClass(object._class) && object._class.conformsTo(this);
+	},
+	
+	/**
+	 * Checks if this class is assignable from specified class
+	 * 
+	 * @param {Core.Lang.Class} fromClass
+	 * @type {Boolean}
+	 */
+	isAssignableFrom: function(fromClass) {
+		if (!fromClass)
+			throw new Error(this.qualifiedName + ".isAssignableFrom(<<undefined>>)");
+		if (!Core.Lang.isClass(fromClass))
+			return false;
+		if (this === fromClass)
+			return true;
+		for (var s = 0; s < this._subClass.length; s++) {
+			var subClass = this._subClass[s];
+			if (subClass === fromClass || subClass.isAssignableFrom(fromClass))
+				return true;
+		}
+		return false;
+	},
+	
+	/**
+	 * @type {String}
+	 */
+	toString: function() {
+		return this.qualifiedName;
 	}
-};
+});

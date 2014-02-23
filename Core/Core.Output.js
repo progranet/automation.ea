@@ -22,7 +22,6 @@ Core.Output = {
 	/**
 	 * Returns string represented by scriptlet replaced with values evaluated from specified params
 	 * 
-	 * @memberOf Core.Output
 	 * @param {String} scriptlet Template scriptlet 
 	 * @param {Object} params Array or map of objects to be evaluated
 	 * @type {String}
@@ -38,8 +37,8 @@ Core.Output = {
 		}
 		else if (typeof(params) == "object") {
 			return scriptlet.replace(/<%\s*([^%]+)\s*%>/g, function(whole, body) {
-				eval("var fn = function(" + Core.Helper.getNames(params).join(", ") + ") {return " + body + ";}");
-				return fn.apply(params.$this, Core.Helper.getValues(params));
+				eval("var fn = function(" + Core.Utils.getNames(params).join(", ") + ") {return " + body + ";}");
+				return fn.apply(params.$this, Core.Utils.getValues(params));
 			});
 		}
 		else {
@@ -50,7 +49,6 @@ Core.Output = {
 	/**
 	 * Returns string representing evaluated context in form depending on its type
 	 * 
-	 * @memberOf Core.Output
 	 * @param {Object} context
 	 * @type {String}
 	 */
@@ -93,7 +91,7 @@ Core.Output = {
 		}
 		
 		if (type == "function") {
-			if (context.isClass) {
+			if (Core.Lang.isClass(context)) {
 				return context;
 			}
 			var parsed = Core.parse(context);

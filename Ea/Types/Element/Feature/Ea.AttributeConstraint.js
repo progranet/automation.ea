@@ -20,13 +20,30 @@ Ea.AttributeConstraint = {
 		}
 };
 
-Ea.AttributeConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
+Ea.AttributeConstraint._Base = extend(Ea.FeatureConstraint._Base, {
+	
+	getNamespace: function() {
+		return this.getAttribute();
+	},
+	
+	setNamespace: function(namespace) {
+		this.setAttribute(namespace);
+	}
+},
+{},
 {
 	/**
-	 * Attribute constraint parent attribute
+	 * Named element namespace
 	 * 
-	 * @private
+	 * @derived
+	 * @type {Ea.Types.Namespace}
+	 */
+	namespace: {},
+
+	/**
+	 * Attribute constraint attribute
+	 * 
 	 * @type {Ea.Attribute._Base}
 	 */
-	__parent: property({api: "AttributeID", referenceBy: "id"})
+	attribute: {api: "AttributeID", referenceBy: "id"}
 });

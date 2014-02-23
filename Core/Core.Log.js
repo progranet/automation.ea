@@ -58,12 +58,10 @@ Core.Log = {
 	
 	/**
 	 * Initializes namespace
-	 * 
-	 * @memberOf Core.Log
 	 */
 	initialize: function() {
 
-		var callbackStacktrace = function(source, namespace, propertyName, qualifiedName, _static) {
+		var callbackStacktrace = function(source, methodName) {
 			var parsed = Core.parse(source);
 			source = "function " + parsed.name + "(" + parsed.joinedArguments + ") " +
 			"{\n\
@@ -131,7 +129,6 @@ Core.Log = {
 	/**
 	 * Registers log on specified logging level and mask
 	 * 
-	 * @memberOf Core.Log
 	 * @param {String} level
 	 * @param {String} mask
 	 */
@@ -143,9 +140,9 @@ Core.Log = {
 			targets: []
 		};
 
-		var callbackLogs = function(source, namespace, propertyName, qualifiedName, _static) {
+		var callbackLogs = function(source, methodName) {
 			return source.replace(new RegExp("([^\\.\\w]\\s*)" + level + "\\s*\\(", "g"), function(whole, prefix) {
-				return prefix + "Core.Log._log(\"" + level + "\", this, \"" + propertyName + "\", ";
+				return prefix + "Core.Log._log(\"" + level + "\", this, \"" + methodName + "\", ";
 			});
 		};
 		Core.registerMethodEnrichment(callbackLogs);
@@ -154,7 +151,6 @@ Core.Log = {
 	/**
 	 * Registers specified target for logs
 	 * 
-	 * @memberOf Core.Log
 	 * @param {String} level
 	 * @param {Core.Target.AbstractTarget} target
 	 */

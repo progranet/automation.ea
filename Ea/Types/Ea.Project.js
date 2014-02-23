@@ -23,12 +23,11 @@ Ea.Project = {
 		}		
 };
 
-Ea.Project._Base = extend(Ea.Types.Any, /** @lends Ea.Project._Base# */ {
+Ea.Project._Base = extend(Ea.Types.Any, {
 	
 	/**
 	 * Returns specified GUID converted to XML format
 	 * 
-	 * @memberOf Ea.Project._Base#
 	 * @param {String} guid
 	 * @type {String}
 	 */
@@ -51,11 +50,33 @@ Ea.Project._Base = extend(Ea.Types.Any, /** @lends Ea.Project._Base# */ {
 	 * For unknown reason Repository interface has OpenFile, OpenFile2 methods, too.
 	 * Those methods seems to be more complex (give possibility of specifying connection strings).
 	 * 
-	 * @see Ea.Repository._Base#open
+	 * @see Ea.Repository._Base.open
 	 * @param {String} path
 	 */
 	load: function(path) {
 		this._source.api.LoadProject(path);
-	}
+	},
 	
+	/**
+	 * Layouts specified diagram
+	 * 
+	 * @param {Ea.Diagram._Base} diagram
+	 * @param {Number} style
+	 * @param {Number} iterations
+	 * @param {Number} layerSpacing
+	 * @param {Number} columnSpacing
+	 * @param {Boolean} saveAsDefault
+	 */
+	layoutDiagram: function(diagram, style, iterations, layerSpacing, columnSpacing, saveAsDefault) {
+		this._source.api.LayoutDiagramEx(diagram.getXmlGuid(), style, iterations, layerSpacing, columnSpacing, saveAsDefault);
+	},
+	
+	/**
+	 * Loads specified diagram
+	 * 
+	 * @param {Ea.Diagram._Base} diagram
+	 */
+	loadDiagram: function(diagram) {
+		this._source.api.LoadDiagram(diagram.getXmlGuid());
+	}
 });

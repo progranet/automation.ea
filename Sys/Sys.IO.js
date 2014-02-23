@@ -20,7 +20,6 @@
 Sys.IO = {
 
 	/**
-	 * @memberOf Sys.IO
 	 * @enum {Number}
 	 */
 	Mode: {
@@ -30,7 +29,6 @@ Sys.IO = {
 	},
 
 	/**
-	 * @memberOf Sys.IO
 	 * @enum {Number}
 	 */
 	Unicode: {
@@ -46,8 +44,6 @@ Sys.IO = {
 	
 	/**
 	 * Finalizes namespace - closes used files
-	 * 
-	 * @memberOf Sys.IO
 	 */
 	finalize: function() {
 		debug("closing used files");
@@ -60,7 +56,7 @@ Sys.IO = {
 	 * @deprecated Use Sys.IO.copyFile instead
 	 * @param {String} filePath
 	 * @param {String} folderPath
-	 * @param {?Object} namespace Namespace containing file
+	 * @param {Object} namespace Namespace containing file
 	 */
 	copy: function(filePath, folderPath, namespace) {
 		this.copyFile(filePath, folderPath, namespace);
@@ -72,7 +68,7 @@ Sys.IO = {
 	 * @see Sys.IO.getPath
 	 * @param {String} filePath
 	 * @param {String} folderPath
-	 * @param {?Object} namespace Namespace containing file
+	 * @param {Object} namespace Namespace containing file
 	 */
 	copyFile: function(filePath, folderPath, namespace) {
 		Sys.IO._fileSystem.CopyFile(this.getPath(filePath, namespace), folderPath);
@@ -92,9 +88,8 @@ Sys.IO = {
 	/**
 	 * Returns absolute path to the file in namespace
 	 * 
-	 * @memberOf Sys.IO
 	 * @param {String} file
-	 * @param {?Object} namespace Namespace containing file 
+	 * @param {Object} namespace Namespace containing file 
 	 * @type {String}
 	 */
 	getPath: function(file, namespace) {
@@ -104,7 +99,6 @@ Sys.IO = {
 	/**
 	 * Checks if specified file exists in file system
 	 * 
-	 * @memberOf Sys.IO
 	 * @param {String} filePath
 	 * @type {Boolean}
 	 */
@@ -195,11 +189,10 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	 * Constructs a file wrapper in file system.
 	 * If there is mode specified file will be opened or created.
 	 * 
-	 * @constructs
 	 * @param {any} file File path or Windows file system File object
-	 * @param {?Sys.IO.Mode} mode File wrapper creation mode
-	 * @param {?Sys.IO.Unicode} unicode File unicode mode (default Sys.IO.Unicode.ASCII)
-	 * @param {?Object} namespace Namespace containing file
+	 * @param {Sys.IO.Mode} mode File wrapper creation mode
+	 * @param {Sys.IO.Unicode} unicode File unicode mode (default Sys.IO.Unicode.ASCII)
+	 * @param {Object} namespace Namespace containing file
 	 */
 	create: function(file, mode, unicode, namespace) {
 		if (typeof file == "string") {
@@ -221,7 +214,7 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	 * Opens file or creates it according to specified parameters
 	 * 
 	 * @param {Sys.IO.Mode} mode File wrapper creation mode
-	 * @param {?Sys.IO.Unicode} unicode File unicode mode (default Sys.IO.Unicode.ASCII)
+	 * @param {Sys.IO.Unicode} unicode File unicode mode (default Sys.IO.Unicode.ASCII)
 	 */
 	open: function(mode, unicode) {
 		
@@ -241,7 +234,6 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	/**
 	 * Writes specified text to this file stream.
 	 * 
-	 * @memberOf Sys.IO.File#
 	 * @param {String} text
 	 */
 	write: function(text) {
@@ -251,7 +243,6 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	/**
 	 * Writes line to this file stream.
 	 * 
-	 * @memberOf Sys.IO.File#
 	 * @param {String} text
 	 */
 	writeLine: function(text) {
@@ -261,7 +252,6 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	/**
 	 * Reads line from this file stream.
 	 * 
-	 * @memberOf Sys.IO.File#
 	 * @type {String}
 	 */
 	readLine: function() {
@@ -271,7 +261,6 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	/**
 	 * Reads entire file.
 	 * 
-	 * @memberOf Sys.IO.File#
 	 * @type {String}
 	 */
 	readAll: function() {
@@ -281,7 +270,6 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	/**
 	 * Checks if this file stream is at the end
 	 * 
-	 * @memberOf Sys.IO.File#
 	 * @type {Boolean}
 	 */
 	atEnd: function() {
@@ -291,7 +279,6 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	/**
 	 * Closes this file.
 	 * 
-	 * @memberOf Sys.IO.File#
 	 */
 	close: function() {
 		if (this._state != Sys.IO.File.State.OPEN) {
@@ -317,7 +304,7 @@ Sys.IO.Folder = extend(Sys.IO._Element, {
 	 * Constructs Sys.IO.Folder
 	 * 
 	 * @param {any} folder Path to folder or Windows file system Folder object
-	 * @param {?Object} namespace
+	 * @param {Object} namespace
 	 */
 	create: function(folder, namespace) {
 		if (typeof folder == "string") {

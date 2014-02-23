@@ -16,26 +16,22 @@
 
 Ea.FeatureConstraint = {};
 
-Ea.FeatureConstraint._Base = extend(Ea.Types.Named, {},
+Ea.FeatureConstraint._Base = extend(Ea.Types.NamedElement, {},
 {
-
-	/**
-	 * Determines the class of FeatureConstraint based on source attributes values
-	 * 
-	 * @param {Ea._Base.Source} source
-	 * @type {Class}
-	 */
-	determineType: function(source) {
-		return this._deriveType(source, this._type);
-	},
-
+	determineType: function(api) {
+		return this._deriveType(api, this.getProperty("_type"));
+	}
+},
+{
 	/**
 	 * Feature constraint notes
 	 */
-	_notes: property({api: "Notes"}),
-	
+	notes: {api: "Notes"},
+
 	/**
 	 * Feature constraint type
+	 * 
+	 * @private
 	 */
-	_type: property({api: "Type"})
+	_type: {api: "Type"}
 });

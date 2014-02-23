@@ -20,24 +20,24 @@ Ea.Swimlane = {
 		}
 };
 
-Ea.Swimlane._Base = extend(Ea.Types.Any, {}, {
+Ea.Swimlane._Base = extend(Ea.Types.Any, {}, {}, {
 	
 	/**
 	 * Swimlane width
 	 * 
 	 * @type {Number}
 	 */
-	_width: property({api: "Width"}),
+	width: {api: "Width"},
 	
 	/**
 	 * Swimlane title
 	 */
-	_title: property({api: "Title"}),
+	title: {api: "Title"},
 	
 	/**
 	 * Swimlane classifier
 	 * 
 	 * @type {Ea.Element._Base}
 	 */
-	_classifier: property({api: "ClassifierGuid", referenceBy: "guid"})	
+	classifier: {api: "ClassifierGuid", referenceBy: "guid"}	
 });

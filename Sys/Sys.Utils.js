@@ -29,8 +29,6 @@ Sys.Utils.FileTarget = extend(Core.Target.AbstractTarget, {
 	/**
 	 * Creates new file target
 	 * 
-	 * @constructs
-	 * @extends Core.Target.AbstractTarget
 	 * @param {String} path Target file path
 	 * @param {Number} type Specifies type of target as one of {@link Core.Target.Type}
 	 */
@@ -43,7 +41,6 @@ Sys.Utils.FileTarget = extend(Core.Target.AbstractTarget, {
 	/**
 	 * Writes specified message to target file
 	 * 
-	 * @memberOf Sys.Utils.FileTarget#
 	 * @param {String} message
 	 */
 	write: function(message) {
@@ -52,8 +49,6 @@ Sys.Utils.FileTarget = extend(Core.Target.AbstractTarget, {
 	
 	/**
 	 * Closes target file
-	 * 
-	 * @memberOf Sys.Utils.FileTarget#
 	 */
 	close: function() {
 		this._file.close();

@@ -25,10 +25,34 @@ Ea = {
 	 */
 	OBJECT_TYPES_NUMBER: 100,
 	
+	_objectTypes: new Array(this.OBJECT_TYPES_NUMBER),
+	
+	_namespaces: [],
+	
 	_application: null,
 	
 	initialize: function() {
-		Ea._Base.Class.prepareClasses();
+		
+		for (var n = 0; n < this._namespaces.length; n++) {
+			var namespace = this._namespaces[n];
+			if (namespace.meta && namespace.meta.objectType)
+				Ea._objectTypes[namespace.meta.objectType] = namespace._Base;
+		}
+		
+		var prepare = function(_class) {
+			
+			for (var propertyName in _class._properties) {
+				var property = _class.getProperty(propertyName);
+				if (!property.isPrepared())
+					property.prepare();
+			}
+			
+			for (var c = 0; c < _class._subClass.length; c++) {
+				prepare(_class._subClass[c]);
+			}
+		};
+		
+		prepare(Ea.Types.Any);
 	},
 	
 	/**
@@ -85,8 +109,6 @@ Ea = {
 		return this._guid.test(guid);
 	},
 	
-	_objectTypes: new Array(this.OBJECT_TYPES_NUMBER),
-	
 	/**
 	 * Logs element to tree logger
 	 * 
@@ -94,6 +116,15 @@ Ea = {
 	 */
 	log: function(element) {
 		Ea._Base.Utils.Log.getLog(element).log();
+	},
+	
+	/**
+	 * Adds owned namespace
+	 * 
+	 * @param {Object} namespace
+	 */
+	addOwned: function(namespace) {
+		this._namespaces.push(namespace);
 	}
 };
 

@@ -26,24 +26,24 @@ Ea.ScenarioExtension._Base = extend(Ea.Types.Any, {
 	_toString: function() {
 		return this.getLevel() + " [" + this._class + "]";
 	}
-},
+}, {},
 {
 	/**
 	 * Scenario extension guid
 	 */
-	_guid: property({api: "ExtensionGUID"}),
+	guid: {api: "ExtensionGUID"},
 	
 	/**
 	 * Scenario extension position in list of element scenario extensions
 	 */
-	_pos: property({api: "Pos"}),
+	pos: {api: "Pos"},
 	
 	/**
 	 * Scenario extension level
 	 * 
 	 * @readOnly
 	 */
-	_level: property({api: "Level"}),
+	level: {api: "Level"},
 	
 	/**
 	 * Scenario extension joining step
@@ -51,7 +51,7 @@ Ea.ScenarioExtension._Base = extend(Ea.Types.Any, {
 	 * @readOnly
 	 * @type {Ea.ScenarioStep._Base}
 	 */
-	_joiningStep: property({api: "JoiningStep"}),
+	joiningStep: {api: "JoiningStep"},
 	
 	/**
 	 * Scenario extension scenario specification
@@ -59,5 +59,5 @@ Ea.ScenarioExtension._Base = extend(Ea.Types.Any, {
 	 * @readOnly
 	 * @type {Ea.Scenario._Base}
 	 */
-	_scenario: property({api: "Scenario"})
+	scenario: {api: "Scenario"}
 });

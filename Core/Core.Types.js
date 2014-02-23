@@ -14,14 +14,11 @@
    limitations under the License.
 */
 
-var callback = function(source, namespace) {
+var callback = function(source) {
 	return source.replace(/\.\s*forEach\s*\(/g, ".forEach(this, ");
 };
 Core.registerMethodEnrichment(callback);
 
-/**
- * @namespace
- */
 Core.Types = {
 
 	_id: 0,
@@ -34,12 +31,10 @@ Core.Types = {
 	}
 };
 
-Core.Types.Object = define(/** @lends Core.Types.Object# */ {
+Core.Types.Object = define({
 	
 	/**
 	 * Core.Types.Object constructor
-	 * 
-	 * @constructs
 	 */
 	create: function() {
 		this._setId();
@@ -57,8 +52,7 @@ Core.Types.Object = define(/** @lends Core.Types.Object# */ {
 	/**
 	 * Checks if this object is an instance of specified class
 	 * 
-	 * @memberOf Core.Types.Object#
-	 * @param {Class} _class
+	 * @param {Core.Lang.Class} _class
 	 * @type {Boolean}
 	 */
 	instanceOf: function(_class) {
@@ -69,7 +63,6 @@ Core.Types.Object = define(/** @lends Core.Types.Object# */ {
 	 * Checks if this object matches specified filter
 	 * 
 	 * @see Core.Types.Filter
-	 * @memberOf Core.Types.Object#
 	 * @param {Object} filter
 	 * @type {Boolean}
 	 */
@@ -103,24 +96,19 @@ Core.Types.Object = define(/** @lends Core.Types.Object# */ {
 {
 	/**
 	 * Class initialization 
-	 * 
-	 * @memberOf Core.Types.Object
-	 * @static
 	 */
 	initialize: function() {
 
 	}
 });
 
-Core.Types.Named = define(/** @lends Core.Types.Named# */{
+Core.Types.Named = define({
 	
 	_name: null,
 	
 	/**
 	 * Core.Types.Named constructor
 	 * 
-	 * @constructs
-	 * @extends Core.Types.Object
 	 * @param {String} name
 	 */
 	create: function(name) {
@@ -131,7 +119,6 @@ Core.Types.Named = define(/** @lends Core.Types.Named# */{
 	/**
 	 * Returns this name
 	 * 
-	 * @memberOf Core.Types.Named#
 	 * @type {String}
 	 */
 	getName: function() {
@@ -148,49 +135,9 @@ Core.Types.Named = define(/** @lends Core.Types.Named# */{
 
 Core.Types.AbstractCollection = define({
 	
-});
-
-Core.Types.Collection = extend(Core.Types.AbstractCollection, {
-
 	_size: 0,
 	_table: null,
 
-	/**
-	 * Core.Types.Collection constructor
-	 * 
-	 * @constructs
-	 * @param {Object} params Specifies initial parameters: {@link Core.Types.Filter} filter, {@link Core.Types.Collection} collection
-	 */
-	create: function(params) {
-		params = params || {};
-		this._table = [];
-		
-		if (params.collection)
-			this.addAll(params.collection);
-	},
-	
-	/**
-	 * Adds specified element to this collection
-	 * 
-	 * @memberOf Core.Types.Collection#
-	 * @param {Core.Types.Object} element
-	 * @type {Boolean}
-	 */
-	add: function(element) {
-		if (!element || !Core.Types.Object.isInstance(element))
-			throw new Error("No element specified or unexpected element type");
-		if (!this._add(element))
-			return false;
-		if (this.contains(element)) {
-			debug("Element already exists in collection: $ (object.__id__ = $)", [element, element.__id__]);
-			return false;
-		}
-		this._table.push(element);
-		this._size++;
-		this._added(element);
-		return true;
-	},
-	
 	/**
 	 * Checks if this collection contains element
 	 * 
@@ -213,6 +160,124 @@ Core.Types.Collection = extend(Core.Types.AbstractCollection, {
 				return i;
 		}
 		return -1;
+	},
+	
+	/**
+	 * Returns collection size.
+	 * 
+	 * @type {Number}
+	 */
+	getSize: function() {
+		return this._size;
+	},
+	
+	/**
+	 * Checks if this collection is empty
+	 * 
+	 * @type {Boolean}
+	 */
+	isEmpty: function() {
+		return this._size == 0;
+	},
+	
+	/**
+	 * Checks if this collection is not empty
+	 * 
+	 * @type {Boolean}
+	 */
+	notEmpty: function() {
+		return this._size != 0;
+	},
+	
+	/**
+	 * Returns first element of this collection
+	 * 
+	 * @type {Object}
+	 */
+	first: function() {
+		return (this._size == 0 ? null : this._table[0]);
+	},
+	
+	/**
+	 * Returns new collection containing elements from this collection matching specified filter
+	 * 
+	 * @see Core.Types.Filter
+	 * @param {Object} filter
+	 * @type {Core.Types.Collection<Core.Types.Object>}
+	 */
+	filter: function(filter) {
+		if (!filter) return this;
+		var filtered = new Core.Types.Collection();
+		filter = Core.Types.Filter.ensure(filter);
+		for (var i = 0; i < this._size; i++) {
+			var element = this._table[i];
+			if (filter.check(element))
+				filtered.add(element);
+		}
+		return filtered;
+	},
+	
+	/**
+	 * Adds all elements of this collection to specified collection
+	 * 
+	 * @param {Core.Types.Collection<Core.Types.Object>} collection
+	 */
+	addAllTo: function(collection) {
+		if (!Core.Types.AbstractCollection.isInstance(collection))
+			throw new Error("No collection specified or unknown collection type: " + collection);
+		for (var i = 0; i < this._size; i++) {
+			collection.add(this._table[i]);
+		}
+	},
+	
+	/**
+	 * Removes all elements of this collection from specified collection
+	 * 
+	 * @param {Core.Types.Collection<Core.Types.Object>} collection
+	 */
+	removeAllFrom: function(collection) {
+		if (!Core.Types.AbstractCollection.isInstance(collection))
+			throw new Error("No collection specified or unknown collection type: " + collection);
+		for (var i = 0; i < this._size; i++) {
+			collection.remove(this._table[i]);
+		}
+	}	
+});
+
+Core.Types.Collection = extend(Core.Types.AbstractCollection, {
+
+	/**
+	 * Core.Types.Collection constructor
+	 * 
+	 * @param {Object} params Specifies initial parameters: {@link Core.Types.Filter} filter, {@link Core.Types.Collection} collection
+	 */
+	create: function(params) {
+		params = params || {};
+		this._table = [];
+		
+		if (params.collection)
+			this.addAll(params.collection);
+	},
+	
+	/**
+	 * Adds specified element to this collection
+	 * 
+	 * @param {Core.Types.Object} element
+	 * @type {Boolean}
+	 */
+	add: function(element) {
+		if (!element || !Core.Types.Object.isInstance(element))
+			throw new Error("No element specified or unexpected element type");
+		if (!this._add(element))
+			return false;
+		if (this.contains(element)) {
+			debug("Element already exists in collection: $ (object.__id__ = $)", [element, element.__id__]);
+			return false;
+		}
+		this._table.push(element);
+		this._size++;
+		this._added(element);
+		return true;
 	},
 	
 	/**
@@ -268,8 +333,7 @@ Core.Types.Collection = extend(Core.Types.AbstractCollection, {
 	/**
 	 * Adds all elements of specified collection to this collection
 	 * 
-	 * @memberOf Core.Types.Collection#
-	 * @param {Core.Types.Collection} collection
+	 * @param {Core.Types.Collection<Core.Types.Object>} collection
 	 */
 	addAll: function(collection) {
 		if (!Core.Types.AbstractCollection.isInstance(collection))
@@ -278,24 +342,9 @@ Core.Types.Collection = extend(Core.Types.AbstractCollection, {
 	},
 	
 	/**
-	 * Adds all elements of this collection to specified collection
-	 * 
-	 * @memberOf Core.Types.Collection#
-	 * @param {Core.Types.Collection} collection
-	 */
-	addAllTo: function(collection) {
-		if (!Core.Types.AbstractCollection.isInstance(collection))
-			throw new Error("No collection specified or unknown collection type: " + collection);
-		for (var i = 0; i < this._size; i++) {
-			collection.add(this._table[i]);
-		}
-	},
-	
-	/**
 	 * Removes all elements of specified collection from this collection
 	 * 
-	 * @memberOf Core.Types.Collection#
-	 * @param {Core.Types.Collection} collection
+	 * @param {Core.Types.Collection<Core.Types.Object>} collection
 	 */
 	removeAll: function(collection) {
 		if (!Core.Types.AbstractCollection.isInstance(collection))
@@ -304,113 +353,54 @@ Core.Types.Collection = extend(Core.Types.AbstractCollection, {
 	},
 	
 	/**
-	 * Removes all elements of this collection from specified collection
-	 * 
-	 * @memberOf Core.Types.Collection#
-	 * @param {Core.Types.Collection} collection
-	 */
-	removeAllFrom: function(collection) {
-		if (!Core.Types.AbstractCollection.isInstance(collection))
-			throw new Error("No collection specified or unknown collection type: " + collection);
-		for (var i = 0; i < this._size; i++) {
-			collection.remove(this._table[i]);
-		}
-	},
-	
-	/**
 	 * Collection iterator.
 	 * 
-	 * @memberOf Core.Types.Collection#
 	 * @param {Object} context
-	 * @param {Function} fn
+	 * @param {Function} fn Callback function
 	 */
 	forEach: function(context, fn) {
 		for (var i = 0; i < this._size; i++) {
 			if (fn.call(context, this._table[i], i)) break;
 		}
-	},
-	
-	/**
-	 * Returns collection size.
-	 * 
-	 * @memberOf Core.Types.Collection#
-	 * @type {Number}
-	 */
-	getSize: function() {
-		return this._size;
-	},
-	
-	/**
-	 * Checks if this collection is empty
-	 * 
-	 * @memberOf Core.Types.Collection#
-	 * @type {Boolean}
-	 */
-	isEmpty: function() {
-		return this._size == 0;
-	},
-	
-	/**
-	 * Checks if this collection is not empty
-	 * 
-	 * @memberOf Core.Types.Collection#
-	 * @type {Boolean}
-	 */
-	notEmpty: function() {
-		return this._size != 0;
-	},
-	
-	/**
-	 * Returns first element of this collection
-	 * 
-	 * @memberOf Core.Types.Collection#
-	 * @type {Object}
-	 */
-	first: function() {
-		return (this._size == 0 ? null : this._table[0]);
-	},
-	
-	/**
-	 * Returns new collection containing elements from this collection matching specified filter
-	 * 
-	 * @see Core.Types.Filter
-	 * @memberOf Core.Types.Collection#
-	 * @param {Object} filter
-	 * @type {Core.Types.Collection}
-	 */
-	filter: function(filter) {
-		if (!filter) return this;
-		var filtered = new Core.Types.Collection();
-		filter = Core.Types.Filter.ensure(filter);
-		for (var i = 0; i < this._size; i++) {
-			var element = this._table[i];
-			if (filter.check(element))
-				filtered.add(element);
-		}
-		return filtered;
-	}
+	}	
 });
 
 Core.Types.AbstractMap = extend(Core.Types.AbstractCollection, {
-	
-});
-
-/**
- * @class
- * @extends Core.Types.Collection
- */
-Core.Types.Map = extend([Core.Types.Collection, Core.Types.AbstractMap], {
 	
 	_keyDef: null,
 	_keyFn: null,
 	_map: null,
 	
 	/**
+	 * Returns an element for specified key
+	 * 
+	 * @param {Object} key
+	 * @type {Object}
+	 */
+	get: function(key) {
+		return key in this._map ? this._map[key] : undefined;
+	},
+	
+	/**
+	 * Returns full set of elements in this map regarding that multiple elements can match same key key definition.
+	 * 
+	 * @type {Core.Types.Collection<Core.Types.Object>}
+	 */
+	asSet: function() {
+		var set = new Core.Types.Collection();
+		for (var i = 0; i < this._size; i++) {
+			set.add(this._table[i]);
+		}
+		return set;
+	}
+
+});
+
+Core.Types.Map = extend([Core.Types.Collection, Core.Types.AbstractMap], {
+
+	/**
 	 * Core.Types.Map constructor
 	 * 
-	 * @constructs
-	 * @memberOf Core.Types.Map#
-	 * @extends Core.Types.Collection
 	 * @param {Object} params Specifies initial parameters: {@link Core.Types.Filter} filter, {@link Core.Types.Collection} collection
 	 */
 	create: function(params) {
@@ -450,41 +440,17 @@ Core.Types.Map = extend([Core.Types.Collection, Core.Types.AbstractMap], {
 	},
 	
 	/**
-	 * Returns an element for specified key
-	 * 
-	 * @memberOf Core.Types.Map#
-	 * @param {Object} key
-	 * @type {Object}
-	 */
-	get: function(key) {
-		return key in this._map ? this._map[key] : undefined;
-	},
-	
-	/**
-	 * Returns full set of elements in this map regarding that multiple elements can match same key key definition.
-	 * 
-	 * @type {Core.Types.Collection}
-	 */
-	asSet: function() {
-		var set = new Core.Types.Collection();
-		for (var i = 0; i < this._size; i++) {
-			set.add(this._table[i]);
-		}
-		return set;
-	},
-
-	/**
 	 * Map iterator.
 	 * 
-	 * @memberOf Core.Types.Map#
 	 * @param {Object} context
-	 * @param {Function} fn
+	 * @param {Function} fn Callback function
 	 */
 	forEach: function(context, fn) {
 		for (var key in this._map) {
 			if (fn.call(context, this._map[key], key)) break;
 		}
 	}
+	
 });
 
 Core.Types.Filter = define({
@@ -498,13 +464,12 @@ Core.Types.Filter = define({
 	 * - function returning boolean value (e.g. new Filter(function(element) {return element.getName() == 'ABC';})),
 	 * - string containing function body (e.g. new Filter("this.getName() == 'ABC'")).
 	 * 
-	 * @constructs
 	 * @param {Object} filter
 	 */
 	create: function(filter) {
 		_super.create();
 		if (filter) {
-			if (filter.isClass)
+			if (Core.Lang.isClass(filter))
 				filter = "this.instanceOf(" + filter.qualifiedName + ")";
 			if (typeof(filter) == "string")
 				filter = new Function("return " + filter);
@@ -517,11 +482,21 @@ Core.Types.Filter = define({
 	/**
 	 * Checks if specified object matches this filter
 	 * 
-	 * @memberOf Core.Types.Filter#
 	 * @param {Object} object
 	 * @type {Boolean}
 	 */
 	check: function(object) {
 		return this._filter ? this._filter.call(object) : true;
 	}
+},
+{
+	/**
+	 * Ensures that specified object is instance of Core.Types.Filter, if not creates it based on provided specification (@link Core.Types.Filter.create)
+	 * 
+	 * @param {Object} object
+	 * @type {Core.Types.Filter}
+	 */
+	ensure: function(object) {
+		return this.isInstance(object) ? object : new this(object);
+	}	
 });

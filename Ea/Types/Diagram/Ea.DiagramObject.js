@@ -24,19 +24,33 @@ Ea.DiagramObject = {
 Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 
 	getDimension: function() {
-		var dimension = new Ea._Base.DataTypes.Dimension({
+		return new Ea._Base.DataTypes.Dimension({
 			left: this._getLeft(),
 			top: -this._getTop(),
 			right: this._getRight(),
 			bottom: -this._getBottom()
 		});
-		return dimension;
 	},
 	
+	getCorrected: function(scale) {
+		var dimension = this.getDimension().valueOf();
+		var diagram = this.getDiagram();
+		var diagramDimension = diagram.getDimension();
+		calculated = new Ea._Base.DataTypes.Dimension({
+			left: Math.round((dimension.left + diagramDimension.correctionX) * scale),
+			top: Math.round((dimension.top + diagramDimension.correctionY) * scale),
+			right: Math.round((dimension.right + diagramDimension.correctionX) * scale),
+			bottom: Math.round((dimension.bottom + diagramDimension.correctionY) * scale)
+		});
+		return calculated;
+	},
+	
+	/**
+	 * @deprecated
+	 */
 	getCalculated: function() {
-
-		var dimension = this.getDimension();
-		var diagram = this.getParent();
+		var dimension = this.getDimension().valueOf();
+		var diagram = this.getDiagram();
 		var diagramDimension = diagram.getDimension();
 		var diagramCalculated = diagram.getCalculated();
 		calculated = new Ea._Base.DataTypes.Dimension({
@@ -46,8 +60,29 @@ Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 			bottom: Math.round((dimension.bottom + diagramDimension.correctionY) * diagramCalculated.scale)
 		});
 		return calculated;
+	},
+	
+	getWidth: function() {
+		return this._getRight() - this._getLeft();
+	},
+	
+	setWidth: function(width) {
+		this._setRight(this._getRight() + (width - this.getWidth()));
+	},
+	
+	getHeight: function() {
+		return - (this._getBottom() - this._getTop());
+	},
+	
+	setHeight: function(height) {
+		this._setBottom(this._getBottom() - (height - this.getHeight()));
+	},
+	
+	getObject: function() {
+		return this.getElement();
 	}
 },
+{},
 {
 	/**
 	 * Element view id
@@ -55,14 +90,23 @@ Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 	 * @readOnly
 	 * @type {Number}
 	 */
-	_id: property({api: "InstanceID"}),
+	id: {api: "InstanceID"},
 	
 	/**
 	 * Element view element
 	 * 
 	 * @type {Ea.Element._Base}
 	 */
-	_element: property({api: "ElementID", referenceBy: "id"}),
+	element: {api: "ElementID", referenceBy: "id"},
+	
+	/**
+	 * View object
+	 * 
+	 * @derived
+	 * @readOnly
+	 * @type {Ea.Types.Any}
+	 */
+	object: {},
 	
 	/**
 	 * Element view left coordinate
@@ -70,7 +114,7 @@ Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 	 * @private
 	 * @type {Number}
 	 */
-	_left: property({api: "Left"}),
+	_left: {api: "Left"},
 	
 	/**
 	 * Element view top coordinate
@@ -78,7 +122,7 @@ Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 	 * @private
 	 * @type {Number}
 	 */
-	_top: property({api: "Top"}),
+	_top: {api: "Top"},
 	
 	/**
 	 * Element view right coordinate
@@ -86,7 +130,7 @@ Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 	 * @private
 	 * @type {Number}
 	 */
-	_right: property({api: "Right"}),
+	_right: {api: "Right"},
 	
 	/**
 	 * Element view bottom coordinate
@@ -94,7 +138,23 @@ Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 	 * @private
 	 * @type {Number}
 	 */
-	_bottom: property({api: "Bottom"}),
+	_bottom: {api: "Bottom"},
+	
+	/**
+	 * Element view width
+	 * 
+	 * @derived
+	 * @type {Number}
+	 */
+	width: {},
+	
+	/**
+	 * Element view height
+	 * 
+	 * @derived
+	 * @type {Number}
+	 */
+	height: {},
 	
 	/**
 	 * Element view style
@@ -102,14 +162,14 @@ Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	_style: property({api: "Style"}), // TODO: http://www.sparxsystems.com/uml_tool_guide/sdk_for_enterprise_architect/diagramobjects.htm
+	_style: {api: "Style"}, // TODO: http://www.sparxsystems.com/uml_tool_guide/sdk_for_enterprise_architect/diagramobjects.htm
 	
 	/**
 	 * Element view sequence number
 	 * 
 	 * @type {Number}
 	 */
-	_sequence: property({api: "Sequence"}),
+	sequence: {api: "Sequence"},
 	
 	/**
 	 * Element view dimension
@@ -118,6 +178,6 @@ Ea.DiagramObject._Base = extend(Ea.Diagram.View, {
 	 * @readOnly
 	 * @type {Ea._Base.DataTypes.Dimension}
 	 */
-	_dimension: property()
+	dimension: {}
 });
 

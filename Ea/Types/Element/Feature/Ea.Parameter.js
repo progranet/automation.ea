@@ -23,12 +23,8 @@ Ea.Parameter = {
 
 Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	
-	getParent: function() {
-		return this._getParent();
-	},
-	
-	setParent: function(parent) {
-		return this._setParent(parent);
+	getNamespace: function() {
+		return this.getMethod();
 	},
 	
 	getCustomProperties: function() {
@@ -54,22 +50,22 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 		var properties = this.getCustomProperties();
 		return properties ? properties.valueOf().isUnique.value != 0 : false;
 	}
-},
+}, {},
 {
 	/**
 	 * Parameter guid
 	 */
-	_guid: property({api: "ParameterGUID"}),
+	guid: {api: "ParameterGUID"},
 	
 	/**
 	 * Parameter alias
 	 */
-	_alias: property({api: "Alias"}),
+	alias: {api: "Alias"},
 	
 	/**
 	 * Parameter notes
 	 */
-	_notes: property({api: "Notes"}),
+	notes: {api: "Notes"},
 
 	/**
 	 * Parameter classifier
@@ -77,38 +73,38 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	 * @private
 	 * @type {Ea.Element.Type}
 	 */
-	_classifier: property({api: "ClassifierID", referenceBy: "id"}),
+	_classifier: {api: "ClassifierID", referenceBy: "id"},
 	
 	/**
 	 * Parameter data type
 	 * 
 	 * @private
 	 */
-	_primitiveType: property({api: "Type"}),
+	_primitiveType: {api: "Type"},
 	
 	/**
 	 * Parameter default value
 	 */
-	_default: property({api: "Default"}),
+	_default: {api: "Default"},
 	
 	/**
 	 * Parameter const switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_const: property({api: "IsConst"}),
+	_const: {api: "IsConst"},
 	
 	/**
 	 * Parameter kind
 	 */
-	_kind: property({api: "Kind"}),
+	kind: {api: "Kind"},
 	
 	/**
 	 * Parameter position in list of method parameters
 	 * 
 	 * @type {Number}
 	 */
-	_position: property({api: "Position"}),
+	position: {api: "Position"},
 	
 	/**
 	 * Parameter style
@@ -116,7 +112,7 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	_style: property({api: "Style"}),
+	_style: {api: "Style"},
 	
 	/**
 	 * Parameter extended style
@@ -124,24 +120,24 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	_styleEx: property({api: "StyleEx"}),
+	_styleEx: {api: "StyleEx"},
 
 	/**
-	 * Parameter parent
+	 * Named element namespace
 	 * 
 	 * @derived
+	 * @readOnly
 	 * @type {Ea.Types.Namespace}
 	 */
-	_parent: property(),
+	namespace: {},
 
 	/**
 	 * Parameter parent method
 	 * 
-	 * @private
 	 * @readOnly
 	 * @type {Ea.Method._Base}
 	 */
-	__parent: property({api: "OperationID", referenceBy: "id"}),
+	method: {api: "OperationID", referenceBy: "id"},
 
 	/**
 	 * Parameter tags collection
@@ -150,7 +146,7 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_tag: property({api: "TaggedValues"}),
+	tags: {api: "TaggedValues"},
 	
 	/**
 	 * Parameter custom properties collection
@@ -159,7 +155,7 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	 * @derived
 	 * @type {Ea._Base.DataTypes.Properties}
 	 */
-	_customProperties: property(),
+	customProperties: {},
 	
 	/**
 	 * Parameter multiplicity lower
@@ -167,7 +163,7 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	 * @readOnly
 	 * @derived
 	 */
-	_lower: property(),
+	lower: {},
 	
 	/**
 	 * Parameter multiplicity upper
@@ -175,7 +171,7 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	 * @readOnly
 	 * @derived
 	 */
-	_upper: property(),
+	upper: {},
 	
 	/**
 	 * Parameter ordered switch value
@@ -184,7 +180,7 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	 * @derived
 	 * @type {Boolean}
 	 */
-	_ordered: property(),
+	ordered: {},
 	
 	/**
 	 * Parameter unique switch value
@@ -193,7 +189,7 @@ Ea.Parameter._Base = extend(Ea.TypedElement._Base, {
 	 * @derived
 	 * @type {Boolean}
 	 */
-	_unique: property()
+	unique: {}
 });
 
 include("Ea.ParameterTag@Ea.Types.Element.Feature");

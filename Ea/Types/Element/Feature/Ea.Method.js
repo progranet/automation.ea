@@ -15,11 +15,11 @@
 */
 
 Ea.Method = {
-		meta: {
-			id: "MethodID",
-			guid: "MethodGUID",
-			objectType: 24		
-		}
+	meta: {
+		id: "MethodID",
+		guid: "MethodGUID",
+		objectType: 24		
+	}
 };
 
 Ea.Method._Base = extend(Ea.TypedElement.Feature, {
@@ -34,6 +34,7 @@ Ea.Method._Base = extend(Ea.TypedElement.Feature, {
 		this._setReturnType(typeName);
 	}
 },
+{},
 {
 	/**
 	 * Method id
@@ -41,88 +42,88 @@ Ea.Method._Base = extend(Ea.TypedElement.Feature, {
 	 * @readOnly
 	 * @type {Number}
 	 */
-	_id: property({api: "MethodID"}),
+	id: {api: "MethodID"},
 	
 	/**
 	 * Method guid
 	 * 
 	 * @readOnly
 	 */
-	_guid: property({api: "MethodGUID"}),
+	guid: {api: "MethodGUID"},
 	
 	/**
 	 * Method abstract switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_abstract: property({api: "Abstract"}),
+	abstract: {api: "Abstract"},
 	
 	/**
 	 * Method behavior
 	 */
-	_behavior: property({api: "Behavior"}),
+	behavior: {api: "Behavior"},
 	
 	/**
 	 * Method code
 	 */
-	_code: property({api: "Code"}),
+	code: {api: "Code"},
 	
 	/**
 	 * Method concurrency
 	 */
-	_concurrency: property({api: "Concurrency"}),
+	concurrency: {api: "Concurrency"},
 	
 	/**
 	 * Method const switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_const: property({api: "IsConst"}),
+	_const: {api: "IsConst"},
 	
 	/**
 	 * Method query switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_query: property({api: "IsQuery"}),
+	query: {api: "IsQuery"},
 	
 	/**
 	 * Method static switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_static: property({api: "IsStatic"}),
+	static: {api: "IsStatic"},
 	
 	/**
 	 * Method synchronized switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_synchronized: property({api: "IsSynchronized"}),
+	synchronized: {api: "IsSynchronized"},
 	
 	/**
 	 * Method array switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_array: property({api: "ReturnIsArray"}),
+	array: {api: "ReturnIsArray"},
 	
 	/**
 	 * Method exceptions specification
 	 */
-	_throws: property({api: "Throws"}),
+	throws: {api: "Throws"},
 	
 	/**
 	 * Method visibility
 	 */
-	_visibility: property({api: "Visibility"}),
+	visibility: {api: "Visibility"},
 	
 	/**
 	 * Method position in tree model of project browser
 	 * 
 	 * @type {Number}
 	 */
-	_position: property({api: "Pos"}),
+	position: {api: "Pos"},
 	
 	/**
 	 * Method parameters collection
@@ -130,7 +131,7 @@ Ea.Method._Base = extend(Ea.TypedElement.Feature, {
 	 * @type {Ea.Collection._Base<Ea.Parameter._Base>}
 	 * @aggregation composite
 	 */
-	_parameter: property({api: "Parameters"}),
+	parameters: {api: "Parameters"},
 	
 	/**
 	 * Method tags collection
@@ -139,7 +140,7 @@ Ea.Method._Base = extend(Ea.TypedElement.Feature, {
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_tag: property({api: "TaggedValues"}),
+	tags: {api: "TaggedValues"},
 	
 	/**
 	 * Method preconditions collection
@@ -147,7 +148,7 @@ Ea.Method._Base = extend(Ea.TypedElement.Feature, {
 	 * @type {Ea.Collection._Base<Ea.MethodConstraint._Base>}
 	 * @aggregation composite
 	 */
-	_preCondition: property({api: "PreConditions"}),
+	preConditions: {api: "PreConditions"},
 	
 	/**
 	 * Method postcondition collection
@@ -155,22 +156,22 @@ Ea.Method._Base = extend(Ea.TypedElement.Feature, {
 	 * @type {Ea.Collection._Base<Ea.MethodConstraint._Base>}
 	 * @aggregation composite
 	 */
-	_postCondition: property({api: "PostConditions"}),
+	postConditions: {api: "PostConditions"},
 	
 	/**
 	 * Method classifier
 	 * 
-	 * @type {Ea.Element.Type}
 	 * @private
+	 * @type {Ea.Element.Type}
 	 */
-	_classifier: property({api: "ClassifierID", referenceBy: "id"}),
+	_classifier: {api: "ClassifierID", referenceBy: "id"},
 	
 	/**
 	 * Method return type
 	 * 
 	 * @private
 	 */
-	_returnType: property({api: "ReturnType"})
+	_returnType: {api: "ReturnType"}
 });
 
 include("Ea.Parameter@Ea.Types.Element.Feature");

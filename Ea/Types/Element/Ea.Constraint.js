@@ -20,40 +20,57 @@ Ea.Constraint = {
 		}
 };
 
-Ea.Constraint._Base = extend(Ea.Types.Named, {},
+Ea.Constraint._Base = extend(Ea.Types.NamedElement, {
+	
+	getNamespace: function() {
+		return this.getParent();
+	}
+},
 {
-	determineType: function(source) {
-		return this._deriveType(source, this._type);
-	},
+	determineType: function(api) {
+		return this._deriveType(api, this.getProperty("_type"));
+	}
+}, 
+{
 
 	/**
 	 * Constraint notes
 	 */
-	_notes: property({api: "Notes"}),
+	notes: {api: "Notes"},
 	
 	/**
 	 * Constraint status
 	 */
-	_status: property({api: "Status"}),
+	status: {api: "Status"},
 	
 	/**
 	 * Constraint weight
 	 * 
 	 * @type {Number}
 	 */
-	_weight: property({api: "Weight"}),
+	weight: {api: "Weight"},
 	
 	/**
 	 * Constraint type
+	 * 
+	 * @private
 	 */
-	_type: property({api: "Type"}),
+	_type: {api: "Type"},
 	
+	/**
+	 * Named element namespace
+	 * 
+	 * @derived
+	 * @readOnly
+	 * @type {Ea.Types.Namespace}
+	 */
+	namespace: {},
+
 	/**
 	 * Constraint parent element
 	 * 
-	 * @private
 	 * @readOnly
 	 * @type {Ea.Element._Base}
 	 */
-	__parent: property({api: "ParentID", referenceBy: "id"})
+	parent: {api: "ParentID", referenceBy: "id"}
 });

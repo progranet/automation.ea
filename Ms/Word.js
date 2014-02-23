@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 300 D&C
+   Copyright 2011-2014 300 D&C
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -73,62 +73,87 @@ Word = {
 		
 		info("Converting output to Office document");
 		
-		if (!this.wordApp)
-			this.wordApp = new ActiveXObject("Word.Application");
+		this.open();
 		
-		var template = this.wordApp.Documents.Open(Sys.IO.getPath(params.template, params.context), Word.WdOpenFormat.wdOpenFormatAuto, true);
+		var document = new Word.Document(params.template, params.context);
 		
 		try {
-			for (var mark in params.embeds) {
-				info("Embedding chapter [$] in template", [params.embeds[mark]]);
-				//debug("Embedding chapter [$] in template", [params.embeds[mark]]);
-				var embedTo = template.ActiveWindow.Selection;
-				//debug("Searching for bookmark [$] in template", [mark]);
-				embedTo.GoTo(-1, 0, 0, mark);
-				this._embed(this.wordApp, params.outputRoot, params.embeds[mark], embedTo);
+			for (var bookmark in params.embeds) {
+				info("Embedding chapter [$] in template", [params.embeds[bookmark]]);
+				document.embed(params.outputRoot + params.embeds[bookmark], bookmark);
 			}
 			
 			info("Saving template to output path");
-			template.SaveAs(params.outputRoot + params.outputFile, params.format || Word.WdSaveFormat.wdFormatDocumentDefault);
-			template.Close();
+			document.save(params.outputRoot + params.outputFile);
+			document.close();
 		}
 		catch(e) {
-			template.Close(Word.WdSaveOptions.wdDoNotSaveChanges);
+			document.close();
 			throw e;
 		}
 	},
 	
-	closeWord: function() {
+	open: function() {
+		if (!this.wordApp)
+			this.wordApp = new ActiveXObject("Word.Application");
+	},
+	
+	close: function() {
 		if (this.wordApp)
 			this.wordApp.Quit();
 		this.wordApp = null;
 	},
 	
-	finalize: function() {
-		this.closeWord();
+	initialize: function() {
+		this.open();
 	},
 	
-	_embed: function(wordApp, outputRoot, file, embedTo) {
-		//debug(" - opening chapter html file");
-		var embedded = wordApp.Documents.Open(outputRoot + file, Word.WdOpenFormat.wdOpenFormatAuto, true);
+	finalize: function() {
+		this.close();
+	}
+};
+
+Word.Document = define({
+	
+	template: null,
+	
+	create: function(templatePath, context) {
+		this.template = Word.wordApp.Documents.Open(Sys.IO.getPath(templatePath, context), Word.WdOpenFormat.wdOpenFormatAuto, true);
+		
+	},
+	
+	embed: function(filePath, bookmark) {
+		var embedded = Word.wordApp.Documents.Open(filePath, Word.WdOpenFormat.wdOpenFormatAuto, true);
 		//embedded.ActiveWindow.Visible = true;
 
-		var count = embedded.InlineShapes.Count;
-		//debug(" - embedding $ shapes in chapter", [count]);
-		for (var si = 0; si < count; si++) {
+		for (var si = 0; si < embedded.InlineShapes.Count; si++) {
 			var shape = embedded.InlineShapes(si + 1);
 			shape.LinkFormat.BreakLink();
 		}
 
-		//debug(" - embedding chapter in template");
 		var selection = embedded.ActiveWindow.Selection;
 		embedded.Select();
 		selection.Copy();
+		var embedTo = this.template.ActiveWindow.Selection;
+		embedTo.GoTo(-1, 0, 0, bookmark);
 		embedTo.Paste();
 		
 		selection.TypeText(' ');
 		embedded.Select();
 		selection.Copy();
-		embedded.Close(0);
+		embedded.Close(Word.WdSaveOptions.wdDoNotSaveChanges);
+	},
+	
+	insertToc: function(bookmark, upperLevel, lowerLevel) {
+		this.template.TablesOfContents.Add(this.template.Bookmarks.Item(bookmark).Range, true, upperLevel, lowerLevel);
+	},
+	
+	save: function(filePath, format) {
+		this.template.SaveAs(filePath, format || Word.WdSaveFormat.wdFormatDocumentDefault);
+	},
+	
+	close: function() {
+		this.template.Close(Word.WdSaveOptions.wdDoNotSaveChanges);		
 	}
-};
+	
+});

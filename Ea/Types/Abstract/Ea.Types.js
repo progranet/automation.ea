@@ -20,6 +20,10 @@
 Ea.Types = {};
 
 Ea.Types.Any = define({
+
+	create: function() {
+		_super.create();
+	},
 	
 	_init: function() {
 		
@@ -28,7 +32,6 @@ Ea.Types.Any = define({
 	/**
 	 * Returns GUID of EA object in XML format
 	 * 
-	 * @memberOf Ea.Types.Any#
 	 * @type {String}
 	 */
 	getXmlGuid: function() {
@@ -54,18 +57,21 @@ Ea.Types.Any = define({
 }, 
 {
 	/**
-	 * Recognizes class of EA object from source
+	 * Determines proxy class based on EA API object.
+	 * By default as proxy class is taken base class from package (Ea.[PackageName]._Base).
+	 * Class can be determined also based on specific EA API properties values (such as Diagram.Type for Ea.Diagram._Base subclass or Package.IsModel for Ea.Package._Base subclass).
 	 * 
-	 * @memberOf Ea.Types.Any
-	 * @param {Object} source
-	 * @type {Class}
+	 * @param {Object} api
+	 * @type {Core.Lang.Class}
 	 */
-	determineType: function(source) {
+	determineType: function(api) {
 		return this.namespace._Base;
 	},
 	
 	/**
-	 * Determines EA API type name on creating API object
+	 * Determines EA API type name on creating API object.
+	 * In some cases EA API object types require inner type name for creation of new objects (e.g. Element, Diagram, Connector).
+	 * Proxy classes wrapping this specific types of EA API objects should be able of "translate" proxy subclass to EA inner type name (e.g. Ea.Element.Class conforms to API Element.Type == "Class").
 	 * 
 	 * @type {String}
 	 */
@@ -73,103 +79,60 @@ Ea.Types.Any = define({
 		return this.namespace.name;
 	},
 	
-	/**
-	 * @private
-	 */
-	_deriveType: function(source, attribute) {
-		var typeName = attribute.get(source).replace(/[-\s]/g,"");
+	_deriveType: function(api, property) {
+		var typeName = property.getApiValue(api).replace(/[-\s]/g,"");
 		var type = this.namespace[typeName] || this._createType(typeName);
 		return type;
 	},
 	
-	/**
-	 * @private
-	 */
 	_createType: function(typeName) {
 		if (typeName in this.namespace)
 			throw new Error("Type already exists: $", [this.namespace[typeName]]);
 		this.namespace[typeName] = Core.Lang.extend(this.namespace, typeName, this.namespace._Base);
 		warn("Not implemented type: $.$", [this.namespace.qualifiedName, typeName]);
 		return this.namespace[typeName];
-	},
-	
-	/**
-	 * Initializes EA Class
-	 */
-	initialize: function() {
-		Ea._Base.Class.registerClass(this);
 	}
 });
 
-Ea.Types.Named = extend(Ea.Types.Any, {
+Ea.Types.NamedElement = extend(Ea.Types.Any, {
 
-	getParent: function() {
-		return null;
-	},
-	
-	setParent: function(parent) {
-		// TODO: check for covering in specialization tree
-	},
-	
-	/**
-	 * Checks if named is part of namespace (directly or indirectly)
-	 * 
-	 * @memberOf Ea.Types.Named#
-	 * @param {Ea.Types.Namespace} namespace
-	 * @type {Boolean}
-	 */
-	hasParent: function(namespace) {
-		var parent = this.getParent();
-		if (!parent) return false;
-		namespace = this._ensure(Ea.Package._Base, namespace);
-		return (parent == namespace ? namespace : parent.hasParent(namespace));
-	},
-	
-	_ensure: function(type, ea) {
-		if (typeof ea == "string" && this.isGuid(ea))
-			ea = this._source.application.getByGuid(type, ea);
-		return ea;
-	},
-	
 	_toString: function() {
 		return this.getName() + " " + _super._toString();
 	},
 	
-	/**
-	 * Returns qualified name of named including namespace
-	 * 
-	 * @memberOf Ea.Types.Named#
-	 * @type {String}
-	 */
+	getNamespace: function() {
+		return this._namespace;
+	},
+	
 	getQualifiedName: function() {
-		var parent = this.getParent();
-		qualifiedName = (parent ? parent.getQualifiedName() + "." : "") + this.getName();
+		var namespace = this.getNamespace();
+		qualifiedName = (namespace ? namespace.getQualifiedName() + "." : "") + this.getName();
 		return qualifiedName;
 	}
-	
-},
+}, 
+{},
 {
 	/**
-	 * Object name
+	 * Named element name
 	 */
-	_name: property({api: "Name"}),
+	name: {api: "Name"},
 
 	/**
-	 * Object parent
+	 * Named element namespace
 	 * 
 	 * @readOnly
 	 * @derived
 	 * @type {Ea.Types.Namespace}
 	 */
-	_parent: property(),
+	namespace: {},
 	
 	/**
-	 * Object qualified name 
+	 * Named element qualified name 
 	 * 
 	 * @readOnly
 	 * @derived
 	 */
-	_qualifiedName: property()
+	qualifiedName: {}
 });
 
-Ea.Types.Namespace = extend(Ea.Types.Named);
+Ea.Types.Namespace = extend(Ea.Types.NamedElement);

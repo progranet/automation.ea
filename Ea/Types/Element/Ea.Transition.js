@@ -20,35 +20,35 @@ Ea.Transition = {
 		}
 };
 
-Ea.Transition._Base = extend(Ea.Types.Any, {},
+Ea.Transition._Base = extend(Ea.Types.Any, {}, {},
 {
 	/**
 	 * Transition notes
 	 */
-	_notes: property({api: "Notes"}),
+	notes: {api: "Notes"},
 	
 	/**
 	 * Transition state
 	 */
-	_state: property({api: "TxState"}),
+	state: {api: "TxState"},
 	
 	/**
 	 * Transition time
 	 */
-	_time: property({api: "TxTime"}),
+	time: {api: "TxTime"},
 	
 	/**
 	 * Transition duration constraint
 	 */
-	_durationConstraint: property({api: "DurationConstraint"}),
+	durationConstraint: {api: "DurationConstraint"},
 	
 	/**
 	 * Transition time constraint
 	 */
-	_timeConstraint: property({api: "TimeConstraint"}),
+	timeConstraint: {api: "TimeConstraint"},
 	
 	/**
 	 * Transition event
 	 */
-	_event: property({api: "Event"})
+	event: {api: "Event"}
 });

@@ -20,87 +20,101 @@ Ea.Issue = {
 		}
 };
 
-Ea.Issue._Base = extend(Ea.Types.Named, {
+Ea.Issue._Base = extend(Ea.Types.NamedElement, {
 	
-	getParent: function() {
-		return this._getParent();
+	getNamespace: function() {
+		return this.getElement();
+	},
+	
+	setNamespace: function(namespace) {
+		this.setElement(namespace);
 	}
 	
 },
 {
-	determineType: function(source) {
-		return this._deriveType(source, this._type);
-	},
-
+	determineType: function(api) {
+		return this._deriveType(api, this.getProperty("_type"));
+	}
+},
+{
 	/**
 	 * Issue report date
 	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
-	_reported: property({api: "DateReported"}),
+	reported: {api: "DateReported"},
 
 	/**
 	 * Issue reporter
 	 */
-	_reporter: property({api: "Reporter"}),
+	reporter: {api: "Reporter"},
 	
 	/**
 	 * Issue notes
 	 */
-	_notes: property({api: "Notes"}),
+	notes: {api: "Notes"},
 	
 	/**
 	 * Issue resolve date
 	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
-	_resolved: property({api: "DateResolved"}),
+	resolved: {api: "DateResolved"},
 	
 	/**
 	 * Issue resolver
 	 */
-	_resolver: property({api: "Resolver"}),
+	resolver: {api: "Resolver"},
 	
 	/**
 	 * Issue resolve notes
 	 */
-	_resolverNotes: property({api: "ResolverNotes"}),
+	resolverNotes: {api: "ResolverNotes"},
 	
 	/**
-	 * Issue parent element
+	 * Named element namespace
+	 * 
+	 * @derived
+	 * @type {Ea.Types.Namespace}
+	 */
+	namespace: {},
+
+	/**
+	 * Issue element
 	 * 
 	 * @type {Ea.Element._Base}
-	 * @private
 	 */
-	__parent: property({api: "ElementID", referenceBy: "id"}),
+	element: {api: "ElementID", referenceBy: "id"},
 
 	/**
 	 * Issue priority
 	 */
-	_priority: property({api: "Priority"}),
+	priority: {api: "Priority"},
 
 	/**
 	 * Issue status
 	 */
-	_status: property({api: "Status"}),
+	status: {api: "Status"},
 
 	/**
 	 * Issue severity
 	 */
-	_severity: property({api: "Severity"}),
+	severity: {api: "Severity"},
 	
 	/**
 	 * Issue difficulty
 	 */
-	_difficulty: property({api: "Difficulty"}),
+	difficulty: {api: "Difficulty"},
 	
 	/**
 	 * Issue version
 	 */
-	_version: property({api: "Version"}),
+	version: {api: "Version"},
 	
 	/**
 	 * Issue type
+	 * 
+	 * @private
 	 */
-	_type: property({api: "Type"})
+	_type: {api: "Type"}
 });

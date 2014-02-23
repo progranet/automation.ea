@@ -54,7 +54,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	 * @param {Object} params
 	 */
 	create: function(params) {
-		_super.create();
+		_super.create(params);
 		params = params || {};
 		this._provider = DataAccess.getProvider(params.provider || "Jet");
 	},
@@ -98,12 +98,12 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	 * Finds objects matching specified criteria in underlying database.
 	 * Output collection contains objects selected from [table] matching [key] == [value] condition.
 	 * 
-	 * @param {Class} type Type of searched objects
+	 * @param {Core.Lang.Class} type Type of searched objects
 	 * @param {String} table Table name where search to
 	 * @param {String} key Name of column in table to search by
 	 * @param {String} value Value which key must match
 	 * @param {String} identity Name of column containing identity (id values) of searched objects
-	 * @type {Core.Types.Collection}
+	 * @type {Core.Types.Collection<Ea.Types.Any>}
 	 */
 	getByQuery: function(type, table, key, value, identity) {
 		var collection = new Core.Types.Collection();
@@ -161,7 +161,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 			for (var s = 0; s < list.length; s++) {
 				var stereotypeDefinition = list[s];
 				if (stereotypeDefinition.GUID) {
-					var stereotype = this._source.application.getByGuid(Ea.Stereotype._Base, stereotypeDefinition.GUID, true);
+					var stereotype = this._source.application.getByGuid(Ea.Stereotype._Base, stereotypeDefinition.GUID, null, true);
 					if (stereotype) {
 						stereotypes.add(stereotype);
 						continue;
@@ -176,7 +176,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	getProjectStereotypes: function() {
 		//this._source.api[Ea.Repository._Base.__projectStereotype.api].Refresh();
 		this._getProjectStereotypes().refresh();
-		Ea.Repository._Base.__projectStereotype.refresh(this);
+		Ea.Repository._Base.getProperty("_projectStereotypes").refresh(this);
 		return this._getProjectStereotypes();
 	},
 
@@ -219,7 +219,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	/**
 	 * Returns class of selected object
 	 * 
-	 * @type {Class}
+	 * @type {Core.Lang.Class}
 	 */
 	getSelectedType: function() {
 		var objectType = this._source.api.GetTreeSelectedItemType();
@@ -238,6 +238,24 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 		var api = this._source.api.GetTreeSelectedObject();
 		var object = this._source.application.get(this.getSelectedType(), api);
 		return object;
+	},
+	
+	/**
+	 * Opens specified diagram
+	 * 
+	 * @param {Ea.Diagram._Base} diagram
+	 */
+	openDiagram: function(diagram) {
+		this._source.api.OpenDiagram(diagram.getId());
+	},
+	
+	/**
+	 * Reloads specified diagram
+	 * 
+	 * @param {Ea.Diagram._Base} diagram
+	 */
+	reloadDiagram: function(diagram) {
+		this._source.api.ReloadDiagram(diagram.getId());
 	},
 	
 	/**
@@ -340,19 +358,20 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	},
 	
 	/**
-	 * Reloads diagram
+	 * Reloads specified package or the entire model (if package is not specified), updating the user interface.
+	 * Method should not be used in model processing because it causes that script execution is stopped.
 	 * 
-	 * @param {Ea.Diagram._Base} diagram
+	 * @param {Ea.Package._Base} _package
 	 */
-	reloadDiagram: function(diagram) {
-		this._source.api.ReloadDiagram(diagram.getId());
+	reloadPackage: function(_package) {
+		this._source.api.RefreshModelView(_package ? _package.getId() : 0);
 	},
 	
 	/**
 	 * Returns proxy object for specified type and guid
 	 * 
 	 * @deprecated Use Ea.Application.getByGuid() instead
-	 * @param {Class} type
+	 * @param {Core.Lang.Class} type
 	 * @param {String} guid
 	 * @type {Ea.Types.Any}
 	 */
@@ -410,7 +429,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	 * Returns classifier related to specified element. Type of classifier must be specified, too.
 	 * 
 	 * @param {Ea.Element._Base} element
-	 * @param {Class} type
+	 * @param {Core.Lang.Class} type
 	 * @type {Ea.Types.Any}
 	 */
 	getElementRelatedClassifier: function(element, type) {
@@ -429,7 +448,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	 */
 	getTypedElementType: function(element) {
 		var rows = this._findByQuery("Element", "id", element.getId());
-		var guid = rows[0].classifierGuid;
+		var guid = rows[0].classifierGuid || rows[0].miscData0;
 		if (!guid)
 			return null;
 		var type = this._source.application.getByGuid(Ea.Element._Base, guid);
@@ -441,56 +460,56 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 		}
 		return type;
 	}
-},
+}, {},
 {
 	/**
 	 * Project guid
 	 * 
 	 * @readOnly
 	 */
-	_projectGuid: property({api: "ProjectGUID"}),
+	projectGuid: {api: "ProjectGUID"},
 
 	/**
 	 * Project batch append switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_batchAppend: property({api: "BatchAppend"}),
+	batchAppend: {api: "BatchAppend"},
 	
 	/**
 	 * Project enable cache switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_enableCache: property({api: "EnableCache"}),
+	enableCache: {api: "EnableCache"},
 	
 	/**
 	 * Project enable UI updates switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_enableUIUpdates: property({api: "EnableUIUpdates"}),
+	enableUIUpdates: {api: "EnableUIUpdates"},
 	
 	/**
 	 * Project flag update switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_flagUpdate: property({api: "FlagUpdate"}),
+	flagUpdate: {api: "FlagUpdate"},
 	
 	/**
 	 * Project security enabled switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_securityEnabled: property({api: "IsSecurityEnabled"}),
+	securityEnabled: {api: "IsSecurityEnabled"},
 	
 	/**
 	 * Project path
 	 * 
 	 * @readOnly
 	 */
-	_path: property({api: "ConnectionString"}),
+	path: {api: "ConnectionString"},
 	
 	/**
 	 * All stereotypes available in project
@@ -498,7 +517,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	 * @private
 	 * @type {Ea.Collection._Base<Ea.Stereotype._Base>}
 	 */
-	__projectStereotype: property({api: "Stereotypes"}),
+	_projectStereotypes: {api: "Stereotypes"},
 	
 	/**
 	 * All stereotypes available in project
@@ -507,7 +526,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	 * @type {Ea.Collection._Base<Ea.Stereotype._Base>}
 	 * @aggregation composite
 	 */
-	_projectStereotype: property(),
+	projectStereotypes: {},
 	
 	/**
 	 * Collection containing all project models.
@@ -515,6 +534,6 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	 * @type {Ea.Collection._Base<Ea.Package.Model>}
 	 * @aggregation composite
 	 */
-	_model: property({api: "Models"})
+	models: {api: "Models"}
 	
 });

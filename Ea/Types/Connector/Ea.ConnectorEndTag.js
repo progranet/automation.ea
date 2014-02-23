@@ -15,11 +15,10 @@
 */
 
 Ea.ConnectorEndTag = {
-		meta: {
-			//guid: "PropertyGUID",
-			objectType: 41
-		}
-
+	meta: {
+		//guid: "PropertyGUID",
+		objectType: 41
+	}
 };
 
 Ea.ConnectorEndTag._Base = extend(Ea.Tag._Extended);

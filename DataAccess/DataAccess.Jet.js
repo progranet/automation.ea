@@ -171,6 +171,26 @@ DataAccess.Jet.Provider = extend(DataAccess._Provider, {
 				borderWidth: {
 					native: "BorderWidth",
 					type: Number
+				},
+				miscData0: {
+					native: "PDATA1",
+					type: String
+				},
+				miscData1: {
+					native: "PDATA2",
+					type: String
+				},
+				miscData2: {
+					native: "PDATA3",
+					type: String
+				},
+				miscData3: {
+					native: "PDATA4",
+					type: String
+				},
+				miscData4: {
+					native: "PDATA5",
+					type: String
 				}
 			}
 		},

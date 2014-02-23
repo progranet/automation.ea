@@ -45,60 +45,60 @@ Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {
 		throw new Error("Unknown aggregation kind: " + aggregation + " for ConnectorEnd: " + this);
 	}
 	
-},
+}, {},
 {
 	/**
 	 * Connector end role name
 	 */
-	_role: property({api: "Role"}),
+	role: {api: "Role"},
 	
 	/**
 	 * Connector end notes
 	 */
-	_notes: property({api: "RoleNote"}),
+	notes: {api: "RoleNote"},
 	
 	/**
 	 * Connector end type
 	 */
-	_type: property({api: "RoleType"}),
+	type: {api: "RoleType"},
 	
 	/**
 	 * Connector end stereotype
 	 */
-	_stereotype: property({api: "Stereotype"}),
+	stereotype: {api: "Stereotype"},
 	
 	/**
 	 * Connector end alias
 	 */
-	_alias: property({api: "Alias"}),
+	alias: {api: "Alias"},
 
 	/**
 	 * Connector end derived switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_derived: property({api: "Derived"}),
+	derived: {api: "Derived"},
 
 	/**
 	 * Connector end derived union switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_derivedUnion: property({api: "DerivedUnion"}),
+	derivedUnion: {api: "DerivedUnion"},
 
 	/**
 	 * Connector end allow duplicates switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_allowDuplicates: property({api: "AllowDuplicates"}),
+	allowDuplicates: {api: "AllowDuplicates"},
 
 	/**
 	 * Connector end owned by classifier swich value
 	 * 
 	 * @type {Boolean}
 	 */
-	_ownedByClassifier: property({api: "OwnedByClassifier"}),
+	ownedByClassifier: {api: "OwnedByClassifier"},
 
 	/**
 	 * Connector end aggregation value
@@ -106,58 +106,58 @@ Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {
 	 * @private
 	 * @type {Number}
 	 */
-	__aggregation: property({api: "Aggregation"}),
+	_aggregation: {api: "Aggregation"},
 
 	/**
 	 * Connector end aggregation literal
 	 * 
 	 * @derived
 	 */
-	_aggregation: property(),
+	aggregation: {},
 
 	/**
 	 * Connector end ordered switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_ordered: property({api: "Ordering"}),
+	ordered: {api: "Ordering"},
 
 	/**
 	 * Connector end constraint
 	 */
-	_constraint: property({api: "Constraint"}),
+	constraint: {api: "Constraint"},
 	
 	/**
 	 * Connector end qualifier
 	 */
-	_qualifier: property({api: "Qualifier"}),
+	qualifier: {api: "Qualifier"},
 	
 	/**
 	 * Connector end multiplicity
 	 */
-	_multiplicity: property({api: "Cardinality"}),
+	multiplicity: {api: "Cardinality"},
 	
 	/**
 	 * Connector end visibility
 	 */
-	_visibility: property({api: "Visibility"}),
+	visibility: {api: "Visibility"},
 	
 	/**
 	 * Connector end changeability
 	 */
-	_changeability: property({api: "IsChangeable"}),
+	changeability: {api: "IsChangeable"},
 	
 	/**
 	 * Connector end navigability
 	 */
-	_navigability: property({api: "Navigable"}),
+	navigability: {api: "Navigable"},
 	
 	/**
 	 * Connector end navigable switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_navigable: property({api: "IsNavigable"}),
+	navigable: {api: "IsNavigable"},
 	
 	/**
 	 * Connector end tags collection
@@ -166,7 +166,7 @@ Ea.ConnectorEnd._Base = extend(Ea.Types.Any, {
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_tag: property({api: "TaggedValues"})
+	tags: {api: "TaggedValues"}
 
 });
 

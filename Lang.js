@@ -17,7 +17,6 @@
 /**
  * Returns first index of specified element in this array 
  * 
- * @memberOf Array#
  * @param {Object} element
  * @type {Number}
  */
@@ -31,7 +30,6 @@ Array.prototype.indexOf = function(element) {
 /**
  * Checks if array this contains specified element 
  * 
- * @memberOf Array#
  * @param {Object} element
  * @type {Boolean}
  */
@@ -42,7 +40,6 @@ Array.prototype.contains = function(element) {
 /**
  * Left pads this string with specified string while length of this string is less than specified 
  * 
- * @memberOf String#
  * @param {String} pad
  * @param {Number} length
  * @type {String}

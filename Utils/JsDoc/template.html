@@ -1,0 +1,80 @@
+<!-- html-head -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Windows-1250"/>
+<link rel="stylesheet" href="<% stylesheet %>" type="text/css"/>
+<title><% title %></title>
+</head>
+<body>
+
+<!-- namespaces-head -->
+<table>
+<!-- namespaces-namespace -->
+<tr>
+<td class="list"><a href="<% fileName %>" target="namespace"><% qualifiedName ? qualifiedName : "«root»" %></a></td>
+</tr>
+<!-- namespaces-foot -->
+</table>
+
+<!-- section-header -->
+<div class="section-header"><% name %></div>
+
+<!-- header -->
+<div class="header"><% name %></div>
+
+<!-- sub-header -->
+<div class="sub-header"><% name %></div>
+
+
+<!-- classes-head -->
+<table>
+<!-- classes-class -->
+<tr>
+<td class="list"><a href="<% fileName %>" target="class"><% name %></a></td>
+</tr>
+<!-- classes-foot -->
+</table>
+
+<!-- inherited-head -->
+<table class="spec">
+<tr>
+<th class="spec-head"><% header %>&nbsp;<% element.getNamespace().getAlias() %>.<a href="<% elementLink %>"><% element.getName() %></a></th>
+</tr>
+<!-- inherited-row-head -->
+<tr>
+<td class="spec-row">
+<!-- inherited-row-content -->
+<a href="<% elementLink %>#<% feature.getName() %>"><% feature.getName() %></a><% separator %>
+<!-- inherited-row-foot -->
+</td>
+</tr>
+<!-- inherited-foot -->
+</table>
+
+<!-- text -->
+<% text %>
+<!-- ref -->
+<a name="<% ref %>"></a>
+<!-- link -->
+<a href="<% link %>"><% name %></a>
+<!-- span -->
+<span><% text %></span>
+<!-- paragraph -->
+<div class="paragraph"><% text %></div>
+
+<!-- diagram -->
+<div style="width: 100%">
+<div class="diagram-image-block"><img id="<% id %>" usemap="#<% id %>-map" class="diagram-image-img"<% dimension %> src="<% filePath %>"></img></div>
+<!-- diagram-legend -->
+<div class="diagram-name-block"><p class="diagram-name-span"><% legend %></p></div>
+<!-- map-head -->
+<map name="<% id %>-map">
+<!-- map-area -->
+<area shape="rect" coords="<% dimension.left %>,<% dimension.top %>,<% dimension.right %>,<% dimension.bottom %>" href="<% elementLink %>" alt="<% elementView.getElement().getName() %>">
+<!-- map-foot -->
+</map>
+</div>
+
+<!-- html-foot -->
+</body>
+</html>

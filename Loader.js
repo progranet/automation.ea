@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 300 D&C
+   Copyright 2011-2014 300 D&C
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -130,7 +130,13 @@ _include = function(library) {
 	
 	WriteOutput("Loader", "evaluating: " + inc.qualifiedName, undefined);
 
-	eval(inc.source);
+	try {
+		eval(inc.source);
+	}
+	catch (error) {
+		WriteOutput("Loader", "Source code of " + library + " does not evaluate correctly", undefined);
+		throw error;
+	}
 
 	if (!inc.builded)
 		_save(inc);
@@ -138,37 +144,34 @@ _include = function(library) {
 	return inc;
 };
 
-_find = function(object, name, condition, context, found) {
+var lang = function(qualifiedName) {
 	
-	if (typeof object == "object") {
-		if (object instanceof Array) {
-			for (var i = 0; i < object.length; i++) {
-				var value = object[i];
-				_find(value, null, condition, context);
-			}
+	if (this.type == "ExpressionStatement" && this.expression.type == "AssignmentExpression" && this.expression.right.type == "CallExpression" && this.expression.right.callee.type == "Identifier") {
+		var method = this.expression.right.callee.name;
+		
+		var properties = null;
+		
+		if (method == "define") {
+			properties = this.expression.right.arguments[2];
+		}
+		else if (method == "extend") {
+			properties = this.expression.right.arguments[3];
 		}
 		else {
-			try {
-				condition.call(object, name, context);
-			}
-			catch (error) {}
-			finally {}
-			for (var name in object) {
-				var value = object[name];
-				_find(value, name, condition, context);
+			return false;
+		}
+		
+		if (properties) {
+			properties = properties.properties;
+			for (var p = 0; p < properties.length; p++) {
+				var property = properties[p];
+				ea2(property);
 			}
 		}
-	}
-};
 
-var lang = function(name, context) {
-	
-	var method = this.right.callee.name;
-	
-	if (name = "expression" && this.right.type == "CallExpression" && this.right.callee.type == "Identifier" && (method == "extend" || method == "define")) {
+		var typeName = this.expression.left.property.name;
 		
-		var typeName = this.left.property.name;
-		this.right.callee = {
+		this.expression.right.callee = {
 	            "type": "MemberExpression",
 	            "computed": false,
 	            "object": {
@@ -188,11 +191,11 @@ var lang = function(name, context) {
 	                "name": method
 	            }
 	        };
-		this.right.arguments.unshift(
+		this.expression.right.arguments.unshift(
 			{
                 "type": "Literal",
-                "value": context.qualifiedName,
-                "raw": "'" + context.qualifiedName + "'"
+                "value": qualifiedName,
+                "raw": "'" + qualifiedName + "'"
 			},		
 			{
                 "type": "Literal",
@@ -200,215 +203,186 @@ var lang = function(name, context) {
                 "raw": "'" + typeName + "'"
 			});
 		
-		//WriteOutput("Loader", "/*define/extend*/" + context.qualifiedName + "." + typeName + " = " + JSON.stringify(this) + ";", undefined);
-		
 		return true;
 	}
+	
 	return false;
 };
 
-var ea = function(name, context) {
+var ea2 = function(property) {
 	
-	if (this.value.type == "CallExpression" && this.value.callee.type == "Identifier" && this.value.callee.name == "property") {
-		
-		this.value.callee = {
-	            "type": "MemberExpression",
-	            "computed": false,
-	            "object": {
-	                "type": "MemberExpression",
-	                "computed": false,
-	                "object": {
-                        "type": "MemberExpression",
-                        "computed": false,
-                        "object": {
-                            "type": "Identifier",
-                            "name": "Ea"
-                        },
-                        "property": {
-                            "type": "Identifier",
-                            "name": "_Base"
-                        }
-	                },
-	                "property": {
-	                    "type": "Identifier",
-	                    "name": "Class"
-	                }
-	            },
-	            "property": {
-	                "type": "Identifier",
-	                "name": "property"
-	            }
-	        };
-		
-		var tags = this.key.commentsBefore.join("\r\n").split("@");
-		var ast = this;
-		if (ast.value.arguments.length == 0) {
-			ast.value.arguments.push({
-                "type": "ObjectExpression",
-                "properties": []
-            });
-		}
-		for (var ti = 0; ti < tags.length; ti++) {
-			var tag = tags[ti];
-			tag = tag.replace(/^\s*type\s+\{([^\}<]+)(<([^\{>]+)>)?[^\}]*\}/g, function(whole, type, nm, elementType) {
-				ast.value.arguments[0].properties.push({
+	var tags = property.key.commentsBefore.join("\r\n").split("@");
+	for (var ti = 0; ti < tags.length; ti++) {
+		var tag = tags[ti];
+		tag = tag.replace(/^\s*type\s+\{([^\}<]+)(<([^\{>]+)>)?[^\}]*\}/g, function(whole, type, nm, elementType) {
+			property.value.properties.push({
+				"type": "Property",
+				"key": {
+					"type": "Identifier",
+					"name": "type"
+				},
+				"value": {
+					"type": "Literal",
+					"value": type,
+					"raw": "'" + type + "'"
+				},
+				"kind": "init"
+			});
+			if (elementType) {
+				property.value.properties.push({
 					"type": "Property",
 					"key": {
 						"type": "Identifier",
-						"name": "type"
+						"name": "elementType"
 					},
 					"value": {
 						"type": "Literal",
-						"value": type,
-						"raw": "'" + type + "'"
+						"value": elementType,
+						"raw": "'" + elementType + "'"
 					},
 					"kind": "init"
 				});
-				if (elementType) {
-					ast.value.arguments[0].properties.push({
-						"type": "Property",
-						"key": {
-							"type": "Identifier",
-							"name": "elementType"
-						},
-						"value": {
-							"type": "Literal",
-							"value": elementType,
-							"raw": "'" + elementType + "'"
-						},
-						"kind": "init"
-					});
-				}
+			}
+		});
+		tag = tag.replace(/^\s*readOnly/g, function(whole) {
+			property.value.properties.push({
+				"type": "Property",
+				"key": {
+					"type": "Identifier",
+					"name": "readOnly"
+				},
+				"value": {
+					"type": "Literal",
+					"value": true,
+					"raw": "'true'"
+				},
+				"kind": "init"
 			});
-			tag = tag.replace(/^\s*readOnly/g, function(whole) {
-				ast.value.arguments[0].properties.push({
-					"type": "Property",
-					"key": {
-						"type": "Identifier",
-						"name": "readOnly"
-					},
-					"value": {
-						"type": "Literal",
-						"value": true,
-						"raw": "'true'"
-					},
-					"kind": "init"
-				});
+		});
+		tag = tag.replace(/^\s*private/g, function(whole) {
+			property.value.properties.push({
+				"type": "Property",
+				"key": {
+					"type": "Identifier",
+					"name": "private"
+				},
+				"value": {
+					"type": "Literal",
+					"value": true,
+					"raw": "'true'"
+				},
+				"kind": "init"
 			});
-			tag = tag.replace(/^\s*private/g, function(whole) {
-				ast.value.arguments[0].properties.push({
-					"type": "Property",
-					"key": {
-						"type": "Identifier",
-						"name": "private"
-					},
-					"value": {
-						"type": "Literal",
-						"value": true,
-						"raw": "'true'"
-					},
-					"kind": "init"
-				});
+		});
+		tag = tag.replace(/^\s*derived/g, function(whole) {
+			property.value.properties.push({
+				"type": "Property",
+				"key": {
+					"type": "Identifier",
+					"name": "derived"
+				},
+				"value": {
+					"type": "Literal",
+					"value": true,
+					"raw": "'true'"
+				},
+				"kind": "init"
 			});
-			tag = tag.replace(/^\s*derived/g, function(whole) {
-				ast.value.arguments[0].properties.push({
-					"type": "Property",
-					"key": {
-						"type": "Identifier",
-						"name": "derived"
-					},
-					"value": {
-						"type": "Literal",
-						"value": true,
-						"raw": "'true'"
-					},
-					"kind": "init"
-				});
+		});
+		tag = tag.replace(/^\s*aggregation\s+([a-z]+)\s*/g, function(whole, kind) {
+			property.value.properties.push({
+				"type": "Property",
+				"key": {
+					"type": "Identifier",
+					"name": "aggregation"
+				},
+				"value": {
+					"type": "Literal",
+					"value": kind,
+					"raw": "'" + kind + "'"
+				},
+				"kind": "init"
 			});
-			tag = tag.replace(/^\s*aggregation\s+([a-z]+)\s*/g, function(whole, kind) {
-				ast.value.arguments[0].properties.push({
-					"type": "Property",
-					"key": {
-						"type": "Identifier",
-						"name": "aggregation"
-					},
-					"value": {
-						"type": "Literal",
-						"value": kind,
-						"raw": "'" + kind + "'"
-					},
-					"kind": "init"
-				});
+		});
+		tag = tag.replace(/^\s*separator\s+([\S]+)/g, function(whole, separator) {
+			property.value.properties.push({
+				"type": "Property",
+				"key": {
+					"type": "Identifier",
+					"name": "separator"
+				},
+				"value": {
+					"type": "Literal",
+					"value": separator,
+					"raw": "'" + separator + "'"
+				},
+				"kind": "init"
 			});
-			tag = tag.replace(/^\s*separator\s+([\S]+)/g, function(whole, separator) {
-				ast.value.arguments[0].properties.push({
-					"type": "Property",
-					"key": {
-						"type": "Identifier",
-						"name": "separator"
-					},
-					"value": {
-						"type": "Literal",
-						"value": separator,
-						"raw": "'" + separator + "'"
-					},
-					"kind": "init"
-				});
+		});
+		tag = tag.replace(/^\s*assigment\s+([\S]+)/g, function(whole, assigment) {
+			property.value.properties.push({
+				"type": "Property",
+				"key": {
+					"type": "Identifier",
+					"name": "assigment"
+				},
+				"value": {
+					"type": "Literal",
+					"value": assigment,
+					"raw": "'" + assigment + "'"
+				},
+				"kind": "init"
 			});
-			tag = tag.replace(/^\s*assigment\s+([\S]+)/g, function(whole, assigment) {
-				ast.value.arguments[0].properties.push({
-					"type": "Property",
-					"key": {
-						"type": "Identifier",
-						"name": "assigment"
-					},
-					"value": {
-						"type": "Literal",
-						"value": assigment,
-						"raw": "'" + assigment + "'"
-					},
-					"kind": "init"
-				});
+		});
+		tag = tag.replace(/^\s*qualifier\s+(\{(.+)\}\s+)?([a-zA-Z0-9_$]+)\s*/g, function(whole, _type, type, qualifier) {
+			var qualifierFn = "this.get" + qualifier.charAt(0).toUpperCase() + qualifier.substr(1) + "()";
+			property.value.properties.push({
+				"type": "Property",
+				"key": {
+					"type": "Identifier",
+					"name": "key"
+				},
+				"value": {
+					"type": "Literal",
+					"value": qualifierFn,
+					"raw": "'" + qualifierFn + "'"
+				},
+				"kind": "init"
 			});
-			tag = tag.replace(/^\s*qualifier\s+(\{(.+)\}\s+)?([a-zA-Z0-9_$]+)\s*/g, function(whole, _type, type, qualifier) {
-				var qualifierFn = "this.get" + qualifier.charAt(0).toUpperCase() + qualifier.substr(1) + "()";
-				ast.value.arguments[0].properties.push({
-					"type": "Property",
-					"key": {
-						"type": "Identifier",
-						"name": "key"
-					},
-					"value": {
-						"type": "Literal",
-						"value": qualifierFn,
-						"raw": "'" + qualifierFn + "'"
-					},
-					"kind": "init"
-				});
+		});
+		tag = tag.replace(/^\s*key\s+([A-Za-z_0-9]+)\s*/g, function(whole, key) {
+			property.value.properties.push({
+				"type": "Property",
+				"key": {
+					"type": "Identifier",
+					"name": "key"
+				},
+				"value": {
+					"type": "Literal",
+					"value": key,
+					"raw": "'" + key + "'"
+				},
+				"kind": "init"
 			});
-			tag = tag.replace(/^\s*key\s+([A-Za-z_0-9]+)\s*/g, function(whole, key) {
-				ast.value.arguments[0].properties.push({
-					"type": "Property",
-					"key": {
-						"type": "Identifier",
-						"name": "key"
-					},
-					"value": {
-						"type": "Literal",
-						"value": key,
-						"raw": "'" + key + "'"
-					},
-					"kind": "init"
-				});
+		});
+		tag = tag.replace(/^\s*single\s+([A-Za-z_0-9]+)\s*/g, function(whole, single) {
+			property.value.properties.push({
+				"type": "Property",
+				"key": {
+					"type": "Identifier",
+					"name": "single"
+				},
+				"value": {
+					"type": "Literal",
+					"value": single,
+					"raw": "'" + single + "'"
+				},
+				"kind": "init"
 			});
+		});
 
-		}
-		
-		//WriteOutput("Loader", "" + context.qualifiedName + "." + this.key.name + " = " + JSON.stringify(this) + ";", undefined);
-	
-		return true;
 	}
-	return false;
+		
 };
 
 _build = function(inc) {
@@ -428,8 +402,10 @@ _build = function(inc) {
 		throw new Error("Syntax error:\r\n" + error.message + "\r\nin " + inc.qualifiedName + "\r\n");
 	}
 
-	_find(ast, null, lang, inc);
-	_find(ast, null, ea, inc);
+	for (var e = 0; e < ast.body.length; e++) {
+		var expression = ast.body[e];
+		lang.call(expression, inc.qualifiedName);
+	}
 	
 	WriteOutput("Loader", "generating: " + inc.qualifiedName, undefined);
 

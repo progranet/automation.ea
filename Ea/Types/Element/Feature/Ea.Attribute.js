@@ -18,14 +18,22 @@
  * @namespace
  */
 Ea.Attribute = {
-		meta: {
-			id: "AttributeID",
-			guid: "AttributeGUID",
-			objectType: 23
-		}
+	meta: {
+		id: "AttributeID",
+		guid: "AttributeGUID",
+		objectType: 23
+	}
 };
 
 Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
+{
+	determineType: function(api) {
+		var stereotype = this.getProperty("stereotype").getApiValue(api); 
+		if (stereotype == "enum")
+			return Ea.Attribute.EnumerationLiteral;
+		return Ea.Attribute.Attribute;
+	}
+},
 {
 	/**
 	 * Attribute id
@@ -33,14 +41,14 @@ Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 	 * @readOnly
 	 * @type {Number}
 	 */
-	_id: property({api: "AttributeID"}),
+	id: {api: "AttributeID"},
 	
 	/**
 	 * Attribute guid
 	 * 
 	 * @readOnly
 	 */
-	_guid: property({api: "AttributeGUID"}),
+	guid: {api: "AttributeGUID"},
 	
 	/**
 	 * Attribute extended style
@@ -48,7 +56,7 @@ Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	_styleEx: property({api: "StyleEx"}),
+	_styleEx: {api: "StyleEx"},
 	
 	/**
 	 * Attribute tags collection
@@ -57,21 +65,15 @@ Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_tag: property({api: "TaggedValues"}),
+	tags: {api: "TaggedValues"},
 	
 	/**
 	 * Attribute position in tree model of project browser. 
 	 * 
 	 * @type {Number}
 	 */
-	_position: property({api: "Pos"}),
+	position: {api: "Pos"}
 	
-	determineType: function(source) {
-		var stereotype = this._stereotype.get(source);
-		if (stereotype == "enum")
-			return Ea.Attribute.EnumerationLiteral;
-		return Ea.Attribute.Attribute;
-	}
 });
 
 Ea.Attribute.EnumerationLiteral = extend(Ea.Attribute._Base, {
@@ -79,7 +81,7 @@ Ea.Attribute.EnumerationLiteral = extend(Ea.Attribute._Base, {
 	/**
 	 * Returns null
 	 * 
-	 * @type {Object}
+	 * @type {Core.Types.Object}
 	 */
 	getType: function() {
 		return null;
@@ -88,7 +90,7 @@ Ea.Attribute.EnumerationLiteral = extend(Ea.Attribute._Base, {
 	/**
 	 * Throws exception
 	 * 
-	 * @param {Class} type
+	 * @param {Core.Types.Object} type
 	 */
 	setType: function(type) {
 		throw new Error("Cannot set type od enumeration literal");
@@ -97,19 +99,9 @@ Ea.Attribute.EnumerationLiteral = extend(Ea.Attribute._Base, {
 	_toString: function() {
 		return this.getName() + " [" + this._class  + "]";
 	}
-},
-{
-	/**
-	 * Enumeration literal type.
-	 * Contains null.
-	 * 
-	 * @derived
-	 * @type {Core.Types.Object}
-	 */
-	_type: property()
 });
 
-Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {}, 
+Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {}, {},
 {
 
 	/**
@@ -118,7 +110,7 @@ Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {},
 	 * @private
 	 * @type {Ea.Element.Type}
 	 */
-	_classifier: property({api: "ClassifierID", referenceBy: "id"}),
+	_classifier: {api: "ClassifierID", referenceBy: "id"},
 	
 	/**
 	 * Attribute constraints collection
@@ -126,102 +118,102 @@ Ea.Attribute.Attribute = extend(Ea.Attribute._Base, {},
 	 * @type {Ea.Collection._Base<Ea.AttributeConstraint._Base>}
 	 * @aggregation composite
 	 */
-	_constraint: property({api: "Constraints"}),
+	constraints: {api: "Constraints"},
 	
 	/**
 	 * Attribute data type
 	 * 
 	 * @private
 	 */
-	_primitiveType: property({api: "Type"}),
+	_primitiveType: {api: "Type"},
 	
 	
 	/**
 	 * Attribute default value
 	 */
-	_default: property({api: "Default"}),
+	_default: {api: "Default"},
 	
 	/**
 	 * Attribute collection switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_collection: property({api: "IsCollection"}),
+	collection: {api: "IsCollection"},
 	
 	/**
 	 * Attribute read only switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_readOnly: property({api: "IsConst"}),
+	readOnly: {api: "IsConst"},
 	
 	/**
 	 * Attribute derived switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_derived: property({api: "IsDerived"}),
+	derived: {api: "IsDerived"},
 	
 	/**
 	 * Attribute ordered switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_ordered: property({api: "IsOrdered"}),
+	ordered: {api: "IsOrdered"},
 	
 	/**
 	 * Attribute static switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_static: property({api: "IsStatic"}),
+	static: {api: "IsStatic"},
 	
 	/**
 	 * Attribute allow duplicates switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_allowDuplicates: property({api: "AllowDuplicates"}),
+	allowDuplicates: {api: "AllowDuplicates"},
 	
 	/**
 	 * Attribute length
 	 */
-	_length: property({api: "Length"}),
+	length: {api: "Length"},
 	
 	/**
 	 * Attribute precision
 	 */
-	_precision: property({api: "Precision"}),
+	precision: {api: "Precision"},
 	
 	/**
 	 * Attribute scale
 	 */
-	_scale: property({api: "Scale"}),
+	scale: {api: "Scale"},
 	
 	/**
 	 * Attribute container
 	 */
-	_container: property({api: "Container"}),
+	container: {api: "Container"},
 	
 	/**
 	 * Attribute containment
 	 */
-	_containment: property({api: "Containment"}),
+	containment: {api: "Containment"},
 	
 	/**
 	 * Attribute multiplicity lower
 	 */
-	_lower: property({api: "LowerBound"}),
+	lower: {api: "LowerBound"},
 	
 	/**
 	 * Attribute multiplicity upper
 	 */
-	_upper: property({api: "UpperBound"}),
+	upper: {api: "UpperBound"},
 	
 	/**
 	 * Attribute visibility
 	 */
-	_visibility: property({api: "Visibility"})
+	visibility: {api: "Visibility"}
 });
 
 include("Ea.AttributeTag@Ea.Types.Element.Feature");

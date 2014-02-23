@@ -24,11 +24,16 @@ Ea.TaggedValue = {
 
 Ea.TaggedValue._Base = extend(Ea.Tag._Base, {
 
-	getParent: function() {
-		return this._getParent();
+	getNamespace: function() {
+		return this.getElement();
+	},
+	
+	setNamespace: function(namespace) {
+		this.setElement(namespace);
 	}
 
 },
+{},
 {
 	/**
 	 * Tag id
@@ -36,23 +41,30 @@ Ea.TaggedValue._Base = extend(Ea.Tag._Base, {
 	 * @readOnly
 	 * @type {Number}
 	 */
-	_id: property({api: "PropertyID"}),
+	id: {api: "PropertyID"},
 	
 	/**
 	 * Tag guid
 	 */
-	_guid: property({api: "PropertyGUID"}),
+	guid: {api: "PropertyGUID"},
 	
 	/**
 	 * Tag notes
 	 */
-	_notes: property({api: "Notes"}),
+	notes: {api: "Notes"},
 	
 	/**
-	 * Tag parent element
+	 * Named element namespace
+	 * 
+	 * @derived
+	 * @type {Ea.Types.Namespace}
+	 */
+	namespace: {},
+
+	/**
+	 * Tag element
 	 * 
 	 * @type {Ea.Element._Base}
-	 * @private
 	 */
-	__parent: property({api: "ElementID", referenceBy: "id"})
+	element: {api: "ElementID", referenceBy: "id"}
 });

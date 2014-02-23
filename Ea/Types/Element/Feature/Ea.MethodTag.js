@@ -22,13 +22,30 @@ Ea.MethodTag = {
 		}
 };
 
-Ea.MethodTag._Base = extend(Ea.Tag._Feature, {},
+Ea.MethodTag._Base = extend(Ea.Tag._Feature, {
+	
+	getNamespace: function() {
+		return this.getMethod();
+	},
+	
+	setNamespace: function(namespace) {
+		this.setMethod(namespace);
+	}
+}, 
+{},
 {
+	/**
+	 * Named element namespace
+	 * 
+	 * @derived
+	 * @type {Ea.Types.Namespace}
+	 */
+	namespace: {},
+
 	/**
 	 * Method tag parent method
 	 * 
-	 * @private
 	 * @type {Ea.Method._Base}
 	 */
-	__parent: property({api: "MethodID", referenceBy: "id"})
+	method: {api: "MethodID", referenceBy: "id"}
 });

@@ -33,9 +33,6 @@ Ea._Base.Utils.Target = extend(Core.Target.AbstractTarget, {
 		this._repository.clearOutput(this._name);
 	},
 	
-	/**
-	 * @memberOf Ea._Base.Utils.Target#
-	 */
 	write: function(message) {
 		if (this._type == Core.Target.Type.TREE)
 			message = message.replace(/\|/g, "      |").replace(/\-/g, "—").replace(/\+/g, "[•]");
@@ -50,7 +47,7 @@ Ea._Base.Utils.Log = define({
 	create: function(element) {
 		_super.create();
 		this._path = [];
-		var parent = element.getParent();
+		var parent = element.getNamespace();
 		if (parent) {
 			var parentPath = Ea._Base.Utils.Log.getLog(parent).getPath();
 			for (var p = 0; p < parentPath.length; p++) {
@@ -60,9 +57,6 @@ Ea._Base.Utils.Log = define({
 		this._path.push(element);
 	},
 	
-	/**
-	 * @memberOf Ea._Base.Utils.Log#
-	 */
 	getPath: function() {
 		return this._path;
 	},

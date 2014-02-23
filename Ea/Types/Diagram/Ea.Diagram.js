@@ -33,39 +33,111 @@ Ea.Diagram = {
 		TOP: 30,
 		RIGHT: 20,
 		BOTTOM: 10
+	},
+	
+	Layout: {
+		CycleRemove: {
+			DFS: 1073741824,
+			Greedy: -2147483648
+		},
+		Initialize: {
+			DFSIn: 201326592,
+			DFSOut: 67108864,
+			Naive: 134217728
+		},
+		Layering: {
+			LongestPathSink: 805306368,
+			LongestPathSource: 536870912,
+			OptimalLinkLength: 268435456
+		},
+		Direction: {
+			Down: 131072,
+			Left: 262144,
+			Right: 524288,
+			Up: 65536
+		}
 	}
+	
 };
 
 Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 
-	getParent: function() {
-		return this._getParent() || this._getPackage();
+	getNamespace: function() {
+		return this.getParent() || this.getPackage();
 	},
 	
-	setParent: function(parent) {
+	setNamespace: function(parent) {
 		if (parent.instanceOf(Ea.Package._Base)) {
-			this._setPackage(parent);
-			this._setParent(null);
+			this.setPackage(parent);
+			this.setParent(null);
 		}
 		else if (parent.instanceOf(Ea.Element._Base)) {
-			this._setPackage(parent._getPackage());
-			this._setParent(parent);
+			this.setPackage(parent.getPackage());
+			this.setParent(parent);
 		}
 		else {
 			throw new Error("Illegal parent type for Diagram: " + parent);
 		}
 	},
 	
-	save: function(path, reuse) {
-		/*
-		var fileDate = new Sys.IO.File(path).getCreated();
-		if (!reuse || (!fileDate || fileDate.valueOf() <= this.getModified())) {
-
-		}
-		*/
+	/**
+	 * @deprecated Use Ea.Diagram.saveToFile() and Ea.Diagram.close()
+	 */
+	save: function(path) {
+		this.saveToFile(path);
+		this.close();
+	},
+	
+	saveToFile: function(path) {
 		this._source.application.getProject().saveDiagram(this, path);
+	},
+
+	load: function() {
+		this._source.application.getProject().loadDiagram(this);
+	},
+	
+	open: function() {
+		this._source.application.getRepository().openDiagram(this);
+	},
+	
+	close: function() {
 		this._source.application.getRepository().closeDiagram(this);
-		return true;
+	},
+	
+	reload: function() {
+		this._source.application.getRepository().reloadDiagram(this);
+	},
+	
+	layout: function(style, iterations, saveAsDefault) {
+		var numStyle = 0;
+		if ("crossReduceAggressive" in style) {
+			numStyle = numStyle + 33554432;
+			delete style.crossReduceAggressive;
+		}
+		
+		var layerSpacing = style.layerSpacing || 20;
+		delete style.layerSpacing;
+		
+		var columnSpacing = style.columnSpacing || 20;
+		delete style.columnSpacing;
+
+		for (var variable in style) {
+			var constantName = variable.substr(0, 1).toUpperCase() + variable.substr(1);
+			if (constantName in Ea.Diagram.Layout) {
+				if (style[variable] in Ea.Diagram.Layout[constantName]) {
+					var constantValue = Ea.Diagram.Layout[constantName][style[variable]];
+					numStyle = numStyle + constantValue;
+				}
+				else {
+					warn("Not defined constant $ for diagram layout style $. Available constants: $", [style[variable], constantName, Ea.Diagram.Layout[constantName]]);
+				}
+			}
+			else {
+				warn("Not defined diagram layout style $", [constantName]);
+			}
+		}
+		
+		this._source.application.getProject().layoutDiagram(this, numStyle, iterations, layerSpacing, columnSpacing, saveAsDefault);
 	},
 	
 	getSwimlanes: function(filter) {
@@ -78,7 +150,9 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 			right: 0,
 			bottom: 0,
 			width: 240,
-			height: 150
+			height: 150,
+			left: null,
+			top: null
 		};
 		var views = new Core.Types.Collection();
 		
@@ -88,8 +162,8 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 		views.forEach(function(view) {
 			if (view.getDimension()) {
 				var viewDimension = view.getDimension().valueOf();
-				dimension.left = dimension.left !== undefined ? Math.min(dimension.left, viewDimension.left) : viewDimension.left;
-				dimension.top = dimension.top !== undefined ? Math.min(dimension.top, viewDimension.top) : viewDimension.top;
+				dimension.left = dimension.left !== null ? Math.min(dimension.left, viewDimension.left) : viewDimension.left;
+				dimension.top = dimension.top !== null ? Math.min(dimension.top, viewDimension.top) : viewDimension.top;
 				dimension.right = Math.max(dimension.right, viewDimension.right);
 				dimension.bottom = Math.max(dimension.bottom, viewDimension.bottom);
 			}
@@ -119,6 +193,14 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 		return dimension;
 	},
 	
+	getScale: function(maxWidth, maxHeight) {
+		var dimension = this.getDimension();
+		return Math.min((maxWidth && dimension.width > maxWidth) ? maxWidth / dimension.width : 1, (maxHeight && dimension.height > maxHeight) ? maxHeight / dimension.height : 1);
+	},
+	
+	/**
+	 * @deprecated
+	 */
 	getCalculated: function(maxWidth, maxHeight) {
 		var dimension = this.getDimension();
 		var scale;
@@ -140,54 +222,39 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 		return this._elements.filter(filter);
 	},
 	
-	getConnectorViews: function(filter) {
-		var connectorViews = this._getConnectorViews().filter("this.getId() != 0");
-		return connectorViews.filter(filter);
-	},
-	
-	createConnectorView: function(name, type) {
-		return this._createConnectorView(name, type);
-	},
-	
-	deleteConnectorView: function(connectorView) {
-		return this._deleteConnectorView(connectorView);
-	},
-	
-	reload: function() {
-		this._source.application.getRepository().reloadDiagram(this);
-	},
-	
 	update: function() {
 		_super.update();
 		this.reload();
 	}
 },
 {
-	determineType: function(source) {
-		return this._deriveType(source, this._type);
-	},
-	
+	determineType: function(api) {
+		return this._deriveType(api, this.getProperty("_type"));
+	}
+},
+{
 	/**
 	 * Diagram id
 	 * 
 	 * @readOnly
 	 * @type {Number}
 	 */
-	_id: property({api: "DiagramID"}),
+	id: {api: "DiagramID"},
 	
 	/**
 	 * Diagram guid
 	 * 
 	 * @readOnly
 	 */
-	_guid: property({api: "DiagramGUID"}),
+	guid: {api: "DiagramGUID"},
 	
 	/**
 	 * Diagram type
 	 * 
+	 * @private
 	 * @readOnly
 	 */
-	_type: property({api: "Type"}),
+	_type: {api: "Type"},
 	
 	/**
 	 * Diagram meta type
@@ -195,17 +262,17 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	 * @private
 	 * @readOnly
 	 */
-	_metaType: property({api: "MetaType"}),
+	_metaType: {api: "MetaType"},
 	
 	/**
 	 * Diagram notes
 	 */
-	_notes: property({api: "Notes"}),
+	notes: {api: "Notes"},
 	
 	/**
 	 * Diagram stereotype
 	 */
-	_stereotype: property({api: "Stereotype"}),
+	stereotype: {api: "Stereotype"},
 	
 	/**
 	 * Diagram style
@@ -213,7 +280,7 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	_style: property({api: "ExtendedStyle"}),
+	_style: {api: "ExtendedStyle"},
 	
 	/**
 	 * Diagram extended style
@@ -221,7 +288,7 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	_styleEx: property({api: "StyleEx"}),
+	_styleEx: {api: "StyleEx"},
 	
 	/**
 	 * Diagram element views collection
@@ -229,49 +296,37 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	 * @type {Ea.Collection._Base<Ea.DiagramObject._Base>}
 	 * @aggregation composite
 	 */
-	_elementView: property({api: "DiagramObjects"}),
+	elementViews: {api: "DiagramObjects"},
 	
 	/**
 	 * Diagram connector views collection
 	 * 
-	 * @private
 	 * @type {Ea.Collection._Base<Ea.DiagramLink._Base>}
-	 */
-	__connectorView: property({api: "DiagramLinks"}),
-	
-	/**
-	 * Diagram connector views collection
-	 * 
-	 * @derived
-	 * @type {Core.Types.Collection<Ea.DiagramLink._Base>}
 	 * @aggregation composite
 	 */
-	_connectorView: property(),
-		// collection filtered because of EA returns virtual connector views for Ea.Connector.Sequence with [id = 0]
+	connectorViews: {api: "DiagramLinks"},
 	
 	/**
-	 * Diagram parent
+	 * Named element namespace
 	 * 
 	 * @derived
 	 * @type {Ea.Types.Namespace}
 	 */
-	_parent: property(),
+	namespace: {},
 
 	/**
 	 * Diagram parent element
 	 * 
-	 * @private
 	 * @type {Ea.Element._Base}
 	 */
-	__parent: property({api: "ParentID", referenceBy: "id"}),
+	parent: {api: "ParentID", referenceBy: "id"},
 	
 	/**
 	 * Diagram package
 	 * 
-	 * @private
 	 * @type {Ea.Package._Base}
 	 */
-	_package: property({api: "PackageID", referenceBy: "id"}),
+	package: {api: "PackageID", referenceBy: "id"},
 	
 	/**
 	 * Diagram swimlanes definition
@@ -279,7 +334,7 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	 * @type {Ea.SwimlaneDef._Base}
 	 * @aggregation composite
 	 */
-	_swimlaneDef: property({api: "SwimlaneDef"}),
+	swimlaneDef: {api: "SwimlaneDef"},
 	
 	/**
 	 * Diagram swimlanes
@@ -288,56 +343,56 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	 * @readOnly
 	 * @type {Core.Types.Collection<Ea.Swimlane._Base>}
 	 */
-	_swimlane: property(),
+	swimlanes: {},
 
 	/**
 	 * Diagram highlight imports switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_highlightImports: property({api: "HighlightImports"}),
+	highlightImports: {api: "HighlightImports"},
 	
 	/**
 	 * Diagram show details switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_showDetails: property({api: "ShowDetails"}),
+	showDetails: {api: "ShowDetails"},
 	
 	/**
 	 * Diagram  show package contents switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_showPackageContents: property({api: "ShowPackageContents"}),
+	showPackageContents: {api: "ShowPackageContents"},
 	
 	/**
 	 * Diagram show private switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_showPrivate: property({api: "ShowPrivate"}),
+	showPrivate: {api: "ShowPrivate"},
 	
 	/**
 	 * Diagram show protected switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_showProtected: property({api: "ShowProtected"}),
+	showProtected: {api: "ShowProtected"},
 	
 	/**
 	 * Diagram show public switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_showPublic: property({api: "ShowPublic"}),
+	showPublic: {api: "ShowPublic"},
 
 	/**
 	 * Diagram selected connector
 	 * 
 	 * @type {Ea.Connector._Base}
 	 */
-	_selectedConnector: property({api: "SelectedConnector"}),
+	selectedConnector: {api: "SelectedConnector"},
 	
 	/**
 	 * Diagram selected elements collection
@@ -345,31 +400,31 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	 * @readOnly
 	 * @type {Ea.Collection._Base<Ea.Element._Base>}
 	 */
-	_selectedElement: property({api: "SelectedObjects"}), // TODO: add/remove elements to collection (not the same as create/delete in this case)
+	selectedElements: {api: "SelectedObjects"}, // TODO: add/remove elements to collection (not the same as create/delete in this case)
 	
 	/**
 	 * Diagram author
 	 */
-	_author: property({api: "Author"}),
+	author: {api: "Author"},
 	
 	/**
 	 * Diagram version
 	 */
-	_version: property({api: "Version"}),
+	version: {api: "Version"},
 	
 	/**
 	 * Diagram creation date
 	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
-	_created: property({api: "CreatedDate"}),
+	created: {api: "CreatedDate"},
 	
 	/**
 	 * Diagram modification date
 	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
-	_modified: property({api: "ModifiedDate"}),
+	modified: {api: "ModifiedDate"},
 	
 	/**
 	 * Diagram dimension
@@ -378,26 +433,52 @@ Ea.Diagram._Base = extend(Ea.Types.Namespace, {
 	 * @readOnly
 	 * @type {Object}
 	 */
-	_dimension: property()
+	dimension: {}
 });
 
 include("Ea.SwimlaneDef@Ea.Types.Diagram");
 
-Ea.Diagram.View = extend(Ea.Types.Any, {
+Ea.Diagram.View = extend(Ea.Types.NamedElement, {
 	
-	_dimension: null,
-
-	left: null,
-	top: null,
-	right: null,
-	bottom: null},
+	getNamespace: function() {
+		return this.getDiagram();
+	},
+	
+	setNamespace: function(namespace) {
+		this.setDiagram(namespace);
+	},
+	
+	getName: function() {
+		return this.getObject().getName() + "@" + this.getDiagram().getName();
+	},
+	
+	setName: function(name) {
+		throw new Error("Setting name of view is not supported");
+	}
+},
+{},
 {
 	/**
-	 * View parent diagram
+	 * Named element namespace
+	 * 
+	 * @derived
+	 * @type {Ea.Types.Namespace}
+	 */
+	namespace: {},
+
+	/**
+	 * View owning diagram
 	 * 
 	 * @type {Ea.Diagram._Base}
 	 */
-	_parent: property({api: "DiagramID", referenceBy: "id"})
+	diagram: {api: "DiagramID", referenceBy: "id"},
+	
+	/**
+	 * View name
+	 * 
+	 * @derived
+	 */
+	name: {}
 });
 
 include("Ea.DiagramLink@Ea.Types.Diagram");

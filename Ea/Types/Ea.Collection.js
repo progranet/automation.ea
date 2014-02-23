@@ -15,17 +15,15 @@
 */
 
 Ea.Collection = {
-		meta: {
-			objectType: 3
-		}
+	meta: {
+		objectType: 3
+	}
 };
 
 Ea.Collection._Base = extend([Ea.Types.Any, Core.Types.AbstractCollection], {
 	
 	_elementType: null,
 	_index: null,
-	_size: 0,
-	_table: null,
 	
 	/**
 	 * Constructs Ea.Collection._Base
@@ -33,7 +31,7 @@ Ea.Collection._Base = extend([Ea.Types.Any, Core.Types.AbstractCollection], {
 	 * @param {Object} params params.elementType specify class of elements in this collection
 	 */
 	create: function(params) {
-		_super.create();
+		_super.create(params);
 		this._table = [];
 		this._elementType = params.elementType;
 		this._index = {};
@@ -44,13 +42,13 @@ Ea.Collection._Base = extend([Ea.Types.Any, Core.Types.AbstractCollection], {
 		for (var e = 0; e < this.getSize(); e++) {
 			var element = application.get(this._elementType, this._getAt(e));
 			this._add(element);
+			this._index[element.__id__] = e;
 		}
 	},
 	
 	_add: function(element) {
 		this._table.push(element);
 		this._size++;
-		this._index[element.__id__] = e;
 		this._added(element);
 	},
 	
@@ -68,7 +66,10 @@ Ea.Collection._Base = extend([Ea.Types.Any, Core.Types.AbstractCollection], {
 
 	_delete: function(element) {
 		var index = this._index[element.__id__];
+		if (!index)
+			return false;
 		this._source.api.Delete(index);
+		return true;
 	},
 	
 	/**
@@ -76,99 +77,6 @@ Ea.Collection._Base = extend([Ea.Types.Any, Core.Types.AbstractCollection], {
 	 */
 	refresh: function() {
 		this._source.api.Refresh();
-	},
-	
-	/**
-	 * Adds all elements of this collection to specified collection
-	 * 
-	 * @param {Core.Types.Collection} collection
-	 */
-	addAllTo: function(collection) {
-		if (!Core.Types.AbstractCollection.isInstance(collection))
-			throw new Error("No collection specified or unknown collection type: " + collection);
-		for (var i = 0; i < this._size; i++) {
-			collection.add(this._table[i]);
-		}
-	},
-	
-	/**
-	 * Removes all elements of this collection from specified collection
-	 * 
-	 * @param {Core.Types.Collection} collection
-	 */
-	removeAllFrom: function(collection) {
-		if (!Core.Types.AbstractCollection.isInstance(collection))
-			throw new Error("No collection specified or unknown collection type: " + collection);
-		for (var i = 0; i < this._size; i++) {
-			collection.remove(this._table[i]);
-		}
-	},
-
-	/**
-	 * Collection iterator.
-	 * 
-	 * @param {Object} context
-	 * @param {Function} fn
-	 */
-	forEach: function(context, fn) {
-		for (var i = 0; i < this._size; i++) {
-			if (fn.call(context, this._table[i], i)) break;
-		}
-	},
-	
-	/**
-	 * Returns collection size.
-	 * 
-	 * @type {Number}
-	 */
-	getSize: function() {
-		return this._size;
-	},
-	
-	/**
-	 * Checks if this collection is empty
-	 * 
-	 * @type {Boolean}
-	 */
-	isEmpty: function() {
-		return this._size == 0;
-	},
-	
-	/**
-	 * Checks if this collection is not empty
-	 * 
-	 * @type {Boolean}
-	 */
-	notEmpty: function() {
-		return this._size != 0;
-	},
-	
-	/**
-	 * Returns first element of this collection
-	 * 
-	 * @type {Object}
-	 */
-	first: function() {
-		return (this._size == 0 ? null : this._table[0]);
-	},
-	
-	/**
-	 * Returns new collection containing elements from this collection matching specified filter
-	 * @see Core.Types.Filter
-	 * 
-	 * @param {Core.Types.Filter} filter
-	 * @type {Core.Types.Collection}
-	 */
-	filter: function(filter) {
-		if (!filter) return this;
-		var filtered = new Core.Types.Collection();
-		filter = Core.Types.Filter.ensure(filter);
-		for (var i = 0; i < this._size; i++) {
-			var element = this._table[i];
-			if (filter.check(element))
-				filtered.add(element);
-		}
-		return filtered;
 	},
 	
 	/**
@@ -189,36 +97,22 @@ Ea.Collection._Base = extend([Ea.Types.Any, Core.Types.AbstractCollection], {
 	 */
 	_getAt: function(index) {
 		return this._source.api.GetAt(index);
-	}
-},
-{
-	/**
-	 * Determines the class of collection based on source attributes values
-	 * 
-	 * @param {Ea._Base.Source} source
-	 * @type {Class}
-	 */
-	determineType: function(source) {
-		return Ea.Collection._Base;
 	},
 	
 	/**
-	 * Processes original property value
+	 * Collection iterator.
 	 * 
-	 * @param {Ea.Collection._Base} value
-	 * @param {Array} params Parameters (arguments) passed to getter. In this case params[0] specify collection filter
-	 * @type {Core.Types.Collection}
+	 * @param {Object} context
+	 * @param {Function} fn Callback function
 	 */
-	processValue: function(value, params) {
-		return value.filter(params[0]);
-	}
+	forEach: function(context, fn) {
+		for (var i = 0; i < this._size; i++) {
+			if (fn.call(context, this._table[i], i)) break;
+		}
+	}	
 });
 
 Ea.Collection.Map = extend([Ea.Collection._Base, Core.Types.AbstractMap], {
-	
-	_keyDef: null,
-	_keyFn: null,
-	_map: null,
 	
 	/**
 	 * Constructs Ea.Collection.Map
@@ -227,7 +121,6 @@ Ea.Collection.Map = extend([Ea.Collection._Base, Core.Types.AbstractMap], {
 	 */
 	create: function(params) {
 		_super.create(params);
-		params = params || {};
 		this._keyDef = params.key;
 		this._keyFn = new Function("return " + this._keyDef + ";");
 		this._map = {};
@@ -245,49 +138,19 @@ Ea.Collection.Map = extend([Ea.Collection._Base, Core.Types.AbstractMap], {
 	},
 	
 	/**
-	 * Returns an element for specified key
-	 * 
-	 * @param {Object} key
-	 * @type {Object}
-	 */
-	get: function(key) {
-		return key in this._map ? this._map[key] : undefined;
-	},
-	
-	/**
-	 * Returns full set of elements in this map regarding that multiple elements can match same key key definition.
-	 * 
-	 * @type {Core.Types.Collection}
-	 */
-	asSet: function() {
-		var set = new Core.Types.Collection();
-		for (var i = 0; i < this._size; i++) {
-			set.add(this._table[i]);
-		}
-		return set;
-	},
-
-	/**
 	 * Map iterator.
 	 * 
 	 * @param {Object} context
-	 * @param {Function} fn
+	 * @param {Function} fn Callback function
 	 */
 	forEach: function(context, fn) {
 		for (var key in this._map) {
 			if (fn.call(context, this._map[key], key)) break;
 		}
 	}
-	
 },
 {
-	/**
-	 * Determines the class of map based on source attributes values
-	 * 
-	 * @param {Ea._Base.Source} source
-	 * @type {Class}
-	 */
-	determineType: function(source) {
-		return Ea.Collection.Map;
+	determineType: function(api) {
+		return this.namespace.Map;
 	}
 });

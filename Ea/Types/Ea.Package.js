@@ -28,7 +28,7 @@ Ea.Package = {
 Ea.Package._Base = extend(Ea.Types.Namespace, {
 	
 	getElements: function(filter) {
-		var elements = this._getElements().filter("this._getParent() == null");
+		var elements = this._getElements().filter("this.getParent() == null");
 		return elements.filter(filter);
 	},
 	
@@ -41,7 +41,7 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	},
 	
 	getDiagrams: function(filter) {
-		var diagrams = this._getDiagrams().filter("this._getParent() == null");
+		var diagrams = this._getDiagrams().filter("this.getParent() == null");
 		return diagrams.filter(filter);
 	},
 	
@@ -53,55 +53,50 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 		return this._deleteDiagram(element);
 	},
 	
-	getParent: function() {
-		return this._getParent();
+	getNamespace: function() {
+		return this.getParent();
 	},
 	
-	setParent: function(parent) {
-		return this._setParent(parent);
+	setNamespace: function(namespace) {
+		return this.setParent(namespace);
 	}
 },
 {
-	/**
-	 * Determines the class of package based on source attributes values
-	 * 
-	 * @param {Ea._Base.Source} source
-	 * @type {Class}
-	 */
-	determineType: function(source) {
-		if (this._model.get(source))
+	determineType: function(api) {
+		if (this.getProperty("_model").getApiValue(api))
 			type = Ea.Package.Model;
 		else
 			type = Ea.Package.Package;
 		return type;
-	},
-	
+	}
+},
+{
 	/**
 	 * Package id
 	 * 
 	 * @readOnly
 	 * @type {Number}
 	 */
-	_id: property({api: "PackageID"}),
+	id: {api: "PackageID"},
 
 	/**
 	 * Package guid
 	 * 
 	 * @readOnly
 	 */
-	_guid: property({api: "PackageGUID"}),
+	guid: {api: "PackageGUID"},
 
 	/**
 	 * Package alias
 	 * 
 	 * @readOnly
 	 */
-	_alias: property({api: "Alias"}),
+	alias: {api: "Alias"},
 	
 	/**
 	 * Package notes
 	 */
-	_notes: property({api: "Notes"}),
+	notes: {api: "Notes"},
 	
 	/**
 	 * Package flag properties
@@ -109,46 +104,47 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	_flags: property({api: "Flags"}),
+	_flags: {api: "Flags"},
 
 	/**
 	 * Package controlled switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_controlled: property({api: "IsControlled"}),
+	controlled: {api: "IsControlled"},
 	
 	/**
 	 * Package namespace switch value
 	 * 
+	 * @private
 	 * @type {Boolean}
 	 */
-	_namespace: property({api: "IsNamespace"}),
+	_namespace: {api: "IsNamespace"},
 	
 	/**
 	 * Package protected switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_protected: property({api: "IsProtected"}),
+	protected: {api: "IsProtected"},
 	
 	/**
 	 * Package version controlled switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_versionControlled: property({api: "IsVersionControlled"}),
+	versionControlled: {api: "IsVersionControlled"},
 	
 	/**
 	 * Package owner
 	 */
-	_owner: property({api: "Owner"}),
+	owner: {api: "Owner"},
 	
 	/**
 	 * XML path of package.
 	 * Property is used in version control configurations.
 	 */
-	_xmlPath: property({api: "XMLPath"}),
+	xmlPath: {api: "XMLPath"},
 
 	/**
 	 * Package model switch value
@@ -157,33 +153,33 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	 * @readOnly
 	 * @type {Boolean}
 	 */
-	_model: property({api: "IsModel"}),
+	_model: {api: "IsModel"},
 	
 	/**
 	 * Package version
 	 */
-	_version: property({api: "Version"}),
+	version: {api: "Version"},
 	
 	/**
 	 * Package creation date
 	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
-	_created: property({api: "Created"}),
+	created: {api: "Created"},
 	
 	/**
 	 * Package modification date
 	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
-	_modified: property({api: "Modified"}),
+	modified: {api: "Modified"},
 	
 	/**
 	 * Package position in tree model of project browser
 	 * 
 	 * @type {Number}
 	 */
-	_position: property({api: "TreePos"}),
+	position: {api: "TreePos"},
 
 	/**
 	 * Element corresponding to package.
@@ -192,32 +188,31 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	 * @type {Ea.Element._Base}
 	 * @aggregation composite
 	 */
-	___element: property({api: "Element"}),
+	element: {api: "Element"},
 	
+	/**
+	 * Named element namespace
+	 * 
+	 * @derived
+	 * @type {Ea.Types.Namespace}
+	 */
+	namespace: {},
+
 	/**
 	 * Package parent package
 	 * 
-	 * @private
 	 * @type {Ea.Package._Base}
 	 */
-	__parent: property({api: "ParentID", referenceBy: "id"}),
-	
-	/**
-	 * Package parent
-	 * 
-	 * @derived
-	 * @type {Ea.Package._Base}
-	 */
-	_parent: property(),
+	parent: {api: "ParentID", referenceBy: "id"},
 	
 	/**
 	 * Package all elements
 	 * 
+	 * @private
 	 * @type {Ea.Collection._Base<Ea.Element._Base>}
 	 * @aggregation composite
-	 * @private
 	 */
-	__element: property({api: "Elements"}),
+	_elements: {api: "Elements"},
 	
 	/**
 	 * Package elements.
@@ -226,7 +221,7 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	 * @derived
 	 * @type {Core.Types.Collection<Ea.Element._Base>}
 	 */
-	_element: property(),
+	elements: {},
 
 	/**
 	 * Package all diagrams
@@ -235,7 +230,7 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	 * @type {Ea.Collection._Base<Ea.Diagram._Base>}
 	 * @aggregation composite
 	 */
-	__diagram: property({api: "Diagrams"}),
+	_diagrams: {api: "Diagrams"},
 	
 	/**
 	 * Package diagrams.
@@ -244,7 +239,7 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	 * @derived
 	 * @type {Core.Types.Collection<Ea.Diagram._Base>}
 	 */
-	_diagram: property(),
+	diagrams: {},
 	
 	/**
 	 * Package sub-packages
@@ -252,7 +247,7 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	 * @type {Ea.Collection._Base<Ea.Package._Base>}
 	 * @aggregation composite
 	 */
-	_package: property({api: "Packages"})
+	packages: {api: "Packages"}
 });
 
 Ea.Package.Package = extend(Ea.Package._Base);

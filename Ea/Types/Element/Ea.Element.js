@@ -25,23 +25,23 @@ Ea.Element = {
 		}
 };
 
-Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
+Ea.Element._Base = extend(Ea.Types.Namespace, {
 
-	getParent: function() {
-		return this._getParent() || this._getPackage();
+	getNamespace: function() {
+		return this.getParent() || this.getPackage();
 	},
 	
-	setParent: function(parent) {
-		if (parent.instanceOf(Ea.Package._Base)) {
-			this._setPackage(parent);
-			this._setParent(null);
+	setNamespace: function(namespace) {
+		if (namespace.instanceOf(Ea.Package._Base)) {
+			this.setPackage(namespace);
+			this.setParent(null);
 		}
-		else if (parent.instanceOf(Ea.Element._Base)) {
-			this._setPackage(parent._getPackage());
-			this._setParent(parent);
+		else if (namespace.instanceOf(Ea.Element._Base)) {
+			this.setPackage(namespace.getPackage());
+			this.setParent(namespace);
 		}
 		else {
-			throw new Error("Illegal parent type for Element: " + parent);
+			throw new Error("Illegal namespace type for Element: " + namespace);
 		}
 	},
 	
@@ -79,7 +79,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	getRelationships: function(relation, filter) {
 		var relations = new Core.Types.Collection();
 		this._getRelationships().forEach(function(relationship) {
-			if (!relation || (typeof relation == "string" && relation == relationship.getRelation()) || (relation.isClass && relation.conformsTo(Ea.Connector._Base) && relationship.getConnector().instanceOf(relation))) {
+			if (!relation || (typeof relation == "string" && relation == relationship.getRelation()) || (Core.Lang.isClass(relation) && relation.conformsTo(Ea.Connector._Base) && relationship.getConnector().instanceOf(relation))) {
 				var related = relationship.getTo();
 				if (related.match(filter))
 					relations.add(relationship);
@@ -152,16 +152,10 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 		}
 	},
 	
-	/**
-	 * Recognizes class of EA Element from source
-	 * 
-	 * @param {Object} source
-	 * @type {Class}
-	 */
-	determineType: function(source) {
+	determineType: function(api) {
 		
-		var typeName = this.__type.get(source).replace(/\s/g,"");
-		var metaType = this._metatype.get(source);
+		var typeName = this.getProperty("_type").getApiValue(api).replace(/\s/g,"");
+		var metaType = this.getProperty("_metatype").getApiValue(api);
 		
 		if (metaType)
 			typeName = metaType;
@@ -171,11 +165,11 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 		}
 		var subTypes = this._subTypes[typeName];
 		if (subTypes)
-			typeName = subTypes[this._subtype.get(source)] || typeName;
+			typeName = subTypes[this.getProperty("_subtype").getApiValue(api)] || typeName;
 		
 		// don't trust subtype == 17 - EA loses this information sometimes (when element becomes "composite" with subtype == 8)
 		if (typeName == "Class") {
-			var association = this._miscData3.get(source);
+			var association = this.getProperty("_miscData3").getApiValue(api);
 			if (association && association != 0)
 				typeName = "AssociationClass";
 		}
@@ -192,7 +186,9 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 */
 	determineEaType: function() {
 		return this.eaType;
-	},
+	}
+},
+{
 
 	/**
 	 * Element id
@@ -200,36 +196,58 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @readOnly
 	 * @type {Number}
 	 */
-	_id: property({api: "ElementID"}),
+	id: {api: "ElementID"},
 
 	/**
 	 * Element guid
 	 * 
 	 * @readOnly
 	 */
-	_guid: property({api: "ElementGUID"}),
+	guid: {api: "ElementGUID"},
 	
 	/**
 	 * Element alias
 	 */
-	_alias: property({api: "Alias"}),
+	alias: {api: "Alias"},
 	
 	/**
 	 * Element notes
 	 */
-	_notes: property({api: "Notes"}),
+	notes: {api: "Notes"},
+	
+	/**
+	 * Named element namespace
+	 * 
+	 * @derived
+	 * @type {Ea.Types.Namespace}
+	 */
+	namespace: {},
+
+	/**
+	 * Element parent element
+	 * 
+	 * @type {Ea.Element._Base}
+	 */
+	parent: {api: "ParentID", referenceBy: "id"},
+	
+	/**
+	 * Element package
+	 * 
+	 * @type {Ea.Package._Base}
+	 */
+	package: {api: "PackageID", referenceBy: "id"},
 	
 	/**
 	 * Element stereotype
 	 */
-	_stereotype: property({api: "Stereotype"}),
+	stereotype: {api: "Stereotype"},
 	
 	/**
 	 * Element stereotype names list
 	 * 
 	 * @type {Ea._Base.DataTypes.List}
 	 */
-	_stereotypesList: property({api: "StereotypeEx"}),
+	stereotypesList: {api: "StereotypeEx"},
 
 	/**
 	 * Element stereotypes collection
@@ -239,14 +257,14 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Core.Types.Collection<Ea._Base.AbstractStereotype>}
 	 * @aggregation shared
 	 */
-	__stereotype: property(),
+	stereotypes: {},
 
 	/**
 	 * Element type
 	 * 
 	 * @private
 	 */
-	__type: property({api: "Type"}),
+	_type: {api: "Type"},
 	
 	/**
 	 * Element subtype
@@ -254,7 +272,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @private
 	 * @type {Number}
 	 */
-	_subtype: property({api: "Subtype"}),
+	_subtype: {api: "Subtype"},
 
 	/**
 	 * Element metatype
@@ -262,7 +280,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @private
 	 * @readOnly
 	 */
-	_metatype: property({api: "MetaType"}),
+	_metatype: {api: "MetaType"},
 	
 	/**
 	 * Element tags collection
@@ -271,7 +289,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @qualifier {String} name
 	 * @aggregation composite
 	 */
-	_tag: property({api: "TaggedValues"}),
+	tags: {api: "TaggedValues"},
 	
 	/**
 	 * Element custom properties collection
@@ -279,8 +297,9 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Collection.Map<Ea.CustomProperty._Base>}
 	 * @qualifier {String} name
 	 * @aggregation composite
+	 * @single customProperty
 	 */
-	_customProperty: property({api: "CustomProperties"}),
+	customProperties: {api: "CustomProperties"},
 	
 	/**
 	 * Element properties collection
@@ -288,8 +307,9 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Properties._Base<Ea.Property._Base>}
 	 * @qualifier {String} name
 	 * @aggregation composite
+	 * @single property
 	 */
-	_property: property({api: "Properties"}),
+	properties: {api: "Properties"},
 	
 	/**
 	 * Element constraints collection
@@ -297,7 +317,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Collection._Base<Ea.Constraint._Base>}
 	 * @aggregation composite
 	 */
-	_constraint: property({api: "Constraints"}),
+	constraints: {api: "Constraints"},
 	
 	/**
 	 * Element requirements collection
@@ -305,7 +325,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Collection._Base<Ea.Requirement._Base>}
 	 * @aggregation composite
 	 */
-	_requirement: property({api: "Requirements"}),
+	requirements: {api: "Requirements"},
 	
 	/**
 	 * Element issues collection
@@ -313,7 +333,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Collection._Base<Ea.Issue._Base>}
 	 * @aggregation composite
 	 */
-	_issue: property({api: "Issues"}),
+	issues: {api: "Issues"},
 	
 	/**
 	 * Element embedded elements collection
@@ -321,7 +341,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Collection._Base<Ea.Element._Base>}
 	 * @aggregation composite
 	 */
-	_embeddedElement: property({api: "EmbeddedElements"}),
+	embeddedElements: {api: "EmbeddedElements"},
 	
 	/**
 	 * Element transitions collection
@@ -329,78 +349,78 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Collection._Base<Ea.Transition._Base>}
 	 * @aggregation composite
 	 */
-	_transition: property({api: "StateTransitions"}),
+	transitions: {api: "StateTransitions"},
 	
 	/**
 	 * Element status
 	 */
-	_status: property({api: "Status"}),
+	status: {api: "Status"},
 	
 	/**
 	 * Element difficulty
 	 */
-	_difficulty: property({api: "Difficulty"}),
+	difficulty: {api: "Difficulty"},
 	
 	/**
 	 * Element keywords
 	 */
-	_keywords: property({api: "Tag"}),
+	keywords: {api: "Tag"},
 	
 	/**
 	 * Element phase
 	 */
-	_phase: property({api: "Phase"}),
+	phase: {api: "Phase"},
 	
 	/**
 	 * Element version
 	 */
-	_version: property({api: "Version"}),
+	version: {api: "Version"},
 	
 	/**
 	 * Element visibility
 	 */
-	_visibility: property({api: "Visibility"}),
+	visibility: {api: "Visibility"},
 	
 	/**
 	 * Element author
 	 */
-	_author: property({api: "Author"}),
+	author: {api: "Author"},
 	
 	/**
 	 * Element creation date
 	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
-	_created: property({api: "Created"}),
+	created: {api: "Created"},
 	
 	/**
 	 * Element modification date
 	 * 
 	 * @type {Ea._Base.DataTypes.Date}
 	 */
-	_modified: property({api: "Modified"}),
+	modified: {api: "Modified"},
 	
 	/**
 	 * Element complexity
 	 * 
 	 * @type {Number}
 	 */
-	_complexity: property({api: "Complexity"}),
+	complexity: {api: "Complexity"},
 	
 	/**
 	 * Element multiplicity
 	 */
-	_multiplicity: property({api: "Multiplicity"}),
+	multiplicity: {api: "Multiplicity"},
 	
 	/**
 	 * Element persistence
 	 */
-	_persistence: property({api: "Persistence"}),
+	persistence: {api: "Persistence"},
 	
 	/**
 	 * Element priority
 	 */
-	_priority: property({api: "Priority"}),
+	priority: {api: "Priority"},
 	
 	/**
 	 * Element relationships collection
@@ -410,7 +430,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @readOnly
 	 * @type {Core.Types.Collection<Ea._Base.Relationship>}
 	 */
-	_relationship: property(),
+	_relationships: {},
 	
 	/**
 	 * Element owned elements collection
@@ -418,7 +438,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Collection._Base<Ea.Element._Base>}
 	 * @aggregation composite
 	 */
-	_element: property({api: "Elements"}),
+	elements: {api: "Elements"},
 	
 	/**
 	 * Element owned diagrams collection
@@ -426,7 +446,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Collection._Base<Ea.Diagram._Base>}
 	 * @aggregation composite
 	 */
-	_diagram: property({api: "Diagrams"}),
+	diagrams: {api: "Diagrams"},
 	
 	/**
 	 * Element connectors collection
@@ -434,7 +454,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Collection._Base<Ea.Connector._Base>}
 	 * @aggregation shared
 	 */
-	_connector: property({api: "Connectors"}),
+	connectors: {api: "Connectors"},
 	
 	/**
 	 * Element files collection
@@ -442,38 +462,14 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @type {Ea.Collection._Base<Ea.File._Base>}
 	 * @aggregation composite
 	 */
-	_file: property({api: "Files"}),
-	
-	/**
-	 * Element parent
-	 * 
-	 * @derived
-	 * @type {Ea.Types.Namespace}
-	 */
-	_parent: property(),
-
-	/**
-	 * Element parent element
-	 * 
-	 * @private
-	 * @type {Ea.Element._Base}
-	 */
-	__parent: property({api: "ParentID", referenceBy: "id"}),
-	
-	/**
-	 * Element parent package
-	 * 
-	 * @private
-	 * @type {Ea.Package._Base}
-	 */
-	__package: property({api: "PackageID", referenceBy: "id"}),
+	files: {api: "Files"},
 	
 	/**
 	 * Element classifier
 	 * 
 	 * @type {Ea.Element.Classifier}
 	 */
-	_classifier: property({api: "ClassifierID", referenceBy: "id"}),
+	classifier: {api: "ClassifierID", referenceBy: "id"},
 
 	/**
 	 * Element extended style map
@@ -481,7 +477,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	__styleEx: property({api: "StyleEx"}),
+	_styleEx: {api: "StyleEx"},
 	
 	/**
 	 * Element action flags map
@@ -489,7 +485,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	__actionFlags: property({api: "ActionFlags"}),
+	_actionFlags: {api: "ActionFlags"},
 	
 	/**
 	 * Element event flags map
@@ -497,7 +493,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	__eventFlags: property({api: "EventFlags"}),
+	_eventFlags: {api: "EventFlags"},
 
 	/**
 	 * Element miscellaneous data on index 0
@@ -505,7 +501,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @private
 	 * @readOnly
 	 */
-	_miscData0: property({api: "MiscData", index: 0}),
+	_miscData0: {api: "MiscData", index: 0},
 	
 	/**
 	 * Element miscellaneous data on index 1
@@ -513,7 +509,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @private
 	 * @readOnly
 	 */
-	_miscData1: property({api: "MiscData", index: 1}),
+	_miscData1: {api: "MiscData", index: 1},
 	
 	/**
 	 * Element miscellaneous data on index 2
@@ -521,7 +517,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @private
 	 * @readOnly
 	 */
-	_miscData2: property({api: "MiscData", index: 2}),
+	_miscData2: {api: "MiscData", index: 2},
 	
 	/**
 	 * Element miscellaneous data on index 3
@@ -529,7 +525,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @private
 	 * @readOnly
 	 */
-	_miscData3: property({api: "MiscData", index: 3}),
+	_miscData3: {api: "MiscData", index: 3},
 	
 	/**
 	 * Element miscellaneous data on index 4
@@ -537,14 +533,14 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @private
 	 * @readOnly
 	 */
-	_miscData4: property({api: "MiscData", index: 4}),
+	_miscData4: {api: "MiscData", index: 4},
 
 	/**
 	 * Element position in tree model of project browser
 	 * 
 	 * @type {Number}
 	 */
-	_position: property({api: "TreePos"}),
+	position: {api: "TreePos"},
 
 	/**
 	 * Element composite diagram
@@ -552,7 +548,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @readOnly
 	 * @type {Ea.Diagram._Base}
 	 */
-	_compositeDiagram: property({api: "CompositeDiagram"}),
+	compositeDiagram: {api: "CompositeDiagram"},
 	
 	/**
 	 * Element linked diagram
@@ -561,7 +557,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @readOnly
 	 * @type {Ea.Diagram._Base}
 	 */
-	_linkedDiagram: property(),
+	linkedDiagram: {},
 	
 	/**
 	 * Element custom references collection
@@ -570,7 +566,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @readOnly
 	 * @type {Core.Types.Collection<Ea.Element._Base>}
 	 */
-	_customReference: property(),
+	customReferences: {},
 	
 	/**
 	 * Element context references collection
@@ -579,7 +575,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @readOnly
 	 * @type {Core.Types.Collection<Ea._Base.ContextReference>}
 	 */
-	_contextReference: property(),
+	contextReferences: {},
 	
 	/**
 	 * Element appearance
@@ -588,7 +584,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, /** @lends Ea.Element._Base# */ {
 	 * @readOnly
 	 * @type {Ea._Base.DataTypes.Appearance}
 	 */
-	_appearance: property()
+	appearance: {}
 });
 
 
@@ -604,8 +600,9 @@ Ea.Element.Package = extend(Ea.Element.PackageableElement, {
 	}
 },
 {
-	eaType: "Package", // see t_objecttypes table
-	
+	eaType: "Package" // see t_objecttypes table
+},
+{
 	/**
 	 * Element corresponding package
 	 * 
@@ -613,10 +610,10 @@ Ea.Element.Package = extend(Ea.Element.PackageableElement, {
 	 * @readOnly
 	 * @type {Ea.Package._Base}
 	 */
-	_package: property()
+	package: {}
 });
 
-Ea.Element.Type = extend(Ea.Element.PackageableElement);
+Ea.Element.Type = extend([Ea.Element.PackageableElement, Ea._Base.Type]);
 
 Ea.Element.Classifier = extend(Ea.Element.Type, {
 
@@ -640,14 +637,14 @@ Ea.Element.Classifier = extend(Ea.Element.Type, {
 	deleteAttribute: function(attribute) {
 		return this._deleteAttribute(attribute);
 	}
-},
+}, {},
 {
 	/**
 	 * Classifier abstract switch number value
 	 * 
 	 * @private
 	 */
-	__abstract: property({api: "Abstract"}),
+	_abstract: {api: "Abstract"},
 	
 	/**
 	 * Classifier abstract switch value
@@ -655,7 +652,7 @@ Ea.Element.Classifier = extend(Ea.Element.Type, {
 	 * @derived
 	 * @type {Boolean}
 	 */
-	_abstract: property(),
+	abstract: {},
 	
 	/**
 	 * Classifier attributes collection
@@ -663,7 +660,7 @@ Ea.Element.Classifier = extend(Ea.Element.Type, {
 	 * @private
 	 * @type {Ea.Collection._Base<Ea.Attribute.Attribute>}
 	 */
-	__attribute: property({api: "Attributes"}),
+	_attributes: {api: "Attributes"},
 	
 	/**
 	 * Classifier attributes collection.
@@ -673,7 +670,7 @@ Ea.Element.Classifier = extend(Ea.Element.Type, {
 	 * @type {Core.Types.Collection<Ea.Attribute.Attribute>}
 	 * @aggregation composite
 	 */
-	_attribute: property(),
+	attributes: {},
 	
 	/**
 	 * Classifier methods collection
@@ -681,7 +678,7 @@ Ea.Element.Classifier = extend(Ea.Element.Type, {
 	 * @type {Ea.Collection._Base<Ea.Method._Base>}
 	 * @aggregation composite
 	 */
-	_method: property({api: "Methods"})
+	methods: {api: "Methods"}
 });
 
 Ea.Element.DataType = extend(Ea.Element.Classifier);
@@ -705,8 +702,9 @@ Ea.Element.Enumeration = extend(Ea.Element.DataType, {
 	
 },
 {
-	eaType: "Enumeration",
-
+	eaType: "Enumeration"
+},
+{
 	/**
 	 * Enumeration literals collection.
 	 * Collection is derived from element attributes collection.
@@ -715,7 +713,7 @@ Ea.Element.Enumeration = extend(Ea.Element.DataType, {
 	 * @type {Core.Types.Collection<Ea.Attribute.EnumerationLiteral>}
 	 * @aggregation composite
 	 */
-	_literal: property()
+	literals: {}
 });
 
 Ea.Element.PrimitiveType = extend(Ea.Element.DataType);
@@ -728,7 +726,7 @@ Ea.Element.Class = extend(Ea.Element.Classifier, {}, {
 
 Ea.Element.Metaclass = extend(Ea.Element.Class);
 
-Ea.Element.AssociationClass = extend(Ea.Element.Class, {},
+Ea.Element.AssociationClass = extend(Ea.Element.Class, {}, {},
 {
 	/**
 	 * Corresponding association of association class
@@ -736,7 +734,7 @@ Ea.Element.AssociationClass = extend(Ea.Element.Class, {},
 	 * @readOnly
 	 * @type {Ea.Connector._Base}
 	 */
-	_association: property({api: "MiscData", index: 3, referenceBy: "id"})
+	association: {api: "MiscData", index: 3, referenceBy: "id"}
 });
 
 Ea.Element.Interface = extend(Ea.Element.Classifier, {}, {
@@ -755,8 +753,9 @@ Ea.Element.Constraint = extend(Ea.Element.PackageableElement, {
 	}
 },
 {
-	eaType: "Constraint",
-	
+	eaType: "Constraint"
+},
+{	
 	/**
 	 * Constraint constrained elements map with ids as values
 	 * 
@@ -764,7 +763,7 @@ Ea.Element.Constraint = extend(Ea.Element.PackageableElement, {
 	 * @private
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	__constrained: property({api: "MiscData", index: 0}),
+	_constrained: {api: "MiscData", index: 0},
 	
 	/**
 	 * Constraint constrained elements collection
@@ -773,7 +772,7 @@ Ea.Element.Constraint = extend(Ea.Element.PackageableElement, {
 	 * @readOnly
 	 * @type {Core.Types.Collection<Ea.Element._Base>}
 	 */
-	_constrainedElement: property()
+	constrainedElements: {}
 });
 
 Ea.Element.TypedElement = extend(Ea.Types.Any, {
@@ -796,14 +795,15 @@ Ea.Element.InstanceSpecification = extend([Ea.Element.PackageableElement, Ea.Ele
 	}
 },
 {
-	eaType: "Object",
-	
+	eaType: "Object"
+},
+{	
 	/**
 	 * Instance specification type
 	 * 
 	 * @type {Ea.Element.Type}
 	 */
-	_type: property({api: "ClassifierID", referenceBy: "id"}),
+	type: {api: "ClassifierID", referenceBy: "id"},
 	
 	/**
 	 * Instance specification run state
@@ -811,7 +811,7 @@ Ea.Element.InstanceSpecification = extend([Ea.Element.PackageableElement, Ea.Ele
 	 * @type {Ea._Base.DataTypes.ObjectMap}
 	 * @key Variable
 	 */
-	_runState: property({api: "RunState"})
+	runState: {api: "RunState"}
 });
 
 
@@ -823,7 +823,7 @@ Ea.Element.InstanceSpecification = extend([Ea.Element.PackageableElement, Ea.Ele
  * Scenarios are custom EA behavior specification.
  * Place where scenarios are specified in Element specialization hierarchy is dictated by pragmatic usage not by any formal specification
  */
-Ea.Element._ScenarioBehavior = extend(Ea.Types.Any, {
+Ea.Element._BehaviorScenario = extend(Ea.Types.Any, {
 
 	getBasicScenario: function() {
 		var basicScenarios = this._getScenarios().filter("this.instanceOf(Ea.Scenario.BasicPath)");
@@ -846,7 +846,7 @@ Ea.Element._ScenarioBehavior = extend(Ea.Types.Any, {
 			});
 		return scenarioExtensions.filter(filter);
 	}	
-},
+}, {},
 {
 	/**
 	 * Element scenarios collection.
@@ -855,7 +855,7 @@ Ea.Element._ScenarioBehavior = extend(Ea.Types.Any, {
 	 * @private
 	 * @type {Ea.Collection._Base<Ea.Scenario._Base>}
 	 */
-	__scenario: property({api: "Scenarios"}),
+	_scenarios: {api: "Scenarios"},
 	
 	/**
 	 * Element basic scenario
@@ -865,7 +865,7 @@ Ea.Element._ScenarioBehavior = extend(Ea.Types.Any, {
 	 * @type {Ea.Scenario.BasicPath}
 	 * @aggregation composite
 	 */
-	_basicScenario: property(),
+	basicScenario: {},
 	
 	/**
 	 * Element scenario extensions collection
@@ -875,10 +875,10 @@ Ea.Element._ScenarioBehavior = extend(Ea.Types.Any, {
 	 * @type {Core.Types.Collection<Ea.ScenarioExtension._Base>}
 	 * @aggregation composite
 	 */
-	_scenarioExtension: property()
+	scenarioExtensions: {}
 });
 
-Ea.Element.BehavioredClassifier = extend([Ea.Element.Classifier, Ea.Element._ScenarioBehavior]);
+Ea.Element.BehavioredClassifier = extend([Ea.Element.Classifier, Ea.Element._BehaviorScenario]);
 
 Ea.Element.Actor = extend(Ea.Element.BehavioredClassifier, {}, {
 	eaType: "Actor"
@@ -886,14 +886,15 @@ Ea.Element.Actor = extend(Ea.Element.BehavioredClassifier, {}, {
 
 Ea.Element.UseCase = extend(Ea.Element.BehavioredClassifier, {},
 {
-	eaType: "UseCase",
-	
+	eaType: "UseCase"
+},
+{	
 	/**
 	 * Use case extension points
 	 * 
 	 * @type {Ea._Base.DataTypes.List}
 	 */
-	_extensionPoints: property({api: "ExtensionPoints"})
+	extensionPoints: {api: "ExtensionPoints"}
 });
 
 
@@ -936,14 +937,15 @@ Ea.Element.Pseudostate = extend(Ea.Element._Base, {
 		13: "entryPoint",
 		14: "exitPoint",
 		15: "deepHistory"
-	},
-	
+	}
+},
+{
 	/**
 	 * Pseudostate kind
 	 * 
 	 * @derived
 	 */
-	_kind: property()
+	kind: {}
 	
 });
 
@@ -952,7 +954,7 @@ Ea.Element.Pseudostate = extend(Ea.Element._Base, {
  * Activities
  */
 
-Ea.Element.Behavior = extend([Ea.Element.Class, Ea.Element._ScenarioBehavior]);
+Ea.Element.Behavior = extend([Ea.Element.Class, Ea.Element._BehaviorScenario]);
 
 Ea.Element.Activity = extend(Ea.Element.Behavior, {}, {
 	eaType: "Activity"
@@ -964,6 +966,45 @@ Ea.Element.Activity = extend(Ea.Element.Behavior, {}, {
  */
 
 Ea.Element.ActivityNode = extend(Ea.Element._Base);
+
+Ea.Element.ActivityParameter = extend([Ea.Element._Base, Ea.Element.TypedElement], {
+	
+	_getClassifierByGuid: function() {
+		return this._source.application.getRepository().getTypedElementType(this);
+	},
+	
+	getType: function() {
+		var type = this._getClassifier() || this.getClassifier() || this._getClassifierByGuid();
+		return type;
+	}
+	
+}, {},
+{
+	/**
+	 * @derived
+	 * @readOnly
+	 * @type {Ea._Base.Type}
+	 */
+	type: {},
+	
+	/**
+	 * @private
+	 * @derived
+	 * @readOnly
+	 * @type {Ea._Base.Type}
+	 */
+	_classifierByGuid: {},
+	
+	/**
+	 * @private
+	 * @readOnly
+	 * @type {Ea.Element._Base}
+	 */
+	_classifier: {api: "MiscData", index: 0, referenceBy: "guid"}
+
+});
+
+Ea.Element.ActivityPartition = extend(Ea.Element._Base);
 
 Ea.Element.Action = extend(Ea.Element.ActivityNode, {}, {
 	eaType: "Action"
@@ -982,7 +1023,7 @@ Ea.Element.CallBehaviorAction = extend(Ea.Element.CallAction, {
 		var behavior = this.getBehavior();
 		return this.getName() + " :" + (behavior ? behavior.getName() : "<<undefined behavior>>") + " [" + this._class  + "]";
 	}
-},
+}, {},
 {
 
 	/**
@@ -990,7 +1031,7 @@ Ea.Element.CallBehaviorAction = extend(Ea.Element.CallAction, {
 	 * 
 	 * @type {Ea.Element.Behavior}
 	 */
-	_behavior: property({api: "ClassifierID", referenceBy: "id"})
+	behavior: {api: "ClassifierID", referenceBy: "id"}
 });
 
 Ea.Element.CallOperationAction = extend(Ea.Element.CallAction, {
@@ -1003,7 +1044,7 @@ Ea.Element.CallOperationAction = extend(Ea.Element.CallAction, {
 		var operation = this.getOperation();
 		return this.getName() + " :" + (operation ? operation.getName() : "<<undefined operation>>") + " [" + this._class  + "]";
 	}
-},
+}, {},
 {
 
 	/**
@@ -1013,7 +1054,7 @@ Ea.Element.CallOperationAction = extend(Ea.Element.CallAction, {
 	 * @readOnly
 	 * @type {Ea.Method._Base}
 	 */
-	_operation: property()
+	operation: {}
 });
 
 Ea.Element.ActionPin = extend([Ea.Element._Base, Ea.Element.TypedElement], {
@@ -1027,29 +1068,29 @@ Ea.Element.ActionPin = extend([Ea.Element._Base, Ea.Element.TypedElement], {
 		return type;
 	}
 	
-},
+}, {},
 {
 	/**
 	 * @derived
 	 * @readOnly
-	 * @type {Core.Types.Object}
+	 * @type {Ea._Base.Type}
 	 */
-	_type: property(),
+	type: {},
 	
 	/**
 	 * @private
 	 * @derived
 	 * @readOnly
-	 * @type {Core.Types.Object}
+	 * @type {Ea._Base.Type}
 	 */
-	__classifierByGuid: property(),
+	_classifierByGuid: {},
 	
 	/**
 	 * @private
 	 * @readOnly
 	 * @type {Ea.Element._Base}
 	 */
-	__classifier: property({api: "MiscData", index: 0, referenceBy: "guid"})
+	_classifier: {api: "MiscData", index: 0, referenceBy: "guid"}
 	
 });
 
@@ -1098,16 +1139,17 @@ Ea.Element.Note = extend(Ea.Element._Base, {
 	}
 },
 {
-	eaType: "Note",
-	
+	eaType: "Note"
+},
+{	
 	/**
 	 * Note noted elements map with ids as values
 	 * 
-	 * @readOnly
 	 * @private
+	 * @readOnly
 	 * @type {Ea._Base.DataTypes.Map}
 	 */
-	__noted: property({api: "MiscData", index: 0}),
+	_noted: {api: "MiscData", index: 0},
 	
 	/**
 	 * Note noted elements collection
@@ -1116,7 +1158,7 @@ Ea.Element.Note = extend(Ea.Element._Base, {
 	 * @readOnly
 	 * @type {Core.Types.Collection<Ea.Element._Base>}
 	 */
-	_notedElement: property()
+	notedElements: {}
 });
 
 Ea.Element.ConnectorNote = extend(Ea.Element.Note);

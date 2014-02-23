@@ -1,11 +1,15 @@
 * {
-	font-family: Calibri;
-	font-size: 11pt;
+	font-family: Tahoma;
+	font-size: 12pt;
+}
+
+body {
+	margin: 10px;
 }
 
 p, ul, li {
-	font-family: Calibri;
-	font-size: 11pt;
+	font-family: Tahoma;
+	font-size: 12pt;
 }
 
 ul, li {
@@ -33,6 +37,10 @@ th {
 	background-color: #C6D9F1
 }
 
+table.spec {
+	width: 100%;
+}
+
 a:link {     
 	text-decoration: none;
 	color: blue; 
@@ -46,6 +54,22 @@ a:hover {
 	text-decoration: underline; 
 	color: red;
 }
+
+hr {
+	border: 0px;
+	border-top: 1px solid black;
+}
+
+code {
+	font-family: monospace;
+	font-size: 12pt;
+}
+
+code > a {     
+	font-family: monospace;
+	font-size: 12pt;
+}
+
 
 .spacer {
 	width: 100%;
@@ -79,11 +103,6 @@ a:hover {
 	margin: 5px;
 }
 
-.actor-id {
-	color: silver;
-	padding: 20px;
-}
-
 .cell-th-span-inner {
 	color: #243F60;
 }
@@ -103,4 +122,35 @@ a:hover {
 .diagram-name-span {
 	text-align: center;
 	margin: 0px;
+}
+
+.section-header {
+	font-weight: bold;
+	font-size: 16pt;
+	padding: 4px;
+	width: 100%;
+	border: 1px solid black;
+	background-color: #C6D9F1
+}
+
+.header {
+	font-weight: bold;
+	font-size: 16pt;
+	padding: 2px;
+	padding-top: 8px;
+	padding-bottom: 4px;
+}
+
+.sub-header {
+	font-weight: bold;
+	font-size: 12pt;
+	padding: 1px;
+	padding-top: 6px;
+	padding-bottom: 3px;
+}
+
+div.paragraph {
+	padding: 1px;
+	padding-top: 10px;
+	padding-bottom: 4px;
 }

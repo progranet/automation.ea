@@ -19,45 +19,48 @@
  */
 Ea.Tag = {};
 
-Ea.Tag._Base = extend(Ea.Types.Named, {},
+Ea.Tag._Base = extend(Ea.Types.NamedElement, {}, {},
 {
 	/**
 	 * Tag value
 	 */
-	_value: property({api: "Value"})
+	value: {api: "Value"}
 });
 
-Ea.Tag._Feature = extend(Ea.Tag._Base, {},
+Ea.Tag._Feature = extend(Ea.Tag._Base, {}, {},
 {
-	_notes: property({api: "Notes"}),
-	
+	/**
+	 * Tag notes
+	 */
+	notes: {api: "Notes"},
+
 	/**
 	 * Tag id
 	 * 
 	 * @readOnly
 	 * @type {Number}
 	 */
-	_id: property({api: "TagID"}),
+	id: {api: "TagID"},
 	
 	/**
 	 * Tag guid
 	 * 
 	 * @readOnly
 	 */
-	_guid: property({api: "TagGUID"})
+	guid: {api: "TagGUID"}
 });
 
-Ea.Tag._Extended = extend(Ea.Tag._Base, {},
+Ea.Tag._Extended = extend(Ea.Tag._Base, {}, {},
 {
 	/**
 	 * Tag guid
 	 * 
 	 * @readOnly
 	 */
-	_guid: property({api: "PropertyGUID"}),
+	guid: {api: "PropertyGUID"},
 	
 	/**
 	 * Tag name
 	 */
-	_name: property({api: "Tag"})
+	name: {api: "Tag"}
 });

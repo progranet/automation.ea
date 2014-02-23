@@ -20,12 +20,12 @@ Ea.CustomProperty = {
 		}
 };
 
-Ea.CustomProperty._Base = extend(Ea.Types.Named, {},
+Ea.CustomProperty._Base = extend(Ea.Types.NamedElement, {}, {},
 {
 	/**
 	 * Custom property value
 	 */
-	_value: property({api: "Value"})
+	value: {api: "Value"}
 
 });
 

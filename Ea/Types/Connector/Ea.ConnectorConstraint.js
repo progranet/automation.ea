@@ -20,13 +20,30 @@ Ea.ConnectorConstraint = {
 	}
 };
 
-Ea.ConnectorConstraint._Base = extend(Ea.FeatureConstraint._Base, {},
+Ea.ConnectorConstraint._Base = extend(Ea.FeatureConstraint._Base, {
+	
+	getNamespace: function() {
+		return this.getConnector();
+	},
+	
+	setNamespace: function(namespace) {
+		this.setConnector(namespace);
+	}
+}, 
+{},
 {
 	/**
-	 * Connector constraint parent
+	 * Named element namespace
 	 * 
-	 * @private
+	 * @derived
+	 * @type {Ea.Types.Namespace}
+	 */
+	namespace: {},
+
+	/**
+	 * Connector constraint connector
+	 * 
 	 * @type {Ea.Connector._Base}
 	 */
-	__parent: property({api: "ConnectorID", referenceBy: "id"})
+	connector: {api: "ConnectorID", referenceBy: "id"}
 });

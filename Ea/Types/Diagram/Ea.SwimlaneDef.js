@@ -38,77 +38,77 @@ Ea.SwimlaneDef._Base = extend(Ea.Types.Any, {
 		}
 		throw new Error("Unknown orientation: " + orientation + " for swimlane definition: " + this);
 	}
-},
+}, {},
 {
 	/**
 	 * Swimlane definition bold switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_bold: property({api: "Bold"}),
+	bold: {api: "Bold"},
 	
 	/**
 	 * Swimlane definition hide classifier switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_hideClassifier: property({api: "HideClassifier"}),
+	hideClassifier: {api: "HideClassifier"},
 	
 	/**
 	 * Swimlane definition hide names switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_hideNames: property({api: "HideNames"}),
+	hideNames: {api: "HideNames"},
 	
 	/**
 	 * Swimlane definition locked switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_locked: property({api: "Locked"}),
+	locked: {api: "Locked"},
 	
 	/**
 	 * Swimlane definition font color
 	 * 
 	 * @type {Number}
 	 */
-	_fontColor: property({api: "FontColor"}),
+	fontColor: {api: "FontColor"},
 	
 	/**
 	 * Swimlane definition line color
 	 * 
 	 * @type {Number}
 	 */
-	_lineColor: property({api: "LineColor"}),
+	lineColor: {api: "LineColor"},
 	
 	/**
 	 * Swimlane definition line width
 	 * 
 	 * @type {Number}
 	 */
-	_lineWidth: property({api: "LineWidth"}),
+	lineWidth: {api: "LineWidth"},
 	
 	/**
 	 * Swimlane definition orientation
 	 * 
 	 * @private
 	 */
-	__orientation: property({api: "Orientation"}),
+	_orientation: {api: "Orientation"},
 	
 	/**
 	 * Swimlane definition orientation
 	 * 
 	 * @derived
 	 */
-	_orientation: property(),
+	orientation: {},
 	
 	/**
 	 * Swimlane definition show in title bar switch value
 	 * 
 	 * @type {Boolean}
 	 */
-	_showInTitleBar: property({api: "ShowInTitleBar"}),
+	showInTitleBar: {api: "ShowInTitleBar"},
 	
 	/**
 	 * Swimlane definition swimlanes collection
@@ -117,7 +117,7 @@ Ea.SwimlaneDef._Base = extend(Ea.Types.Any, {
 	 * @qualifier {String} title
 	 * @aggregation composite
 	 */
-	_swimlane: property({api: "Swimlanes"})
+	swimlanes: {api: "Swimlanes"}
 });
 
 include("Ea.Swimlanes@Ea.Types.Diagram");

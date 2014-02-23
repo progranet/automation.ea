@@ -22,11 +22,9 @@ include("Sys.IO@Sys");
  */
 Html.IO = {};
 
-Html.IO.File = extend(Sys.IO.File, /** @lends Html.IO.File# */ {
+Html.IO.File = extend(Sys.IO.File, {
 	
 	/**
-	 * @constructs
-	 * @extends Sys.IO.File
 	 * @param {String} path
 	 */
 	create: function(path) {
@@ -36,7 +34,6 @@ Html.IO.File = extend(Sys.IO.File, /** @lends Html.IO.File# */ {
 	/**
 	 * Writes string to output HTML according to specified template and provided parameters
 	 * 
-	 * @memberOf Html.IO.File#
 	 * @param {Html.Template} template
 	 * @param {Object} params
 	 */

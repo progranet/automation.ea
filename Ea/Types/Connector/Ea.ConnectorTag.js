@@ -15,20 +15,37 @@
 */
 
 Ea.ConnectorTag = {
-		meta: {
-			//id: "TagID",
-			//guid: "TagGUID",
-			objectType: 36
-		}
+	meta: {
+		//id: "TagID",
+		//guid: "TagGUID",
+		objectType: 36
+	}
 };
 
-Ea.ConnectorTag._Base = extend(Ea.Tag._Feature, {},
+Ea.ConnectorTag._Base = extend(Ea.Tag._Feature, {
+
+	getNamespace: function() {
+		return this.getConnector();
+	},
+	
+	setNamespace: function(namespace) {
+		this.setConnector(namespace);
+	}
+},
+{},
 {
 	/**
-	 * Connector tag parent
+	 * Named element namespace
+	 * 
+	 * @derived
+	 * @type {Ea.Types.Namespace}
+	 */
+	namespace: {},
+
+	/**
+	 * Connector tag connector
 	 * 
 	 * @type {Ea.Connector._Base}
-	 * @private
 	 */
-	__parent: property({api: "ConnectorID", referenceBy: "id"})
+	connector: {api: "ConnectorID", referenceBy: "id"}
 });

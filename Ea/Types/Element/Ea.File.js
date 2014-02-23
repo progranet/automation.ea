@@ -20,45 +20,36 @@ Ea.File = {
 		}		
 };
 
-Ea.File._Base = extend(Ea.Types.Named, {},
+Ea.File._Base = extend(Ea.Types.NamedElement, {},
 {
-	determineType: function(source) {
-		return this._deriveType(source, this._type);
-	},
-
+	determineType: function(api) {
+		return this._deriveType(api, this.getProperty("_type"));
+	}
+},
+{
 	/**
 	 * File notes
 	 */
-	_notes: property({api: "Notes"}),
+	notes: {api: "Notes"},
 	
 	/**
 	 * File date
 	 */
-	_date: property({api: "FileDate"}),
+	date: {api: "FileDate"},
 	
 	/**
 	 * File size
 	 */
-	_size: property({api: "Size"}),
+	size: {api: "Size"},
 	
 	/**
 	 * File type
+	 * 
+	 * @private
 	 */
-	_type: property({api: "Type"})
+	_type: {api: "Type"}
 });
 
-Ea.File.WebAdress = extend(Ea.File._Base, {
-	getHref: function() {
-		var href = this.getName();
-		if (!href.indexOf("http")) {
-			href = "http://" + href;
-		}
-		return href;
-	}
-});
+Ea.File.WebAdress = extend(Ea.File._Base);
 
-Ea.File.LocalFile = extend(Ea.File._Base, {
-	getHref: function() {
-		return this.getName();
-	}
-});
+Ea.File.LocalFile = extend(Ea.File._Base);
