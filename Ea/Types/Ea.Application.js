@@ -235,7 +235,14 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 		if (cacheOnly)
 			return null;
 		var method = "Get" + type.namespace.name + "ByGuid";
-		var api = this._repository._source.api[method](guid);
+		var api = null;
+		try {
+			var api = this._repository._source.api[method](guid);
+		}
+		catch (error) {
+			warn("$ not found by Guid = $", [type, guid]);
+			return null;
+		}
 		if (!api) {
 			warn("$ not found by Guid = $", [type, guid]);
 			return null;

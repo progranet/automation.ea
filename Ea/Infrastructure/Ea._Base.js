@@ -63,6 +63,8 @@ Ea._Base.Relationship = define({
 	
 	_opposite: null,
 	
+	_uid: null,
+	
 	create: function(params) {
 		
 		_super.create();
@@ -84,6 +86,8 @@ Ea._Base.Relationship = define({
 		this._fromMethod = this._isClient ? this._connector.getSupplierMethod() : this._connector.getClientMethod();
 		this._toAttribute = !this._isClient ? this._connector.getSupplierAttribute() : this._connector.getClientAttribute();
 		this._toMethod = !this._isClient ? this._connector.getSupplierMethod() : this._connector.getClientMethod();
+		
+		this._uid = this._connector.getGuid() + "/" + this._to.getGuid();
 		
 		this._opposite = params.opposite || new Ea._Base.Relationship({
 			from: params.to, 
@@ -173,6 +177,10 @@ Ea._Base.Relationship = define({
 	
 	getGuard: function() {
 		return this._guard;
+	},
+	
+	getGuid: function() {
+		return this._uid;
 	}
 });
 

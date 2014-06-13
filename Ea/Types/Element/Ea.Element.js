@@ -125,8 +125,19 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 	
 	getStereotypes: function() {
 		return this._source.application.getRepository().getStereotypes(this);
-	}
+	},
 	
+	getLinkedDocument: function() {
+		return this._source.api.GetLinkedDocument();
+	},
+	
+	saveLinkedDocument: function(path) {
+		return this._source.api.SaveLinkedDocument(path);
+	},
+	
+	loadLinkedDocument: function(path) {
+		return this._source.api.LoadLinkedDocument(path);
+	}
 },
 {
 	_subTypes: {
@@ -901,6 +912,8 @@ Ea.Element.UseCase = extend(Ea.Element.BehavioredClassifier, {},
 /*
  * State machines
  */
+
+Ea.Element.StateMachine = extend(Ea.Element._Base);
 
 Ea.Element.State = extend(Ea.Element._Base, {}, {
 	eaType: "State"

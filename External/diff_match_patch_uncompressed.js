@@ -27,7 +27,7 @@
  * Class containing the diff, match and patch methods.
  * @constructor
  */
-function diff_match_patch() {
+diff_match_patch = function() {
 
   // Defaults.
   // Redefine these in your program to override the defaults.
@@ -52,7 +52,7 @@ function diff_match_patch() {
 
   // The number of bits in an int.
   this.Match_MaxBits = 32;
-}
+};
 
 
 //  DIFF FUNCTIONS
@@ -1225,14 +1225,13 @@ diff_match_patch.prototype.diff_prettyHtml = function(diffs) {
   for (var x = 0; x < diffs.length; x++) {
     var op = diffs[x][0];    // Operation (insert, delete, equal)
     var data = diffs[x][1];  // Text of change.
-    var text = data.replace(pattern_amp, '&amp;').replace(pattern_lt, '&lt;')
-        .replace(pattern_gt, '&gt;').replace(pattern_para, '&para;<br>');
+    var text = data;//.replace(pattern_amp, '&amp;').replace(pattern_lt, '&lt;').replace(pattern_gt, '&gt;').replace(pattern_para, '&para;<br>');
     switch (op) {
       case DIFF_INSERT:
-        html[x] = '<ins style="background:#e6ffe6;">' + text + '</ins>';
+        html[x] = '<ins style="background:#e6ffe6;color:green;">' + text + '</ins>';
         break;
       case DIFF_DELETE:
-        html[x] = '<del style="background:#ffe6e6;">' + text + '</del>';
+        html[x] = '<del style="background:#ffe6e6;color:red;">' + text + '</del>';
         break;
       case DIFF_EQUAL:
         html[x] = '<span>' + text + '</span>';
@@ -2187,7 +2186,7 @@ diff_match_patch.patch_obj.prototype.toString = function() {
 // In a browser, 'this' will be 'window'.
 // Users of node.js should 'require' the uncompressed version since Google's
 // JS compiler may break the following exports for non-browser environments.
-this['diff_match_patch'] = diff_match_patch;
-this['DIFF_DELETE'] = DIFF_DELETE;
-this['DIFF_INSERT'] = DIFF_INSERT;
-this['DIFF_EQUAL'] = DIFF_EQUAL;
+//this['diff_match_patch'] = diff_match_patch;
+//this['DIFF_DELETE'] = DIFF_DELETE;
+//this['DIFF_INSERT'] = DIFF_INSERT;
+//this['DIFF_EQUAL'] = DIFF_EQUAL;

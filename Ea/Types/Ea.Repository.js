@@ -241,6 +241,26 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	},
 	
 	/**
+	 * Returns selected objects
+	 * 
+	 * @type {Core.Types.Collection<Ea.Types.Any>}
+	 */
+	getSelectedObjects: function() {
+		var apiCollection = this._source.api.GetTreeSelectedElements();
+		var objects = new Core.Types.Collection();
+		for (var o = 0; o < apiCollection.Count; o++) {
+			var api = apiCollection.GetAt(o);
+			var objectType = api.ObjectType;
+			var type = Ea._objectTypes[objectType];
+			if (!type) 
+				throw new Error("Unregistered EA object type: " + objectType);
+			var object = this._source.application.get(type, api);
+			objects.add(object);
+		}
+		return objects;
+	},
+	
+	/**
 	 * Opens specified diagram
 	 * 
 	 * @param {Ea.Diagram._Base} diagram
@@ -531,7 +551,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	/**
 	 * Collection containing all project models.
 	 * 
-	 * @type {Ea.Collection._Base<Ea.Package.Model>}
+	 * @type {Ea.Collection._Base<Ea.Package._Base>}
 	 * @aggregation composite
 	 */
 	models: {api: "Models"}

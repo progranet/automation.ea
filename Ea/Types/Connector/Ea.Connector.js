@@ -469,6 +469,19 @@ Ea.Connector.Dependency = extend(Ea.Connector._Base, {
 	}
 });
 
+Ea.Connector.Abstraction = extend(Ea.Connector._Base, {
+	
+	/**
+	 * Determines relation name for this relation type according to relation direction
+	 * 
+	 * @param {Boolean} client Specifies whether this end is client end
+	 * @type {String}
+	 */
+	getRelation: function(client) {
+		return client ? "needed by" : "depends on";
+	}
+});
+
 Ea.Connector.Generalization = extend(Ea.Connector._Base, {
 	
 	/**

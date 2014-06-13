@@ -105,7 +105,7 @@ Word = {
 	},
 	
 	initialize: function() {
-		this.open();
+		//this.open();
 	},
 	
 	finalize: function() {
@@ -118,8 +118,8 @@ Word.Document = define({
 	template: null,
 	
 	create: function(templatePath, context) {
+		Word.open();
 		this.template = Word.wordApp.Documents.Open(Sys.IO.getPath(templatePath, context), Word.WdOpenFormat.wdOpenFormatAuto, true);
-		
 	},
 	
 	embed: function(filePath, bookmark) {
@@ -135,7 +135,12 @@ Word.Document = define({
 		embedded.Select();
 		selection.Copy();
 		var embedTo = this.template.ActiveWindow.Selection;
-		embedTo.GoTo(-1, 0, 0, bookmark);
+		try {
+			embedTo.GoTo(-1, 0, 0, bookmark);
+		}
+		catch (error) {
+			warn(error.message);
+		}
 		embedTo.Paste();
 		
 		selection.TypeText(' ');
@@ -145,7 +150,8 @@ Word.Document = define({
 	},
 	
 	insertToc: function(bookmark, upperLevel, lowerLevel) {
-		this.template.TablesOfContents.Add(this.template.Bookmarks.Item(bookmark).Range, true, upperLevel, lowerLevel);
+		var range = bookmark ? this.template.Bookmarks.Item(bookmark).Range : this.template.Range(0, 0);
+		this.template.TablesOfContents.Add(range, true, upperLevel, lowerLevel);
 	},
 	
 	save: function(filePath, format) {

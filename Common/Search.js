@@ -19,99 +19,134 @@ include("Sys.IO@Sys");
 include("Ea@Ea");
 
 Search = {
+		
 	params: {
 		
 	},
 
 	file: null,
-	found: new Core.Types.Collection(),
 	application: null,
+	xml: "",
+	
+	initialize: function() {
+		this.application = Ea.initializeDefaultApplication();
+	},
 
 	execute: function(params) {
-
-		this.application = Ea.initializeDefaultApplication(params);
+		
+		if (!this.application)
+			this.initialize();
 
 		info("=== START ===");
 		
-		var _package = this.application.getRepository().getSelectedPackage();
+		var _package = (params && params.package) ? params.package : this.application.getRepository().getSelectedPackage();
 		
 		if (this.params.file) {
 			this.file = new Sys.IO.File(this.params.file, Sys.IO.Mode.WRITE);
 		}
+		else {
+			this.file = {
+				write: function() {},
+				writeLine: function() {}
+			};
+		}
 		
-		this.processElement(_package);
+		this.params.selectFn = this.params.select ? new Function("return " + this.params.select) : null;
 		
-		this.processOutput();
+		this.processOutputHead();
+		this.processPackage(_package);
+		this.processOutputFoot();
+		this.application.getRepository().renderSearchResults(this.xml);
 
 		info("=== FINISHED ===");
 	},
 	
-	xml: "",
-	out: function(xml) {
-		this.xml = this.xml + xml;
-		if (this.file) {
-			this.file.writeLine(xml);
-		}
-	},
-	
-	processOutput: function() {
-		this.out("<?xml version=\"1.0\" encoding=\"windows-1250\"?>"); 
-		this.out("<ReportViewData UID=\"MySearchID\">");
-		this.out("<Fields>");
-		this.out("<Field name=\"CLASSGUID\"/>");
-		this.out("<Field name=\"CLASSTYPE\"/>");
-		var columns = Search.params.output;
+	processOutputHead: function() {
+		this.xml = this.xml + "<?xml version=\"1.0\" encoding=\"windows-1250\"?>"; 
+		this.xml = this.xml + "<ReportViewData UID=\"ModelSearch\">";
+		this.xml = this.xml + "<Fields>";
+		this.xml = this.xml + "<Field name=\"CLASSGUID\"/>";
+		this.xml = this.xml + "<Field name=\"CLASSTYPE\"/>";
+		
+		var columns = this.params.output;
 		for (var column in columns) {
-			this.out("<Field name=\"" + column + "\"/>");
-			var def = columns[column];
+			this.xml = this.xml + "<Field name=\"" + column + "\"/>";
+			this.file.write(column + ";");
+			var fnDef = columns[column];
 			columns[column] = {
-				def: def,
-				fn: new Function("return " + def + ";")
+				def: fnDef,
+				fn: typeof(fnDef) == "function" ? fnDef : new Function("return " + fnDef + ";")
 			};
 		}
-		this.out("</Fields>");
-		this.out("<Rows>");
+		this.xml = this.xml + "</Fields>";
+		this.file.writeLine("");
+
+		this.xml = this.xml + "<Rows>";
+	},
+	
+	processOutputFoot: function() {
+		this.xml = this.xml + "</Rows>";
+		this.xml = this.xml + "</ReportViewData>";
+	},
+	
+	processOutputRow: function(element, selected) {
+		
+		this.xml = this.xml + "<Row>";
+		this.xml = this.xml + "<Field name=\"CLASSGUID\" value=\"" + element.getGuid() + "\"/>";
+		this.xml = this.xml + "<Field name=\"CLASSTYPE\" value=\"" + element._getType() + "\"/>";
 
 		var columns = this.params.output;
-		this.found.forEach(function(element) {
-			this.out("<Row>");
-			this.out("<Field name=\"CLASSGUID\" value=\"" + element.getGuid() + "\"/>");
-			this.out("<Field name=\"CLASSTYPE\" value=\"" + element._getType() + "\"/>");
-			for (var column in columns) {
-				var fn = columns[column].fn;
-				var value = fn.call(element);
-				value = value ? (value + "").replace(/"/g, "'").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
-				this.out("<Field name=\"" + column + "\" value=\"" + value + "\"/>");
-			}
-			this.out("</Row>");
+		for (var column in columns) {
+			var fn = columns[column].fn;
+			var value = (fn.call(selected) || "") + "";
+			this.file.write("\"" + value.replace(/"/g, "'") + "\";");
+			this.xml = this.xml + "<Field name=\"" + column + "\" value=\"" + value.replace(/"/g, "'").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&/g, "&amp;") + "\"/>";
+		}
+
+		this.xml = this.xml + "</Row>";
+		this.file.writeLine("");
+	},
+	
+	processPackage: function(_package) {
+		
+		Ea.log(_package);
+		
+		_package.getElements().forEach(function(element) {
+			Search.processElement(element);
 		});
 		
-		this.out("</Rows>");
-		this.out("</ReportViewData>");
-
-		this.application.getRepository().renderSearchResults(this.xml);
+		if (this.params.drill) {
+			_package.getPackages().forEach(function(_package) {
+				Search.processPackage(_package);
+			});
+		}
 	},
 	
 	processElement: function(element) {
-		Ea.log(element);
-		this.found.addAll(element.getElements().filter(this.params.filter));
-		if (!element.instanceOf(Ea.Package._Base)) {
-			this.found.addAll(element.getEmbeddedElements().filter(this.params.filter));
+		
+		if (element.match(this.params.filter)) {
+			if (Search.params.selectFn) {
+				var selection = this.params.selectFn.call(element);
+				if (selection) {
+					if (Core.Types.Collection.isInstance(selection)) {
+						selection.forEach(function(selected) {
+							this.processOutputRow(element, selected);
+						});
+					}
+					else {
+						this.processOutputRow(element, selection);
+					}
+				}
+			}
+			else {
+				this.processOutputRow(element, element);
+			}
 		}
 		
-		element.getElements().forEach(function(element) {
-			this.processElement(element);
+		element.getEmbeddedElements().forEach(function(element) {
+			Search.processElement(element);
 		});
-		if (element.instanceOf(Ea.Package._Base)) {
-			element.getPackages().forEach(function(element) {
-				this.processElement(element);
-			});
-		}
-		else {
-			element.getEmbeddedElements().forEach(function(element) {
-				this.processElement(element);
-			});
-		}
+		
 	}
 	
 };
