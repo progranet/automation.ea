@@ -17,11 +17,11 @@
 /**
  * @namespace
  */
-Ea._Base = {
-	
-};
+Ea._Base = {};
 
-Ea._Base.Type = extend(Core.Types.Named);
+Ea._Base._Base = extend(Core.Types.Named);
+
+Ea._Base.Type = extend(Ea._Base._Base);
 
 Ea._Base.PrimitiveType = extend(Ea._Base.Type, {},
 {

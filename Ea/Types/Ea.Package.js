@@ -62,12 +62,10 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 	}
 },
 {
-	determineType: function(api) {
-		if (this.getProperty("_model").getApiValue(api))
-			type = Ea.Package.Model;
-		else
-			type = Ea.Package.Package;
-		return type;
+	_deriveTypeName: function(source) {
+		if (this.getProperty("_model").getApiValue(source.api))
+			return "Model";
+		return "Package";
 	}
 },
 {

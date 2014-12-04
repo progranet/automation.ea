@@ -304,7 +304,7 @@ Ea._Base.Class.ApiProperty = extend(Ea._Base.Class._Property, {
 		var name = params[0];
 		var type = params[1];
 		if (typeof(type) == "string")
-			type = this.elementType.namespace[type] || this.elementType._createType(type);
+			type = this.elementType.namespace.findType(type);
 		if (!(this.name in source.value)) {
 			object._class._properties[this.name].get(object);
 		}

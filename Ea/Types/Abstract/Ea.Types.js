@@ -57,18 +57,6 @@ Ea.Types.Any = define({
 }, 
 {
 	/**
-	 * Determines proxy class based on EA API object.
-	 * By default as proxy class is taken base class from package (Ea.[PackageName]._Base).
-	 * Class can be determined also based on specific EA API properties values (such as Diagram.Type for Ea.Diagram._Base subclass or Package.IsModel for Ea.Package._Base subclass).
-	 * 
-	 * @param {Object} api
-	 * @type {Core.Lang.Class}
-	 */
-	determineType: function(api) {
-		return this.namespace._Base;
-	},
-	
-	/**
 	 * Determines EA API type name on creating API object.
 	 * In some cases EA API object types require inner type name for creation of new objects (e.g. Element, Diagram, Connector).
 	 * Proxy classes wrapping this specific types of EA API objects should be able of "translate" proxy subclass to EA inner type name (e.g. Ea.Element.Class conforms to API Element.Type == "Class").
@@ -77,21 +65,8 @@ Ea.Types.Any = define({
 	 */
 	determineEaType: function() {
 		return this.namespace.name;
-	},
-	
-	_deriveType: function(api, property) {
-		var typeName = property.getApiValue(api).replace(/[-\s]/g,"");
-		var type = this.namespace[typeName] || this._createType(typeName);
-		return type;
-	},
-	
-	_createType: function(typeName) {
-		if (typeName in this.namespace)
-			throw new Error("Type already exists: $", [this.namespace[typeName]]);
-		this.namespace[typeName] = Core.Lang.extend(this.namespace, typeName, this.namespace._Base);
-		warn("Not implemented type: $.$", [this.namespace.qualifiedName, typeName]);
-		return this.namespace[typeName];
 	}
+	
 });
 
 Ea.Types.NamedElement = extend(Ea.Types.Any, {

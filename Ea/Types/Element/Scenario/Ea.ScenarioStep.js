@@ -34,10 +34,9 @@ Ea.ScenarioStep._Base = extend(Ea.Types.NamedElement, {
 	
 },
 {
-	determineType: function(api) {
-		var typeName = Ea.ScenarioStep.StepType[this.getProperty("_type").getApiValue(api)];
-		var type = this.namespace[typeName] || this._createType(typeName);
-		return type;
+	_deriveTypeName: function(source) {
+		var typeName = Ea.ScenarioStep.StepType[this.getProperty("_type").getApiValue(source.api)];
+		return typeName;
 	}
 },
 {

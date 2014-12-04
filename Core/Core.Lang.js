@@ -48,12 +48,13 @@ Core.Lang = {
 	 * @type {Core.Lang.Class}
 	 */
 	define: function(namespace, name, features, staticFeatures, properties) {
-		if (namespace != "Core.Lang" || name != "Class")
+		if (namespace != "Core.Lang")
 			return Core.Lang.extend(namespace, name, Core.Types.Object, features, staticFeatures, properties);
 		
 		var metaClass = new Function("this.create.apply(this, arguments);");
 		metaClass.prototype = features;
-		_meta._class = metaClass;
+		if (name == "Class")
+			_meta._class = metaClass;
 	},
 	
 	/**
@@ -146,8 +147,7 @@ Core.Lang = {
 };
 
 Core.Lang.Class = define({
-	
-	
+
 	/**
 	 * Creates new class
 	 * 
@@ -178,7 +178,7 @@ Core.Lang.Class = define({
 		for (var s = 0; s < superClasses.length; s++) {
 			var superClass = superClasses[s];
 			for (var featureName in superClass) {
-				if (!this[featureName])
+				if (!(featureName in this))
 					this[featureName] = superClass[featureName];
 			}
 		}
@@ -230,7 +230,6 @@ Core.Lang.Class = define({
 		}
 		
 		this._class = _class;
-		
 	},
 
 		

@@ -41,6 +41,22 @@ include = function(library, params) {
 		return this.qualifiedName;
 	};
 	namespace._loader = inc;
+	namespace._extensions = [];
+	
+	namespace.findType = function(typeName) {
+		if (!namespace.typeExists(typeName)) {
+			namespace[typeName] = Core.Lang.extend(namespace, typeName, namespace._Base);
+			warn("Not implemented type: $.$", [namespace.qualifiedName, typeName]);
+		}
+		return namespace[typeName];
+	};	
+	namespace.typeExists = function(typeName) {
+		return (typeName in namespace);
+	};
+	namespace.extension = function(extension) {
+		namespace._extensions.push(extension);
+	};
+	
 	Core.enrichNamespace(namespace);
 	if ("initialize" in namespace)
 		namespace.initialize();

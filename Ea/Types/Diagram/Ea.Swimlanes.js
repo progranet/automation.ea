@@ -34,9 +34,6 @@ Ea.Swimlanes._Base = extend(Ea.Collection.Map, {
 	}
 },
 {
-	determineType: function(api) {
-		return this.namespace._Base;
-	}
 });
 
 include("Ea.Swimlane@Ea.Types.Diagram");

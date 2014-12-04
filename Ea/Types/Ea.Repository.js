@@ -29,18 +29,12 @@ Ea.Repository = {
 		objectType: 2
 	},
 	
+	eaPrimitiveTypes: {},
+
 	initialize: function() {
 		DataAccess.registerProviderClass("Jet", DataAccess.Jet.Provider);
 		DataAccess.registerProviderClass("Oracle", DataAccess.Oracle.Provider);
-	},
-	
-	eaPrimitiveTypes: {
-		EABOOL00: Ea._Base.PrimitiveType.getPrimitiveType("Boolean"),
-		EAINT000: Ea._Base.PrimitiveType.getPrimitiveType("Integer"),
-		EAREAL00: Ea._Base.PrimitiveType.getPrimitiveType("Real"),
-		EASTRING: Ea._Base.PrimitiveType.getPrimitiveType("String"),
-		EAUNAT00: Ea._Base.PrimitiveType.getPrimitiveType("UnlimitedNatural")
-	}
+	}	
 };
 
 			
@@ -61,10 +55,16 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	
 	_findByQuery: function(table, key, value) {
 		
-		//var sql = "select * from " + table + " where " + key + " = " + value;
 		var sql = this._provider.getSelect(table) + " " + this._provider.getExpression(table, key, value);
-		
-		var xml = this._source.api.SQLQuery(sql);
+		//info(sql);
+		var xml;
+		try {
+			xml = this._source.api.SQLQuery(sql);
+		}
+		catch (error) {
+			warn("Query error: " + error.message + " (SQL: " + sql + ")");
+			return [];
+		}
 		
 		var dom = new ActiveXObject("MSXML2.DOMDocument");
 		dom.validateOnParse = false;
@@ -90,7 +90,6 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 			}
 			rows.push(row);
 		}
-		
 		return rows;
 	},
 	
@@ -147,7 +146,7 @@ Ea.Repository._Base = extend(Ea.Types.Any, {
 	 */
 	getStereotypes: function(object) {
 		var list = null;
-		var rows = this._findByQuery("XRef", "clientGuid", object.getGuid());
+		var rows = this._findByQuery("XRef", "clientGuid", (typeof object == "string") ? object : object.getGuid());
 		for (var ri = 0; ri < rows.length; ri++) {
 			var row = rows[ri];
 			if (row.name == "Stereotypes") {

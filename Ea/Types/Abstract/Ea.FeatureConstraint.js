@@ -18,8 +18,9 @@ Ea.FeatureConstraint = {};
 
 Ea.FeatureConstraint._Base = extend(Ea.Types.NamedElement, {},
 {
-	determineType: function(api) {
-		return this._deriveType(api, this.getProperty("_type"));
+	_deriveTypeName: function(source) {
+		var name = this.getProperty("_type").getApiValue(source.api).replace(/[-\s]/g,"");
+		return name;
 	}
 },
 {

@@ -53,7 +53,7 @@ Ea.Collection._Base = extend([Ea.Types.Any, Core.Types.AbstractCollection], {
 	},
 	
 	_added: function(element) {
-		
+
 	},
 	
 	_create: function(name, type) {
@@ -150,7 +150,7 @@ Ea.Collection.Map = extend([Ea.Collection._Base, Core.Types.AbstractMap], {
 	}
 },
 {
-	determineType: function(api) {
-		return this.namespace.Map;
+	_deriveTypeName: function() {
+		return "Map";
 	}
 });

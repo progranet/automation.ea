@@ -66,6 +66,13 @@ Word = {
 		wdPromptToSaveChanges: -2,
 		wdSaveChanges: -1
 	},
+	MsoPropertyType: {
+		msoPropertyTypeNumber: 1,
+		msoPropertyTypeBoolean: 2,
+		msoPropertyTypeDate: 3,
+		msoPropertyTypeString: 4,
+		msoPropertyTypeFloat: 5
+	},
 	
 	wordApp: null,
 
@@ -152,6 +159,15 @@ Word.Document = define({
 	insertToc: function(bookmark, upperLevel, lowerLevel) {
 		var range = bookmark ? this.template.Bookmarks.Item(bookmark).Range : this.template.Range(0, 0);
 		this.template.TablesOfContents.Add(range, true, upperLevel, lowerLevel);
+	},
+	
+	setCustomProperty: function(name, value) {
+		try {
+			this.template.CustomDocumentProperties(name).Value = value;
+		}
+		catch (error) {
+			this.template.CustomDocumentProperties.Add(name, false, Word.MsoPropertyType.msoPropertyTypeString, value);
+		}
 	},
 	
 	save: function(filePath, format) {

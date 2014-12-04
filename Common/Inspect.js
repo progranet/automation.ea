@@ -19,6 +19,7 @@ include("Sys@Sys");
 include("Sys.Utils@Sys");
 include("Ea@Ea");
 include("Browser@Ms.IExplorer");
+include("Bpmn@Extension.Bpmn");
 
 Inspect = {
 	params: {

@@ -98,6 +98,21 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 		return this._source.application.getRepository().getStereotypes(this);
 	},
 	
+	hasStereotype: function(stereotype) {
+		var stereotypes = this.getStereotypes();
+		if (typeof stereotype == "string") {
+			var has = false;
+			stereotypes.forEach(function(s) {
+				if (s.getName() == stereotype) {
+					has = true;
+					return true;
+				}
+			});
+			return has;
+		}
+		return stereotypes.contains(stereotype);
+	},
+
 	getNamespace: function() {
 		return this.getClient().getPackage();
 	},
@@ -123,8 +138,9 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 		return this.name;
 	},
 
-	determineType: function(api) {
-		return this._deriveType(api, this.getProperty("_type"));
+	_deriveTypeName: function(source) {
+		var name = this.getProperty("_type").getApiValue(source.api).replace(/[-\s]/g,"");
+		return name;
 	}
 },
 {

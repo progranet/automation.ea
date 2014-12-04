@@ -27,11 +27,11 @@ Ea.Attribute = {
 
 Ea.Attribute._Base = extend(Ea.TypedElement.Feature, {},
 {
-	determineType: function(api) {
-		var stereotype = this.getProperty("stereotype").getApiValue(api); 
+	_deriveTypeName: function(source) {
+		var stereotype = this.getProperty("stereotype").getApiValue(source.api); 
 		if (stereotype == "enum")
-			return Ea.Attribute.EnumerationLiteral;
-		return Ea.Attribute.Attribute;
+			return "EnumerationLiteral";
+		return "Attribute";
 	}
 },
 {

@@ -259,9 +259,25 @@ Ea.Application._Base = extend(Ea.Types.Any, {
 	 * @type {Ea.Types.Any}
 	 */
 	wrapProxy: function(baseType, api, params) {
-		var type = baseType.determineType(api);
+
+		var typeName = null;
+		var namespace = baseType.namespace;
+		var source = new Ea._Base.Class.Source(this, api);
+		
+		for (var e = 0; e < namespace._extensions.length; e++) {
+			typeName = namespace._extensions[e]._Base._deriveTypeName(source);
+			if (typeName) {
+				namespace = namespace._extensions[e];
+				break;
+			}
+		}
+		if (!typeName)
+			typeName = baseType._deriveTypeName(source);
+		var type = namespace.findType(typeName);
+	
+		//var type = baseType.namespace.determineType(api);
 		var proxy = new type(params || {});
-		proxy._source = new Ea._Base.Class.Source(this, api);
+		proxy._source = source;
 		proxy._init();
 		this._cache(proxy);
 		return proxy;

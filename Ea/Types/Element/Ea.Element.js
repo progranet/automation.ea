@@ -127,6 +127,21 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 		return this._source.application.getRepository().getStereotypes(this);
 	},
 	
+	hasStereotype: function(stereotype) {
+		var stereotypes = this.getStereotypes();
+		if (typeof stereotype == "string") {
+			var has = false;
+			stereotypes.forEach(function(s) {
+				if (s.getName() == stereotype) {
+					has = true;
+					return true;
+				}
+			});
+			return has;
+		}
+		return stereotypes.contains(stereotype);
+	},
+	
 	getLinkedDocument: function() {
 		return this._source.api.GetLinkedDocument();
 	},
@@ -163,8 +178,9 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 		}
 	},
 	
-	determineType: function(api) {
+	_deriveTypeName: function(source) {
 		
+		var api = source.api;
 		var typeName = this.getProperty("_type").getApiValue(api).replace(/\s/g,"");
 		var metaType = this.getProperty("_metatype").getApiValue(api);
 		
@@ -185,9 +201,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 				typeName = "AssociationClass";
 		}
 		
-		var type = this.namespace[typeName] || this._createType(typeName);
-		
-		return type;
+		return typeName;
 	},
 	
 	/**

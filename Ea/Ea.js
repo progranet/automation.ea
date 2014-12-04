@@ -51,8 +51,14 @@ Ea = {
 				prepare(_class._subClass[c]);
 			}
 		};
-		
+
 		prepare(Ea.Types.Any);
+
+		Ea.Repository.eaPrimitiveTypes.EABOOL00 = Ea._Base.PrimitiveType.getPrimitiveType("Boolean");
+		Ea.Repository.eaPrimitiveTypes.EAINT000 = Ea._Base.PrimitiveType.getPrimitiveType("Integer");
+		Ea.Repository.eaPrimitiveTypes.EAREAL00 = Ea._Base.PrimitiveType.getPrimitiveType("Real");
+		Ea.Repository.eaPrimitiveTypes.EASTRING = Ea._Base.PrimitiveType.getPrimitiveType("String");
+		Ea.Repository.eaPrimitiveTypes.EAUNAT00 = Ea._Base.PrimitiveType.getPrimitiveType("UnlimitedNatural");
 	},
 	
 	/**
@@ -63,8 +69,8 @@ Ea = {
 	 * @type {Ea.Application._Base}
 	 */
 	initializeDefaultApplication: function(params) {
-		params = params || {};
 		if (!this._application) {
+			params = params || {};
 			this._application = Ea.Application.createApplication(params);
 			this._initializeLogs(params.targetClass || Ea._Base.Utils.Target, this._application.getRepository());
 		}

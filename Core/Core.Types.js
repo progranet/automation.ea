@@ -94,6 +94,10 @@ Core.Types.Object = define({
 	}	
 },
 {
+	_deriveTypeName: function() {
+		return "_Base";
+	},
+	
 	/**
 	 * Class initialization 
 	 */
@@ -218,6 +222,27 @@ Core.Types.AbstractCollection = define({
 	},
 	
 	/**
+	 * Returns new collection containing elements collected from this collection matching specified expression
+	 * 
+	 * @param {Object} expression
+	 * @type {Core.Types.Collection<Core.Types.Object>}
+	 */
+	collect: function(expression) {
+		if (!expression) return this;
+		var selected = new Core.Types.Collection();
+		if (typeof expression == "string")
+			expression = new Function("return " + expression);
+		for (var i = 0; i < this._size; i++) {
+			var element = this._table[i];
+			try {
+				selected.add(expression.call(element));
+			}
+			catch (error) {}
+		}
+		return selected;
+	},
+	
+	/**
 	 * Adds all elements of this collection to specified collection
 	 * 
 	 * @param {Core.Types.Collection<Core.Types.Object>} collection
@@ -320,7 +345,7 @@ Core.Types.Collection = extend(Core.Types.AbstractCollection, {
 	 * @private
 	 */
 	_added: function(element) {
-		
+
 	},
 	
 	/**

@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 300 D&C
+   Copyright 2014 300 D&C
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,26 +14,10 @@
    limitations under the License.
 */
 
-Ea.Properties = {
-		meta: {
-			objectType: 48
-		}
-};
+/**
+ * @namespace
+ */
+Bpmn = {};
 
-Ea.Properties._Base = extend(Ea.Collection.Map, {
-
-	/**
-	 * Returns element at specified index
-	 * 
-	 * @private
-	 * @param {Number} index
-	 * @type {Ea.Types.Any}
-	 */
-	_getAt: function(index) {
-		return this._source.api.Item(index);
-	}
-},
-{
-});
-
-include("Ea.Property@Ea.Types.Element.Property");
+include("Bpmn.Element@Extension.Bpmn");
+include("Bpmn.Connector@Extension.Bpmn");
