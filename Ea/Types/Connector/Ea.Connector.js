@@ -140,6 +140,8 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 
 	_deriveTypeName: function(source) {
 		var name = this.getProperty("_type").getApiValue(source.api).replace(/[-\s]/g,"");
+		if (this.getProperty("_metaType").getApiValue(source.api) == "PackageImport")
+			name = "PackageImport";
 		return name;
 	}
 },
@@ -483,6 +485,14 @@ Ea.Connector.Dependency = extend(Ea.Connector._Base, {
 	getRelation: function(client) {
 		return client ? "needed by" : "depends on";
 	}
+});
+
+Ea.Connector.PackageImport = extend(Ea.Connector.Dependency, {
+
+	getRelation: function(client) {
+		return client ? "imported by" : "import";
+	}
+	
 });
 
 Ea.Connector.Abstraction = extend(Ea.Connector._Base, {

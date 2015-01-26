@@ -30,18 +30,27 @@ Bpmn.Connector = {
 	}
 };
 
-Bpmn.Connector._Base = extend(Ea.Connector._Base, {}, {
+Bpmn.Connector._Base = extend([Ea.Connector._Base, Bpmn.BaseElement], {}, {
 	
 	_deriveTypeName: function(source) {
 		
-		var typeName;
-		
-		typeName = null;
+		var typeName = null;
 		var guid = this.getProperty("guid").getApiValue(source.api);
 		var stereotypes = source.application.getRepository().getStereotypes(guid);
+		
+		if (!stereotypes)
+			return null;
+
 		stereotypes.forEach(function(stereotype) {
-			if (stereotype.getQualifiedName) {
-				var qualifiedName = stereotype.getQualifiedName();
+			if (stereotype.getVisualType) {
+				var techId = stereotype.getVisualType().get("TechID");
+				if (techId != "BPMN2.0")
+					return false;
+				typeName = stereotype.getName();
+				return true;
+			}
+			else if (stereotype.getQualifiedName) {
+				var qualifiedName = stereotype.getQualifiedName() || "";
 				var path = qualifiedName.split("::");
 				if (path.length != 2 || path[0] != "BPMN2.0")
 					return false;
@@ -53,69 +62,55 @@ Bpmn.Connector._Base = extend(Ea.Connector._Base, {}, {
 		if (!typeName)
 			return null;
 		
-		/*if (typeName == "Activity") {
-			var tags = this.getProperty("tags").getApiValue(source.api);
-			typeName = tags.getByName("activityType").Value;
-		}*/
-		
 		return typeName;
 	}
 });
 
-Bpmn.Connector.MessageFlow = extend(Bpmn.Connector._Base, {
-	
-	getMessageRef: function() {
-		return this.getTags().get("messageRef").getValue();
-	},
-	
-	setMessageRef: function(messageRef) {
-		this.getTags().get("messageRef").setValue(messageRef);
-	}
-	
-}, {}, {
+Bpmn.Connector.MessageFlow = extend(Bpmn.Connector._Base, {}, {}, {
 	
 	/**
 	 * Message reference
 	 * 
-	 * @derived
-	 * @type {String}
+	 * @type {Bpmn.Element.Message}
 	 */
-	messageRef: {}
+	messageRef: {api: "tag:messageRef", referenceBy: "guid"}
 });
 
 Bpmn.Connector.SequenceFlow = extend(Bpmn.Connector._Base, {
 	
 	getConditionExpression: function() {
-		return this.getTags().get("conditionExpression").getValue();
+		return this.getTags().get("conditionExpression").getNotes();
 	},
 	
-	setConditionExpression: function(conditionExpression) {
-		this.getTags().get("conditionExpression").setValue(conditionExpression);
-	},
-		
-	getDataObjectRef: function() {
-		return this.getTags().get("dataObjectRef").getValue();
-	},
-	
-	setDataObjectRef: function(dataObjectRef) {
-		this.getTags().get("dataObjectRef").setValue(dataObjectRef);
+	setConditionExpression: function(expression) {
+		this.getTags().get("conditionExpression").setNotes(expression);
 	}
-
-}, {}, {
+	
+},
+{}, {
 	
 	/**
-	 * Condition Expression
-	 * 
 	 * @derived
 	 * @type {String}
 	 */
 	conditionExpression: {},
 	
 	/**
-	 * Data Object reference
-	 * 
-	 * @derived
 	 * @type {String}
 	 */
-	dataObjectRef: {}
+	conditionType: {api: "tag:conditionType"},
+
+	/**
+	 * Data Object reference
+	 * 
+	 * @type {Bpmn.Element.DataObject}
+	 */
+	dataObjectRef: {api: "tag:dataObjectRef", referenceBy: "guid"}
 });
+
+Bpmn.Connector.Association = extend(Bpmn.Connector._Base);
+
+Bpmn.Connector.DataAssociation = extend(Bpmn.Connector._Base);
+
+Bpmn.Connector.DataInputAssociation = extend(Bpmn.Connector.DataAssociation);
+Bpmn.Connector.DataOutputAssociation = extend(Bpmn.Connector.DataAssociation);

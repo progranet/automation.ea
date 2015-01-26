@@ -1196,6 +1196,7 @@ Ea.Element.Object = extend(Ea.Element.InstanceSpecification);
 
 Ea.Element.Goal = extend(Ea.Element.Object);
 
+Ea.Element.BusinessProcess = extend(Ea.Element.Activity);
 
 
 include("Ea.TypedElement@Ea.Types.Abstract");

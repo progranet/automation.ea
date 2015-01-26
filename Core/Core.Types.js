@@ -153,6 +153,17 @@ Core.Types.AbstractCollection = define({
 	},
 	
 	/**
+	 * Returns JScript Array object
+	 * 
+	 *  @type {Array}
+	 */
+	toArray: function() {
+		var array = [];
+		array.push(this._table);
+		return array;
+	},
+	
+	/**
 	 * Finds specified element in this collection and returns its index or -1 if element was not found.
 	 * 
 	 * @param {Core.Types.Object} element
@@ -280,8 +291,19 @@ Core.Types.Collection = extend(Core.Types.AbstractCollection, {
 		params = params || {};
 		this._table = [];
 		
-		if (params.collection)
+		if (params.collection) {
 			this.addAll(params.collection);
+		}
+		else if (params.array) {
+			for (var i = 0; i < params.array.length; i++) {
+				this.add(params.array[i]);
+			}
+		}
+		else if (params.map) {
+			for (var name in params.map) {
+				this.add(params.map[name]);
+			}
+		}
 	},
 	
 	/**

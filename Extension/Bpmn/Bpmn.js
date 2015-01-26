@@ -17,7 +17,14 @@
 /**
  * @namespace
  */
-Bpmn = {};
+Bpmn = {
+	initialize: function() {
+		Ea.preapreProperties(Bpmn.Element._Base);
+		Ea.preapreProperties(Bpmn.Connector._Base);
+	}
+};
+
+Bpmn.BaseElement = define();
 
 include("Bpmn.Element@Extension.Bpmn");
 include("Bpmn.Connector@Extension.Bpmn");

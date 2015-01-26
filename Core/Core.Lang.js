@@ -275,7 +275,21 @@ Core.Lang.Class = define({
 	_subClass: null,
 	
 	_properties: null,
+	_propertiesCollection: null,
 	
+	/**
+	 * Returns all class properties
+	 * 
+	 * @type {Core.Types.Collection<Ea._Base.Class._Property>}
+	 */
+	getProperties: function() {
+		var properties = this._properties;
+		if (this._propertiesCollection)
+			return this._propertiesCollection;
+		this._propertiesCollection = new Core.Types.Collection({map: this._properties});
+		return this._propertiesCollection;
+	},
+
 	/**
 	 * Returns property by name
 	 * 

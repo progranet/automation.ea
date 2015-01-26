@@ -30,16 +30,23 @@ Bpmn.Element = {
 	}
 };
 
-Bpmn.Element._Base = extend(Ea.Element._Base, {
+Bpmn.Element._Base = extend([Ea.Element._Base, Bpmn.BaseElement], {
 
 	_getClassifierByGuid: function() {
 		return this._source.application.getRepository().getTypedElementType(this);
 	},
 	
+	_getClassifier: function() {
+		var guid = this._getMiscData0();
+		if (!guid)
+			return null;
+		return this._source.application.getByGuid(guid);
+	},
+	
 	getRef: function() {
 		var type = null;
 		try {
-			type = this._getClassifier();
+			type = this._getClassifier3();
 		}
 		catch (error) {}
 		if (!type)
@@ -52,9 +59,7 @@ Bpmn.Element._Base = extend(Ea.Element._Base, {
 	
 	_deriveTypeName: function(source) {
 		
-		var typeName;
-		
-		typeName = null;
+		var typeName = null;
 		var guid = this.getProperty("guid").getApiValue(source.api);
 		var stereotypes = source.application.getRepository().getStereotypes(guid);
 		
@@ -62,7 +67,14 @@ Bpmn.Element._Base = extend(Ea.Element._Base, {
 			return null;
 		
 		stereotypes.forEach(function(stereotype) {
-			if (stereotype.getQualifiedName) {
+			if (stereotype.getVisualType) {
+				var techId = stereotype.getVisualType().get("TechID");
+				if (techId != "BPMN2.0")
+					return false;
+				typeName = stereotype.getName();
+				return true;
+			}
+			else if (stereotype.getQualifiedName) {
 				var qualifiedName = stereotype.getQualifiedName() || "";
 				var path = qualifiedName.split("::");
 				if (path.length != 2 || path[0] != "BPMN2.0")
@@ -75,11 +87,68 @@ Bpmn.Element._Base = extend(Ea.Element._Base, {
 		if (!typeName)
 			return null;
 		
+		var tags = this.getProperty("tags").getApiValue(source.api);
 		if (typeName == "Activity") {
-			var tags = this.getProperty("tags").getApiValue(source.api);
 			typeName = tags.getByName("activityType").Value;
+			if (typeName == "Task") {
+				var taskType = tags.getByName("taskType").Value;
+				switch (taskType) {
+				case "Abstract":
+					typeName = "Task";
+					break;
+				default:
+					typeName = taskType + "Task";
+				}
+			}
+
+			if (tags.getByName("adHoc").Value == "true")
+				typeName = "AdHocSubProcess";
+			if (tags.getByName("isATransaction").Value == "true")
+				typeName = "Transaction";
+			if (tags.getByName("isACalledActivity").Value == "true")
+				typeName = "CallActivity";
+			
+		}
+		else if (typeName == "IntermediateEvent") {
+			
+			/*var parentId = this.getProperty("parent").getApiValue(source.api);
+			var parent = null;
+			var bound = false;
+			if (parentId) {
+				parent = source.application.getRepository()._source.api.GetElementByID(parentId);
+				if (parent) {
+					var embedded = parent.EmbeddedElements;
+					for (var i = 0; i < embedded.Count; i++) {
+						if (embedded.GetAt(i).ElementID == source.api.ElementID) {
+							bound = true;
+							break;
+						}
+					}
+					if (bound)
+						typeName = "BoundaryEvent";
+				}
+			}
+			if (!parent || !bound) {
+				typeName = "Intermediate" + tags.getByName("catchOrThrow").Value + "Event";
+			}*/
+			
+			var type = source.api.Type;
+			if (type == "ObjectNode") {
+				typeName = "BoundaryEvent";
+			}
+			else {
+				typeName = "Intermediate" + tags.getByName("catchOrThrow").Value + "Event";
+			}
+		}
+		else if (typeName == "BusinessProcess") {
+			typeName = "Process";
+		}
+		else if (typeName == "Gateway") {
+			var gatewayType = tags.getByName("gatewayType").Value;
+			typeName = gatewayType + (gatewayType == "Event" ? "Based" : "") + "Gateway";
 		}
 		
+		typeName = typeName.replace(/[\-\s]/g, "");
 		return typeName;
 	}
 },
@@ -101,321 +170,263 @@ Bpmn.Element._Base = extend(Ea.Element._Base, {
 	
 	/**
 	 * @private
+	 * @derived
 	 * @readOnly
 	 * @type {Ea.Element._Base}
 	 */
-	_classifier: {api: "MiscData", index: 0, referenceBy: "guid"}
+	_classifier: {}
 	
 });
 
-Bpmn.Element.Activity = extend(Bpmn.Element._Base, {
-	
-	getTaskType: function() {
-		return this.getTags().get("taskType").getValue();
-	},
-	
-	setTaskType: function(taskType) {
-		this.getTags().get("taskType").setValue(taskType);
-	},
-	
-	isSequential: function() {
-		return this.getTags().get("isSequential").getValue();
-	},
-	
-	setSequential: function(isSequential) {
-		this.getTags().get("isSequential").setValue(isSequential);
-	},
-	
-	getSubprocessRef: function() {
-		return this.getTags().get("sub-ProcessRef").getValue();
-	},
-	
-	setSubprocessRef: function(subProcessRef) {
-		this.getTags().get("sub-ProcessRef").setValue(subProcessRef);
-	},
-	
-	isTriggeredByEvent: function() {
-		return this.getTags().get("triggeredByEvent").getValue();
-	},
-	
-	setTriggeredByEvent: function(triggeredByEvent) {
-		this.getTags().get("triggeredByEvent").setValue(triggeredByEvent);
-	},
-	
-	isForCompensation: function() {
-		return this.getTags().get("isForCompensation").getValue();
-	},
-	
-	setForCompensation: function(isForCompensation) {
-		this.getTags().get("isForCompensation").setValue(isForCompensation);
-	},
-	
-	isATransaction: function() {
-		return this.getTags().get("isATransaction").getValue();
-	},
-	
-	setATransaction: function(isATransaction) {
-		this.getTags().get("isATransaction").setValue(isATransaction);
-	},
-	
-	isACalledActivity: function() {
-		return this.getTags().get("isACalledActivity").getValue();
-	},
-	
-	setACalledActivity: function(isACalledActivity) {
-		this.getTags().get("isACalledActivity").setValue(isACalledActivity);
-	},
-	
-	getCalledActivityRef: function() {
-		return this.getTags().get("calledActivityRef").getValue();
-	},
-	
-	setCalledActivityRef: function(calledActivityRef) {
-		this.getTags().get("calledActivityRef").setValue(calledActivityRef);
-	},
+Bpmn.Element.FlowElement = extend(Bpmn.Element._Base);
 
-	isAdHoc: function() {
-		return this.getTags().get("adHoc").getValue();
-	},
-	
-	setAdHoc: function(adHoc) {
-		this.getTags().get("adHoc").setValue(adHoc);
-	},
+Bpmn.Element.FlowElementsContainer = extend(Bpmn.Element._Base);
+		
+Bpmn.Element.FlowNode = extend(Bpmn.Element.FlowElement);
 
-	getAdHocOrdering: function() {
-		return this.getTags().get("adHocOrdering").getValue();
-	},
-	
-	setAdHocOrdering: function(adHoc) {
-		this.getTags().get("adHocOrdering").setValue(adHocOrdering);
-	},
-	
-	getMessageRef: function() {
-		return this.getTags().get("messageRef").getValue();
-	},
-	
-	setMessageRef: function(messageRef) {
-		this.getTags().get("messageRef").setValue(messageRef);
-	}
-
-} ,{}, {
-	
-	/**
-	 * @derived
-	 * @type {String}
-	 */
-	taskType: {},
-	
-	/**
-	 * @derived
-	 * @type {String}
-	 */
-	subprocessRef: {},
-	
-	/**
-	 * @derived
-	 * @type {Boolean}
-	 */
-	triggeredByEvent: {},
+Bpmn.Element.ItemDefinition = extend(Bpmn.Element._Base, {}, {}, {
 
 	/**
-	 * @derived
-	 * @type {Boolean}
-	 */
-	sequential: {},
-	
-	/**
-	 * @derived
-	 * @type {Boolean}
-	 */
-	forCompensation: {},
-	
-	/**
-	 * @derived
-	 * @type {Boolean}
-	 */
-	aTransaction: {},
-	
-	/**
-	 * @derived
-	 * @type {Boolean}
-	 */
-	aCalledActivity: {},
-	
-	/**
-	 * @derived
 	 * @type {String}
 	 */
-	calledActivityRef: {},
-	
+	itemKind: {api: "tag:itemKind"},
+
 	/**
-	 * @derived
 	 * @type {Boolean}
 	 */
-	adHoc: {},
-	
+	isCollection: {api: "tag:isCollection"},
+
 	/**
-	 * @derived
+	 * @type {Ea.Element._Base}
+	 */
+	structureRef: {api: "tag:structureRef", referenceBy: "guid"}
+});
+
+Bpmn.Element.Message = extend(Bpmn.Element._Base, {}, {}, {
+
+	/**
+	 * @type {Bpmn.Element.ItemDefinition}
+	 */
+	itemRef: {api: "tag:itemRef", referenceBy: "guid"}
+});
+
+Bpmn.Element.Operation = extend(Bpmn.Element._Base);
+Bpmn.Element.Error = extend(Bpmn.Element._Base, {}, {}, {
+
+	/**
 	 * @type {String}
 	 */
-	adHocOrdering: {},
+	errorCode: {api: "tag:errorCode"},
+
+	/**
+	 * @type {Bpmn.Element.ItemDefinition}
+	 */
+	structureRef: {api: "tag:errorStructureRef", referenceBy: "guid"}
+});
+
+Bpmn.Element.Escalation = extend(Bpmn.Element._Base, {}, {}, {
+
+	/**
+	 * @type {String}
+	 */
+	escalationCode: {api: "tag:escalationCode"},
+
+	/**
+	 * @type {Bpmn.Element.ItemDefinition}
+	 */
+	structureRef: {api: "tag:escalationStructureRef", referenceBy: "guid"}
+});
+
+Bpmn.Element.Activity = extend(Bpmn.Element.FlowNode, {},
+{},
+{
+	/**
+	 * @type {String}
+	 */
+	taskType: {api: "tag:taskType"},
+	
+	/**
+	 * @type {String}
+	 */
+	subprocessRef: {api: "tag:sub-ProcessRef"},
+	
+	/**
+	 * @type {Boolean}
+	 */
+	triggeredByEvent: {api: "tag:triggeredByEvent"},
+
+	/**
+	 * @type {Boolean}
+	 */
+	sequential: {api: "tag:isSequential"},
+	
+	/**
+	 * @type {Boolean}
+	 */
+	forCompensation: {api: "tag:isForCompensation"},
+	
+	/**
+	 * @type {Boolean}
+	 */
+	aTransaction: {api: "tag:isATransaction"},
+	
+	/**
+	 * @type {Boolean}
+	 */
+	aCalledActivity: {api: "tag:isACalledActivity"},
+	
+	/**
+	 * @type {Bpmn.Element.Activity}
+	 */
+	calledActivityRef: {api: "tag:calledActivityRef", referenceBy: "guid"},
+	
+	/**
+	 * @type {Boolean}
+	 */
+	adHoc: {api: "tag:adHoc"},
+	
+	/**
+	 * @type {String}
+	 */
+	adHocOrdering: {api: "tag:adHocOrdering"},
 	
 	/**
 	 * Message reference
 	 * 
-	 * @derived
-	 * @type {String}
+	 * @type {Bpmn.Element.Message}
 	 */
-	messageRef: {}
+	messageRef: {api: "tag:messageRef", referenceBy: "guid"},
 	
+	/**
+	 * Operation reference
+	 * 
+	 * @type {Bpmn.Element.Operation}
+	 */
+	operationRef: {api: "tag:operationRef", referenceBy: "guid"}
 });
 
-Bpmn.Element.BusinessProcess = extend(Bpmn.Element.Activity);
+Bpmn.Element.Process = extend(Bpmn.Element.FlowElementsContainer);
+Bpmn.Element.SubProcess = extend([Bpmn.Element.FlowElementsContainer, Bpmn.Element.Activity]);
+Bpmn.Element.AdHocSubProcess = extend(Bpmn.Element.SubProcess);
+Bpmn.Element.Transaction = extend(Bpmn.Element.SubProcess);
+
+Bpmn.Element.CallActivity = extend(Bpmn.Element.Activity);
 
 Bpmn.Element.Task = extend(Bpmn.Element.Activity);
+Bpmn.Element.ManualTask = extend(Bpmn.Element.Task);
+Bpmn.Element.ServiceTask = extend(Bpmn.Element.Task);
+Bpmn.Element.ReceiveTask = extend(Bpmn.Element.Task);
+Bpmn.Element.SendTask = extend(Bpmn.Element.Task);
+Bpmn.Element.BusinessRule = extend(Bpmn.Element.Task);
+Bpmn.Element.ScriptTask = extend(Bpmn.Element.Task);
+Bpmn.Element.UserTask = extend(Bpmn.Element.Task);
 
-Bpmn.Element.DataObject = extend(Bpmn.Element._Base, {
-	
-	getDataInOut: function() {
-		return this.getTags().get("dataInOut").getValue();
-	},
-	
-	setDataInOut: function(dataInOut) {
-		this.getTags().get("dataInOut").setValue(dataInOut);
-	},
-	
-	getDataObjectRef: function() {
-		return this.getTags().get("dataObjectRef").getValue();
-	},
-	
-	setDataObjectRef: function(dataObjectRef) {
-		this.getTags().get("dataObjectRef").setValue(dataObjectRef);
-	},
-	
-	getDataState: function() {
-		return this.getTags().get("dataState").getValue();
-	},
-	
-	setDataState: function(dataState) {
-		this.getTags().get("dataState").setValue(dataState);
-	}
 
-}, {}, {
+Bpmn.Element.Gateway = extend(Bpmn.Element.FlowNode, {}, {}, {
+	
+	/**
+	 * @type {String}
+	 */
+	gatewayDirection: {api: "tag:gatewayDirection"}
+
+});
+
+Bpmn.Element.ExclusiveGateway = extend(Bpmn.Element.Gateway);
+Bpmn.Element.InclusiveGateway = extend(Bpmn.Element.Gateway);
+Bpmn.Element.ParallelGateway = extend(Bpmn.Element.Gateway);
+Bpmn.Element.ComplexGateway = extend(Bpmn.Element.Gateway);
+Bpmn.Element.EventBasedGateway = extend(Bpmn.Element.Gateway, {}, {}, {
+	
+	/**
+	 * @type {String}
+	 */
+	eventGatewayType: {api: "tag:eventGatewayType"}
+
+});
+
+Bpmn.Element.DataObject = extend(Bpmn.Element.FlowElement, {}, {}, {
 	
 	/**
 	 * Data In Out
 	 * 
-	 * @derived
 	 * @type {String}
 	 */
-	dataInOut: {},
+	dataInOut: {api: "tag:dataInOut"},
 	
 	/**
 	 * Data Object reference
 	 * 
-	 * @derived
-	 * @type {String}
+	 * @type {Ea.Element._Base}
 	 */
-	dataObjectRef: {},
+	dataObjectRef: {api: "tag:dataObjectRef", referenceBy: "guid"},
 	
 	/**
 	 * Data State
 	 * 
-	 * @derived
 	 * @type {String}
 	 */
-	dataState: {}
+	dataState: {api: "tag:dataState"}
 
 });
 
-Bpmn.Element.Pool = extend(Bpmn.Element._Base, {
-	
-	isBlackBoxPool: function() {
-		return this.getTags().get("blackBoxPool").getValue();
-	},
-	
-	setBlackBoxPool: function(blackBoxPool) {
-		this.getTags().get("blackBoxPool").setValue(blackBoxPool);
-	},
-	
-	getParticipantRef: function() {
-		return this.getTags().get("participantRef").getValue();
-	},
-	
-	setParticipantRef: function(participantRef) {
-		this.getTags().get("participantRef").setValue(participantRef);
-	}
-	
-}, {}, {
+Bpmn.Element.DataStore = extend(Bpmn.Element.FlowElement);
+
+Bpmn.Element.Participant = extend(Bpmn.Element._Base);
+
+Bpmn.Element.Pool = extend(Bpmn.Element._Base, {}, {}, {
 	
 	/**
-	 * @derived
 	 * @type {Boolean}
 	 */
-	blackBoxPool: {},
+	blackBoxPool: {api: "tag:blackBoxPool"},
 	
 	/**
-	 * @derived
-	 * @type {String}
+	 * @type {Bpmn.Element.Participant}
 	 */
-	participantRef: {}
+	participantRef: {api: "tag:participantRef", referenceBy: "guid"}
 });
 
-Bpmn.Element.Lane = extend(Bpmn.Element._Base, {
-	
-	getPartitionElementRef: function() {
-		return this.getTags().get("partitionElementRef").getValue();
-	},
-	
-	setPartitionElementRef: function(partitionElementRef) {
-		this.getTags().get("partitionElementRef").setValue(partitionElementRef);
-	}
-	
-}, {}, {
+Bpmn.Element.Lane = extend(Bpmn.Element._Base, {}, {}, {
 	
 	/**
-	 * @derived
-	 * @type {String}
+	 * @type {Ea.Element._Base}
 	 */
-	partitionElementRef: {}
+	partitionElementRef: {api: "tag:partitionElementRef", referenceBy: "guid"}
 });
 
-Bpmn.Element.Event = extend(Bpmn.Element._Base, {
-	
-	getCatchOrThrow: function() {
-		return this.getTags().get("catchOrThrow").getValue();
-	},
-	
-	setCatchOrThrow: function(catchOrThrow) {
-		this.getTags().get("catchOrThrow").setValue(catchOrThrow);
-	},
-	
-	getEventDefinition: function() {
-		return this.getTags().get("eventDefinition").getValue();
-	},
-	
-	setEventDefinition: function(eventDefinition) {
-		this.getTags().get("eventDefinition").setValue(eventDefinition);
-	}
-	
-}, {}, {
+Bpmn.Element.Event = extend(Bpmn.Element.FlowNode, {}, {}, {
 	
 	/**
-	 * @derived
 	 * @type {String}
 	 */
-	catchOrThrow: {},
+	catchOrThrow: {api: "tag:catchOrThrow"},
 	
 	/**
-	 * @derived
 	 * @type {String}
 	 */
-	eventDefinition: {}
+	eventDefinition: {api: "tag:eventDefinition"}
 	
 });
 
-Bpmn.Element.StartEvent = extend(Bpmn.Element.Event);
-
-Bpmn.Element.EndEvent = extend(Bpmn.Element.Event);
+Bpmn.Element.ThrowEvent = extend(Bpmn.Element.Event);
+Bpmn.Element.CatchEvent = extend(Bpmn.Element.Event);
 
 Bpmn.Element.IntermediateEvent = extend(Bpmn.Element.Event);
+
+Bpmn.Element.EndEvent = extend(Bpmn.Element.ThrowEvent);
+Bpmn.Element.IntermediateThrowEvent = extend([Bpmn.Element.IntermediateEvent, Bpmn.Element.ThrowEvent]);
+
+Bpmn.Element.StartEvent = extend(Bpmn.Element.CatchEvent);
+Bpmn.Element.IntermediateCatchEvent = extend([Bpmn.Element.IntermediateEvent, Bpmn.Element.CatchEvent]);
+Bpmn.Element.BoundaryEvent = extend(Bpmn.Element.CatchEvent);
+
+Bpmn.Element.Artifact = extend(Bpmn.Element._Base);
+Bpmn.Element.Group = extend(Bpmn.Element.Artifact);
+Bpmn.Element.TextAnnotation = extend(Bpmn.Element.Artifact, {}, {}, {
+	
+	/**
+	 * Annotation text
+	 */
+	text: {api: "Notes"}
+
+});

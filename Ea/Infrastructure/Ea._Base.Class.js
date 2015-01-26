@@ -184,6 +184,15 @@ Ea._Base.Class._Property = define({
 Ea._Base.Class.ApiProperty = extend(Ea._Base.Class._Property, {
 	
 	_getBy: null,
+	tag: false,
+	
+	create: function(_class, features, params) {
+		_super.create(_class, features, params);
+		if (this.api.indexOf("tag:") == 0) {
+			this.tag = true;
+			this.api = this.api.substring(4);
+		}
+	},
 	
 	prepare: function() {
 		_super.prepare();
@@ -225,8 +234,11 @@ Ea._Base.Class.ApiProperty = extend(Ea._Base.Class._Property, {
 		else if (this._isClass) {
 			value = new this.type(apiValue, this);
 		}
+		else if (this.type == Boolean) {
+			value = (typeof(apiValue) == "string") ? (apiValue.toLowerCase() === "true") : (new Boolean(apiValue)).valueOf();
+		}
 		else {
-			value = new this.type(apiValue).valueOf();
+			value = (new this.type(apiValue)).valueOf();
 		}
 		source.value[this.name] = value;
 		return value;
@@ -235,17 +247,31 @@ Ea._Base.Class.ApiProperty = extend(Ea._Base.Class._Property, {
 	getApiValue: function(api) {
 		if (this.index == null) {
 			var value;
-			try {
-				value = api[this.api];
-				//	don't remove this dumb check:
-				//		EA for some reason throws exception on access to Ea.Property._Base._value value for NoteLink property
-				//		logging of this value is necessary for proper exception handing (i don't know why)
-				if (this.qualifiedName == "Ea.Property._Base._value")
-					_quietLogger("$", [value]);
+			if (this.tag) {
+				var tags = api.TaggedValues;
+				var tag = null;
+				for (var i = 0; i < tags.Count; i++) {
+					var t = tags.GetAt(i);
+					if (t.Name == this.api) {
+						tag = t;
+						break;
+					}
+				}
+				value = (tag ? tag.Value : null);
 			}
-			catch(error) {
-				warn("EA API exception on getting property value $ ($)", [this.toString(), error.message]);
-				value = null;
+			else {
+				try {
+					value = api[this.api];
+					//	don't remove this dumb check:
+					//		EA for some reason throws exception on access to Ea.Property._Base._value value for NoteLink property
+					//		logging of this value is necessary for proper exception handing (i don't know why)
+					if (this.qualifiedName == "Ea.Property._Base._value")
+						_quietLogger("$", [value]);
+				}
+				catch(error) {
+					warn("EA API exception on getting property value $ ($)", [this.toString(), error.message]);
+					value = null;
+				}
 			}
 			return value;
 		}
@@ -293,6 +319,16 @@ Ea._Base.Class.ApiProperty = extend(Ea._Base.Class._Property, {
 	setApiValue: function(api, value) {
 		
 		if (this.index == null) {
+			if (this.tag) {
+				var tag = api.TaggedValues.GetByName(this.api);
+				if (tag) {
+					tag.Value = value;
+				}
+				else {
+					warn("Tagged Value not found: " + this.api);
+				}
+				return;
+			}
 			api[this.api] = value;
 			return;
 		}

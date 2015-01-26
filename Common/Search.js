@@ -17,6 +17,7 @@
 include("Sys@Sys");
 include("Sys.IO@Sys");
 include("Ea@Ea");
+include("Bpmn@Extension.Bpmn");
 
 Search = {
 		
@@ -130,20 +131,20 @@ Search = {
 				if (selection) {
 					if (Core.Types.Collection.isInstance(selection)) {
 						selection.forEach(function(selected) {
-							this.processOutputRow(element, selected);
+							Search.processOutputRow(element, selected);
 						});
 					}
 					else {
-						this.processOutputRow(element, selection);
+						Search.processOutputRow(element, selection);
 					}
 				}
 			}
 			else {
-				this.processOutputRow(element, element);
+				Search.processOutputRow(element, element);
 			}
 		}
 		
-		element.getEmbeddedElements().forEach(function(element) {
+		element.getElements().forEach(function(element) {
 			Search.processElement(element);
 		});
 		

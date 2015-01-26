@@ -31,6 +31,19 @@ Ea = {
 	
 	_application: null,
 	
+	preapreProperties: function(_class) {
+
+		for (var propertyName in _class._properties) {
+			var property = _class.getProperty(propertyName);
+			if (!property.isPrepared())
+				property.prepare();
+		}
+		
+		for (var c = 0; c < _class._subClass.length; c++) {
+			Ea.preapreProperties(_class._subClass[c]);
+		}
+	},
+	
 	initialize: function() {
 		
 		for (var n = 0; n < this._namespaces.length; n++) {
@@ -39,20 +52,7 @@ Ea = {
 				Ea._objectTypes[namespace.meta.objectType] = namespace._Base;
 		}
 		
-		var prepare = function(_class) {
-			
-			for (var propertyName in _class._properties) {
-				var property = _class.getProperty(propertyName);
-				if (!property.isPrepared())
-					property.prepare();
-			}
-			
-			for (var c = 0; c < _class._subClass.length; c++) {
-				prepare(_class._subClass[c]);
-			}
-		};
-
-		prepare(Ea.Types.Any);
+		Ea.preapreProperties(Ea.Types.Any);
 
 		Ea.Repository.eaPrimitiveTypes.EABOOL00 = Ea._Base.PrimitiveType.getPrimitiveType("Boolean");
 		Ea.Repository.eaPrimitiveTypes.EAINT000 = Ea._Base.PrimitiveType.getPrimitiveType("Integer");
