@@ -1,0 +1,102 @@
+<!-- html-head -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Windows-1250"/>
+<link rel="stylesheet" href="<% stylesheet %>" type="text/css"/>
+<title><% title %></title>
+</head>
+<body style="width: 29.7cm;">
+<div style="padding: 2.5cm;"><div style="">
+
+
+<!-- spacer -->
+<br>
+
+<!-- ref-name -->
+<a name="<% guid %>"></a>
+
+<!-- chapter-head -->
+<h<% level %>><% name %></h<% level %>>
+
+<!-- chapter-notes -->
+<p><% notes %></p>
+
+<!-- section-title -->
+<p><b><% title %></b></p>
+
+<!-- diagram -->
+<div style="width: 100%">
+<div class="diagram-image-block"><img id="<% id %>" usemap="#<% id %>-map" class="diagram-image-img"<% dimension %> src="<% filePath %>"></img></div>
+<!-- diagram-legend -->
+<div class="diagram-name-block"><p class="diagram-name-span"><% legend %></p></div>
+<!-- map-head -->
+<map name="<% id %>-map">
+<!-- map-area -->
+<area shape="rect" coords="<% dimension.left %>,<% dimension.top %>,<% dimension.right %>,<% dimension.bottom %>" href="<% elementLink %>" alt="<% elementView.getElement().getName() %>">
+<!-- map-foot -->
+</map>
+</div>
+
+
+<!-- table-head -->
+<div style="width: 100%;">
+<table style="width: 100%;">
+<tbody>
+
+<!-- table-row-head -->
+<tr style="<% style %>">
+
+<!-- table-head-cell -->
+<th style="<% style %>"><div class="cell-th" style="<% style %>"><p class="cell-th-span"><b><% value %></b></p></div></th>
+
+<!-- table-inner-head-cell -->
+<td style="background-color: #DFE0FF;color:black;<% style %>"><div class="cell-th" style="text-align:right;width:120px;"><p class="cell-th-span"><b><% value %>:</b></p></div></td>
+
+<!-- table-body-cell -->
+<td><div class="cell-th"><p class="cell-td-span"><% value %></p></div></td>
+
+<!-- table-body-cell-span -->
+<td colspan="<% colspan %>" style="<% style %>"><div class="cell-th"><p class="cell-td-span"><% value %></p></div></td>
+
+<!-- table-body-cell-span-head -->
+<td colspan="<% colspan %>" style="<% style %>">
+
+<!-- table-body-cell-span-foot -->
+</td>
+
+<!-- inner-table-head -->
+<td colspan="<% colspan %>" style="<% style %>">
+<table style="width: 100%;">
+<tbody>
+
+<!-- inner-table-row -->
+<tr style="<% style %>">
+<td style="border:0px;border-bottom:1px dotted black;background-color: #DFE0FF;color:black;width:130px;"><div class="cell-th" style="text-align:right;width:120px;"><p class="cell-th-span"><b><% name %>:</b></p></div></td>
+<td style="border:0px;border-bottom:1px dotted black;width:100%;"><div class="cell-th" style="width:100%;"><p class="cell-td-span"><% value %></p></div></td>
+</tr>
+
+<!-- inner-table-row-simple -->
+<tr style="<% style %>">
+<td colspan="2" style="border:0px;border-bottom:1px dotted black;width:100%;"><div class="cell-th" style="width:100%;"><p class="cell-td-span"><% value %></p></div></td>
+</tr>
+
+<!-- inner-table-foot -->
+</tbody>
+</table>
+</td>
+
+<!-- table-row-foot -->
+</tr>
+
+<!-- table-foot -->
+</tbody>
+</table>
+</div>
+
+<!-- plain -->
+<% tag %>
+
+<!-- html-foot -->
+</div></div>
+</body>
+</html>
