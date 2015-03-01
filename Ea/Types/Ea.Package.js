@@ -49,8 +49,8 @@ Ea.Package._Base = extend(Ea.Types.Namespace, {
 		return this._createDiagram(name, type);
 	},
 	
-	deleteDiagram: function(elemediagramnt) {
-		return this._deleteDiagram(element);
+	deleteDiagram: function(diagram) {
+		return this._deleteDiagram(diagram);
 	},
 	
 	getNamespace: function() {

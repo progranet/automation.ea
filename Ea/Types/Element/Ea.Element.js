@@ -79,7 +79,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 	getRelationships: function(relation, filter) {
 		var relations = new Core.Types.Collection();
 		this._getRelationships().forEach(function(relationship) {
-			if (!relation || (typeof relation == "string" && relation == relationship.getRelation()) || (Core.Lang.isClass(relation) && relation.conformsTo(Ea.Connector._Base) && relationship.getConnector().instanceOf(relation))) {
+			if (!relation || (typeof relation == "string" && relation == relationship.getRelation()) || (typeof relation == "function" && relation.call(relationship)) || (Core.Lang.isClass(relation) && relation.conformsTo(Ea.Connector._Base) && relationship.getConnector().instanceOf(relation))) {
 				var related = relationship.getTo();
 				if (related.match(filter))
 					relations.add(relationship);

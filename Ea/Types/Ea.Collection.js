@@ -66,7 +66,7 @@ Ea.Collection._Base = extend([Ea.Types.Any, Core.Types.AbstractCollection], {
 
 	_delete: function(element) {
 		var index = this._index[element.__id__];
-		if (!index)
+		if (index == null)
 			return false;
 		this._source.api.Delete(index);
 		return true;
