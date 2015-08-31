@@ -248,7 +248,9 @@ Core.Types.AbstractCollection = define({
 			try {
 				selected.add(expression.call(element));
 			}
-			catch (error) {}
+			catch (error) {
+				warn(error);
+			}
 		}
 		return selected;
 	},

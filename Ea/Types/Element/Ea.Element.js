@@ -79,7 +79,7 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 	getRelationships: function(relation, filter) {
 		var relations = new Core.Types.Collection();
 		this._getRelationships().forEach(function(relationship) {
-			if (!relation || (typeof relation == "string" && relation == relationship.getRelation()) || (typeof relation == "function" && relation.call(relationship)) || (Core.Lang.isClass(relation) && relation.conformsTo(Ea.Connector._Base) && relationship.getConnector().instanceOf(relation))) {
+			if (!relation || (typeof relation == "string" && relation == relationship.getRelation()) || (Core.Lang.isClass(relation) && relation.conformsTo(Ea.Connector._Base) && relationship.getConnector().instanceOf(relation)) || (!Core.Lang.isClass(relation) && (typeof relation == "function") && relation.call(relationship))) {
 				var related = relationship.getTo();
 				if (related.match(filter))
 					relations.add(relationship);
@@ -706,7 +706,11 @@ Ea.Element.Classifier = extend(Ea.Element.Type, {
 	methods: {api: "Methods"}
 });
 
-Ea.Element.DataType = extend(Ea.Element.Classifier);
+Ea.Element.DataType = extend(Ea.Element.Classifier, {}, {
+
+	eaType: "DataType"
+	
+});
 
 Ea.Element.Enumeration = extend(Ea.Element.DataType, {
 	
@@ -741,7 +745,11 @@ Ea.Element.Enumeration = extend(Ea.Element.DataType, {
 	literals: {}
 });
 
-Ea.Element.PrimitiveType = extend(Ea.Element.DataType);
+Ea.Element.PrimitiveType = extend(Ea.Element.DataType, {}, {
+
+	eaType: "PrimitiveType"
+	
+});
 
 Ea.Element.Class = extend(Ea.Element.Classifier, {}, {
 
@@ -764,6 +772,18 @@ Ea.Element.AssociationClass = extend(Ea.Element.Class, {}, {},
 
 Ea.Element.Interface = extend(Ea.Element.Classifier, {}, {
 	eaType: "Interface"	
+});
+
+Ea.Element.RequiredInterface = extend(Ea.Element._Base, {}, {
+	eaType: "RequiredInterface"	
+});
+
+Ea.Element.ProvidedInterface = extend(Ea.Element._Base, {}, {
+	eaType: "ProvidedInterface"	
+});
+
+Ea.Element.Component = extend(Ea.Element.Class, {}, {
+	eaType: "Component"	
 });
 
 Ea.Element.Constraint = extend(Ea.Element.PackageableElement, {

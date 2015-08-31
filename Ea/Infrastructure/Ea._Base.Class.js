@@ -336,15 +336,21 @@ Ea._Base.Class.ApiProperty = extend(Ea._Base.Class._Property, {
 	},
 	
 	_add: function(object, params) {
+		
 		var source = object._source;
+		
 		var name = params[0];
-		var type = params[1];
-		if (typeof(type) == "string")
-			type = this.elementType.namespace.findType(type);
 		if (!(this.name in source.value)) {
 			object._class._properties[this.name].get(object);
 		}
 		var collection = source.value[this.name];
+
+		var type = params[1];
+		if (!type)
+			type = this.elementType;
+		else if (typeof(type) == "string")
+			type = this.elementType.namespace.findType(type);
+		
 		var added = collection._create(name, type);
 		added._source._transient = [];
 		added._source._transient.push(object);
@@ -360,6 +366,7 @@ Ea._Base.Class.ApiProperty = extend(Ea._Base.Class._Property, {
 	_remove: function(object, params) {
 		var source = object._source;
 		var element = params[0];
+		this._get(object);
 		
 		if (!this.elementType.isInstance(element))
 			throw new Error("Specified object " + element + " type not conforms to collection element type [" + this.elementType.qualifiedName + "] for property: " + this.toString());

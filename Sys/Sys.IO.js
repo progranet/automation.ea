@@ -195,6 +195,9 @@ Sys.IO.File = extend(Sys.IO._Element, {
 	 * @param {Object} namespace Namespace containing file
 	 */
 	create: function(file, mode, unicode, namespace) {
+		
+		_super.create();
+		
 		if (typeof file == "string") {
 			this._path = Sys.IO.getPath(file, namespace);
 			if (mode != Sys.IO.Mode.WRITE) {
@@ -307,6 +310,9 @@ Sys.IO.Folder = extend(Sys.IO._Element, {
 	 * @param {Object} namespace
 	 */
 	create: function(folder, namespace) {
+		
+		_super.create();
+		
 		if (typeof folder == "string") {
 			this._path = Sys.IO.getPath(folder, namespace);
 			this._element = Sys.IO._fileSystem.GetFolder(this._path);
@@ -326,8 +332,9 @@ Sys.IO.Folder = extend(Sys.IO._Element, {
 		var foldersCollection = new Enumerator(this._element.SubFolders);
 		var folders = new Core.Types.Collection();
 		for (foldersCollection.moveFirst(); !foldersCollection.atEnd(); foldersCollection.moveNext()) {
-			folder = new Sys.IO.Folder(foldersCollection.item());
+			var folder = new Sys.IO.Folder(foldersCollection.item());
 			folders.add(folder);
+			
 		}
 		return folders;
 	},
@@ -341,7 +348,7 @@ Sys.IO.Folder = extend(Sys.IO._Element, {
 		var filesCollection = new Enumerator(this._element.Files);
 		var files = new Core.Types.Collection();
 		for (filesCollection.moveFirst(); !filesCollection.atEnd(); filesCollection.moveNext()) {
-			file = new Sys.IO.File(filesCollection.item());
+			var file = new Sys.IO.File(filesCollection.item());
 			files.add(file);
 		}
 		return files;

@@ -57,8 +57,9 @@ Ea.Collection._Base = extend([Ea.Types.Any, Core.Types.AbstractCollection], {
 	},
 	
 	_create: function(name, type) {
-		type = type || this._elementType;
-		var elementTypeName =  type.determineEaType();
+//		type = type || this._elementType;
+//		var elementTypeName =  type.determineEaType();
+		var elementTypeName = type.eaType || (type.name == "_Base" ? type.namespace.name : type.name);
 		var api = this._source.api.AddNew(name, elementTypeName);
 		var element = this._source.application.createProxy(type, api);
 		return element;

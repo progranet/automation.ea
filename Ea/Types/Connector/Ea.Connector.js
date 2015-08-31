@@ -557,5 +557,18 @@ Ea.Connector.Sequence = extend(Ea.Connector._Base, {}, {},
 	sequenceNo: {api: "SequenceNo"}
 });
 
+Ea.Connector.NoteLink = extend(Ea.Connector._Base, {
+	
+	/**
+	 * Determines relation name for this relation type according to relation direction
+	 * 
+	 * @param {Boolean} client Specifies whether this end is client end
+	 * @type {String}
+	 */
+	getRelation: function(client) {
+		return client ? "links" : "links";
+	}
+});
+
 include("Ea.ConnectorTag@Ea.Types.Connector");
 include("Ea.ConnectorConstraint@Ea.Types.Connector");
