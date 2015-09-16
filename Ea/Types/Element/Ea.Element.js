@@ -202,15 +202,6 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 		}
 		
 		return typeName;
-	},
-	
-	/**
-	 * Determines EA API Element type name on creating API object
-	 * 
-	 * @type {String}
-	 */
-	determineEaType: function() {
-		return this.eaType;
 	}
 },
 {

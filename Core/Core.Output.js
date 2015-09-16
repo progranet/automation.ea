@@ -24,9 +24,25 @@ Core.Output = {
 	 * 
 	 * @param {String} scriptlet Template scriptlet 
 	 * @param {Object} params Array or map of objects to be evaluated
+	 * @param {Object} scriptlets map of scriptlets to include
 	 * @type {String}
 	 */
-	exec: function(scriptlet, params) {
+	exec: function(scriptlet, params, scriptlets) {
+		
+		var evalParam = function(string, inContext, outContext, sign) {
+			if (!string)
+				return null;
+			var ep = string.indexOf(sign || "=");
+			if (ep == -1)
+				throw new Error("Illegal parameter substitution: " + string);
+			var name = string.substr(0, ep).trim();
+			var expression = string.substr(ep + 1).trim();
+			eval("var fn = function(" + Core.Utils.getNames(inContext).join(", ") + ") {return " + expression + ";}");
+			var value = fn.apply(inContext.$this, Core.Utils.getValues(inContext));
+			outContext[name] = value;
+			return name;
+		};		
+		
 		scriptlet = scriptlet + "";
 		params = params || {};
 		if (params instanceof Array) {
@@ -36,7 +52,54 @@ Core.Output = {
 			});
 		}
 		else if (typeof(params) == "object") {
-			return scriptlet.replace(/<%\s*([^%]+)\s*%>/g, function(whole, body) {
+			return scriptlet.replace(/<%([\!\^\*]?)\s*([^%]+)\s*%>/g, function(whole, dir, body) {
+				if (dir == "!") {
+					evalParam(body, params, params);
+					return "";
+				}
+				else if (dir == "^") {
+					return body.replace(/^\s*([^\(]+)\((.*)\)\s*$/g, function(whole, name, paramValues) {
+						var scriptlet = scriptlets[name.trim()];
+						if (!scriptlet)
+							throw new Error("Undefined scriptlet, name: " + name);
+						var includeContext = {};
+						paramValues = paramValues.split(",");
+						for (var p = 0; p < paramValues.length; p++) {
+							evalParam(paramValues[p], params, includeContext);
+						}
+						if (typeof(scriptlet.generate == "function"))
+							return scriptlet.generate(includeContext);
+						return Core.Output.exec(scriptlet, includeContext, scriptlets);
+					});
+				}
+				else if (dir == "*") {
+					return body.replace(/^\s*([^\(]+)\((.*)\)\s*$/g, function(whole, name, paramValues) {
+						var scriptlet = scriptlets[name.trim()];
+						if (!scriptlet)
+							throw new Error("Undefined scriptlet, name: " + name);
+						var includeContext = {};
+						paramValues = paramValues.split(",");
+						if (paramValues.length < 1)
+							throw new Error("Collection undefined for scriptlet name: " + name);
+						for (var p = 1; p < paramValues.length; p++) {
+							evalParam(paramValues[p], params, includeContext);
+						}
+						var collection = {};
+						var elementParamName = evalParam(paramValues[0], params, collection, "@");
+						collection = collection[elementParamName];
+						var result = [];
+						collection.forEach(null, function(element) {
+							includeContext[elementParamName] = element;
+							var elementResult;
+							if (typeof(scriptlet.generate == "function"))
+								elementResult = scriptlet.generate(includeContext);
+							else
+								elementResult = Core.Output.exec(scriptlet, includeContext, scriptlets);
+							result.push(elementResult);
+						});
+						return result.join("");
+					});
+				}
 				eval("var fn = function(" + Core.Utils.getNames(params).join(", ") + ") {return " + body + ";}");
 				return fn.apply(params.$this, Core.Utils.getValues(params));
 			});

@@ -53,20 +53,6 @@ Ea.Types.Any = define({
 		this._source.api.Update();
 		this._source.application.cache(this);
 	}
-	
-}, 
-{
-	/**
-	 * Determines EA API type name on creating API object.
-	 * In some cases EA API object types require inner type name for creation of new objects (e.g. Element, Diagram, Connector).
-	 * Proxy classes wrapping this specific types of EA API objects should be able of "translate" proxy subclass to EA inner type name (e.g. Ea.Element.Class conforms to API Element.Type == "Class").
-	 * 
-	 * @type {String}
-	 */
-	determineEaType: function() {
-		return this.namespace.name;
-	}
-	
 });
 
 Ea.Types.NamedElement = extend(Ea.Types.Any, {
@@ -107,7 +93,15 @@ Ea.Types.NamedElement = extend(Ea.Types.Any, {
 	 * @readOnly
 	 * @derived
 	 */
-	qualifiedName: {}
+	qualifiedName: {},
+	
+	/**
+	 * Element guid in XML form
+	 * 
+	 * @readOnly
+	 * @derived
+	 */
+	xmlGuid: {}	
 });
 
 Ea.Types.Namespace = extend(Ea.Types.NamedElement);

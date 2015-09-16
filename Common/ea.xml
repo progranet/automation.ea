@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="windows-1250"?>
+<ReportViewData UID="ModelSearch" xmlns:ea="https://github.com/progranet/automation.ea">
+ 
+ <Fields>
+  <Field name="CLASSGUID"/>
+  <Field name="CLASSTYPE"/>
+  <ea:for in="columns" key="key">
+   <Field name="{{ key }}"/>
+  </ea:for>
+ </Fields>
+ 
+ <Rows>
+
+  <ea:template name="row">
+   <Row>
+    <Field name="CLASSGUID" value="{{ element.getGuid() }}"/>
+    <Field name="CLASSTYPE" value="{{ element._getType() }}"/>
+    <ea:for var="column" in="columns" key="key">
+     <Field name="{{ key }}" value="{{ (column.fn.call(selected) || '') + '' }}"/>
+    </ea:for>
+   </Row>
+  </ea:template>
+
+  <ea:extension name="rows">
+  </ea:extension>
+ 
+ </Rows>
+ 
+</ReportViewData>

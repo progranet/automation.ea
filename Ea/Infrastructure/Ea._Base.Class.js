@@ -346,10 +346,6 @@ Ea._Base.Class.ApiProperty = extend(Ea._Base.Class._Property, {
 		var collection = source.value[this.name];
 
 		var type = params[1];
-		if (!type)
-			type = this.elementType;
-		else if (typeof(type) == "string")
-			type = this.elementType.namespace.findType(type);
 		
 		var added = collection._create(name, type);
 		added._source._transient = [];

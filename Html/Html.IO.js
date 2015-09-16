@@ -20,15 +20,30 @@ include("Sys.IO@Sys");
 /**
  * @namespace
  */
-Html.IO = {};
+Html.IO = {
+	ProcessContentMode: {
+		RAW: 0,
+		CONTENT: 1,
+		ATTRIBUTE: 2,
+		HTML: 3,
+		XML: 4
+	}
+};
 
 Html.IO.File = extend(Sys.IO.File, {
+	
+	processing: null,
 	
 	/**
 	 * @param {String} path
 	 */
 	create: function(path) {
 		_super.create(path, Sys.IO.Mode.WRITE);
+		this.processing = {
+			processContentAs: Html.IO.ProcessContentMode.XML,
+			trimContent: false,
+			filterContent: null
+		};
 	},
 	
 	/**
@@ -41,7 +56,14 @@ Html.IO.File = extend(Sys.IO.File, {
 		if (typeof template == "string") {
 			template = Html.templates[template];
 		}
-		var html = template.generate(params);
+		var html = template.generate(params, this);
+		this.writeRaw(html);
+	},
+	
+	/**
+	 * @param {String} html HTML to write
+	 */
+	writeRaw: function(html) {
 		_super.write(html);
 	}
 });

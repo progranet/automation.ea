@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="windows-1250"?>
+<?mso-application progid="Excel.Sheet"?>
+<?ea process-content-as="html" trim-content="true"?>
+<?ea filter-content="this.replace(/\r\n/g, '&#10;')"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ea="https://github.com/progranet/automation.ea" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="s01">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+  </Style>
+  <Style ss:ID="s02">
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#FFFFFF" ss:Bold="1"/>
+   <Interior ss:Color="#1F497D" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s03">
+   <Font ss:FontName="Courier New" ss:Size="10"/>
+  </Style>
+ </Styles>
+
+ <Worksheet ss:Name="Results">
+  <Table ss:DefaultRowHeight="15">
+  
+   <Column ss:Index="1" ss:AutoFitWidth="0" ss:Width="100"/>
+   <Column ss:Index="2" ss:AutoFitWidth="0" ss:Width="100"/>
+   <ea:for in="columns" index="index">
+    <Column ss:Index="{{ index + 3 }}" ss:AutoFitWidth="0" ss:Width="200"/>
+   </ea:for>
+
+   <Row ss:StyleID="s02">
+    <Cell><Data ss:Type="String">CLASSGUID</Data></Cell>
+    <Cell><Data ss:Type="String">CLASSTYPE</Data></Cell>
+    <ea:for in="columns" key="key">
+     <Cell><Data ss:Type="String">{{ key }}</Data></Cell>
+    </ea:for>
+   </Row>   
+   
+   <ea:template name="row">
+    <Row ss:Height="45">
+     <Cell ss:StyleID="s03"><ss:Data ss:Type="String" xmlns="http://www.w3.org/TR/REC-html40">{{ element.getGuid() }}</ss:Data></Cell>
+     <Cell ss:StyleID="s03"><ss:Data ss:Type="String" xmlns="http://www.w3.org/TR/REC-html40">{{ element._getType() }}</ss:Data></Cell>
+     <ea:for var="column" in="columns">
+      <Cell ss:StyleID="s01"><ss:Data ss:Type="{{ typeof(value) == 'number' ? 'Number' : 'String' }}" xmlns="http://www.w3.org/TR/REC-html40">
+      {{ ((column.fn.call(selected) || '') + '') }}
+      </ss:Data></Cell>
+     </ea:for>
+    </Row>
+   </ea:template>
+
+   <ea:extension name="rows">
+   </ea:extension>
+
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Unsynced/>
+   <Selected/>
+   <FreezePanes/>
+   <FrozenNoSplit/>
+   <SplitHorizontal>1</SplitHorizontal>
+   <TopRowBottomPane>1</TopRowBottomPane>
+   <ActivePane>2</ActivePane>
+  </WorksheetOptions>
+  <AutoFilter x:Range="R1C1:R1C{{ columnsCount + 2 }}" xmlns="urn:schemas-microsoft-com:office:excel">
+  </AutoFilter>
+ </Worksheet>
+
+</Workbook>

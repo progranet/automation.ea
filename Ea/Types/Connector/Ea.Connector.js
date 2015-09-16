@@ -129,15 +129,6 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 	}
 },
 {
-	/**
-	 * Determines EA API Connector type name on creating API object
-	 * 
-	 * @type {String}
-	 */
-	determineEaType: function() {
-		return this.name;
-	},
-
 	_deriveTypeName: function(source) {
 		var name = this.getProperty("_type").getApiValue(source.api).replace(/[-\s]/g,"");
 		if (this.getProperty("_metaType").getApiValue(source.api) == "PackageImport")
