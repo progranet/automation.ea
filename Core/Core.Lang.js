@@ -24,8 +24,6 @@ _meta = {
 
 Core.Lang = {
 		
-	_propertyListener: [],
-		
 	/**
 	 * Tests if specified type is a class
 	 * 
@@ -81,28 +79,9 @@ Core.Lang = {
 		}
 		
 		features = features || {};
-		if (!features.create) {
-			var args = Core.parse(superClasses[0].prototype.create).joinedArguments;
-			eval("features.create = function(" + args + ") {_super.create(" + args + ");}");
-		}
 		
 		for (var s = 0; s < superClasses.length; s++) {
 			var superClass = superClasses[s];
-			
-			if (s == 0) {
-				for (var featureName in features) {
-					var feature = features[featureName];
-
-					if (Core.isMethod(feature, featureName)) {
-						var fn = feature.toString();
-						fn = fn.replace(/_super\.([a-zA-Z0-9_$]+)\((\)?)/g, function($0, $1, $2) {
-							var string = "this[\"" + superClass.qualifiedName + "." + $1 + "\"].call(this" + ($2 ? ")" : ", ");
-							return string;
-						});
-						fn = eval("features." + featureName + " = " + fn);
-					}
-				}
-			}
 			
 			var _fn = function(featureName) {
 				var feature = superClass.prototype[featureName];
@@ -128,21 +107,8 @@ Core.Lang = {
 			if (!Core.isNative(superClass.prototype.valueOf))
 				_fn("valueOf");
 		}
-		
+
 		return (new _meta._class(superClasses, namespace, name, features, staticFeatures, properties))._class;
-	},
-	
-	/**
-	 * Registers listener function that checks if provided property definition satisfies conditions for specified property class  
-	 * 
-	 * @param {Function} listener
-	 * @param {Core.Lang.Class} propertyClass
-	 */
-	registerPropertyListener: function(listener, propertyClass) {
-		this._propertyListener.push({
-			listener: listener, 
-			propertyClass: propertyClass
-		});
 	}
 };
 
@@ -165,7 +131,7 @@ Core.Lang.Class = define({
 		this.namespace = eval(namespace);
 		this._super = superClasses;
 		this._subClass = [];
-		this._properties = {};
+		this._properties = properties || {};
 		
 		for (var featureName in staticFeatures) {
 			var feature = staticFeatures[featureName];
@@ -186,19 +152,8 @@ Core.Lang.Class = define({
 		for (var s = 0; s < superClasses.length; s++) {
 			var superClass = superClasses[s];
 			for (var propertyName in superClass._properties) {
+				if (!(propertyName in this._properties))
 				this._properties[propertyName] = superClass._properties[propertyName];
-			}
-		}
-		
-		for (var propertyName in properties) {
-			var property = properties[propertyName];
-			property.name = propertyName;
-			for (var l = 0; l < Core.Lang._propertyListener.length; l++) {
-				var listener = Core.Lang._propertyListener[l];
-				if (listener.listener(this, property)) {
-					this._properties[propertyName] = new listener.propertyClass(this, features, property);
-					break;
-				}
 			}
 		}
 		

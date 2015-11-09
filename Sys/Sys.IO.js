@@ -179,8 +179,55 @@ Sys.IO._Element = define({
 		return new Date(this._element.DateLastAccessed);
 	}
 });
+
+Sys.IO._Buffer = define({
 	
-Sys.IO.File = extend(Sys.IO._Element, {
+	create: function() {
+		_super.create();
+	},
+	
+	write: function(object) {
+		throw new Error("Not implemented");
+	},
+	
+	writeLine: function(text) {
+		return this.writeString(text + "\r\n");
+	},
+	
+	writeString: function(text) {
+		return this.write(text);
+	},
+	
+	read: function() {
+		throw new Error("Not implemented");
+	},
+	
+	readAll: function() {
+		throw new Error("Not implemented");
+	}
+});
+
+Sys.IO.StringBuffer = extend(Sys.IO._Buffer, {
+	
+	_buffer: null,
+	_index: null,
+	
+	create: function() {
+		this._buffer = [];
+		this._index = 0;
+	},
+	
+	write: function(text) {
+		this._buffer[this._index] = text;
+		this._index++;
+	},
+	
+	readAll: function() {
+		return this._buffer.join("");
+	}
+});
+
+Sys.IO.File = extend([Sys.IO._Element, Sys.IO._Buffer], {
 
 	_stream: null,
 	_state: null,

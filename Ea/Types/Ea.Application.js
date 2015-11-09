@@ -30,7 +30,7 @@ Ea.Application = {
 	createApplication: function(params) {
 		var application = new Ea.Application._Base(params);
 		// initializes caches with all stereotypes available in project
-		application.getRepository().getProjectStereotypes();
+		//application.getRepository().getProjectStereotypes();
 		return application;
 	}
 };

@@ -99,8 +99,8 @@ Ea = {
 		Core.Log.registerTarget("_treeLogger", treeTarget);
 		Core.Log.registerTarget("_quietLogger", blindTarget);
 
-		Core.Log.registerTarget("__exceptionLogger", systemTarget);
-		Core.Log.registerTarget("__stackLogger", systemTarget);
+		Core.Log.registerTarget("__el", systemTarget);
+		Core.Log.registerTarget("__sl", systemTarget);
 	},
 	
 	_guid: /^\{[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}\}$/i,

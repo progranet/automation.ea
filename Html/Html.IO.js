@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 300 D&C
+   Copyright 2011-2015 300 D&C
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -30,15 +30,12 @@ Html.IO = {
 	}
 };
 
-Html.IO.File = extend(Sys.IO.File, {
+Html.IO._Buffer = extend(Sys.IO._Buffer, {
 	
 	processing: null,
 	
-	/**
-	 * @param {String} path
-	 */
-	create: function(path) {
-		_super.create(path, Sys.IO.Mode.WRITE);
+	create:  function() {
+		_super.create();
 		this.processing = {
 			processContentAs: Html.IO.ProcessContentMode.XML,
 			trimContent: false,
@@ -57,14 +54,51 @@ Html.IO.File = extend(Sys.IO.File, {
 			template = Html.templates[template];
 		}
 		var html = template.generate(params, this);
-		this.writeRaw(html);
-	},
-	
-	/**
-	 * @param {String} html HTML to write
-	 */
-	writeRaw: function(html) {
-		_super.write(html);
+		this._write(html);
 	}
 });
 
+Html.IO.StringBuffer = extend([Sys.IO.StringBuffer, Html.IO._Buffer], {
+	
+	create: function() {
+		this["Html.IO._Buffer.create"].call(this);
+		_super.create();
+	},
+	
+	write: function(template, params) {
+		this["Html.IO._Buffer.write"].call(this, template, params);
+	},
+	
+	_write: function(text) {
+		_super.write(text);
+	},
+	
+	writeString: function(text) {
+		this._write(text);
+	}
+});
+
+Html.IO.File = extend([Sys.IO.File, Html.IO._Buffer], {
+	
+	create: function(path) {
+		this["Html.IO._Buffer.create"].call(this);
+		_super.create(path, Sys.IO.Mode.WRITE);
+	},
+	
+	write: function(template, params) {
+//		if (!template)
+//			return;
+//		info(template.name);
+//		var html = template.generate(params, this);
+//		this._write(html);
+		this["Html.IO._Buffer.write"].call(this, template, params);
+	},
+	
+	_write: function(text) {
+		_super.write(text);
+	},
+	
+	writeString: function(text) {
+		this._write(text);
+	}
+});

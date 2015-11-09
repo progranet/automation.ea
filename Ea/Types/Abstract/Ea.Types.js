@@ -30,15 +30,6 @@ Ea.Types.Any = define({
 	},
 	
 	/**
-	 * Returns GUID of EA object in XML format
-	 * 
-	 * @type {String}
-	 */
-	getXmlGuid: function() {
-		return this._source.application.getProject().guidToXml(this.getGuid());
-	},
-	
-	/**
 	 * @private
 	 * @type {String}
 	 */
@@ -69,6 +60,17 @@ Ea.Types.NamedElement = extend(Ea.Types.Any, {
 		var namespace = this.getNamespace();
 		qualifiedName = (namespace ? namespace.getQualifiedName() + "." : "") + this.getName();
 		return qualifiedName;
+	},
+	
+	/**
+	 * Returns GUID of EA object in XML format
+	 * 
+	 * @type {String}
+	 */
+	getXmlGuid: function() {
+		if (this.getGuid)
+			return this._source.application.getProject().guidToXml(this.getGuid());
+		return null;
 	}
 }, 
 {},

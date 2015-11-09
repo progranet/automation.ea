@@ -104,7 +104,7 @@ Html = {
 			throw new Error("Error parsing XHTML file " + file.getName() + ":" + dom.parseError.reason);
 		
 		var template = new Html.XTemplate("", dom, null, extensions);
-		
+		file.close();
 		return template;
 	}
 };
@@ -211,6 +211,10 @@ Html.XTemplate = extend(Core.Types.Named, {
 		return attrs;
 	},
 	
+	/**
+	 * @param {String} name
+	 * @type {Function}
+	 */
 	_findExtension: function(name) {
 		var extension = this._extensions[name];
 		if (!extension) {
@@ -224,6 +228,7 @@ Html.XTemplate = extend(Core.Types.Named, {
 	
 	/**
 	 * @param {Sting} name Template name
+	 * @type {Html.XTemplate}
 	 */
 	findTemplate: function(name) {
 		var template = this.templates[name];
@@ -287,10 +292,11 @@ Html.XTemplate = extend(Core.Types.Named, {
 			if (isContect && string) {
 				var filter = output.processing.filterContent;
 				if (filter) {
-					string = filter.call(string);
+					for (var f = 0; f < filter.length; f++)
+						string = filter[f].call(string);
 				}
 			}
-			output.writeRaw(string);
+			output.writeString(string);
 		};
 		
 		var template = this;
@@ -622,7 +628,15 @@ Html.XTemplate = extend(Core.Types.Named, {
 							output.processing.trimContent = (value.toLowerCase() == "true");
 							break;
 						case "filter-content":
-							output.processing.filterContent = value ? new Function("return " + value + ";") : null;
+							if (value) {
+								value = new Function("return " + value + ";");
+								if (!output.processing.filterContent)
+									output.processing.filterContent = [];
+								output.processing.filterContent.push(value);
+							}
+							else {
+								output.processing.filterContent = null;
+							}
 							break;
 						default:
 							throw new Error("Unsupported processing instruction: " + name);
@@ -639,6 +653,9 @@ Html.XTemplate = extend(Core.Types.Named, {
 				generate(node.xml, Html.IO.ProcessContentMode.RAW);
 				break;
 			case "comment":
+				generate(processText(node.xml, context), Html.IO.ProcessContentMode.RAW);
+				break;
+			case "cdatasection":
 				generate(processText(node.xml, context), Html.IO.ProcessContentMode.RAW);
 				break;
 			case "text":

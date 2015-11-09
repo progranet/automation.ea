@@ -14,21 +14,7 @@
    limitations under the License.
 */
 
-Ea._Base.Class = {
-		
-	initialize: function() {
-		Core.Lang.registerPropertyListener(this.apiPropertyListener, Ea._Base.Class.ApiProperty);
-		Core.Lang.registerPropertyListener(this.derivedPropertyListener, Ea._Base.Class.DerivedProperty);
-	},
-	
-	apiPropertyListener: function(_class, params) {
-		return (_class.isSubclassOf(Ea.Types.Any) && !params.derived);
-	},
-	
-	derivedPropertyListener: function(_class, params) {
-		return (_class.isSubclassOf(Ea.Types.Any) && params.derived);
-	}
-};
+Ea._Base.Class = {};
 
 Ea._Base.Class.Source = define({
 	
@@ -57,6 +43,7 @@ Ea._Base.Class._Property = define({
 	_isDataType: false,
 	
 	owner: null,
+	className: null,
 	qualifiedName: null,
 	typeName: null,
 
@@ -74,45 +61,45 @@ Ea._Base.Class._Property = define({
 		return type;
 	},
 	
-	create: function(_class, features, params) {
+	create: function(className, params) {
+		
 		_super.create();
 
 		Core.merge(this, params);
 
-		this.owner = _class;
-		this.qualifiedName = this.owner.qualifiedName + "." + this.name;
+		this.className = className;
+		this.qualifiedName = this.className + "." + this.name;
 		this._isCollection = this.elementType != null;
 		this.typeName = (this.type || "String") + (this._isCollection ? "<" + this.elementType + ">" : "");
 		
 		var accessorName = this.name.replace(/^_+/g, "");
 		accessorName = accessorName.substring(0,1).toUpperCase() + accessorName.substring(1);
 		
-		this._createAccessor("get", (this.private ? "_" : "") + (this.type == "Boolean" ? "is" : "get") + accessorName, features);
+		this._createAccessor("get", (this.private ? "_" : "") + (this.type == "Boolean" ? "is" : "get") + accessorName);
 		
 		if (!this.readOnly) {
 			if (this._isCollection) {
 				var mutatorName = this.single || this.name.replace(/^_+/g, "").replace(/s$/, "");
 				mutatorName = mutatorName.substring(0,1).toUpperCase() + mutatorName.substring(1);
-				this._createAccessor("add", (this.private ? "_" : "") + "create" + mutatorName, features);
-				this._createAccessor("remove", (this.private ? "_" : "") + "delete" + mutatorName, features);
+				this._createAccessor("add", (this.private ? "_" : "") + "create" + mutatorName);
+				this._createAccessor("remove", (this.private ? "_" : "") + "delete" + mutatorName);
 			}
 			else {
-				this._createAccessor("set", (this.private ? "_" : "") + "set" + accessorName, features);
+				this._createAccessor("set", (this.private ? "_" : "") + "set" + accessorName);
 			}
 		}
 	},
 	
-	_createAccessor: function(kind, name, features) {
-		this._prepareAccessor(kind, name, features);
-		features[name] = new Function("return this._class._properties." + this.name + "." + kind + "(this, arguments);");
-		//Core.enrichMethod(features, name, this.qualifiedName, false);
+	_createAccessor: function(kind, name) {
+		this._prepareAccessor(kind, name);
 	},
 	
 	prepare: function() {
 		
 		if (this._prepared)
 			throw new Error("Property already prepared: " + this.toString());
-		
+
+		this.owner = eval(this.className);
 		this.type = this._typeEval(this.type || "String");
 		
 		if (this._isCollection && !Core.Types.AbstractCollection.isAssignableFrom(this.type))
@@ -201,7 +188,7 @@ Ea._Base.Class.ApiProperty = extend(Ea._Base.Class._Property, {
 		}
 	},
 	
-	_prepareAccessor: function(kind, name, features) {
+	_prepareAccessor: function(kind, name) {
 
 	},
 	
@@ -387,12 +374,7 @@ Ea._Base.Class.DerivedProperty = extend(Ea._Base.Class._Property, {
 		_super.create(_class, features, params);
 	},
 	
-	_prepareAccessor: function(kind, name, features) {
-		var accessor = features[name];
-		if (!accessor)
-			throw new Error("Accessor not defined for derived property: " + this.toString());
-		
-		features[name + "$inner"] = accessor;
+	_prepareAccessor: function(kind, name) {
 		this._accessors[kind] = name + "$inner";
 	},
 

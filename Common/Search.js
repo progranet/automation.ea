@@ -110,7 +110,7 @@ Search = {
 			if (Search.params.selectFn) {
 				var selection = this.params.selectFn.call(element);
 				if (selection) {
-					if (Core.Types.Collection.isInstance(selection)) {
+					if (Core.Types.AbstractCollection.isInstance(selection)) {
 						selection.forEach(function(selected) {
 							Search.processRow(element, selected);
 						});

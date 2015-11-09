@@ -14,7 +14,7 @@
   <ea:template name="row">
    <Row>
     <Field name="CLASSGUID" value="{{ element.getGuid() }}"/>
-    <Field name="CLASSTYPE" value="{{ element._getType() }}"/>
+    <Field name="CLASSTYPE" value="{{ element._class.eaType || element._getType() }}"/>
     <ea:for var="column" in="columns" key="key">
      <Field name="{{ key }}" value="{{ (column.fn.call(selected) || '') + '' }}"/>
     </ea:for>

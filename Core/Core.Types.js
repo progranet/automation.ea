@@ -14,11 +14,6 @@
    limitations under the License.
 */
 
-var callback = function(source) {
-	return source.replace(/\.\s*forEach\s*\(/g, ".forEach(this, ");
-};
-Core.registerMethodEnrichment(callback);
-
 Core.Types = {
 
 	_id: 0,
@@ -106,7 +101,7 @@ Core.Types.Object = define({
 	}
 });
 
-Core.Types.Named = define({
+Core.Types.Named = extend(Core.Types.Object, {
 	
 	_name: null,
 	
@@ -137,7 +132,7 @@ Core.Types.Named = define({
 	}
 });
 
-Core.Types.AbstractCollection = define({
+Core.Types.AbstractCollection = extend(Core.Types.Object, {
 	
 	_size: 0,
 	_table: null,
@@ -158,21 +153,29 @@ Core.Types.AbstractCollection = define({
 	 *  @type {Array}
 	 */
 	toArray: function() {
-		var array = [];
-		array.push(this._table);
-		return array;
+		//var array = [];
+		//array.push(this._table);
+		return [].concat(this._table);
 	},
 	
 	/**
 	 * Finds specified element in this collection and returns its index or -1 if element was not found.
 	 * 
-	 * @param {Core.Types.Object} element
+	 * @param {Any} element
 	 * @type {Number}
 	 */
 	_find: function(element) {
+		var isNative = !Core.Types.Object.isInstance(element);
 		for (var i = 0; i < this._size; i++) {
-			if (this._table[i].equals(element))
-				return i;
+			var e = this._table[i];
+			if (Core.Types.Object.isInstance(e)) {
+				if (!isNative && e.equals(element))
+					return i;
+			}
+			else {
+				if (isNative && e === element)
+					return i;
+			}
 		}
 		return -1;
 	},
@@ -244,13 +247,18 @@ Core.Types.AbstractCollection = define({
 		if (typeof expression == "string")
 			expression = new Function("return " + expression);
 		for (var i = 0; i < this._size; i++) {
-			var element = this._table[i];
+			var element = this._table[i],
+				collected;
 			try {
-				selected.add(expression.call(element));
+				collected = expression.call(element);
 			}
 			catch (error) {
-				warn(error);
+				warn(error.message);
 			}
+			if (collected)
+				selected.add(collected);
+			else
+				warn("Expression evaluated to null for: " + element);
 		}
 		return selected;
 	},
@@ -311,12 +319,12 @@ Core.Types.Collection = extend(Core.Types.AbstractCollection, {
 	/**
 	 * Adds specified element to this collection
 	 * 
-	 * @param {Core.Types.Object} element
+	 * @param {Any} element
 	 * @type {Boolean}
 	 */
 	add: function(element) {
-		if (!element || !Core.Types.Object.isInstance(element))
-			throw new Error("No element specified or unexpected element type");
+		if (!element)
+			throw new Error("No element specified");
 		if (!this._add(element))
 			return false;
 		if (this.contains(element)) {
@@ -332,12 +340,12 @@ Core.Types.Collection = extend(Core.Types.AbstractCollection, {
 	/**
 	 * Removes specified element from this collection
 	 * 
-	 * @param {Core.Types.Object} element
+	 * @param {Any} element
 	 * @type {Boolean}
 	 */
 	remove: function(element) {
-		if (!element || !Core.Types.Object.isInstance(element))
-			throw new Error("No element specified or unexpected element type");
+		if (!element)
+			throw new Error("No element specified");
 		if (!this._remove(element))
 			return false;
 		var index = this._find(element);
@@ -502,7 +510,7 @@ Core.Types.Map = extend([Core.Types.Collection, Core.Types.AbstractMap], {
 	
 });
 
-Core.Types.Filter = define({
+Core.Types.Filter = extend(Core.Types.Object, {
 	
 	_filter: null,
 

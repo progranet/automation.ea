@@ -50,7 +50,7 @@ Comparable.Object = define({
 	$type: null,
 	$cur: null,
 	$old: null,
-	$and: null,
+	$any: null,
 	$guid: null,
 	$xmlGuid: null,
 	$isAdded: false,
@@ -64,9 +64,13 @@ Comparable.Object = define({
 		
 		_super.create();
 		
-		this.$type = type;
 		this.$cur = cur;
 		this.$old = old;
+		if (cur && cur._class.isSubclassOf(type))
+			type = cur._class;
+		if (old && type.isSubclassOf(old._class))
+			type = old._class;
+		this.$type = type;
 		curApp = curApp || cur._source.application;
 		if (!curApp)
 			throw new Error("Current EA application not reacheable");
@@ -76,13 +80,15 @@ Comparable.Object = define({
 			throw new Error("Old EA application not reacheable");
 		this.$oldApp = oldApp;
 		this.$any = cur || old;
-		this.$guid = this.$any.getGuid();
-		this.$xmlGuid = this.$any.getXmlGuid();
+		if (this.$any.getGuid)
+			this.$guid = this.$any.getGuid();
+		if (this.$any.getXmlGuid)
+			this.$xmlGuid = this.$any.getXmlGuid();
 		this.$isAdded = cur && !old;
 		this.$isRemoved = !cur && old;
 		this.$isMoved = this.$isRemoved && curApp.getRepository().getByGuid(type, this.$guid);
 		this.$_cache = {};
-		
+
 		type.getProperties().forEach(function(property) {
 			var getterName = property.name.replace(/^_+/g, "");
 			getterName = (property.private ? "_" : "") + (property.type == Boolean ? "is" : "get") + getterName.substring(0,1).toUpperCase() + getterName.substring(1);

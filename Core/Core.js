@@ -27,7 +27,8 @@ Core = {
 	 * @type {Boolean}
 	 */
 	isMethod: function(property, propertyName) {
-		return typeof property == "function" && !/^[A-Z]/.test(propertyName.replace(/^_+/, "")) && !this.isNative(property);
+		return typeof property == "function" && propertyName != "_class" && !/^[A-Z]/.test(propertyName.replace(/^_+/, "")) && !this.isNative(property);
+		//return typeof property == "function";
 	},
 	
 	_fnPattern: new RegExp("^\\s*function\\s*([\\w$]*)\\s*\\(([\\w$,\\s]*)\\)\\s*\\{\\s*([\\w\\W]*)\\s*\\}\\s*$"),
@@ -93,17 +94,10 @@ Core = {
 	enrichMethod: function(namespace, methodName, qualifiedName, _static) {
 		var method = namespace[methodName];
 		if (!method._enriched) {
-			var source = method.toString();
-			for (var ci = 0; ci < this._callbacksMethod.length; ci++) {
-				var callback = this._callbacksMethod[ci];
-				source = callback(source, methodName);
-			}
-			eval("namespace[methodName] = " + source);
 			namespace[methodName].qualifiedName = qualifiedName;
 			namespace[methodName]._static = _static;
 			namespace[methodName]._enriched = true;
 		}
-		return namespace[methodName];
 	},
 	
 	/**

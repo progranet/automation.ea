@@ -1,0 +1,10 @@
+<ea:content xmlns:ea="https://github.com/progranet/automation.ea">
+  <ea:for in="columns" key="key">"{{ key }}";</ea:for>
+  <ea:raw content="'~\r\n'"/>
+  <ea:template name="row">
+    <ea:for var="column" in="columns" key="key">"{{ (column.fn.call(selected) || '').replace(/"/g, "'") + '' }}";</ea:for>
+    <ea:raw content="'~\r\n'"/>
+  </ea:template>
+  <ea:extension name="rows">
+  </ea:extension>
+</ea:content>

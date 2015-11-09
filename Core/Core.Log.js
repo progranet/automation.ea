@@ -29,8 +29,8 @@ Core.Log = {
 			_treeLogger: ["*"],
 			_quietLogger: ["*"],
 
-			__exceptionLogger: ["*"],
-			__stackLogger: ["*"]
+			__el: ["*"],
+			__sl: ["*"]
 		},
 		output: {
 			format: {
@@ -48,8 +48,8 @@ Core.Log = {
 				}
 			},
 			level: {
-				__exceptionLogger: "exception",
-				__stackLogger: "stack"
+				__el: "exception",
+				__sl: "stack"
 			}
 		}
 	},
@@ -60,26 +60,6 @@ Core.Log = {
 	 * Initializes namespace
 	 */
 	initialize: function() {
-
-		var callbackStacktrace = function(source, methodName) {
-			var parsed = Core.parse(source);
-			source = "function " + parsed.name + "(" + parsed.joinedArguments + ") " +
-			"{\n\
-				try {"
-					+ parsed.body + "\n\
-				}\n\
-				catch(e) {\n\
-					if (!e.throwed) {\n\
-						__exceptionLogger(\"$\", [e]);\n\
-						e.throwed = true;\n\
-					}\n\
-					__stackLogger(\"\");\n\
-					throw e;\n\
-				}\n\
-			}\n";
-			return source;
-		};
-		Core.registerMethodEnrichment(callbackStacktrace);
 
 		for (var level in this.params.level) {
 			var mask = this.params.level[level];
@@ -107,18 +87,22 @@ Core.Log = {
 	_log: function(level, context, propertyName, message, params) {
 		if (typeof(level) == "string")
 			level = this._logs[level];
-		var fn = context[propertyName];
-		if (!fn)
-			return;
-		var qualifiedName = fn.qualifiedName;
-		if (!this._macth(level, qualifiedName))
-			return;
 
-		var contextName = fn._static === false ? context._class.qualifiedName : context.qualifiedName;
-		var sourceFn = contextName + "." + propertyName;
-		var source = sourceFn + (sourceFn == qualifiedName ? "" : " (" + qualifiedName.replace(/\.[^\.]+$/, "") + ")");
-		var debugInfo = "" + (fn._static === false ? "" : "static ") + source;
-		
+		var fn = propertyName ? context[propertyName] : null;
+		var debugInfo;
+		if (fn) {
+			var qualifiedName = fn.qualifiedName;
+			var contextName = fn._static === false ? context._class.qualifiedName : context.qualifiedName;
+			var sourceFn = contextName + "." + propertyName;
+			var source = sourceFn + (sourceFn == qualifiedName ? "" : " (" + qualifiedName.replace(/\.[^\.]+$/, "") + ")");
+			debugInfo = "" + (fn._static === false ? "" : "[static] ") + source;
+		}
+		else {
+			debugInfo = propertyName ? (propertyName.indexOf("[global]") == -1 ? "[private] " : "") + propertyName : "[anonymous]";
+		}
+//		if (!this._macth(level, qualifiedName))
+//			return;
+
 		for (var ti = 0; ti < level.targets.length; ti++) {
 			var target = level.targets[ti];
 			message = level.outputFormat(message, params, level.name, target.isDebug(), debugInfo);
@@ -139,13 +123,6 @@ Core.Log = {
 			outputFormat: outputFormat,
 			targets: []
 		};
-
-		var callbackLogs = function(source, methodName) {
-			return source.replace(new RegExp("([^\\.\\w]\\s*)" + level + "\\s*\\(", "g"), function(whole, prefix) {
-				return prefix + "Core.Log._log(\"" + level + "\", this, \"" + methodName + "\", ";
-			});
-		};
-		Core.registerMethodEnrichment(callbackLogs);
 	},
 	
 	/**
@@ -159,4 +136,8 @@ Core.Log = {
 			level = this._logs[level];
 		level.targets.push(target);
 	}
+};
+
+_log = function() {
+	return Core.Log._log.apply(Core.Log, arguments);
 };

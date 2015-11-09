@@ -674,7 +674,7 @@ Ea.Element.Classifier = extend(Ea.Element.Type, {
 	 * Classifier attributes collection
 	 * 
 	 * @private
-	 * @type {Ea.Collection._Base<Ea.Attribute.Attribute>}
+	 * @type {Ea.Collection._Base<Ea.Attribute._Base>}
 	 */
 	_attributes: {api: "Attributes"},
 	
