@@ -65,3 +65,5 @@ Core.Target.AbstractTarget = define({
 		return this._type == Core.Target.Type.DEBUG;
 	}
 });
+
+Core.Target.Blind = extend(Core.Target.AbstractTarget);

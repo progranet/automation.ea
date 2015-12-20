@@ -22,23 +22,29 @@ Script = {
 		this.script = WScript;
 	},
 	
-	echo: function(message) {
+	info: function(message) {
 		this.script.Echo(message);
-	}
-		
+		//console.log(message);
+	},
+	
+	error: function(message) {
+		this.script.StdErr.WriteLine(message);
+	}	
 };
 
 Script.Target = extend(Core.Target.AbstractTarget, {
 	
 	_name: null,
 	
-	create: function(name, debug) {
+	create: function(debug, params) {
 		_super.create(debug);
-		this._name = name;
+		params = params || {};
+		this._name = params.name;
 	},
 	
 	write: function(message) {
-		//Script.echo(message);
-		WScript.StdErr.WriteLine(message);
+		if (this._type == Core.Target.Type.TREE)
+			message = message.replace(/\|/g, " \u2502").replace(/\u2502\-\+/, "\u251C\u2500\u25D8").replace(/\-\+/, " \u25D8");
+		Script.info(message);
 	}
 });

@@ -64,8 +64,7 @@ Ea = {
 	/**
 	 * Initializes default EA application
 	 * 
-	 * @param {Core.Target.AbstractTarget} targetClass Target for logger mechanism
-	 * @param {Object} params
+	 * @param {Object} params targetClass:Core.Target.AbstractTarget Target for logger
 	 * @type {Ea.Application._Base}
 	 */
 	initializeDefaultApplication: function(params) {
@@ -83,13 +82,14 @@ Ea = {
 	/**
 	 * @private
 	 * @param {Core.Target.AbstractTarget} targetClass
+	 * @param {Ea.Repository._Base} repository
 	 */
 	_initializeLogs: function(targetClass, repository) {
 		
 		var systemTarget = new targetClass(Core.Target.Type.DEBUG, {name: "System", repository: repository});
 		var scriptTarget = new targetClass(Core.Target.Type.INFO, {name: "Script", repository: repository});
 		var treeTarget = new targetClass(Core.Target.Type.TREE, {name: "Script", repository: repository});
-		var blindTarget = new Core.Target.AbstractTarget(Core.Target.Type.BLIND);
+		var blindTarget = new Core.Target.Blind(Core.Target.Type.BLIND);
 		
 		Core.Log.registerTarget("info", scriptTarget);
 		Core.Log.registerTarget("error", systemTarget);

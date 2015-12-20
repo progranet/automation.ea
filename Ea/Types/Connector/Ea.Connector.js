@@ -413,6 +413,8 @@ Ea.Connector._Base = extend(Ea.Types.Namespace, {
 
 Ea.Connector.Association = extend(Ea.Connector._Base, {});
 
+Ea.Connector.Deployment = extend(Ea.Connector._Base, {});
+
 Ea.Connector.Aggregation = extend(Ea.Connector._Base, {
 	
 	/**

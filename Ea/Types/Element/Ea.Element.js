@@ -600,7 +600,14 @@ Ea.Element._Base = extend(Ea.Types.Namespace, {
 	 * @readOnly
 	 * @type {Ea._Base.DataTypes.Appearance}
 	 */
-	appearance: {}
+	appearance: {},
+		
+	/**
+	 * State
+	 *
+	 * @private
+	 */
+	_state: {api: "RunState"}
 });
 
 

@@ -642,7 +642,7 @@ Html.XTemplate = extend(Core.Types.Named, {
 							throw new Error("Unsupported processing instruction: " + name);
 						}
 					});
-					if (rest)
+					if (rest && rest !== "undefined") // TODO: WTF with Chakra?
 						throw new Error("Syntax error in processing instruction at: " + rest);
 				}
 				else {

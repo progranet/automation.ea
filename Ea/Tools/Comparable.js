@@ -90,37 +90,35 @@ Comparable.Object = define({
 		this.$_cache = {};
 
 		type.getProperties().forEach(function(property) {
+			
 			var getterName = property.name.replace(/^_+/g, "");
 			getterName = (property.private ? "_" : "") + (property.type == Boolean ? "is" : "get") + getterName.substring(0,1).toUpperCase() + getterName.substring(1);
-			var curValue = cur ? cur[getterName].call(cur) : null;
-			var oldValue = old ? old[getterName].call(old) : null;
-			if (property._isCollection) {
-				this[getterName] = function() {
-					if (!(getterName in this.$_cache)) {
-						var collectionType = property.key ? Comparable.Map : Comparable.Collection;
-						this.$_cache[getterName] = new collectionType(property.elementType, curValue || new Core.Types.Collection(), oldValue || new Core.Types.Collection(), curApp, oldApp, {key: property.key});
-					}
+			
+			this[getterName] = function() {
+				
+				if (getterName in this.$_cache)
 					return this.$_cache[getterName];
-				};
-			}
-			else {
-				if (property.type == String || property.type == Number || property.type == Boolean) {
-					this[getterName] = function() {
-						if (!(getterName in this.$_cache)) {
-							this.$_cache[getterName] = Comparable.compareString(curValue, oldValue);
-						}
-						return this.$_cache[getterName];
-					};
+				
+				var isCollection = property._isCollection;
+				var curValue = cur ? cur[getterName].call(cur) : (isCollection ? new Core.Types.Collection() : null);
+				var oldValue = old ? old[getterName].call(old) : (isCollection ? new Core.Types.Collection() : null);
+				var value;
+				if (isCollection) {
+					var collectionType = property.key ? Comparable.Map : Comparable.Collection;
+					value = new collectionType(property.elementType, curValue, oldValue, curApp, oldApp, {key: property.key});
 				}
 				else {
-					this[getterName] = function() {
-						if (!(getterName in this.$_cache)) {
-							this.$_cache[getterName] = new Comparable.Object(property.type, curValue, oldValue, curApp, oldApp);
-						}
-						return this.$_cache[getterName];
-					};
+					if (property.type == String || property.type == Number || property.type == Boolean) {
+						value = Comparable.compareString(curValue, oldValue);
+					}
+					else {
+						value = (curValue || oldValue) ? new Comparable.Object(property.type, curValue, oldValue, curApp, oldApp) : null;
+					}
 				}
-			}
+				this.$_cache[getterName] = value;
+				return value;
+			};
+			
 		});
 	},
 	
@@ -143,8 +141,8 @@ Comparable.Object = define({
 	},
 	
 	$getResult: function(fn, type) {
-		var curValue = this.$cur ? fn.call(this.$cur) : null;
-		var oldValue = this.$old ? fn.call(this.$old) : null;
+		var curValue = this.$cur ? fn.call(this.$cur).filter(type) : null;
+		var oldValue = this.$old ? fn.call(this.$old).filter(type) : null;
 		var comparable;
 		if (Core.Types.Collection.isInstance(curValue) || Core.Types.Collection.isInstance(oldValue)) {
 			comparable = new Comparable.Collection(type, curValue || new Core.Types.Collection(), oldValue || new Core.Types.Collection(), this.$curApp, this.$oldApp);

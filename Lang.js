@@ -50,3 +50,10 @@ String.prototype.lpad = function(pad, length) {
         context = pad + context;
     return context;
 };
+
+chakra = {};
+
+var htmlfile = new ActiveXObject('htmlfile');
+htmlfile.write('<meta http-equiv="x-ua-compatible" content="IE=12" />');
+chakra.Object = htmlfile.parentWindow.Object;
+htmlfile.close();
